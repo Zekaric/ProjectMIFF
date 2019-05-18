@@ -146,7 +146,8 @@ function UpdateToc()
     <td></td>
     <td>
      This document is licensed under Creative Commons Attribution-NoDerivs. <a href="https://creativecommons.org/licenses/by-nd/4.0/">
- (CC BY-ND)</a>
+      (CC BY-ND)
+     </a>
     </td>
    </tr>
   </table>
@@ -166,20 +167,20 @@ function UpdateToc()
   <!--==========================================================================================-->
   <script>HeaderAdd(2, "about", "Discussion");</script>
   <p>
-   What is the purpose of M.I.F.F.? (MIFF from now on.)  MIFF is intended to be a file format for 
+   What is the purpose of M.I.F.F.? (MIFF from now on.)  MIFF is intended to be a file format for
    exporting and importing data from one Mining software package to another Mining software package.
   </p>
   <p>
-   Users of software packages are becoming increasingly annoyed at the lack of interoperability 
-   between software packages.  Currently each software package attempts to do its best at 
+   Users of software packages are becoming increasingly annoyed at the lack of interoperability
+   between software packages.  Currently each software package attempts to do its best at
    supporting competitor file formats but there are often a lot of loss of data or, as data formats
-   in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to 
+   in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to
    very basic, raw ASCII files, like csv files, which are often lacking compared to the original
-   data.  Often users will need to massage this raw data in order to import it into their target 
-   software package.  
+   data.  Often users will need to massage this raw data in order to import it into their target
+   software package.
   </p>
   <p>
-   A lot of the client's time is lost with all this work.  The idea with an interchange format is 
+   A lot of the client's time is lost with all this work.  The idea with an interchange format is
    to remove some of the pain of this data transfer task and put more of the pain on the software
    vendors of doing the hard part of reading in the data to their expectations.  The software users
    will not need to know some of the intricacies of the data or task.
@@ -193,7 +194,7 @@ function UpdateToc()
    The main goal of this format is to be specifically an interchange format.  It is not intended
    to be a native format for any software package.  The focus is to make it easy for the developers
    from any software package to export their data to this interchange format and, without too much
-   difficulty, to import other vendor's data.  
+   difficulty, to import other vendor's data.
   </p>
   <p>
    For the users of the software packages, the process of moving data from package to package will
@@ -205,13 +206,13 @@ function UpdateToc()
   <ul>
    <li>
     Simple.  The format should be simple for the developers to export their data.  Import may still
-    be challenging because of the differences between software packages but the format to import 
+    be challenging because of the differences between software packages but the format to import
     the data should not impose too much pain for the developers either.  The simplicity should go a
     long way in getting the format adopted and implemented.
    </li>
    <li>
-    Inclusive.  All data from all venders should be representable with the least amount of 
-    compromizes in the data being exported.  
+    Inclusive.  All data from all venders should be representable with the least amount of
+    compromizes in the data being exported.
    </li>
    <li>
     Brief.  The format should not produce unnecessary waste.  The data in some cases will be quite
@@ -221,7 +222,7 @@ function UpdateToc()
    <li>
     Flexibility.  The format needs to be able to accomodate change or vendor specific data.  A few
     software vendors started life in the 70's with time shared machines.  Over the years the amount
-    of data and the types of data the clients want to maintain has changed and grown.  A format 
+    of data and the types of data the clients want to maintain has changed and grown.  A format
     needs to try its best to keep up without importers and exporters to be completely remade.
    </li>
   </ul>
@@ -231,32 +232,32 @@ function UpdateToc()
   <script>HeaderAdd(2, "disclosure", "Disclosure");</script>
 
   <p>
-   As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon 
-   (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners 
-   of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of 
-   survey equipment and related material; as well as other mine related hardware and software 
-   products.  
+   As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon
+   (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners
+   of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of
+   survey equipment and related material; as well as other mine related hardware and software
+   products.
   </p>
   <p>
-   This format is currently not sanctioned by any software vendor or even by Hexagon.  This was 
-   something spurned by recent efforts being made by Global Mining Guidelines (GMG), with Open 
-   Mining Format (OMF), which seems to have the backing of some big players in the industry.  My 
-   issue with OMF for now is that they only have a Python library that implements the format 
+   This format is currently not sanctioned by any software vendor or even by Hexagon.  This was
+   something spurned by recent efforts being made by Global Mining Guidelines (GMG), with Open
+   Mining Format (OMF), which seems to have the backing of some big players in the industry.  My
+   issue with OMF for now is that they only have a Python library that implements the format
    available publically.  They may have a specification document somewhere but currently it is not
    available, or at least I cannot find it anywhere in the 'open'.  Plus this format seems to be
-   strictly binary, which is not entirely a bad idea considering the data that needs to be passed 
+   strictly binary, which is not entirely a bad idea considering the data that needs to be passed
    around, but binary formats can be very fussy.  And inspecting their sample OMF file, it does not
    look like something that is easily reverse engineered.
   </p>
   <p>
    Having said that, I thought I would try my hand at defining a format what I think would be good
-   as an interchange format.  I am trying to write MIFF independent of any software package.  
-   However there may be some unintended bias as I am most familiar with MinePlan 3D I have worked 
+   as an interchange format.  I am trying to write MIFF independent of any software package.
+   However there may be some unintended bias as I am most familiar with MinePlan 3D I have worked
    on.  I do intend to include other software package requirements as best as I understand them.
   </p>
   <p>
    If anyone is interested in educating me on some features they would like to see with respect
-   to their software package of choice I would love to hear from you.  You can reach me at these 
+   to their software package of choice I would love to hear from you.  You can reach me at these
    two email addresses.
   </p>
   <p>
@@ -267,66 +268,113 @@ function UpdateToc()
   <!--##########################################################################################-->
   <!--##########################################################################################-->
   <!--##########################################################################################-->
-  <script>HeaderAdd(1, "format", "MIFF Format");</script>
+  <script>HeaderAdd(1, "format", "MIFF Base Format");</script>
 
   <p>
-   There are two versions of the format.  A Text file and a Binary file version.  They will both 
-   contain exactly the same data and be exactly the same in feature set.  The Binary file may just 
-   have the advantage of being slightly more accurate, possibly slightly more compact and possibly 
+   There are two versions of the format.  A Text file and a Binary file version.  They will both
+   contain exactly the same data and be exactly the same in feature set.  The Binary file may just
+   have the advantage of being slightly more accurate, possibly slightly more compact and possibly
    slightly faster.
   </p>
   <p>
-   At the low level, a MIFF format is just a collection of key value pairs.  Values can be a 
+   At the low level, a MIFF format is just a collection of key value pairs.  Values can be a
    collection of further key value pairs.  Meaning nesting can be possible.  Very similar to XML.
   </p>
+  <p>
+   The intent on reading or writing these files is to pass over them once, twice at most, but for
+   the most part a one pass over the contents should be enough to read in the data.  So there is
+   not a focus on making the file random accessable or rewindable.
+  </p>
+  <p>
+   Common to both styles, any mutlibyte data that is encode or stored as a binary byte sequence
+   will be in network (big endian) order.
+  </p>
 
-  <script>HeaderAdd(2, "text", "MIFF Text Format");</script>
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "header", "File Header");</script>
 
   <p>
-   The text format is a UTF8 text file.  UTF8 is the 1 byte UNICODE format for text.  The format 
+   There will always be a file header so that you can be sure the file you recieved is actually a
+   MIFF file and not some other file.
+  </p>
+
+  <pre>
+"MIFF   1TXT\n"
+
+or 
+
+"MIFF   1BIN\n"
+</pre>
+
+  <p>
+   "MIFF" indicates the base file format type.
+  </p>
+
+  <p>
+   "&nbsp;&nbsp;&nbsp;1" indicates the base file format version.  Currently at version 1.  We will only use whole
+   numbers instead of the usual XX.XX.XX.XX versioning of software.
+  </p>
+
+  <p>
+   "TXT\n" and "BIN\n" indicate the content organization.  TXT for text, and BIN for binary.
+  </p>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "text", "Text");</script>
+
+  <p>
+   The text format is a UTF8 text file.  UTF8 is the 1 byte UNICODE format for text.  The format
    only uses the ASCII characters only (first 128 UNICODE character codes) for the format.
   </p>
   <p>
-   I did not take XML as a format because of XML is too verbose.  JSON is very flexible but I also
-   find it can be easily abused and still unnecessarily verbose.  Better than XML but still 
-   unacceptable in my opinion.  Considering the data, I do not want a format that would cause too 
-   much data bloat.  There will always be some bloat happening but it should be mitigated in my 
-   opinion.
+   The format is somewhat human readable, or somewhat text editor friendly but it really is not
+   meant to be human friendly.  What I mean is that you will be able to look at the format in a
+   text editor (if the text editor is capable) and if you know this format to a certain degree, you
+   will understand what you are seeing, but the format is not intended to be pretty.
   </p>
   <p>
-   All lines are terminated with a UNIX '\n'.  NOT an MSDOS \r\n or a MAC \n\r ending.  
+   The format does not adhere to any line length limit.  So if you are using a text editor that
+   does have line length limits you may end up corrupting the file or may not be seeing the whole
+   file.
+  </p>
+  <p>
+   All lines are terminated with a UNIX '\n'.  NOT an MSDOS \r\n or a MAC \n\r ending.
   </p>
 
+  <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textKeyValue", "Key Value Pair");</script>
 
   <pre>
 [key] [value header] [value]\n
 
-[key] [value header]\n
-[value]
+[key] [value header] ...\n
+[value]\n
+[value]\n
+[value]\n
 ...
-\n
 </pre>
 
   <p>
-   Keys are always a single word.  There can be leading spaces before the key but these are 
-   ignored.  There has to be at least one white space between key and value header, and at least
-   one white space between value header and the value.  There can be more than one white space 
-   character but all this extra white space is ignored.  
+   Keys are always a single word and are limited to 127 characters.  There can be leading spaces 
+   before the key but these are ignored.  There has to be at least one white space between key and 
+   value header, and at least one white space between value header and the value.  There can be 
+   more than one white space character but all this extra white space is ignored.
   </p>
   <p>
-   The first key value pair fits on a single line.  The second key value pair is for when values 
-   will span multiple lines.  A multi line key value will terminate with a blank line.  You will
-   need multiple blank lines to terminate nested multiline key values.
+   The first key value pair fits on a single line.  The second key value pair is for when values
+   will span multiple lines.  Multiline key values are limited to certain cases.
   </p>
   <p>
-   Values depend on the what the key is suppose to define.  
+   Values depend on the what the value header specifies.
   </p>
 
+  <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textValue", "Value");</script>
 
   <p>
-   There are quite a few different value types and organizations.  Each value is prepended with 
+   There are quite a few different value types and organizations.  Each value is prepended with
    a header explaining the data you will be reading.
   </p>
 
@@ -335,11 +383,11 @@ function UpdateToc()
   </p>
 
   <pre>
-[type flag][array flag][encoding flag] [array count] [compressed size]
+[value header] => [type flag][array and encoding flag] [array count] [compressed size]
 
 [type flag] is one of:
-=  - key value dictionary, no other flags.
-"" - string (UTF8) data.
+=  - key value block, no other flags.  See Key Value Block below.
+"" - string (UTF8) data.  See String Encoding below.
 i1 - integer of 1 byte
 i2 -            2
 i4 -            4
@@ -354,7 +402,7 @@ p4 - 2d point using r4.
 p8 -                r8.
 P4 - 3d point using r4.
 P8 -                r8.
-m4 - 3x3 matrix using r4.  Value will always be multiline.
+m4 - 3x3 matrix using r4.  
 m8 -                  r8.
 M4 - 4x4 matrix using r4.
 M8 -                  r8.
@@ -362,10 +410,14 @@ c3 - rgb  color using n1.
 c4 - rgba color using n1.
 C3 - rgb  color using r4.
 C4 - rgba color using r4.
-g3 - graphic (image) using c3.  Value will always be multiline.
+g3 - graphic (image) using c3.  See Graphic Encoding below.
 g4 -                       c4.
 G3 - graphic         using C3.
 G4 -                       C4.
+gp - graphic as a PNG file.     Always in base64 encoding.
+gj - graphic as a JPG file.     Always in base64 encoding.
+gJ - graphic as a JPG2000 file. Always in base64 encoding.
+gl - graphic as a link to a file.
 az - azimuth (strike) using r4, azimuth in degrees
 ad - dip direction    using r4, dip direction in degrees
 Ad - azimuth and dip  using r4, azimuth in degrees, dip in degrees
@@ -374,46 +426,187 @@ A/ -                                                       ratio 1:XXX
 dd - dip only         using r4, dip in degrees
 d% -                                   percent
 d/ -                                   ratio 1:XXX
-cs - coordinate system information
+bn - binary data. See Binary Blob Encoding below.
 
-[array flag] is one of:
-[empty] - default, single data point.
-a       - array of data points.  [array count] will follow.  Value will always be multiline.
-
-[encoding flag] needs to be paired with [array flag] a or with g and G options,
-is one of:
-[empty] - default, UTF8 representation.
-x       - hexidecimal encoded, multibyte data in network order.
-u       - base64 encoded, multibyte data in network order.
-z       - zlib compressed, base64 encoded, multibyte data in network order.  
-          [compressed size] will follow.
+[array and encoding flag] is one of:
+t       - Single data point.    Readable text encoding.
+T       - Array of data points.                                   [array count] will follow.
+e       - Single data point.    Base64 encoded.                   
+E       - Array of data points.                                   [array count] will follow. 
+z       - Single data point.    Zlib compressed, base64 encoded.                              [compressed size] will follow.
+Z       - Array of data points.                                   [array count] will follow.  [compressed size] will follow.
 
 Examples: (adding \n to indicate the necessity of this line.)
-image g3z 
-[base64 zip compressed byte stream]
-\n
 
-itemList =
-[more key values]
-...
-\n
+image g3z 64 64 [base64 zip compressed byte stream]
 
 count n1 128
 
-pointList P8a 5
-10.5 20 0
-20.5 20 0
-20.5 50 0
-10.5 50 0
-10.5 20 0
+string ""t This is a string.\nThis is really a multiline string!
+
+pointList P8T 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValueKeyValue", "Value: Key Value Block");</script>
+
+  <pre>
+itemList =
+ title  ""t M.I.F.F.: Mining Interchange File Format
+ author ""t Robbert de Groot
 \n
 </pre>
-  
+
+  <p>
+   Key value blocks are special.  This allows nesting of key value inside a keyed block.  The last
+   line of a block needs to be a comletely empty line with nothing on it to indicate that the block
+   is terminated.
+  </p>
+
+  <pre>
+level1 =
+ level2 =
+  level3 =
+   ...
+\n
+  anotherLevel3 =
+\n
+\n
+ anotherLevel2 =
+\n
+\n
+anotherLevel1 =
+...
+\n
+</pre>
+
+  <p>
+   Trying to make it clear how it works.  Again leading spaces before the key are unnecessary and
+   are only here for clarity.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValueString", "Value: String Encoding");</script>
+
+  <p>
+   String values are sort of the odd one out with all the other data types.  The other data types
+   have a known size based on their input while strings are variable in size.  So encoding them
+   will be slightly different.
+  </p>
+  <p>
+   All strings will have their cursor return and line feed characters replaced with \r and \n
+   respectively when written to the file.  If your string already has a \r and \n inside then the
+   slash will be escaped, \\r and \\n respectively, so that they do not get converted when reading 
+   them back in.
+  </p>
+  <p>
+   Even though \n is strictly followed for the TEXT format, I convert \r as well because text
+   editors will attempt to honor \r or complain about inconsistent line endings and mess things up.
+  </p>
+  <p>
+   If the string is base64 or Zlib compressed then this \r and \n encoding does not happen as it is
+   not needed.
+  </p>
+  <p>
+   Strings are placed on one line even if they define a multi-line string.  With the above
+   replacement of cursor return and line feeds this can be done.
+  </p>
+  <p>
+   Unlike other data types, strings using "t" or "T" encoding in the value header can not have
+   leading space in front of their value.
+  </p>
+  <p>
+   For a single string, the value will immediately start one space after the value header.
+  </p>
+  <p>
+   For an array of strings, the first character of the the next line will be the start of the
+   first string in the array.  The line after that will be the second string.  No lines will have
+   any leading spaces.  Any space visible is part of the string.
+  </p>
+
+  <pre>
+string ""t This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string
+
+stringList ""T 3
+This is string 1, line 1.\r\nThis is line 2.\r\n
+This is string 2.
+This is string 3.
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValueGraphic", "Value: Graphic Encoding");</script>
+
+  <p>
+   Graphic data is always raw bitmap data.  Not an encoded file.
+  </p>
+
+  <p>
+   All graphics will have a header of 2 unsigned integer values before the image data.  These
+   values indicate width and height.  These values are not included in the Base64 or Zlib
+   compression if compression is used.  However the image data will honor Base64 or Zlib
+   compression if used.
+  </p>
+  <p>
+   Array of graphics will place each graphic on a separate line similar to string encoding.
+  </p>
+
+  <pre>
+image g3t 2 2 0 0 0 64 64 64 128 128 128 192 192 192
+
+image g3T 2
+2 2 0 0 0 64 64 64 128 128 128 192 192 192
+2 2 64 64 64 128 128 128 192 192 192 255 255 255
+</pre>
+
+  <p>
+   For gp, gj, and gJ, the file that represents the image is copied verbatum into the value
+   portion.  There is never any compression applied.  The data is always base64 encoded.
+  </p>
+
+  <pre>
+imageFile gp [base64 encoding of a png file data]
+</pre>
+
+  <p>
+   For gl, there will be a path to an image.  This path should really be relative to the MIFF file
+   so that finding this file is easy.  However this is up to the software writing the MIFF file.
+  </p>
+
+  <pre>
+imageFileLink gl \path\to\image\file\image.png
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValueBinary", "Value: Binary Blob Encoding");</script>
+
+  <p>
+   Similar to graphic, we need a buffer size value before the buffer data.
+  </p>
+
+  <pre>
+image bnt 10 0 1 2 3 4 5 7 8 9
+
+image bnT 2
+10 0 1 2 3 4 5 6 7 8 9
+10 9 8 7 6 5 4 3 2 1 0
+</pre>
+
+  <p>
+   Binary blobs are dangerous and should be used sparingly.  If someone uses them then they should
+   be on the hook to define what the contents of the blob mean.  If they do not, then they are
+   being bad citizens and should be shamed!
+  </p>
+  <p>
+   However this is here as a catchall just in case.
+  </p>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
   <script>HeaderAdd(2, "bin", "Binary");</script>
 
   <p>
-   The Binary file will to match the Text file 1-1.  Everything within '[]' is a byte sequence of 
-   a known size.  Each byte seqence is separated here with a comma but is immediately following 
+   The Binary file will to match the Text file 1-1.  Everything within '[]' is a byte sequence of
+   a known size.  Each byte seqence is separated here with a comma but is immediately following
    after previous byte sequence.
   </p>
   <p>
@@ -421,19 +614,183 @@ pointList P8a 5
    sequence takes up.
   </p>
 
+  <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "binKeyValue", "Key Value Pair");</script>
 
   <pre>
-[1:key string length],[key string length:key],[4:value header],[4;array count],
-   [4:compress buffer size],[*:value]
+[1:key string length],[key string length:key],[3:value header],[4;array count],[4:compress buffer size],[*:value]
 </pre>
 
   <p>
-   The first byte defines how long the key string is (no null terminator).  Then 
+   [key string length] is the first byte sequence and defines how long the key string is in bytes.
+  </p>
+  <p>
+   [key] is the second byte sequence and defines the key of the key value pair.  The length of
+   which was defined by [key string lenght] above.  This means keys can not exceed 255 bytes.
+   No null terminator for the key.
+  </p>
+  <p>
+   [value header] is the third byte sequence and is 3 bytes following the [array and encoding flag]
+   as defined in the Text section above.
+  </p>
+  <p>
+   t, T, e, and E are all the same in binary mode.  The data is stored raw and no encoding is
+   actually done.  z and Z will apply Zlib compression to the binary data.
+  </p>
+  <p>
+   [array count] and [compress buffer size] are only present when certain value header conditions
+   are present.  Meaning [array count] byte sequence is only present when the value is an array of
+   values; [compress buffer size] is only present when the value is being compressed with zlib
+   compression routines.  If neither of these are present in the value header then these byte
+   sequences are not present.
+  </p>
+  <p>
+   Both [array count] and [compress buffer size] are 4 byte unsigned integers stored in network
+   order.
+  </p>
+  <p>
+   [value] field will vary wildly depending on the [value header], [array count], and [compress
+   buffer size] values.  But it will be a known size given that information.
   </p>
 
+  <pre>
+[value] 
+Type                                 Byte Count
+----------------------------------   ---------------------------
+=                                    See Key Value Block below.
+""                                   See String Encoding below.
+i1, n1                                 1 
+i2, n2                                 2
+c3                                     3
+c4, i4, n4, r4, az, ad, dd, d%, d/     4
+i8, n8, r8, p4, Ad, A%, A/             8
+c4, P4                                12
+p8                                    16
+P8                                    24
+C4                                    32
+m4                                    36
+M4                                    64
+m8                                    72
+M8                                   128
+g3, g4, G3, G4                       See Graphic Encoding below.
+</pre>
 
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "binValueKeyValue", "Value: Key Value Block");</script>
 
+  <p>
+   This indicates the start of a block.  There technically is not value.  The next byte after the
+   [value header] is the start of the first key in the block.
+  </p>
+  <p>
+   A block is terminated when the [key string length] is equal to 0.
+  </p>
+
+  <pre>
+[8],["itemList"],["=   "],
+[!0 key string length],...
+[!0 key string length],...
+[!0 key string length],...
+[0]
+</pre>
+
+  <p>
+   Hopefully the above explains it.  I have defined an "itemList" key which starts the key value
+   block.  If the next key value has a key string length that is > 0 then it is part of the
+   itemList key value block.  The last key string length is 0 which indicates that the block is
+   done.  Anything that follows the block is a new key value thing.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "binValueString", "Value: String Encoding");</script>
+
+  <p>
+   String encoding is simpler than in the text case.
+  </p>
+
+  <pre>
+[4:string length][string length:string]
+</pre>
+
+  <p>
+   Each string is prefixed with a [string length], the byte count of the UTF8 string.  Then you
+   just dump out the string in UTF8 format.
+  </p>
+  <p>
+   Array of strings will have as many of these pairs as found in the array.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "binValueGraphic", "Value: Graphic Encoding");</script>
+
+  <p>
+   For g3, g4, G3, and G4 the format is...
+  </p>
+
+  <pre>
+[4:width][4:height][width * height * size of [c3|c4|C3|C4]:graphic data]
+</pre>
+
+  <p>
+   Raw graphic data size will be (unsigned integer) width * (unsigned integer) height * size of the
+   color item.  It will be the compressed size in the file if compression is used but the raw size
+   in memory.
+  </p>
+
+  <p>
+   For gp, gj, and gJ the format is...
+  </p>
+
+  <pre>
+[4:image file size][image file size:binary buffer of the image file]
+</pre>
+
+  <p>
+   For gl the format is...
+  </p>
+
+  <pre>
+[4:string length][string length:file path]
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "binValueBinary", "Value: Binary Encoding");</script>
+
+  <p>
+   Binary encoding is like string encoding.  We need a byte count before the buffer data.
+  </p>
+
+  <pre>
+[4:byte count][byte count:buffer data]
+</pre>
+
+  <p>
+   Array of binaries will have as many of these pairs as found in the array.
+  </p>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "baseDesign", "Design Decisions:");</script>
+
+  <p>
+   <strong>Why not XML or JSON?</strong><br />
+   I did not take XML as a format because of XML is too verbose.  JSON is very flexible but I also
+   find it can be easily abused and still unnecessarily verbose.  Better than XML but still
+   unacceptable in my opinion.  Considering the data, I do not want a format that would cause too
+   much data bloat.  There will always be some bloat happening but it should be mitigated in my
+   opinion.
+  </p>
+
+  <p>
+   <strong>Why network order for multibyte data types?</strong><br />
+   In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows NT.  At
+   that time the architecture on some of the other platforms was Big Endian and we stored the data
+   in the native format of the machine.  However this lead to issues when users moved their data
+   over to a Little Endian machine which Windows has always been.  The problems that we faced were
+   trivial to solve but just very annoying and yet anothering thing to remember.  So standardizing
+   on one option is easier than having to support two options.  I go with simplicity, only one
+   option to rule them all!  It keeps things simpler.
+  </p>
 
 
 

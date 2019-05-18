@@ -1,0 +1,437 @@
+﻿<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="style_reset.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <title>G.R.L: Groot's Runtime Library</title>
+
+  <!-- Script for generation a table of contents -->
+  <script>
+const indexLEVEL     = 0;
+const indexTAG       = 1;
+const indexTITLE     = 2;
+const indexHAS_TYPE  = 3;
+const indexHAS_CONST = 4;
+const indexHAS_FUNC  = 5;
+const indexCOUNT     = 6;
+
+var tocIndex = 0;
+var toc      = [];
+
+// Display a header line and add to the table of contents (TOC)
+function HeaderAdd(level, tag, title)
+{
+   var record = [];
+   
+   record[indexLEVEL]     = level;
+   record[indexTAG]       = tag;
+   record[indexTITLE]     = title;
+   record[indexHAS_TYPE]  = false;
+   record[indexHAS_CONST] = false;
+   record[indexHAS_FUNC]  = false;
+
+   toc.push(record);
+
+   // Chrome complains about this document write.  I have looked for an alternative but everything
+   // I have found is utter rubbish.  HeaderAdd is only called on doc load.  This call is not a
+   // problem.
+   document.write("<h" + level + "><a name=\"" + tag + "\">" + title + "</a></h" + level + ">\n\n");
+}
+
+function HeaderAddType()
+{
+   var record = toc[toc.length - 1];
+
+   record[indexHAS_TYPE] = true;
+
+   document.write("<h2><a name=\"" + record[indexTAG] + "Type\">Type</a></h2>\n\n");
+}
+
+function HeaderAddConst()
+{
+   var record = toc[toc.length - 1];
+
+   record[indexHAS_CONST] = true;
+
+   document.write("<h2><a name=\"" + record[indexTAG] + "Const\">Constant</a></h2>\n\n");
+}
+
+function HeaderAddFunc()
+{
+   var record = toc[toc.length - 1];
+
+   record[indexHAS_FUNC] = true;
+
+   document.write("<h2><a name=\"" + record[indexTAG] + "Func\">Function</a></h2>\n\n");
+}
+
+// Update the TOC with all the header lines.
+function UpdateToc()
+{
+   var value;
+   var record;
+   var index;
+
+   value = "<table>\n";
+
+   for (; tocIndex < toc.length; tocIndex++)
+   {
+      record     = toc[tocIndex];
+    
+      value += "<tr>\n<td>";
+    
+      // Indenting
+      for (index = 1; index < record[0]; index++)
+      {
+         value += "&nbsp;&nbsp;&nbsp;&nbsp;";
+      }
+
+      value += "<a href=\"#" + record[1] + "\">" + record[2] + "</a></td>\n";
+      
+      value += "<td>";
+      if (record[indexHAS_TYPE] == 1)
+      {
+         value += "<a href=\"#" + record[1] + "Type\">Type</a>\n";
+      }
+      value += "</td>\n";
+      
+      value += "<td>";
+      if (record[indexHAS_CONST] == 1)
+      {
+         value += "<a href=\"#" + record[1] + "Const\">Constant</a>\n";
+      }
+      value += "</td>\n";
+
+      value += "<td>";
+      if (record[indexHAS_FUNC] == 1)
+      {
+         value += "<a href=\"#" + record[1] + "Func\">Function</a>\n";
+      }
+      value += "</td>\n";
+
+      value += "</td>\n";
+   }
+
+   value += "</table>\n";
+
+   document.getElementById("toc").innerHTML = value;
+}
+  </script>
+ </head>
+ <body>
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <h1 class="page">M.I.F.F.: Mining Interchange File Format</h1>
+
+   <table>
+    <tr>
+     <td><p>Author:</p></td>
+     <td>Robbert de Groot</td>
+    </tr>
+    <tr>
+     <td><p>Date:</p></td>
+     <td>2019-05-15</td>
+    </tr>
+    <tr>
+     <td><p>Copyright:</p></td>
+     <td>2019, Robbert de Groot</td>
+    </tr>
+    <tr>
+     <td><p>License:</p></td>
+     <td>The library will be BSD 2 clause.</td>
+    </tr>
+   </table>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <h2>Table Of Contents:</h2>
+
+  <p id="toc"></p>
+
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "MIFF", "M.I.F.F.");</script>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "about", "Discussion");</script>
+  <p>
+   What is the purpose of M.I.F.F.? (MIFF from now on.)  MIFF is intended to be a file format for 
+   exporting and importing data from one Mining software package to another Mining software package.
+  </p>
+  <p>
+   Users of software packages are becoming increasingly annoyed at the lack of interoperability 
+   between software packages.  Currently each software package attempts to do its best at 
+   supporting competitor file formats but there are often a lot of loss of data or, as data formats
+   in each package evolves, compatibility issues.  Often data needs to be dumped to very basic,
+   raw ASCII files, like csv files, which lack in understanding some of the nuances of the original
+   data.  Plus users of the packages need to massage this raw data in order to import it into their
+   target software package.  
+  </p>
+  <p>
+   A lot of time is lost with all this nonsense.  The idea with an interchange format is to remove
+   some of the pain the user is feeling with having to jump through hoops to get the data over and
+   to hopefully provide a very painless way to do the task with a format that all software vendors
+   can agree to as a inbetween format.
+  </p>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "goals", "Goals");</script>
+
+  <p>
+   The main goal of this format is to be specifically an interchange format.  It is not intended
+   to be a native format for any software package.  That might be a different project.  So the 
+   focus is to make it easy for the developers from any software package to export their data to
+   this interchange format and, without too much difficulty, to import other vendor's data via this
+   interchange format.  
+  </p>
+  <p>
+   For the users of the software packages the process of moving data from package to package will
+   be much easier and less painful as they will only have to export and import to just one type of
+   file instead of potentially a motely crue of file formats.
+  </p>
+
+  <ul>
+   <li>
+    Simple.  The format should be simple for the developers to export their data.  Import may still
+    be challenging because of the differences between software packages but the format to import the
+    data should not impose too much pain for the developers either.  The simplicity should go a long
+    way in getting the format adopted and implemented.
+   </li>
+   <li>
+    Inclusive.  All styles of data that all venders have that their users want exported/imported 
+    should be definable with the least amount of compromizes in the data being exported.  
+   </li>
+   <li>
+    Brief.  The format should not produce unnecessary waste.  The data in some cases will be quite
+    large so it should not bloat the data too much.
+   </li>
+   <li>
+    Flexibility.  The format needs to be able to accomodate change or vendor specific data.  A few
+    software vendors started life in the 70's with time shared machines.  Over the years the amount
+    of data and the types of data the clients want to maintain has changed and grown.  A format needs
+    to try its best to keep up without importers and exporteds to be completely remade.
+   </li>
+  </ul>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "disclosure", "Disclosure");</script>
+
+  <p>
+   As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon, the current
+   owners of MinePlan 3D and software (AKA MineSight; Previously known as MineSight Inc. or Mintec
+   Inc.); Leica Geosystems, the makers of survey equipment and related material; as well as othre mine
+   related hardware and software products.
+  </p>
+  <p>
+   This format is currently not sanctioned by any software vendor or even by Hexagon.  This was 
+   something I thought I write down and see where it goes.
+  </p>
+  <p> 
+   There is another effort being made by GMG, with Open Mining Format (OMF), which seems to have the
+   backing of some big players in the industry.  My gripe with that format for now is that they only
+   have a Python library that implements the format available publically.  That is it.  They may have
+   a specification document somewhere but currently it is not available.  Plus this format seems to be
+   strictly binary, which is not entirely a bad idea considering the data that needs to be passed 
+   around, but binary formats can be very fussy.
+  </p>
+  <p>
+   I am trying to write MIFF independent of any software package.  However there may be some 
+   unintended bias as I am most familiar with the package I have worked on for the last 25+ years.
+   I do intend to try to figure out and understand the various software package needs and try to 
+   address their needs as part of this effort.
+  </p>
+  <p>
+   If anyone is interested in educating me on some features they would like to see with respect
+   to their software package of choice I would love to hear from you.  You can reach me at these two
+   email addresses.
+  </p>
+  <p>
+   robbert.degroot@hexagon.com<br />
+   zekaric@gmail.com
+  </p>
+
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "Format", "MIFF Format");</script>
+
+  <p>
+   There are two versions of the format.  A UTF8 and a Binary version.  They will both contain
+   exactly the same data and be exactly the same in feature set.  Binary may just have the 
+   advantage of being slightly more accurate for real numbers and possibly slightly more compact.
+  </p>
+  <p>
+   For the most part a MIFF format is a collection of key value pairs.  Values can depend on what
+   it is that they are defining.  Values can be a collection of further key value pairs.  Meaning
+   nesting can be possible.  Very similar to XML.
+  </p>
+  <p>
+   A MIFF
+  </p>
+
+  <script>HeaderAdd(2, "utf", "UTF8");</script>
+
+  <p>
+   UTF8 is a unicode format so that unicode data strings are possible.  The format only uses the
+   ASCII (first 128 characters) set for the format.
+  </p>
+  <p>
+   I did not take XML as a format because of XML is verbose.  Considering the data I did not a 
+   format that would cause too much data bloat.  There will always be some bloat happening but
+   it should be mitigated in my opinion.
+  </p>
+  <p>
+   All lines are terminated with a UNIX '\n'.  NOT an MSDOS \r\n or a MAC \n\r ending.  
+  </p>
+
+  <script>HeaderAdd(3, "utfKeyValue", "Key Value Pair");</script>
+
+  <pre>
+[key] [value header] [value]\n
+
+[key] [value header]\n
+[value]
+...
+\n
+</pre>
+
+  <p>
+   Keys are always a single word.  There can be leading spaces before the key but these are ignored.
+   There has to be at least one space between key and value.  There can be more than one space but
+   all this space is ignored.  
+  </p>
+  <p>
+   The first key value pair fits on a single line.  The second key value is for when values will span
+   multiple lines.  A multi line key value will terminate with a blank line.  You will need multiple
+   blank lines to terminate nested multiline key values.
+  </p>
+  <p>
+   Values depend on the what the key is suppose to define.  
+  </p>
+
+  <script>HeaderAdd(3, "utfValue", "Value");</script>
+
+  <p>
+   There are quite a few different value types and organizations.  Each value is prepended with 
+   a header explaining the data you will be reading.
+  </p>
+
+  <p>
+   Value header is as follows.
+  </p>
+
+  <pre>
+[type flag][array flag][encoding flag] [array count] [compressed size]
+
+[type flag] is one of:
+=  - key value dictionary, no other flags.
+s. - string (UTF8) data.
+i1 - integer of 1 byte
+i2 -            2
+i4 -            4
+i8 -            8
+n1 - natural of 1 byte
+n2 -            2
+n4 -            4
+n8 -            8
+r4 - real of 4 bytes
+r8 -         8
+p4 - 2d point using r4.
+p8 -                r8.
+P4 - 3d point using r4.
+P8 -                r8.
+m4 - 3x3 matrix using r4.  Value will always be multiline.
+m8 -                  r8.
+M4 - 4x4 matrix using r4.
+M8 -                  r8.
+c3 - rgb color using n1.
+c4 - rgba color using n1.
+C3 - rgb color using r4.
+C4 - rgba color using r4.
+g3 - graphic using c3.  Value will always be multiline.
+g4 -               c4.
+G3 - graphic using C3.
+G4 -               C4.
+a. - azimuth only using r4, azimuth in degrees
+Ad - azimuth dip using r4, azimuth in degrees, dip in degrees
+A% -                                                  percent
+A/ -                                                  ratio 1:XXX
+dd - dip only using r4, dip in degrees
+d% -                           percent
+d/ -                           ratio 1:XXX
+cs - coordinate system information
+
+[array flag] is one of:
+[empty] - default, single data point.
+a       - array of data points.  [array count] will follow.
+
+[encoding flag] needs to be paired with [array flag] a or with g and G options,
+is one of:
+[empty] - default, UTF8 representation.
+x       - hexidecimal encoded, multibyte data in network order.
+u       - base64 encoded, multibyte data in network order.
+z       - zlib compressed, base64 encoded, multibyte data in networrk order.  
+          [compressed size] will follow.
+
+Examples: (adding \n to indicate the necessity of this line.)
+image g3z 
+[base64 zip compressed byte stream]
+\n
+
+itemList =
+[more key values]
+...
+\n
+
+count n1 128
+</pre>
+  
+  <script>HeaderAdd(2, "bin", "Binary");</script>
+
+  <p>
+   Binary will to match the UTF8 1-1.  Everything within '[]' is a byte sequence of a known
+   size separated by commas.  Each byte seqence is immediately after previous byte sequence.
+  </p>
+  <p>
+   A byte sequence is [[size]:[name]]
+  </p>
+
+  <pre>
+[size] is one of...
+n1 - a natural using 1 byte.
+n2 -                 2
+n4 -                 4
+n8 -                 8
+</pre>
+
+  <script>HeaderAdd(3, "binKeyValue", "Key Value Pair");</script>
+
+  <pre>
+[n1:key],[value header] [value]
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>UpdateToc();</script>
+
+ </body>
+</html>

@@ -1,0 +1,308 @@
+Mining Interchange File Format (MIFF)
+=====================================
+
+Discussion:
+-----------
+
+For a long time there has never been a common format for the various data that 
+mining companies need to import or export.  Everyone tries to support each 
+other's formats and do very poorly at such a job.  The goal here is to define
+a format or formats that can be used as an interchange for the various data
+that needs to be passed around.
+
+There is a group that is trying to acchieve a global interchange format but as
+far as I can see they are going about it in a different way and currently have
+not actually provided a 'spec' for what they have done already.
+
+The types of data that need to pass around.
+
+- Model files
+   - 3D Block Models (3DBM) (Simple plus various Sub-Blocked styles.)
+   - Gridded Seam Models (GSM) 
+   - Gridded Surface Files (GSF) 
+- Drillhole files
+   - Blast patterns
+   - Ring designs 
+   - Composite data
+   - Survey data
+   - etc.
+- Generic Geometry or Informational Data
+   - Points
+   - Polylines (open and closed)
+   - Surfaces (open and closed)
+   - Text
+   - Symbols
+   - Attribute information on the above.
+
+Survey data would fall under Generic Data.  
+
+The Format:
+-----------
+
+The Goals
+
+1. Be simple to write an importer.
+
+If the format is too complicated, no one will use it.  So the format needs to
+be simple and easy to write an importer and exporter.
+
+2. Be inclusive of all styles of data out there.
+
+If the format cannot handle any one of the Mine Software Packages data without
+them having to drop some critical data on the floor then the format will not
+be adopted by that company.  The writing out of their data to the format should
+be trivial for each company.  Reading could be a little tricky but that would
+be because each company has their own way of representing their data so there 
+will always be a reading hurdle to overcome.  Writing should not cause 
+problems.
+
+3. Be not too verbose.
+
+No need to be wasteful of space.  This is an interchange format and not a 
+format for storing your data natively.  There is nothing preventing you from
+doing that but I think that would not really work for anyone.
+
+4. Be flexible to change.
+
+As technology progresses, so does the desire to store more data.  I work for a
+company that started life in 1970.  The data that needed to be stored and 
+tracked in the 70s, 80, 90, 00s to today has changed a lot.  So this format
+needs to allow for new things to be added without causing importers and 
+exporters to be remade.
+
+5. Be ASCII/UTF8.
+
+It does not necessarily have to be human readable but it will help that it can
+be readable by anyone to figure out where imports or exports are going wrong.
+ASCII/UTF8 also makes it universal.  It may not be a fast format for 
+interchanging data but speed is not the goal.  See point 1.
+
+
+MIFF: Header 
+============
+
+I hate XML, even though it is well defined and used in a lot of places the 
+data we are having to store is a LOT.
+
+So an MIFF file simpler less verbose.
+
+The file always starts of with a version string.
+
+   miff   1utf\n
+
+or 
+ 
+   miff   1bin\n
+
+"miff" is a tag to say this is a MIFF file.
+
+"   1" is the version.  We just use whole numbers.  I do not see a real need to
+use .00.00.00 numbering.
+
+"utf\n" and "bin\n" round out the header.  
+"uft\n" will mean the rest of the file is a UTF8 MIFF file and human readable.  
+"bin\n" will mean the rest of the file is a binary MIFF file and not so human 
+readable.
+
+MIFF: utf
+---------
+
+The idea of MIFF is to keep it easy to read and write by a computer.  Only 
+somewhat easy to read for a human but this is only required for debugging.
+
+'\n' is UNIX line feed and not MSDOS \r\n or MAC \n\r.  We do not want 
+unnecessary bytes wasted.  Also including \n just to be obvious.
+
+All values can be preceeded with blank space but that will increase file size
+for readability.  Use caution.
+
+Sections:
+~~~~~~~~~
+
+[name]{\n
+...
+}\n
+
+A section will block of information into a logical chunk.  [name] to be 
+replaced with the name of the section.  Sections can be nested so the ending
+"}" needs to be matched with the equivalent "{".  
+
+We do not want to waste too many bytes so the terminal "}\n" does not have 
+space in front of it.  It can has space but it is not required.  
+
+The contents "..." can be indented but it is not required.  
+
+
+MIFF: bin (Binary)
+------------------
+
+Same as utf, trying to keep it as easy as possible to read and write by a 
+computer.  Only somewhate easy to read for a human in a hex editor.
+
+[[type][=value]:[name]] defines how many bytes or type of a binary block.
+
+types can be 
+- 'n' + '1'|'2'|'4'|'8' for natural (unsigned integer) values of 1, 2, 4, or 8 bytes
+  in size.  
+- i1, i2, i4, i8 for integer values of 1, 2, 4, or 8 bytes in size.
+- r4, r8 for real values of 4, or 8 bytes in size.
+- s1, s2, or s4 for utf8 string values where the 1, 2, or 4 means there is an
+  natural of that size preceeding the actual string contents to define how
+  many bytes are in the string. 
+- P4, or P8 define an east, north, z value
+- d, D, t, for date, date and time, and time.  Dates are YYYYMMDD in ASCII and
+  time is HHMMSS using 24 hour time Greenwich Mean Time zone.
+
+["string"] will indicate "string" will appear in the file as you see it here.
+No null termination.  It will be preceeded with an n1 to define the size of the
+string.  So all strings shown like this will be at max 256 in length.  In other
+words these are the same.
+
+   ["info"]
+
+   [n1=4], 'i', 'n', 'f', 'o'
+
+Where [n1] is 1 natural byte defining the count of letters.  In this case 4.
+
+MIFF: Information Block
+=======================
+
+Every MIFF file will have a common block and it will be the first block in the
+file.  This block will define the contents of the file.  The type of the file 
+will be based off of the file extension but details on that type will be 
+defined in the information block
+
+utf
+-------------------------------------------------------------------------------
+info{\n
+...
+}\n
+
+bin
+-------------------------------------------------------------------------------
+["info{"],...,["}"]
+
+
+MIFF: Information Block Contents
+--------------------------------
+
+utf
+-------------------------------------------------------------------------------
+company MIFF Specification Co.\n
+dateCreated 2019-05-15 14:40:00 PST\n
+author Robbert de Groot\n
+comment{\n
+Sample information block data.\n
+}\n
+
+bin
+-------------------------------------------------------------------------------
+["info{"],...,["}"]
+
+Where ... contains one or more of the following.
+
+["company"],     [n2], [<company name utf8>]
+["author"],      [n2], [<autor(s) utf8>]
+["dateCreated"], [d]
+["comment{"],    [n4], [<comment utf8>], ["}"]
+
+
+MIFF: Model
+===========
+
+File Extension:   .miffModel
+
+No point in trying to keep 3 letter extensions.  All major computers handle
+long file names now, might as well use it.
+
+If a miff file has this extension then the contents is a model of some sort.
+
+The model information block will defined the contents.
+
+MIFF: Model Information
+-----------------------
+
+The information block for model is the first block after the MIFF Information
+block and it is to define what the model looks like, its orientation, its data 
+contents, etc.
+
+   <infoModel>
+    <type         s="3dbm subBlock regular 5 5 3"/>
+    <origin       v="0.0  0.0  0.0"/>
+    <colInfo      s="dir 1.0  0.0  0.0 count 1200 length 20"/>
+    <rowInfo      s="dir 0.0  1.0  0.0 count 750  length 20"/>
+    <benInfo      s="dir 0.0  0.0 -1.0 count 400  length 5"/>
+    <itemList>
+     <item index="cu">
+      <nameLong>Copper</nameNice>
+      <nameShort>CU</nameCode>
+      <type>double</type>
+      <min>0.0</min>
+      <max>5.0</max>
+      <precision>0.1</precision>
+     </item>
+     ...
+    </itemList>
+   </infoModel>
+
+type defines what kind of model we are defining in this file.
+First word is one of "3dbm", "gsm", "gsf".
+What follows the first word are options of each.
+
+3dbm options:
+- "subBlock", the 3D block model is sub-blocked.
+   - "fixed colCount rowCount zCount", defines a fixed subdivision of the block.
+   - "octree levelCount", defines an octree subdivision of blocks.
+   - [to be filled out]
+- "varBench" indicates that bench heights can vary.  This will require defining
+  a bench lengths inside benInfo below.
+   <benInfo s="dir... count...>
+     <length d=10/> <!-- bench 1 -->
+     <length d=10/> <!-- bench 2 -->
+     <length d=15/> <!-- bench 3 -->
+     ...
+   </benInfo>
+   
+origin is the top most root corner for the model.  
+
+colInfo, rowInfo, and benInfo define how the blocks in the model are defined.
+- "dir [east] [north] [z]" defined the direction, from the origin block, of 
+  increasing block index.
+- "count [integer]" indicates how many blocks are in that direction.
+- "length [real]" indicates the side of the block in that direction.
+
+itemList defines the potential values stored in each block of the model.  
+
+For each "item" there is an "index" name.  This name is used when filling out
+the block and the value need not be at all related to the names of the item.
+It just needs to be unique compared to the other items in the item list.
+
+MIFF: Model Block Information
+-----------------------------
+
+The rest of the file is the actual block information.  There can be a 'default'
+block which will define the values of the blocks that are not explicitely 
+defined.  Not all blocks need to be defined if a default or uninitialized state
+of a block is ok.
+
+   <b s="default"><!-- define default values for items, optional -->
+   </b>
+   <b s="0 0 0"><!-- defining the values for block column 0, row 0, bench 0 -->
+    <cu v=1.01/>
+    <c% v=45.5/>
+    ...
+   </b>
+   ...
+
+Inside each block <b...> are the values of the items.
+
+The code value defined in the Model Information item list is being used here
+as the key.  "v=..." specifies the values.
+
+We are trying to not use too many characters here because a block model written
+out in ASCII/UTF8 will take up a lot of space.  But it will compress well.
+
+Not all items in the item list need to be defined here.  If there is no value
+and the item is missing from the block, then the value for that item should be
+what is defined in the default block or be defined as value being missing or 
+unset.

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style_reset.css">
   <link rel="stylesheet" type="text/css" href="style.css">
-  <title>M.I.F.F.: Mining Interchange File Format</title>
+  <title>M.I.F.F.: Mixed Information File Format</title>
 
   <!-- Script for generation a table of contents -->
   <script>
@@ -123,7 +123,7 @@ function UpdateToc()
   <!--##########################################################################################-->
   <!--##########################################################################################-->
   <!--##########################################################################################-->
-  <h1 class="page">M.I.F.F.: Mining Interchange File Format</h1>
+  <h1 class="page">M.I.F.F.: Mixed Information File Format</h1>
 
   <table>
    <tr>
@@ -168,16 +168,16 @@ function UpdateToc()
   <script>HeaderAdd(2, "about", "Discussion");</script>
   <p>
    What is the purpose of M.I.F.F.? (MIFF from now on.)  MIFF is intended to be a file format for
-   exporting and importing data from one Mining software package to another Mining software package.
+   exporting and importing data from one software package to another software package.
   </p>
   <p>
    Users of software packages are becoming increasingly annoyed at the lack of interoperability
    between software packages.  Currently each software package attempts to do its best at
-   supporting competitor file formats but there are often a lot of loss of data or, as data formats
+   supporting competitor file formats but there is often a lot of loss of data or, as data formats
    in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to
-   very basic, raw ASCII files, like csv files, which are often lacking compared to the original
-   data.  Often users will need to massage this raw data in order to import it into their target
-   software package.
+   formats that come 'close' but are not exact or down to very basic, raw ASCII files, like csv
+   files, which are often lacking compared to the original data.  Users will need to massage this
+   raw data in order to import it into their target software package.
   </p>
   <p>
    A lot of the client's time is lost with all this work.  The idea with an interchange format is
@@ -200,27 +200,27 @@ function UpdateToc()
    For the users of the software packages, the process of moving data from package to package will
    be much easier, less time consuming, and less problematic as they will only have to export and
    import to just one type of file instead of various file formats and more intimate knowledge of
-   the data transfer process.
+   the data transfer process specific to their software packages.
   </p>
 
   <ul>
    <li>
-    Simple.  The format should be simple for the developers to export their data.  Import may still
+    <strong>Simple</strong>.  The format should be simple for the developers to export their data.  Import may still
     be challenging because of the differences between software packages but the format to import
     the data should not impose too much pain for the developers either.  The simplicity should go a
     long way in getting the format adopted and implemented.
    </li>
    <li>
-    Inclusive.  All data from all venders should be representable with the least amount of
+    <strong>Inclusive</strong>.  All data from all venders should be representable with the least amount of
     compromizes in the data being exported.
    </li>
    <li>
-    Brief.  The format should not produce unnecessary waste.  The data in some cases will be quite
+    <strong>Brief</strong>.  The format should not produce unnecessary waste.  The data in some cases will be quite
     large so it should not bloat the data too much.  Meaning, file sizes should not become overly
     large.  However, because of point 1 there will always be some bloat.
    </li>
    <li>
-    Flexibility.  The format needs to be able to accomodate change or vendor specific data.  A few
+    <strong>Flexible</strong>.  The format needs to be able to accomodate change or vendor specific data.  A few
     software vendors started life in the 70's with time shared machines.  Over the years the amount
     of data and the types of data the clients want to maintain has changed and grown.  A format
     needs to try its best to keep up without importers and exporters to be completely remade.
@@ -268,22 +268,23 @@ function UpdateToc()
   <!--##########################################################################################-->
   <!--##########################################################################################-->
   <!--##########################################################################################-->
-  <script>HeaderAdd(1, "format", "MIFF Base Format");</script>
+  <script>HeaderAdd(1, "formatBase", "MIFF Format: Base");</script>
 
   <p>
-   There are two versions of the format.  A Text file and a Binary file version.  They will both
-   contain exactly the same data and be exactly the same in feature set.  The Binary file may just
-   have the advantage of being slightly more accurate, possibly slightly more compact and possibly
-   slightly faster.
+   There are two representations of the format.  A Text file and a Binary file representation.
+   They will both contain exactly the same data and be exactly the same in feature set.  The Binary
+   file may just have the advantage of being slightly more accurate, possibly slightly more compact
+   and possibly slightly faster.
   </p>
   <p>
    At the low level, a MIFF format is just a collection of key value pairs.  Values can be a
-   collection of further key value pairs.  Meaning nesting can be possible.  Very similar to XML.
+   collection of further key value pairs.  Meaning nesting can be possible.
   </p>
   <p>
-   The intent on reading or writing these files is to pass over them once, twice at most, but for
-   the most part a one pass over the contents should be enough to read in the data.  So there is
-   not a focus on making the file random accessable or rewindable.
+   The intent on reading these files is to make just one pass over them; twice at most, but for
+   the most part, one pass over the contents should be enough to read in the data.  So there is
+   not a focus on making the file random accessable or rewindable.  This format is not intended as
+   a substitute for native formats for any software package.
   </p>
   <p>
    Common to both styles, any mutlibyte data that is encode or stored as a binary byte sequence
@@ -312,12 +313,13 @@ or
   </p>
 
   <p>
-   "&nbsp;&nbsp;&nbsp;1" indicates the base file format version.  Currently at version 1.  We will only use whole
-   numbers instead of the usual XX.XX.XX.XX versioning of software.
+   "&nbsp;&nbsp;&nbsp;1" indicates the base file format version.  Currently at version 1.  This
+   will only use whole numbers instead of the usual XX.XX.XX.XX versioning of software.
   </p>
 
   <p>
-   "TXT\n" and "BIN\n" indicate the content organization.  TXT for text, and BIN for binary.
+   "TXT\n" and "BIN\n" indicate the content organization.  TXT for text, and BIN for binary.  \n
+   is a line feed character.
   </p>
 
   <!--==========================================================================================-->
@@ -326,7 +328,8 @@ or
 
   <p>
    The text format is a UTF8 text file.  UTF8 is the 1 byte UNICODE format for text.  The format
-   only uses the ASCII characters only (first 128 UNICODE character codes) for the format.
+   only uses the ASCII characters only (first 128 UNICODE character codes) for the format.  UTF8
+   mainly comes into play with the string data being stored.
   </p>
   <p>
    The format is somewhat human readable, or somewhat text editor friendly but it really is not
@@ -340,38 +343,109 @@ or
    file.
   </p>
   <p>
-   All lines are terminated with a UNIX '\n'.  NOT an MSDOS \r\n or a MAC \n\r ending.
+   All lines are terminated with a UNIX '\n'.  NOT an MSDOS \r\n or a MAC \n\r ending.  This is
+   a strict rule.  If the file ahs \r\n or \n\r line endings then it is not a MIFF file.  Shame
+   and shun the developer for not adhering to this format's rules.
+  </p>
+  <p>
+   '\r' (Cursor Return) should not appear anywhere in the format unless writted explicitely as '\',
+   'r'.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "textKeyValue", "Key Value Pair");</script>
+  <script>HeaderAdd(3, "textWhitespace", "Whitespace Characters");</script>
+  <p>
+   A whitespace character is any character that does not make a blemish on a piece of paper if
+   printed out; this includes control characters like bell, NULL, form feed, etc.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textSeparator", "Separator Characters");</script>
+  <p>
+   MIFF limits what white space characters can be used as separators of values.
+  </p>
 
   <pre>
-[key] [value header] [value]\n
-
-[key] [value header] ...\n
-[value]\n
-[value]\n
-[value]\n
-...
+' '    '\t'
+Space  Tab 
 </pre>
 
   <p>
-   Keys are always a single word and are limited to 127 characters.  There can be leading spaces 
-   before the key but these are ignored.  There has to be at least one white space between key and 
-   value header, and at least one white space between value header and the value.  There can be 
-   more than one white space character but all this extra white space is ignored.
-  </p>
-  <p>
-   The first key value pair fits on a single line.  The second key value pair is for when values
-   will span multiple lines.  Multiline key values are limited to certain cases.
-  </p>
-  <p>
-   Values depend on the what the value header specifies.
+   If you see any other whitespace characters used as a separator in the MIFF file then the file is
+   not MIFF.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "textValue", "Value");</script>
+  <script>HeaderAdd(3, "textPrintable", "Printable Characters");</script>
+  <p>
+   Just to be clear what a printable character is.  If you had a blank piece of paper with just one
+   character on it, if the character makes a mark, it is printable.  If it does not make a mark, it
+   is not printable (like spaces, control characters, etc.)
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textKeyValue", "Key Value Format");</script>
+
+  <pre>
+[key] [value header] [value]\n
+</pre>
+
+  <p>
+   There can be leading separators before the key but these will be ignored.
+  </p>
+  <p>
+   There has to be at least one separator between key and value header.
+  </p>
+  <p>
+   There has to be at least one separator between value header and the value.
+  </p>
+  <p>
+   Any extra separators in the line will be ignored.
+  </p>
+  <p>
+   To terminate the key value pair should be a single '\n' character.
+  </p>
+
+  <p>
+   To be clear...
+  </p>
+
+  <pre>
+Valid: spaces and tabs can be used to indent and separate parts.
+\t\t[key]\t[value header]\t\t\t[value]\n
+
+Invalid: Absolutely no \n anywhere before or within the key value line.  \n characters indicate a 
+termination of a kv block.  Discussed later in this document.
+\n\n\n[key]\n[value header]\n[value]\n
+ \n[key] [value header] [value]\n
+</pre>
+
+  <p>
+   There are cases where [value] will be on individual lines but this will be indicated below.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textKey", "Key");</script>
+
+  <p>
+   Keys are always a single string of characters and are limited to printable character in the
+   first 127 UNICODE code points.  Meaning no whitespace of any kind inside a key.
+  </p>
+
+  <pre>
+Valid:
+12345
+;':][.,<>]'
+a_b_c
+$cost
+</pre>
+
+  <p>
+   The key can be nonsense or just a number.  As long it does not include any whitespace.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValueHeader", "Value Header");</script>
 
   <p>
    There are quite a few different value types and organizations.  Each value is prepended with
@@ -386,8 +460,9 @@ or
 [value header] => [type flag][array and encoding flag] [array count] [compressed size]
 
 [type flag] is one of:
-kv - key value block, no other flags.  See Key Value Block below.
-"" - string (UTF8) data.  See String Encoding below.
+kv - key value block.
+"" - string (UTF8) data.
+bo - boolean value. 
 i1 - integer of 1 byte
 i2 -            2
 i4 -            4
@@ -398,25 +473,33 @@ n4 -            4
 n8 -            8
 r4 - real    of 4 bytes
 r8 -            8
-p4 - 2d point using r4.
-p8 -                r8.
-P4 - 3d point using r4.
-P8 -                r8.
-m4 - 3x3 matrix using r4.  
-m8 -                  r8.
-M4 - 4x4 matrix using r4.
-M8 -                  r8.
+pr - 2d point using r4.
+pR -                r8.
+Pr - 3d point using r4.
+PR -                r8.
+pi - 2d point using i4.
+pI -                i8.
+Pi - 3d point using i4.
+PI -                i8.
+pn - 2d point using n4.
+pN -                n8.
+Pn - 3d point using n4.
+PN -                n8.
+mr - 3x3 matrix using r4.  
+mR -                  r8.
+Mr - 4x4 matrix using r4.
+MR -                  r8.
 c3 - rgb  color using n1.
 c4 - rgba color using n1.
 C3 - rgb  color using r4.
 C4 - rgba color using r4.
-g3 - graphic (image) using c3.  See Graphic Encoding below.
+g3 - graphic (image) using c3.
 g4 -                       c4.
 G3 - graphic         using C3.
 G4 -                       C4.
-gp - graphic as a PNG file.     Always in base64 encoding.
-gj - graphic as a JPG file.     Always in base64 encoding.
-gJ - graphic as a JPG2000 file. Always in base64 encoding.
+gp - graphic as a PNG file.     
+gj - graphic as a JPG file.     
+gJ - graphic as a JPG2000 file. 
 gl - graphic as a link to a file.
 az - azimuth (strike) using r4, azimuth in degrees
 ad - dip direction    using r4, dip direction in degrees
@@ -426,66 +509,184 @@ A/ -                                                       ratio 1:XXX
 dd - dip only         using r4, dip in degrees
 d% -                                   percent
 d/ -                                   ratio 1:XXX
-td - time: date only.  YYYY-MM-DD format in text.  [n2] for year, [n1] for month, and [n1] for day in binary.
-tt - time: time only.  HH:MM:SS format in text (GMT always).  [n1] for hour, [n1] for minute, and [n1] for second in binary.
-t* - time: date and time.  YYYY-MM-DD HH:MM:SS format in text (GMT always).  [n2][n1][n1][n1][n1][n1] format in binary
-bn - binary data. See Binary Blob Encoding below.
+td - time: date only.
+tt - time: time only.
+t* - time: date and time.
+bn - binary data.
 
 [array and encoding flag] is one of:
-t       - Single data point.    Readable text encoding.
-T       - Array of data points.                                   [array count] will follow.
-e       - Single data point.    Base64 encoded.                   
-E       - Array of data points.                                   [array count] will follow. 
-z       - Single data point.    Zlib compressed, base64 encoded.                              [compressed size] will follow.
-Z       - Array of data points.                                   [array count] will follow.  [compressed size] will follow.
+t  - Single data point.    Readable text encoding.
+T  - Array of data points.                                 
+e  - Single data point.    Base64 encoded.                 
+E  - Array of data points.                                 
+z  - Single data point.    Zlib compressed, base64 encoded.
+Z  - Array of data points.                                 
+
+[array count] will be an unsigned integer value indicating how many values in the array.  Only present when T, E, and Z are used.
+
+[compressed size] will be an unsigned integer value indicating the raw, in memory byte count of the compressed data.  Only present when z and Z are used.
+
+e, E, z, and Z will generate a base64 encoded string.  This string lives on one line, there are no \n embedded in the encoding.
 
 Examples: (adding \n to indicate the necessity of this line.)
 
-image g3z 64 64 [base64 zip compressed byte stream]
+image g3z 64 64 [base64 zip compressed byte stream]\n
 
-count n1 128
+count n1 128\n
 
-string ""t This is a string.\nThis is really a multiline string!
+string ""t This is a string.\nThis is really a multiline string!\n
 
-pointList P8T 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0
+pointList PRT 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0\n
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "textValue", "Value: Value");</script>
+
+  <p>
+   <strong>t encoding</strong>
+  </p>
+
+  <pre>
+Type                                                         Representation
+----------------------------------------------------------   ------------------------------------------
+kv                                                           See Key Value Block below.
+""                                                           See String Encoding below.
+bo                                                           't' for true, 'f' for false.
+i1, i2, i4, i8, n1, n2, n4, n8, r4, r8, az, ad, dd, d%, d/   1 number. 
+pr, pR, pi, pI, pn, pN, Ad, A%, A/                           2 numbers separated by at least one space. (east, north)
+Pr, PR, Pi, PI, Pn, PN, c3, C3                               3 numbers separated by at least one space. (east, north, z)
+mr, mR                                                       9 numbers separated by at least one space.  
+                                                             Columns written out left to right before moving to the next row.  
+                                                             Rows written out top to bottom.
+Mr, MR                                                       16 numbers separated by at least one space.
+                                                             Columns written out left to right before moving to the next row.  
+                                                             Rows written out top to bottom.
+c4, C4                                                       4 numbers separated by at least one space.
+g3, g4, G3, G4, gp, gj, gJ, gl                               See Graphic Encoding below.
+td                                                           "YYYY-MM-DD" format.
+tt                                                           "HH:MM:SS" format, GMT timezone.
+t*                                                           "YYYY-MM-DD HH:MM:SS" format.
+bn                                                           See Binary Encoding below.
+</pre>
+
+  <p>
+   For all the above.  If using 'T' encoding, the individual array elements are separated with at least one space.
+  </p>
+
+  <p>
+   <strong>e and z encoding</strong>
+  </p>
+  <p>
+   We are dumping the internal memory in binary form out to the Text MIFF in a binary encoded text
+   representation.
+  </p>
+
+  <pre>
+Type                             Representation
+------------------------------   ------------------------------------------
+bo                               1 for true, 0 for false.  1 bit in 1 byte.
+i1, n1                           1 byte. 
+i2, n2                           2 bytes. 
+i4, n4, r4, az, ad, dd, d%, d/   4 bytes. 
+i8, n8, r8                       8 bytes. 
+pr, pi, pn, Ad, A%, A/           2 x 4 bytes. (east, north)
+pR, pI, pN                       2 x 8 bytes.
+Pr, Pi, Pn,                      3 x 4 bytes. (east, north, z)
+PR, PI, PN                       3 x 8 bytes.
+mr                               9 x 4 bytes.  
+                                 Columns written out left to right before moving to the next row.  
+                                 Rows written out top to bottom.
+mR                               9 x 8 bytes.  
+                                 Columns written out left to right before moving to the next row.  
+                                 Rows written out top to bottom.
+Mr                               16 x 4 bytes.
+                                 Columns written out left to right before moving to the next row.  
+                                 Rows written out top to bottom.
+MR                               16 x 8 bytes.
+                                 Columns written out left to right before moving to the next row.  
+                                 Rows written out top to bottom.
+c3                               3 x 1 byte.  (r, g, b)
+C4                               3 x 4 bytes. 
+c4                               3 x 1 byte.  (r, g, b, a)
+C4                               4 x 4 bytes. 
+td                               2 bytes, 1 byte, 1 byte. (year, month, day)
+tt                               1 byte, 1 byte, 1 byte. (24 hour, minute, second)
+t*                               2 bytes, 1 byte, 1 byte, 1 byte, 1 byte, 1 byte. (year, month, day, 24 hour, minute, second)
+</pre>
+
+  <p>
+   Arrays of the above will just tacking on another bunch of bytes to as many iterations as found
+   in the array.
+  </p>
+  <p>
+   Array of bo is special, for efficiency it should be a bitmap.  
+  </p>
+  <pre>
+Byte 0                            Byte 1
++---+---+---+---+---+---+---+---+ +---  ...
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | | 8
++---+---+---+---+---+---+---+---+ +--- ...
+ 2^7 2^6 ...                 2^0   2^8 ...                   
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textValueKeyValue", "Value: Key Value Block");</script>
 
+  <p>
+   Key value blocks are special.  They are needed to allow nesting of key values.  The last line of
+   a block needs to be a comletely empty line with nothing on it but a \n to indicate that the
+   block is terminated.
+  </p>
+
   <pre>
-itemList kv
- title  ""t M.I.F.F.: Mining Interchange File Format
- author ""t Robbert de Groot
+docInfo kv\n
+ title  ""t M.I.F.F.: Mining Interchange File Format\n
+ author ""t Robbert de Groot\n
 \n
 </pre>
 
   <p>
-   Key value blocks are special.  This allows nesting of key value inside a keyed block.  The last
-   line of a block needs to be a comletely empty line with nothing on it to indicate that the block
-   is terminated.
+   Trying to make it clear how it works.  Leading separators before the key are unnecessary and are
+   only here for clarity.  Leading separators before a \n are allowed but are wasteful.
   </p>
 
   <pre>
-level1 kv
- level2 kv
-  level3 kv
+level1 kv\n
+ level2 kv\n
+  level3 kv\n
    ...
+  \n
+  anotherLevel3 kv\n
+  \n
+ \n
+ anotherLevel2 kv\n
+ \n
 \n
-  anotherLevel3 kv
-\n
-\n
- anotherLevel2 kv
-\n
-\n
-anotherLevel1 kv
+anotherLevel1 kv\n
 ...
 \n
 </pre>
 
   <p>
-   Trying to make it clear how it works.  Again leading spaces before the key are unnecessary and
-   are only here for clarity.
+   Key value bocks can have an 'a' array specifier and a array count.  This is useful for an array
+   of a complex type.
+  </p>
+
+  <pre>
+itemList kva 2\n
+item kv\n
+name ""t item A\n
+value i4t 0\n
+\n
+item kv\n
+name ""t item B\n
+value i4t 10\n
+\n
+\n
+</pre>
+
+  <p>
+   e, E, z, and Z are never used with kv.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
@@ -499,11 +700,11 @@ anotherLevel1 kv
   <p>
    All strings will have their cursor return and line feed characters replaced with \r and \n
    respectively when written to the file.  If your string already has a \r and \n inside then the
-   slash will be escaped, \\r and \\n respectively, so that they do not get converted when reading 
+   slash will be escaped, \\r and \\n respectively, so that they do not get converted when reading
    them back in.
   </p>
   <p>
-   Even though \n is strictly followed for the TEXT format, I convert \r as well because text
+   Even though \n is strictly followed for the text format, I convert \r as well because text
    editors will attempt to honor \r or complain about inconsistent line endings and mess things up.
   </p>
   <p>
@@ -515,11 +716,11 @@ anotherLevel1 kv
    replacement of cursor return and line feeds this can be done.
   </p>
   <p>
-   Unlike other data types, strings using "t" or "T" encoding in the value header can not have
-   leading space in front of their value.
+   Unlike other data types, strings using "t" encoding in the value header can not have leading
+   separators in front of their value.
   </p>
   <p>
-   For a single string, the value will immediately start one space after the value header.
+   For a single string, the value will immediately start one separator after the value header.
   </p>
   <p>
    For an array of strings, the first character of the the next line will be the start of the
@@ -528,76 +729,99 @@ anotherLevel1 kv
   </p>
 
   <pre>
-string ""t This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string
+string ""t This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string\n
 
-stringList ""T 3
-This is string 1, line 1.\r\nThis is line 2.\r\n
-This is string 2.
-This is string 3.
+stringList ""T 3\n
+This is string 1, line 1.\\r\\nThis is line 2.\\r\\n\n
+This is string 2.\n
+This is string 3.\n
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textValueGraphic", "Value: Graphic Encoding");</script>
 
   <p>
-   Graphic data is always raw bitmap data.  Not an encoded file.
+   <strong>g3, g4, G3, G4</strong>
   </p>
-
   <p>
-   All graphics will have a header of 2 unsigned integer values before the image data.  These
-   values indicate width and height.  These values are not included in the Base64 or Zlib
-   compression if compression is used.  However the image data will honor Base64 or Zlib
-   compression if used.
+   These graphic options will have a header of 2 unsigned integer values before the image data.  
+   These values indicate width and height of the graphic.  These values are not included in the 
+   Base64 or Zlib compression if compression is used.  However the image data will honor Base64 or 
+   Zlib compression if used.
+  </p>
+  <p>
+   Images are written out row by row, left to right, top to bottom.
   </p>
   <p>
    Array of graphics will place each graphic on a separate line similar to string encoding.
   </p>
 
   <pre>
-image g3t 2 2 0 0 0 64 64 64 128 128 128 192 192 192
+image g3t 2 2 0 0 0 64 64 64 128 128 128 192 192 192\n
 
-image g3T 2
-2 2 0 0 0 64 64 64 128 128 128 192 192 192
-2 2 64 64 64 128 128 128 192 192 192 255 255 255
+image g3T 2\n
+2 2 0 0 0 64 64 64 128 128 128 192 192 192\n
+2 2 64 64 64 128 128 128 192 192 192 255 255 255\n
 </pre>
 
   <p>
+   <strong>gp, gj, gJ</strong>
+  </p>
+
+  <p>
    For gp, gj, and gJ, the file that represents the image is copied verbatum into the value
-   portion.  There is never any compression applied.  The data is always base64 encoded.
+   portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z,
+   and Z are never used. 
   </p>
 
   <pre>
-imageFile gp [base64 encoding of a png file data]
+imageFile gpt [base64 encoding of a png file data]\n
+
+imageFileList gpT 2\n
+[base64 encoding of a png file 1 data]\n
+[base64 encoding of a png file 2 data]\n
 </pre>
+
+  <p>
+   <strong>gl</strong>
+  </p>
 
   <p>
    For gl, there will be a path to an image.  This path should really be relative to the MIFF file
    so that finding this file is easy.  However this is up to the software writing the MIFF file.
+   e, E, z, and Z are never used for this type.
   </p>
 
   <pre>
-imageFileLink gl \path\to\image\file\image.png
+imageFileLink glt \path\to\image\file\image.png\n
+
+imageFileLinkList glT 2\n
+\path\to\image\file\image1.png\n
+\path\to\image\file\image2.png\n
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "textValueBinary", "Value: Binary Blob Encoding");</script>
+  <script>HeaderAdd(3, "textValueBinary", "Value: Binary Encoding");</script>
 
   <p>
-   Similar to graphic, we need a buffer size value before the buffer data.
+   The binary data will have a header of 1 unsigned integer value before the binary data.  This 
+   value indicates the byte count of the binary data.  This byte count is not included when using 
+   Base64 ro Zlib compression.  However the binary data will honor Base64 and Zlib compression if
+   used.
   </p>
 
   <pre>
-image bnt 10 0 1 2 3 4 5 7 8 9
+image bnt 10 0 1 2 3 4 5 7 8 9\n
 
-image bnT 2
-10 0 1 2 3 4 5 6 7 8 9
-10 9 8 7 6 5 4 3 2 1 0
+image bnT 2\n
+10 0 1 2 3 4 5 6 7 8 9\n
+10 9 8 7 6 5 4 3 2 1 0\n
 </pre>
 
   <p>
-   Binary blobs are dangerous and should be used sparingly.  If someone uses them then they should
-   be on the hook to define what the contents of the blob mean.  If they do not, then they are
-   being bad citizens and should be shamed!
+   Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they 
+   should be on the hook to define what the contents of the blob mean.  If they do not, then they 
+   are being bad citizens and should be shamed!
   </p>
   <p>
    However this is here as a catchall just in case.
@@ -658,25 +882,26 @@ image bnT 2
 
   <pre>
 [value] 
-Type                                    Byte Count
-----------------------------------      ---------------------------
-=                                       See Key Value Block below.
-""                                      See String Encoding below.
-i1, n1                                    1 
-i2, n2                                    2
-c3, tt                                    3
-c4, i4, n4, r4, az, ad, dd, d%, d/, td    4
-t*                                        7
-i8, n8, r8, p4, Ad, A%, A/                8
-c4, P4                                   12
-p8                                       16
-P8                                       24
-C4                                       32
-m4                                       36
-M4                                       64
-m8                                       72
-M8                                      128
-g3, g4, G3, G4                          See Graphic Encoding below.
+Type                                              Byte Count
+----------------------------------                ---------------------------
+=                                                 See Key Value Block below.
+""                                                See String Encoding below.
+i1, n1                                              1 
+i2, n2                                              2
+c3, tt                                              3
+c4, i4, n4, r4, az, ad, dd, d%, d/, td              4
+t*                                                  7
+i8, n8, r8, pr, pi, pn, Ad, A%, A/                  8
+c4, Pr, Pi, Pn                                     12
+pR, pI, pN                                         16
+PR, PI, PN                                         24
+C4                                                 32
+mr                                                 36
+Mr                                                 64
+mR                                                 72
+MR                                                128
+g3, g4, G3, G4                                    See Graphic Encoding below.
+bn                                                See Binary Encoding below.
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
@@ -804,9 +1029,9 @@ g3, g4, G3, G4                          See Graphic Encoding below.
   <script>HeaderAdd(1, "formatMine", "MIFF Format: Mining");</script>
 
   <p>
-   The above section defines how the data is stored in the format.  But it does not address the 
+   The above section defines how the data is stored in the format.  But it does not address the
    meat of the mining data.  In actuality, the above is agnostic with regards to data to be stored.
-   It could be used for game information of anything else for that matter.  
+   It could be used for game information of anything else for that matter.
   </p>
   <p>
    From now on we will concenttrate on actual Mining field related data.
@@ -843,7 +1068,7 @@ g3, g4, G3, G4                          See Graphic Encoding below.
     </ul>
    </li>
    <li>
-    Drillhole 
+    Drillhole
     <ul>
      <li>Drillhole survery information.</li>
      <li>Drillhole assay information.</li>
@@ -964,7 +1189,7 @@ comment ""t [comments]
   <p>
    Seam Model is a bit fancier Block Model.  This format will be regular in the east and north
    directions of the model but there is not regular block size in the elevation direction.  In
-   short you will have 'seams' and each block in the east and north for a seam will have an 
+   short you will have 'seams' and each block in the east and north for a seam will have an
    elevation top and bottom to indicate the seam's limits and that defines the volume, as well as
    any other values that are found within that seam block.
   </p>
@@ -972,11 +1197,11 @@ comment ""t [comments]
    The last one, Surface Model, is much more limited than the other two as it just holds a stack
    of surfaces instead of defining any volume.  Like the Seam Model, Surface Models are regular
    in the east and north directions of the model but not regular in the elevation.  In short you
-   will have 'surfaces' and each block for a surface will have an elevation value as well as 
+   will have 'surfaces' and each block for a surface will have an elevation value as well as
    other values that are being tracked by the client at that surface block.
   </p>
   <p>
-   Even though only Block Models are sub-blocked, MIFF does not limit you to only allowing 
+   Even though only Block Models are sub-blocked, MIFF does not limit you to only allowing
    sub-blocks for Block Models.  The logic could be applied to the other two if the software
    does do this.  As far as I know, all software providers only do this for Block Models and not
    for Seam Models or Surface Models.
@@ -995,18 +1220,16 @@ InfoModel kv
  type ""t [model type]
  isSubblocked bot [true if subblocked]
  subblockType ""t [subblock type]
- subblockOption Pi [subblock fixed resolution]
- subblockOption pi [subblock row col resolution]
+ subblockOption Pn [subblock fixed resolution]
+ subblockOption pn [subblock row col resolution]
  subblockOption n4 [subblock octtree level count]
- origin P8t  [origin point]
- colVec P8t  [column vector, length if vector is the length of the block] 
- rowVec P8t  [row vector, length of the vector is the length of the block]
- benVec P8t  [bench vector, length of the vector id the length of the block] 
- colCount n4t [number of column blocks]
- rowCount n4t  [number of row blocks]
- benCount n4t  [number of bench blocks]
+ origin PRt  [origin point]
+ colVec PRt  [column vector, length if vector is the length of the block] 
+ rowVec PRt  [row vector, length of the vector is the length of the block]
+ benVec PRt  [bench vector, length of the vector id the length of the block] 
+ blockCount Pnt [number of column, row, bench blocks]
  isBenVariable bot [true if variable bench heights]
- benchList r4at [number of bench blocks] [length] [length] ...
+ benchList r4at [number of benchs] [length] [length] ...
  itemList kv [item list count]
   item kv 
    id ""t [item id]

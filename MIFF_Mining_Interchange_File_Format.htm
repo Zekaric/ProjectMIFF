@@ -386,7 +386,7 @@ or
 [value header] => [type flag][array and encoding flag] [array count] [compressed size]
 
 [type flag] is one of:
-=  - key value block, no other flags.  See Key Value Block below.
+kv - key value block, no other flags.  See Key Value Block below.
 "" - string (UTF8) data.  See String Encoding below.
 i1 - integer of 1 byte
 i2 -            2
@@ -426,6 +426,9 @@ A/ -                                                       ratio 1:XXX
 dd - dip only         using r4, dip in degrees
 d% -                                   percent
 d/ -                                   ratio 1:XXX
+td - time: date only.  YYYY-MM-DD format in text.  [n2] for year, [n1] for month, and [n1] for day in binary.
+tt - time: time only.  HH:MM:SS format in text (GMT always).  [n1] for hour, [n1] for minute, and [n1] for second in binary.
+t* - time: date and time.  YYYY-MM-DD HH:MM:SS format in text (GMT always).  [n2][n1][n1][n1][n1][n1] format in binary
 bn - binary data. See Binary Blob Encoding below.
 
 [array and encoding flag] is one of:
@@ -451,7 +454,7 @@ pointList P8T 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0
   <script>HeaderAdd(3, "textValueKeyValue", "Value: Key Value Block");</script>
 
   <pre>
-itemList =
+itemList kv
  title  ""t M.I.F.F.: Mining Interchange File Format
  author ""t Robbert de Groot
 \n
@@ -464,18 +467,18 @@ itemList =
   </p>
 
   <pre>
-level1 =
- level2 =
-  level3 =
+level1 kv
+ level2 kv
+  level3 kv
    ...
 \n
-  anotherLevel3 =
+  anotherLevel3 kv
 \n
 \n
- anotherLevel2 =
+ anotherLevel2 kv
 \n
 \n
-anotherLevel1 =
+anotherLevel1 kv
 ...
 \n
 </pre>
@@ -655,24 +658,25 @@ image bnT 2
 
   <pre>
 [value] 
-Type                                 Byte Count
-----------------------------------   ---------------------------
-=                                    See Key Value Block below.
-""                                   See String Encoding below.
-i1, n1                                 1 
-i2, n2                                 2
-c3                                     3
-c4, i4, n4, r4, az, ad, dd, d%, d/     4
-i8, n8, r8, p4, Ad, A%, A/             8
-c4, P4                                12
-p8                                    16
-P8                                    24
-C4                                    32
-m4                                    36
-M4                                    64
-m8                                    72
-M8                                   128
-g3, g4, G3, G4                       See Graphic Encoding below.
+Type                                    Byte Count
+----------------------------------      ---------------------------
+=                                       See Key Value Block below.
+""                                      See String Encoding below.
+i1, n1                                    1 
+i2, n2                                    2
+c3, tt                                    3
+c4, i4, n4, r4, az, ad, dd, d%, d/, td    4
+t*                                        7
+i8, n8, r8, p4, Ad, A%, A/                8
+c4, P4                                   12
+p8                                       16
+P8                                       24
+C4                                       32
+m4                                       36
+M4                                       64
+m8                                       72
+M8                                      128
+g3, g4, G3, G4                          See Graphic Encoding below.
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
@@ -688,9 +692,9 @@ g3, g4, G3, G4                       See Graphic Encoding below.
 
   <pre>
 [8],["itemList"],["=   "],
-[!0 key string length],...
-[!0 key string length],...
-[!0 key string length],...
+[> 0 key string length],...
+[> 0 key string length],...
+[> 0 key string length],...
 [0]
 </pre>
 
@@ -765,6 +769,9 @@ g3, g4, G3, G4                       See Graphic Encoding below.
 </pre>
 
   <p>
+   byte count will never be compressed when compression is used but buffer data will.
+  </p>
+  <p>
    Array of binaries will have as many of these pairs as found in the array.
   </p>
 
@@ -774,11 +781,10 @@ g3, g4, G3, G4                       See Graphic Encoding below.
 
   <p>
    <strong>Why not XML or JSON?</strong><br />
-   I did not take XML as a format because of XML is too verbose.  JSON is very flexible but I also
-   find it can be easily abused and still unnecessarily verbose.  Better than XML but still
-   unacceptable in my opinion.  Considering the data, I do not want a format that would cause too
-   much data bloat.  There will always be some bloat happening but it should be mitigated in my
-   opinion.
+   I did not take XML as a format because it is too verbose.  JSON is very flexible but I also
+   find it is still unnecessarily verbose.  Better than XML but still unacceptable in my opinion.
+   Considering the data, I do not want a format that would cause too much data bloat.  There will
+   always be some bloat happening but it should be mitigated in my opinion.
   </p>
 
   <p>
@@ -792,11 +798,230 @@ g3, g4, G3, G4                       See Graphic Encoding below.
    option to rule them all!  It keeps things simpler.
   </p>
 
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "formatMine", "MIFF Format: Mining");</script>
 
+  <p>
+   The above section defines how the data is stored in the format.  But it does not address the 
+   meat of the mining data.  In actuality, the above is agnostic with regards to data to be stored.
+   It could be used for game information of anything else for that matter.  
+  </p>
+  <p>
+   From now on we will concenttrate on actual Mining field related data.
+  </p>
 
+  <p>
+   The various data that mining companies need to keep track of and transfer around.
+  </p>
 
+  <ul>
+   <li>
+    Geometry
+    <ul>
+     <li>
+      3D
+      <ul>
+       <li>Points</li>
+       <li>Polylines (open and closed)</li>
+       <li>Surfaces:Generic (open and closed (solids))</li>
+       <li>Surfaces:Grid</li>
+       <li>Text</li>
+       <li>Symbol</li>
+      </ul>
+     </li>
+     <li>
+      2D (Planar, Fence)
+      <ul>
+       <li>Points</li>
+       <li>Polylines (open and closed)</li>
+       <li>Text</li>
+       <li>Symbol</li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li>
+    Drillhole 
+    <ul>
+     <li>Drillhole survery information.</li>
+     <li>Drillhole assay information.</li>
+     <li>Drillhole composite information.</li>
+     <li>Blast hole shot information.</li>
+     <li>Chip assay information.</li>
+     <li>Design vs surveyed information.</li>
+    </ul>
+   </li>
+   <li>
+    Model
+    <ul>
+     <li>
+      Block model information.
+      <ul>
+       <li>Regular</li>
+       <li>Sub-blocked</li>
+       <li>Seam</li>
+      </ul>
+     </li>
+     <li>
+      Seam model information.
+      <ul>
+       <li>Regular</li>
+       <li>Sub-blocked</li>
+      </ul>
+     </li>
+     <li>
+      Surface model information.
+      <ul>
+       <li>Regular</li>
+       <li>Sub-blocked</li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
 
+  <p>
+   MIFF will handle all these types of data.  However, how each is actually stored in MIFF can vary.
+  </p>
+  <p>
+   File naming can help in MIFF file importing.  It is suggested to use the following file extensions...
+  </p>
+  <ul>
+   <li>*.miff - Still valid but can be anything.  What is it?</li>
+   <li>*.miffGeom - for Geometry data.</li>
+   <li>*.miffDrill - for Drillhole data.</li>
+   <li>*.miffModel - for Model data.</li>
+  </ul>
+  <p>
+   This information is duplicated inside the file so reading in the file will confirm with the extension
+   but it will help the user if the extension is properly set.
+  </p>
 
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "formatMineInfo", "Information Block");</script>
+
+  <p>
+   Common to all MIFF Mining Formats for any of the types above, there will be an information block
+   providing general, data wide information.
+  </p>
+  <p>
+   This information block will be the very first key value in the file right after the MIFF header.
+  </p>
+
+  <pre>
+MIFF   1TXT\n
+info kv\n
+...
+\n
+</pre>
+
+  <p>
+   Inside the information block we have the following possible key values.  Not all are required.
+  </p>
+
+  <pre>
+type ""t [file type]
+company ""t [company name]
+copyright ""t [copyright if any]
+author ""t [client employee name]
+dateCreated t* [date created]
+dateModified t* [date modified]
+comment ""t [comments]
+...
+</pre>
+
+  <p>
+   [file type] is one of...
+  </p>
+  <ul>
+   <li>Drillhole</li>
+   <li>Geometry</li>
+   <li>Model</li>
+  </ul>
+
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "formatMineModel", "MIFF Format: Mining: Model");</script>
+
+  <p>
+   There are 3 basic model formats that are in use.
+  </p>
+
+  <ul>
+   <li>Block Model</li>
+   <li>Seam Model</li>
+   <li>Surface Model</li>
+  </ul>
+
+  <p>
+   Block Model is a regular collection of, usually, uniform blocks.  Each block will have values
+   for what ever it is that is being tracked by the client.
+  </p>
+  <p>
+   Seam Model is a bit fancier Block Model.  This format will be regular in the east and north
+   directions of the model but there is not regular block size in the elevation direction.  In
+   short you will have 'seams' and each block in the east and north for a seam will have an 
+   elevation top and bottom to indicate the seam's limits and that defines the volume, as well as
+   any other values that are found within that seam block.
+  </p>
+  <p>
+   The last one, Surface Model, is much more limited than the other two as it just holds a stack
+   of surfaces instead of defining any volume.  Like the Seam Model, Surface Models are regular
+   in the east and north directions of the model but not regular in the elevation.  In short you
+   will have 'surfaces' and each block for a surface will have an elevation value as well as 
+   other values that are being tracked by the client at that surface block.
+  </p>
+  <p>
+   Even though only Block Models are sub-blocked, MIFF does not limit you to only allowing 
+   sub-blocks for Block Models.  The logic could be applied to the other two if the software
+   does do this.  As far as I know, all software providers only do this for Block Models and not
+   for Seam Models or Surface Models.
+  </p>
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "formatMineModelInfo", "Information Block: Model");</script>
+
+  <p>
+   After the general information block the next block will be the Model Information block.
+  </p>
+
+  <pre>
+InfoModel kv
+ type ""t [model type]
+ isSubblocked bot [true if subblocked]
+ subblockType ""t [subblock type]
+ subblockOption Pi [subblock fixed resolution]
+ subblockOption pi [subblock row col resolution]
+ subblockOption n4 [subblock octtree level count]
+ origin P8t  [origin point]
+ colVec P8t  [column vector, length if vector is the length of the block] 
+ rowVec P8t  [row vector, length of the vector is the length of the block]
+ benVec P8t  [bench vector, length of the vector id the length of the block] 
+ colCount n4t [number of column blocks]
+ rowCount n4t  [number of row blocks]
+ benCount n4t  [number of bench blocks]
+ isBenVariable bot [true if variable bench heights]
+ benchList r4at [number of bench blocks] [length] [length] ...
+ itemList kv [item list count]
+  item kv 
+   id ""t [item id]
+   nameLong ""t [item name]
+   nameShort ""t [item name short]
+   type ""t [item type]
+   min r4t [item min value]
+   max r4t [item max value]
+   precision r4t [item precision]
+\n
+...
+\n
+\n
+\n
+</pre>
 
 
 

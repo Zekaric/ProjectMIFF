@@ -619,7 +619,7 @@ t*                               2 bytes, 1 byte, 1 byte, 1 byte, 1 byte, 1 byte
    in the array.
   </p>
   <p>
-   Array of bo is special, for efficiency it should be a bitmap.  
+   Array of booleans in binary or base64 encoding forma is special, for efficiency it should be a bitmap.  
   </p>
   <pre>
 Byte 0                            Byte 1
@@ -628,6 +628,9 @@ Byte 0                            Byte 1
 +---+---+---+---+---+---+---+---+ +--- ...
  2^7 2^6 ...                 2^0   2^8 ...                   
 </pre>
+  <p>
+   0, 1, 2, ... indicates the index into the array and how it relates to the bytes.
+  </p>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textValueKeyValue", "Value: Key Value Block");</script>
@@ -883,7 +886,7 @@ image bnT 2\n
   <pre>
 [value] 
 Type                                              Byte Count
-----------------------------------                ---------------------------
+---------------------------------------           ---------------------------
 =                                                 See Key Value Block below.
 ""                                                See String Encoding below.
 i1, n1                                              1 

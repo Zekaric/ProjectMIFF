@@ -414,14 +414,14 @@ Space  Tab
 Valid: spaces and tabs can be used to indent and separate parts.
 \t\t[key]\t[value header]\t\t\t[value]\n
 
-Invalid: Absolutely no \n anywhere before or within the key value line.  \n characters indicate a 
-termination of a kv block.  Discussed later in this document.
+Invalid: Absolutely no \n anywhere before or within the key value line*.  \n characters indicate a 
+termination of a kv block.  
 \n\n\n[key]\n[value header]\n[value]\n
  \n[key] [value header] [value]\n
 </pre>
 
   <p>
-   There are cases where [value] will be on individual lines but this will be indicated below.
+   * There are cases where [value] will be on individual lines but this will be indicated below.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
@@ -513,6 +513,16 @@ td - time: date only.
 tt - time: time only.
 t* - time: date and time.
 bn - binary data.
+co - Count same as  n4.
+Co -                n8.
+sz - Size same as   n4.
+Sz -                n8.
+ix - Index same as  n4.
+Ix -                n8.
+of - Offset same as n4.
+Of -                n8.
+id - Id value, same as n4.  Potentially not unique, more user controlled.
+Id - GUID value
 
 [array and encoding flag] is one of:
 t  - Single data point.    Readable text encoding.
@@ -538,6 +548,11 @@ string ""t This is a string.\nThis is really a multiline string!\n
 
 pointList PRT 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0\n
 </pre>
+
+  <p>
+   Why co, Co, sz, Sz, ix, Ix, of, and Of when n4 and n8 would suffice?  Extra semantic information
+   about what we are storing.  It may be useful.  
+  </p>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "textValue", "Value: Value");</script>
@@ -1158,6 +1173,8 @@ author ""t [client employee name]
 dateCreated t* [date created]
 dateModified t* [date modified]
 comment ""t [comments]
+software ""t [software preparing this file]
+softwareVersion ""t [software version]
 ...
 </pre>
 
@@ -1168,6 +1185,7 @@ comment ""t [comments]
    <li>Drillhole</li>
    <li>Geometry</li>
    <li>Model</li>
+   <li>...</li>
   </ul>
 
   <!--##########################################################################################-->
@@ -1191,10 +1209,10 @@ comment ""t [comments]
   </p>
   <p>
    Seam Model is a bit fancier Block Model.  This format will be regular in the east and north
-   directions of the model but there is not regular block size in the elevation direction.  In
-   short you will have 'seams' and each block in the east and north for a seam will have an
-   elevation top and bottom to indicate the seam's limits and that defines the volume, as well as
-   any other values that are found within that seam block.
+   directions of the model but there is no regular block size in the elevation direction.  In
+   short you will have a number 'seams' and each block in the east and north for a seam will have 
+   an elevation top and bottom to indicate the seam's limits and that defines the volume, as well 
+   as any other values that are found within that seam block.
   </p>
   <p>
    The last one, Surface Model, is much more limited than the other two as it just holds a stack
@@ -1206,7 +1224,7 @@ comment ""t [comments]
   <p>
    Even though only Block Models are sub-blocked, MIFF does not limit you to only allowing
    sub-blocks for Block Models.  The logic could be applied to the other two if the software
-   does do this.  As far as I know, all software providers only do this for Block Models and not
+   does do this.  As far as I know, all software providers only sub-block for Block Models and not
    for Seam Models or Surface Models.
   </p>
 
@@ -1225,7 +1243,7 @@ InfoModel kv
  subblockType ""t [subblock type]
  subblockOption Pn [subblock fixed resolution]
  subblockOption pn [subblock row col resolution]
- subblockOption n4 [subblock octtree level count]
+ subblockOption n1 [subblock octtree level count]
  origin PRt  [origin point]
  colVec PRt  [column vector, length if vector is the length of the block] 
  rowVec PRt  [row vector, length of the vector is the length of the block]
@@ -1242,6 +1260,8 @@ InfoModel kv
    min r4t [item min value]
    max r4t [item max value]
    precision r4t [item precision]
+   enumList ""ta [enum count] 
+...
 \n
 ...
 \n
@@ -1249,9 +1269,53 @@ InfoModel kv
 \n
 </pre>
 
+  <p>
+   <strong>[model type]</strong> will be one of...
+  </p>
+  <ul>
+   <li>block - For a block model.</li>
+   <li>seam - For a seam model.</li>
+   <li>surface - For a surface model.</li>
+  </ul>
 
+  <p>
+   <strong>[subblock type]</strong> will be one of...
+  </p>
+  <ul>
+   <li>fixed - For a regular division of the block in the east, north, and z directions of the block.</li>
+   <li>semi - For a regular division of a block in the east and north directions but an infinitely variable z value for block height.</li>
+   <li>tree - For an oct-tree subvision of a block.</li>
+  </ul>
 
-
+  <p>
+   Depending on what is set for [subblock type] there will be one of 3 [subblockOption] values.
+  </p>
+  <ul>
+   <li>fixed subblocking requires a Pn to define the number of divisions in the east, north and z directions.</li>
+   <li>semi subblocking requires a pn to define the number of divisions in the east and north directions.</li>
+   <li>tree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.</li>
+  </ul>
+  
+  <p><strong>origin</strong> - The extreme most point of the 0 east, 0 north, and 0 bench block of the model.</p>
+  <p><strong>colVec, rowVec, benVec</strong> - The direction of increasing block index for the east, north, and bench directions.  
+  Also the size of the block in the east, north and bench directions.  benVec does not need to be sized if the bench 
+  height is variable.  It should at least be unit length.</p>
+  <p><strong>blockCount</strong> - The number of blocks in the east, north, and bench directions.</p>
+  <p><strong>isBenVariable</strong> - Flag to indicate the bench heights are not uniform.  This does not
+  need to be present if the benches are a fixed height.</p>
+  <p><strong>benchList</strong> - A list of bench heights starting from bench 0.  Only required if
+  isBenVariable is true.</p>
+  <p><strong>itemList</strong> - A key value block for the list of items stored in each block.  Can be
+  using the array notation for this block if item count is known.</p>
+  
+  <p><strong>item</strong> - A key value block describing the item.</p>
+  <p><strong>id</strong> - A short unique string uniquely identifying the item.</p>
+  <p><strong>nameLong</strong> - A 'nice' name for the item.</p>
+  <p><strong>nameShort</strong> - A 'compact' name for the item.</p>
+  <p><strong>type</strong> - What sort of value the item stores.  One of "", r4, r8, n1, n2, n4, n8, i1, i2, i4, i8, en ("en" for enumeration value)</p>
+  <p><strong>min, max</strong> - limits for an item if a number value.</p>
+  <p><strong>precision</strong> - The accuracy of the number if type is r4 or r8.</p>
+  <p><strong>enumList</strong> - Required only for "en" type.  This lists the enumeration values available in a string list.</p>
 
 
   <script>UpdateToc();</script>

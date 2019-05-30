@@ -512,7 +512,6 @@ d/ -                                   ratio 1:XXX
 td - time: date only.
 tt - time: time only.
 t* - time: date and time.
-bn - binary data.
 co - Count same as  n4.
 Co -                n8.
 sz - Size same as   n4.
@@ -523,6 +522,9 @@ of - Offset same as n4.
 Of -                n8.
 id - Id value, same as n4.  Potentially not unique, more user controlled.
 Id - GUID value
+ty - Type value.  One of these 2 lettter types
+vs - Value stream.  The contents deviates from the rest of the format.  Representations will explained in their respective sections.
+bn - binary data.
 
 [array and encoding flag] is one of:
 t  - Single data point.    Readable text encoding.
@@ -1237,7 +1239,7 @@ softwareVersion ""t [software version]
   </p>
 
   <pre>
-InfoModel kv
+infoModel kv
  type ""t [model type]
  isSubblocked bot [true if subblocked]
  subblockType ""t [subblock type]
@@ -1256,11 +1258,12 @@ InfoModel kv
    id ""t [item id]
    nameLong ""t [item name]
    nameShort ""t [item name short]
-   type ""t [item type]
+   type tyt [item type]
    min r4t [item min value]
    max r4t [item max value]
    precision r4t [item precision]
    enumList ""ta [enum count] 
+   default [type][encoding] [default value for this item]
 ...
 \n
 ...
@@ -1316,6 +1319,114 @@ InfoModel kv
   <p><strong>min, max</strong> - limits for an item if a number value.</p>
   <p><strong>precision</strong> - The accuracy of the number if type is r4 or r8.</p>
   <p><strong>enumList</strong> - Required only for "en" type.  This lists the enumeration values available in a string list.</p>
+  <p><strong>default</strong> - default value for this item if block is skipped.</p>
+
+
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "formatMineModel", "Model Block:");</script>
+
+  <p>
+   This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially 
+   optional values depending on the key.
+  </p>
+
+  <pre>
+model vst\n
+...
+\n
+</pre>
+
+  <p>
+   The model data will be enclosed in a value stream chunk.  This stream can be in t, e, or z encodings.  The contents are broken down in key, or key and value
+   pairs.
+  </p>
+
+  <pre>
+Key (1 byte) Value
+------------ -----
+B            n2 value follows immeadiately.  Jump to current bench index + N.  Reset current row and current column to 0
+b            No value.  Jump to next bench.
+R            n2 value follows immeadiately.  Jump to current row index + N.  Reset currrent column to 0
+r            No value.  Jump to next row.
+C            n2 value follows immeadiately.  Jump to current column index + N.
+c            No value.  Jump to next column.
+s            Defining subblock.  See subblocking information below to deal with the various subblock types.
+v            For the current block or subblock, provide all values for the items defined in the infoModel section in the order they appear in the infoModel separated by
+             a \n in text mode.  Binary mode just uses as many bytes as necessary for the values. 
+             Increment the column or subblock column (if applicable).  
+             (If applicable) If this is the last column or subblock column, column restarts at the first column, increment the row.
+             (If applicable) If this is the last row or subblock row, row restarts at the first row, increment the bench/level.
+             (If applicable) If this is the last subblock bench/level, move to the next parent block following these rules.
+             If this is the last block and last subblock block, there should not be anything else in the value stream.  
+.            No value.  Indicates end of the subblock data or value stream.
+</pre>
+
+  <p>
+   The above may not make that much sense yet so here is an example of a 5x5 block model where we have 3 r4 values per block.  
+  </p>
+
+  <pre>
+File                   What is happening
+--------------------   -----------------
+model vst\n            Start of the model data value stream.  Current block is 0 (first) bench, 0 (first) row, 0 (column)
+B2                     Add 2 to the bench index.  Current block jumps to 2, 0, 0.  All blocks on benches 0 and 1 have default values.
+R3                     Add 2 to the row index. Curent block jumps to 2, 2, 0.  All blocks on bench 2, rows 0 and 1 have default values.
+C2                     Add 2 to the column index.  Current block jumps to 2, 2, 2.  Block 2, 2, 0, and Block 2, 2, 1 have default values.
+v1.2\n2.3\n3.14\n      Block 2, 2, 2 has values 1.2, 2.3, 3.14.  Current block after this line is 2, 2, 2.
+c                      Block 2, 2, 3 get default value.  Current block after this line is 2, 2, 4.
+c                      Block 2, 2, 4 get default value.  Current block after this line is 2, 3, 0.  We jumped to the next row
+s                      Block 2, 3, 0 is subblocked.  Depending on the subblocking used we start at 0, 0, 0 subblock and used the same B, b, R, r, C, c for 
+                       navigating the subblock blocks until we reach the subblock block or a '.' key is reacched.  See below for subblock filling.
+S                      Similar to s but parent block has values as well as having subblocks with values.  First v encountered is for the parent block.
+                       c to jump to the first subblock block.
+...
+.                      Current block can be anything, this indicates that the rest of the model blocks not yet reached are set to default values.
+</pre>
+
+  <p>
+   Note that there are no \n after every key value pairs.  This is to keep the text representation as compact as possible.  In binary the above will look like...
+  </p>
+
+  <pre>
+[n1:5]["model"],["vst "],["B"],[n2:2],["R"],[n2:2],["C"],[n2:2],["v"],[r4:1.2],[r4:2.3],[r4:3.14],["c"],["c"],["s"]...,["."]
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelFixed", "SubBlock: Fixed");</script>
+
+  <p>
+   In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.
+   Use B, b, R, r, C, c, and . in the same way as for the parent blocks.
+  </p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelSemi", "SubBlock: Semi");</script>
+
+  <p>
+   In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.
+   One difference...
+  </p>
+
+  <p>
+   In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'h' key for the first
+   level of blocks of the subblocks.  Second level of subblocks will be block height - bench 0 block height.
+  </p>
+
+  <pre>
+Key   Value
+---   -----
+h     r4 value immediately follows,  This is only for bench 0 blocks of the subblocks.  If following a previous h record then we increment the block
+      to the next subblock block.  This needs to preceed a v record. 
+</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelTree", "SubBlock: Tree");</script>
+
+
+
+
+
 
 
   <script>UpdateToc();</script>

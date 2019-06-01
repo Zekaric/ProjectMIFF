@@ -553,7 +553,7 @@ pointList PRT 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0\n
 
   <p>
    Why co, Co, sz, Sz, ix, Ix, of, and Of when n4 and n8 would suffice?  Extra semantic information
-   about what we are storing.  It may be useful.  
+   about what we are storing.  It may be useful.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
@@ -636,7 +636,7 @@ t*                               2 bytes, 1 byte, 1 byte, 1 byte, 1 byte, 1 byte
    in the array.
   </p>
   <p>
-   Array of booleans in binary or base64 encoding forma is special, for efficiency it should be a bitmap.  
+   Array of booleans in binary or base64 encoding forma is special, for efficiency it should be a bitmap.
   </p>
   <pre>
 Byte 0                            Byte 1
@@ -764,9 +764,9 @@ This is string 3.\n
    <strong>g3, g4, G3, G4</strong>
   </p>
   <p>
-   These graphic options will have a header of 2 unsigned integer values before the image data.  
-   These values indicate width and height of the graphic.  These values are not included in the 
-   Base64 or Zlib compression if compression is used.  However the image data will honor Base64 or 
+   These graphic options will have a header of 2 unsigned integer values before the image data.
+   These values indicate width and height of the graphic.  These values are not included in the
+   Base64 or Zlib compression if compression is used.  However the image data will honor Base64 or
    Zlib compression if used.
   </p>
   <p>
@@ -791,7 +791,7 @@ image g3T 2\n
   <p>
    For gp, gj, and gJ, the file that represents the image is copied verbatum into the value
    portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z,
-   and Z are never used. 
+   and Z are never used.
   </p>
 
   <pre>
@@ -824,8 +824,8 @@ imageFileLinkList glT 2\n
   <script>HeaderAdd(3, "textValueBinary", "Value: Binary Encoding");</script>
 
   <p>
-   The binary data will have a header of 1 unsigned integer value before the binary data.  This 
-   value indicates the byte count of the binary data.  This byte count is not included when using 
+   The binary data will have a header of 1 unsigned integer value before the binary data.  This
+   value indicates the byte count of the binary data.  This byte count is not included when using
    Base64 ro Zlib compression.  However the binary data will honor Base64 and Zlib compression if
    used.
   </p>
@@ -839,8 +839,8 @@ image bnT 2\n
 </pre>
 
   <p>
-   Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they 
-   should be on the hook to define what the contents of the blob mean.  If they do not, then they 
+   Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they
+   should be on the hook to define what the contents of the blob mean.  If they do not, then they
    are being bad citizens and should be shamed!
   </p>
   <p>
@@ -1196,7 +1196,18 @@ softwareVersion ""t [software version]
   <script>HeaderAdd(1, "formatMineModel", "MIFF Format: Mining: Model");</script>
 
   <p>
-   There are 3 basic model formats that are in use.
+   Some of the information found here is based off of the block model formats that are used at
+   Hexagon, where I work, but also from information found freely on the internet.  Particularly this
+   link from Deskwik which is a well written overview of some of the subblocking types by the
+   various software vendors.
+  </p>
+
+  <p>
+   <a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">Block Model Knowledge For Mining Engineers - An Introduction</a>
+  </p>
+
+  <p>
+   There are 3 basic model formats that are in use as Hexagon.
   </p>
 
   <ul>
@@ -1210,24 +1221,22 @@ softwareVersion ""t [software version]
    for what ever it is that is being tracked by the client.
   </p>
   <p>
-   Seam Model is a bit fancier Block Model.  This format will be regular in the east and north
-   directions of the model but there is no regular block size in the elevation direction.  In
-   short you will have a number 'seams' and each block in the east and north for a seam will have 
-   an elevation top and bottom to indicate the seam's limits and that defines the volume, as well 
-   as any other values that are found within that seam block.
+   Seam Model is a bit fancier Block Model.  This model is subdivided uniformly in the east and
+   north directions of the model but instead of benches, seams are described.  Each block in a seam
+   will have an elevation top and bottom to indicate the seam's limits, as well as any other values
+   that are found within that seam block just like a normal block model.
   </p>
   <p>
-   The last one, Surface Model, is much more limited than the other two as it just holds a stack
-   of surfaces instead of defining any volume.  Like the Seam Model, Surface Models are regular
-   in the east and north directions of the model but not regular in the elevation.  In short you
-   will have 'surfaces' and each block for a surface will have an elevation value as well as
-   other values that are being tracked by the client at that surface block.
+   Surface Model is much more limited than the other two as it just holds a stack of surfaces
+   instead of defining any volume.  This model is subdivided uniformly in the east and north
+   directions of the model but instead of seams you will have a surface.  Each 'block', or really
+   the contact point, for a surface will have an elevation value as well as other values that are
+   being tracked by the client at that surface point.
   </p>
   <p>
    Even though only Block Models are sub-blocked, MIFF does not limit you to only allowing
-   sub-blocks for Block Models.  The logic could be applied to the other two if the software
-   does do this.  As far as I know, all software providers only sub-block for Block Models and not
-   for Seam Models or Surface Models.
+   sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As
+   far as I know, no software vendors sub-block for Seam or Surface Models.
   </p>
 
   <!--==========================================================================================-->
@@ -1264,6 +1273,7 @@ infoModel kv
    precision r4t [item precision]
    enumList ""ta [enum count] 
    default [type][encoding] [default value for this item]
+   calculation ""t [calculation field value]
 ...
 \n
 ...
@@ -1285,9 +1295,53 @@ infoModel kv
    <strong>[subblock type]</strong> will be one of...
   </p>
   <ul>
-   <li>fixed - For a regular division of the block in the east, north, and z directions of the block.</li>
-   <li>semi - For a regular division of a block in the east and north directions but an infinitely variable z value for block height.</li>
-   <li>tree - For an oct-tree subvision of a block.</li>
+   <li>
+    <p>fixed - For a regular division of the block in the east, north, and z directions of the block.</p>
+    <pre>
+Using just a cross section.
++--+--+--+--+
+|  |  |  |  | <--- Each sub-block of the parent block is of uniform size.
+                   +--+--+--+--+
+                   | | | | |
+                   +--+--+--+--+
+                   | | | | |
+                   +--+--+--+--+
+</pre>
+   </li>
+   <li>
+    <p>semi - For a regular division of a block in the east and north directions but an infinitely variable z value for block height.</p>
+    <pre>
++--+--+--+--+
+|  +--+  |  |
+|  |  +--+  |
+|  +--+  |  | Infinitely variable in the bench direction.
++--+  |  |  |
++--+--+--+--+
+Uniform divisions in the row and column directions.
+</pre>
+   </li>
+   <li>
+    <p>octree - For an oct-tree subvision of a block.</p>
+    <pre>
++-----+-----+
+|     |     |
++--+--+-----+  Recursive bisecting the blocks until a limit.
++--+--+     |
++--+--+-----+
+</pre>
+   </li>
+   <li>
+    <p>free - For a free subdivision of a block where each subblock is individually defined as being some subvolume of the parent.</p>
+    <pre>
++-----------+
+|    +----+ |
+|    |    | |
+|    +----+ | Bad diagram but essentially possible with this option.  This is a catchall case for
++--+        | those types of subblocking I have not addressed.
+|  |        |
++--+--------+
+</pre>
+   </li>
   </ul>
 
   <p>
@@ -1295,39 +1349,87 @@ infoModel kv
   </p>
   <ul>
    <li>fixed subblocking requires a Pn to define the number of divisions in the east, north and z directions.</li>
-   <li>semi subblocking requires a pn to define the number of divisions in the east and north directions.</li>
-   <li>tree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.</li>
+   <li>semiFixed subblocking requires a pn to define the number of divisions in the east and north directions.</li>
+   <li>octree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.</li>
+   <li>free subblocking does not require an option.</li>
   </ul>
-  
-  <p><strong>origin</strong> - The extreme most point of the 0 east, 0 north, and 0 bench block of the model.</p>
-  <p><strong>colVec, rowVec, benVec</strong> - The direction of increasing block index for the east, north, and bench directions.  
-  Also the size of the block in the east, north and bench directions.  benVec does not need to be sized if the bench 
-  height is variable.  It should at least be unit length.</p>
+
+  <pre>
+       \   /
+        \ /
+         +  Col 2
+        / \
+ Row 2 /   \   /
+      /     \ /
+     /Ben 1  +
+\   / Row 1 /|
+ \ /  Col 1/ |
+  +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
+                   |\     /   |/
+  | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
+                   \ | \ /    /|
+ \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
+                   + |   /
+
+  |\  | <--------- benVec (Length can be block size or unit, depends see below. Direction is direction of increasing bench index.)
+                   | \ | /
+
+     \|/
+      +
+      | Ben 2
+      |
+</pre>
+
+  <p>
+   <strong>origin</strong> - The extreme most point of the 0 east, 0 north, and 0 bench block of the model.
+  </p>
+  <p>
+   <strong>colVec, rowVec, benVec</strong> - The direction vectors of increasing block index for the
+   east, north, and bench directions.  The length of this vector is the size of the block in the east,
+   north and bench directions.  benVec does not need to be sized if the bench height is variable.
+   It should at least be unit length.  All vectors need not be perpendicular to each other but usually
+   this is the case in most software.  I believe there is one software where colVec and rowVec are not
+   90 degrees to the benVec.  Essentially creating sloped benches.
+  </p>
   <p><strong>blockCount</strong> - The number of blocks in the east, north, and bench directions.</p>
-  <p><strong>isBenVariable</strong> - Flag to indicate the bench heights are not uniform.  This does not
-  need to be present if the benches are a fixed height.</p>
-  <p><strong>benchList</strong> - A list of bench heights starting from bench 0.  Only required if
-  isBenVariable is true.</p>
-  <p><strong>itemList</strong> - A key value block for the list of items stored in each block.  Can be
-  using the array notation for this block if item count is known.</p>
-  
+  <p>
+   <strong>isBenVariable</strong> - Flag to indicate the bench heights are not uniform.  This does not
+   need to be present if the benches are a fixed height.
+  </p>
+  <p>
+   <strong>benchList</strong> - A list of bench heights starting from bench 0.  Only required if
+   isBenVariable is true.
+  </p>
+  <p>
+   <strong>itemList</strong> - A key value block for the list of items stored in each block.  Can be
+   using the array notation for this block if item count is known.
+  </p>
+
   <p><strong>item</strong> - A key value block describing the item.</p>
   <p><strong>id</strong> - A short unique string uniquely identifying the item.</p>
   <p><strong>nameLong</strong> - A 'nice' name for the item.</p>
   <p><strong>nameShort</strong> - A 'compact' name for the item.</p>
-  <p><strong>type</strong> - What sort of value the item stores.  One of "", r4, r8, n1, n2, n4, n8, i1, i2, i4, i8, en ("en" for enumeration value)</p>
+  <p><strong>type</strong> - What sort of value the item stores.  One of "", r4, r8, n1, n2, n4, n8, i1, i2, i4, i8, en ("en" for enumeration value), +x ("+x" for calculated field)</p>
   <p><strong>min, max</strong> - limits for an item if a number value.</p>
   <p><strong>precision</strong> - The accuracy of the number if type is r4 or r8.</p>
   <p><strong>enumList</strong> - Required only for "en" type.  This lists the enumeration values available in a string list.</p>
   <p><strong>default</strong> - default value for this item if block is skipped.</p>
-
+  <p>
+   <strong>calculation</strong> - a formula that is used to calculate the contents of this value.
+   Use $[item id] in the formula to refer to another item value in the current block.  Full discussion
+   about the formula composition will be discussed elsewhere.
+  </p>
+  <pre>
+Calculation example:
+($ore% * $cu) - $i_am_making_something_up
+</pre>
 
   <!--==========================================================================================-->
   <!--==========================================================================================-->
   <script>HeaderAdd(2, "formatMineModel", "Model Block:");</script>
 
   <p>
-   This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially 
+   This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially
    optional values depending on the key.
   </p>
 
@@ -1352,18 +1454,19 @@ r            No value.  Jump to next row.
 C            n2 value follows immeadiately.  Jump to current column index + N.
 c            No value.  Jump to next column.
 s            Defining subblock.  See subblocking information below to deal with the various subblock types.
-v            For the current block or subblock, provide all values for the items defined in the infoModel section in the order they appear in the infoModel separated by
-             a \n in text mode.  Binary mode just uses as many bytes as necessary for the values. 
+V            For the current block or subblock, provide all values for the items defined in the infoModel section in the order they appear in the infoModel (not including calculated items),
+             each value separated by a \n in text mode.  In Binary mode values are using as many bytes as necessary as defined by the items. 
              Increment the column or subblock column (if applicable).  
              (If applicable) If this is the last column or subblock column, column restarts at the first column, increment the row.
              (If applicable) If this is the last row or subblock row, row restarts at the first row, increment the bench/level.
              (If applicable) If this is the last subblock bench/level, move to the next parent block following these rules.
              If this is the last block and last subblock block, there should not be anything else in the value stream.  
+v            No value.  Copy the last blocks values to the current block.  Increment to the next block.
 .            No value.  Indicates end of the subblock data or value stream.
 </pre>
 
   <p>
-   The above may not make that much sense yet so here is an example of a 5x5 block model where we have 3 r4 values per block.  
+   The above may not make that much sense yet so here is an example of a 5x5 block model where we have 3 r4 values per block.
   </p>
 
   <pre>
@@ -1396,36 +1499,72 @@ S                      Similar to s but parent block has values as well as havin
   <script>HeaderAdd(3, "formatMineModelFixed", "SubBlock: Fixed");</script>
 
   <p>
-   In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.
-   Use B, b, R, r, C, c, and . in the same way as for the parent blocks.
+   In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the
+   subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as
+   for the parent blocks.
   </p>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineModelSemi", "SubBlock: Semi");</script>
 
   <p>
-   In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.
-   One difference...
+   In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into
+   the subblocks as defined in the infoModel section.  One difference...
   </p>
 
   <p>
-   In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'h' key for the first
-   level of blocks of the subblocks.  Second level of subblocks will be block height - bench 0 block height.
+   In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.
+   This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level
+   subblocks will depend on how many times H is used for the same column.
   </p>
 
   <pre>
 Key   Value
 ---   -----
-h     r4 value immediately follows,  This is only for bench 0 blocks of the subblocks.  If following a previous h record then we increment the block
-      to the next subblock block.  This needs to preceed a v record. 
+H     r4 value immediately follows.  The r4 value is a percent of the block height.  This record
+      needs to preceed a v record. 
+h     No value.  The rest of the subblock cylinder is used.
 </pre>
 
+  <p>
+   If H or h follows an H or h then the previous block will be holding default values, and the current
+   block will be incremented to the next subblock.  The following H or h will determin the height of
+   the new current block.
+  </p>
+  <p>
+   If a subblock cell has already defined the entire height of the block then these will be skipped
+   over when jumping to the next subblock.  This means that some subblock cells could have a different
+   number of levels that others.
+  </p>
+
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "formatMineModelTree", "SubBlock: Tree");</script>
+  <script>HeaderAdd(3, "formatMineModelTree", "SubBlock: Octree");</script>
 
+  <p>
+   In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we
+   are already at a subblock then that subblock will be split into small 8 uniform pieces.  This
+   should not exceed the subblock option count defined in the model information block.
+  </p>
 
+  <p>
+   The 's' key need to preceed the v record.
+  </p>
 
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelFree", "SubBlock: Free");</script>
 
+  <p>
+   In the free block case, an 's' key will indicate the parent block is subblocked.  However after
+   that you will need to define the blocks manually.
+  </p>
+
+  <pre>
+Key   Value
+---   -----
+c     6 x r4 values follow.  First 3 r4 values are percents for the min point and the second 3 r4 
+      values are percents for the max point of the subblock.
+.     Indicates we are done with the subblocking and to process to the next parent block.
+</pre>
 
 
 

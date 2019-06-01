@@ -1301,11 +1301,11 @@ infoModel kv
 Using just a cross section.
 +--+--+--+--+
 |  |  |  |  | <--- Each sub-block of the parent block is of uniform size.
-                   +--+--+--+--+
-                   | | | | |
-                   +--+--+--+--+
-                   | | | | |
-                   +--+--+--+--+
++--+--+--+--+
+|  |  |  |  |
++--+--+--+--+
+|  |  |  |  |
++--+--+--+--+
 </pre>
    </li>
    <li>
@@ -1365,15 +1365,13 @@ Uniform divisions in the row and column directions.
 \   / Row 1 /|
  \ /  Col 1/ |
   +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
-                   |\     /   |/
+  |\     /   |/
   | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
-                   \ | \ /    /|
+\ |  \ /    /|
  \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
-                   + |   /
-
+  +   |   /
   |\  | <--------- benVec (Length can be block size or unit, depends see below. Direction is direction of increasing bench index.)
-                   | \ | /
-
+  | \ | /
      \|/
       +
       | Ben 2

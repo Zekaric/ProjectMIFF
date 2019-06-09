@@ -377,9 +377,7 @@ $cost
    <tr> <td>g4</td>                 <td>Graphic using c4.</td></tr>
    <tr> <td>G3</td>                 <td>Graphic using C3.</td></tr>
    <tr> <td>G4</td>                 <td>Graphic using C4.</td></tr>
-   <tr> <td>gp</td>                 <td>Graphic as a PNG file.</td></tr>
-   <tr> <td>gj</td>                 <td>Graphic as a JPG file.</td></tr>
-   <tr> <td>gJ</td>                 <td>Graphic as a JPG2000 file.</td></tr>
+   <tr> <td>gf</td>                 <td>Graphic as an inline included file.</td></tr>
    <tr> <td>gl</td>                 <td>Graphic as a link to a file.</td></tr>
    <tr> <td>az</td>                 <td>Azimuth (strike) using r4. Value in degrees</td></tr>
    <tr> <td>ad</td>                 <td>Dip direction using r4. Value in degrees</td></tr>
@@ -572,6 +570,58 @@ pointList PR 5 10.5 20 0 20.5 20 0 20.5 50 0 10.5 50 0 10.5 20 0\n
   text file.</p>
   
   <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(4, "formatBaseTextValueKeyValue", "Key Value Block");</script>
+
+  <p>Key value blocks are special.  They are needed to allow nesting of key values.  The last line
+  of a block needs to be a comletely empty line with nothing on it but a \n to indicate that the
+  block is terminated.</p>
+
+  <pre>
+docInfo kv\n
+ title  "" M.I.F.F.: Mining Interchange File Format\n
+ author "" Robbert de Groot\n
+\n
+</pre>
+
+  <p>To be clear on how it works.  Leading separators before the key are unnecessary and are only 
+  here for clarity.  Leading separators before a \n are allowed but are wasteful.</p>
+
+  <pre>
+level1 kv\n
+ level2 kv\n
+  level3 kv\n
+   ...
+  \n
+  anotherLevel3 kv\n
+  \n
+ \n
+ anotherLevel2 kv\n
+ \n
+\n
+anotherLevel1 kv\n
+...
+\n
+</pre>
+
+  <p>Key value bocks can have an 'A' array specifier and a array count.  This is useful for an array
+  of a complex type.</p>
+
+  <pre>
+itemList kvA 2\n
+ item kv\n
+  name ""t item A\n
+  value i4t 0\n
+ \n
+ item kv\n
+  name ""t item B\n
+  value i4t 10\n
+ \n
+\n
+</pre>
+
+  <p>e, E, z, and Z are never used with kv.</p>
+
+  <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(4, "formatBaseTextValueBasic", "a*, a*, c*, C*, d*, i*, m*, M*, n*, p*, P*, r*");</script>
 
   <p>Types az, ad, Ad, A%, A/, c3, c4, C3, C4, dd, d%, d/, i1, i2, i4, i8, mr, mR, Mr, MR, n1, n2, 
@@ -641,58 +691,6 @@ IsOptimized bo f\n
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(4, "formatBaseTextValueKeyValue", "Key Value Block");</script>
-
-  <p>Key value blocks are special.  They are needed to allow nesting of key values.  The last line
-  of a block needs to be a comletely empty line with nothing on it but a \n to indicate that the
-  block is terminated.</p>
-
-  <pre>
-docInfo kv\n
- title  "" M.I.F.F.: Mining Interchange File Format\n
- author "" Robbert de Groot\n
-\n
-</pre>
-
-  <p>To be clear on how it works.  Leading separators before the key are unnecessary and are only 
-  here for clarity.  Leading separators before a \n are allowed but are wasteful.</p>
-
-  <pre>
-level1 kv\n
- level2 kv\n
-  level3 kv\n
-   ...
-  \n
-  anotherLevel3 kv\n
-  \n
- \n
- anotherLevel2 kv\n
- \n
-\n
-anotherLevel1 kv\n
-...
-\n
-</pre>
-
-  <p>Key value bocks can have an 'A' array specifier and a array count.  This is useful for an array
-  of a complex type.</p>
-
-  <pre>
-itemList kvA 2\n
- item kv\n
-  name ""t item A\n
-  value i4t 0\n
- \n
- item kv\n
-  name ""t item B\n
-  value i4t 10\n
- \n
-\n
-</pre>
-
-  <p>e, E, z, and Z are never used with kv.</p>
-
-  <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(4, "formatBaseTextValueString", "\"\"");</script>
 
   <p>String values are sort of the odd one out with all the other data types.  The other data types
@@ -743,12 +741,12 @@ stringList ""Z afkj8u234123234dfjaee...
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(4, "formatBaseTextValueGraphic", "g3, g4, G3, G4");</script>
+  <script>HeaderAdd(4, "formatBaseTextValueGraphic", "g*, G*");</script>
 
-  <p>These graphic options will have a header of 2 unsigned integer values before the image data.
-  These values indicate width and height of the graphic.  These values are not included in the
-  Base64 or Zlib compression if compression is used.  However the image data will honor Base64 or
-  Zlib compression if used.</p>
+  <p><strong>g3, g4, G3, G4</strong> graphic options will have a header of 2 unsigned integer values
+  before the image data.  These values indicate width and height of the graphic.  These values are 
+  not included in the Base64 or Zlib compression if compression is used.  However the image data 
+  will honor Base64 or Zlib compression if used.</p>
   
   <p>Images are written out row by row, left to right, top to bottom.</p>
   
@@ -762,68 +760,70 @@ image g3T 2\n
 2 2 64 64 64 128 128 128 192 192 192 255 255 255\n
 </pre>
 
-  <p>
-   <strong>gp, gj, gJ</strong>
-  </p>
-
-  <p>
-   For gp, gj, and gJ, the file that represents the image is copied verbatum into the value
-   portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z,
-   and Z are never used.
-  </p>
+  <p><strong>gf</strong> graphic option will have a 3 letter image identifier for the file type, an
+  unsigned integer for the file size, and then the file that represents the image, copied verbatum 
+  into the value portion.  There is never any compression applied.  The data is always base64 
+  encoded.  e, E, z, and Z are never used.</p>
 
   <pre>
-imageFile gpt [base64 encoding of a png file data]\n
+imageFile gf png 1024 [base64 encoding of a png file data]\n
 
-imageFileList gpT 2\n
-[base64 encoding of a png file 1 data]\n
-[base64 encoding of a png file 2 data]\n
+imageFileList gpA 2\n
+jpg 2048 [base64 encoding of a jpg file 1 data]\n
+tif 4096 [base64 encoding of a tiff file 2 data]\n
 </pre>
 
-  <p>
-   <strong>gl</strong>
-  </p>
-
-  <p>
-   For gl, there will be a path to an image.  This path should really be relative to the MIFF file
-   so that finding this file is easy.  However this is up to the software writing the MIFF file.
-   e, E, z, and Z are never used for this type.
-  </p>
+  <p><strong>gl</strong> graphic option simple contains a link to an image file.  This path should 
+  be relative to the MIFF file if not right next to the MIFF file.  However this is up to the 
+  software writing the MIFF file.  z, and Z are never used for this type.</p>
 
   <pre>
-imageFileLink glt \path\to\image\file\image.png\n
+imageFileLink gl \path\to\image\file\image.png\n
 
-imageFileLinkList glT 2\n
+imageFileLinkList glA 2\n
 \path\to\image\file\image1.png\n
 \path\to\image\file\image2.png\n
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(4, "formatBaseTextValueBinary", "Binary Encoding");</script>
+  <script>HeaderAdd(4, "formatBaseTextValueTime", "t*");</script>
 
-  <p>
-   The binary data will have a header of 1 unsigned integer value before the binary data.  This
-   value indicates the byte count of the binary data.  This byte count is not included when using
-   Base64 ro Zlib compression.  However the binary data will honor Base64 and Zlib compression if
-   used.
-  </p>
+  <p><strong>td, tt, t*</strong> store time values.</p>
+  
+  <p>Dates are only stored one way in readable UTF8, "YYYY-MM-DD" where YYYY, MM, DD are unsigned 
+  integers.  MM and DD are 0 padded.</p>
+  
+  <p>Times are only stored one way in readable UTF8, "HH:MM:SS" where HH, MM, SS are unsigned 
+  integers.  HH is 24 hour Greenwich Time zone, no daylights correction.</p>
+  
+  <p>Binary representation if encoded as base64 will be n2 for year and n1 for all other values and
+  ordered in the same year, month, day, hour, minute, second.</p>
 
   <pre>
-image bnt 10 0 1 2 3 4 5 7 8 9\n
+date td 2019-01-31\n
+</pre>
 
-image bnT 2\n
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(4, "formatBaseTextValueBinary", "Binary Encoding");</script>
+
+  <p>The binary data will have a header of 1 unsigned integer value before the binary data.  This
+  value indicates the byte count of the binary data.  This byte count is not included when using
+  Base64 ro Zlib compression.  However the binary data will honor Base64 and Zlib compression if
+  used.</p>
+
+  <pre>
+image bn 10 0 1 2 3 4 5 7 8 9\n
+
+image bnA 2\n
 10 0 1 2 3 4 5 6 7 8 9\n
 10 9 8 7 6 5 4 3 2 1 0\n
 </pre>
 
-  <p>
-   Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they
-   should be on the hook to define what the contents of the blob mean.  If they do not, then they
-   are being bad citizens and should be shamed!
-  </p>
-  <p>
-   However this is here as a catchall just in case.
-  </p>
+  <p>Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they
+  should be on the hook to define what the contents of the blob mean.  If they do not, then they are
+  being bad citizens and should be shamed!</p>
+  
+  <p>However this is here as a catchall just in case.</p>
 
   <!--==========================================================================================-->
   <!--==========================================================================================-->

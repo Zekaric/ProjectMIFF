@@ -344,9 +344,10 @@ function UpdateToc()
   extension but it will help the user if the extension is properly set and will make it easier on 
   the software on how to read in the file if these are properly set.</p>
 
-  <!--==========================================================================================-->
-  <!--==========================================================================================-->
-  <script>HeaderAdd(2, "formatMineHeader", "Header");</script>
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "formatMineHeader", "Header");</script>
   
   <p>MIFF has fields for a Sub-Format Name and Version.  For a MI-MIFF file this will be set to...</p>
   
@@ -366,44 +367,131 @@ function UpdateToc()
   <p>This information block will be the very first key value in the file right after the MIFF 
   header.</p>
 
-  <pre>info kv</pre>
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>info</td><td>kv</td><td>See below.</td></tr>
+  </table>
 
   <p>Inside the information block we have the following possible key values.  Not all are required.
   </p>
 
-  <pre>
-type              "" [file type]
-company           "" [company name]
-copyright         "" [copyright if any]
-author            "" [client employee name]
-dateCreated       t* [date created]
-dateModified      t* [date modified]
-comment           "" [comments]
-software          "" [software preparing this file]
-softwareVersion   "" [software version]
-projectName       "" [name of project area]
-projectMin        PR [minimum project area point]
-projectMax        PR [maximum project area point]
-projectSystem     "" [coordinate system the project is in]
-...
-</pre>
-
-  <p>
-   [file type] is one of...
-  </p>
   <table>
-   <tr><th>Value</th><th>Description</th></tr>
-   <tr><td>Mixed</td><td>Combination of any of the types below.</td></tr>
-   <tr><td>Drillhole</td><td>Only holds drillhole data.</td></tr>
-   <tr><td>Geometry</td><td>Only holds geometry data.</td></tr>
-   <tr><td>Model</td><td>Only holds model data.</td></tr>
-   <tr><td>...</td></tr>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
+   <tr><td>type           </td><td>""</td><td>File type of the MI-MIFF.  One of...<br />
+   Mixed - Combinatino of any of the types below.<br />
+   Drillhole - Only holds drillhole data.<br />
+   Geometry - Only holds geometry data.<br />
+   Model - Only holds model data.</td></tr>
+   <tr><td>company        </td><td>""</td><td>Name of company that the data belongs to.</td></tr>
+   <tr><td>copyright      </td><td>""</td><td>Copyright information for the data.</td></tr>
+   <tr><td>author         </td><td>""</td><td>The name of the author of this data.</td></tr>
+   <tr><td>dateCreated    </td><td>t*</td><td>The date this data was created on.</td></tr>
+   <tr><td>dateModified   </td><td>t*</td><td>The date this data was modified.</td></tr>
+   <tr><td>comment        </td><td>""</td><td>Comments relevant to this file.</td></tr>
+   <tr><td>software       </td><td>""</td><td>The software that prepared this file.</td></tr>
+   <tr><td>softwareVersion</td><td>""</td><td>The software version that prepared this file.</td></tr>
+   <tr><td>projectName    </td><td>""</td><td>The project name associated with the data.</td></tr>
+   <tr><td>projectMin     </td><td>PR</td><td>The project minimum coordinate.  This need not be exact or present.</td></tr>
+   <tr><td>projectMax     </td><td>PR</td><td>The project maximum coordinate.  This need not be exact or present.</td></tr>
+   <tr><td>projectSystem  </td><td>""</td><td>The coordinate system used for the coordinated found in the file.</td></tr>
   </table>
 
   <!--##########################################################################################-->
   <!--##########################################################################################-->
   <!--##########################################################################################-->
-  <script>HeaderAdd(1, "formatMineModel", "MIFF Format: Mining: Model");</script>
+  <script>HeaderAdd(1, "formatMineGeometry", "Geometry");</script>
+  
+  <p>The types of data that are common to store as geometry are...</p>
+  
+  <ul>
+  <li>Point</li>
+  <li>Point Cloud</li>
+  <li>Symbol</li>
+  <li>Text</li>
+  <li>Polyline (simple open and closed polylines)</li>
+  <li>Polyline (complex open and closed polylines)</li>
+  <li>Surface (irregular surface, open and closed (solid))</li>
+  <li>Surface (regular surface, open (and closed?))</li>
+  <li>Grid (plane and fence definitions)</li>
+  </ul>
+  
+  <p>Point data is just that, a single east, north, and elevation.  But also associated with that 
+  point we may have other values that the user may want to record with that location in space.</p>
+  
+  <p>Point Cloud data is a little more involved than just point data.  Mainly a point cloud is still
+  just points but the points are all related to each other in some manner so they should be treated
+  as a unit instead of as individual parts.</p>
+  
+  <p>Symbol data is a little more involved than a simple point.  Not only does it have all the 
+  information of a point but it also has orientation in space as well as all the other information
+  that points have.  Sybols are also complex in that their display geometry can be a combination of
+  points, polylines, and simple text.</p>
+  
+  <p>Text data is a little more involved than a point and more like a symbol in that it will have
+  orientation in 3D space.</p>
+  
+  <p>Polyline data is an ordered list of point data where there is a connection between successive
+  points in the list.  The simple polyline is a single connect line in space.  A simple polygon is
+  when there is a duplicated end point that matches the start point.  A complex polyline is a line
+  that is disjoint in space but the disjoint lines are all still treated as one polyline.  A complex
+  polygon is one where you may have voids inside a polygon.  A slice of Swiss cheese if that makes a
+  a more accurate image in your mind.  The collection of polygons should still be treated as one
+  thing.</p>
+  
+  <p>Surface data defines some sort of 3D boundary from inside and outside, at a transition or 
+  other.  The irregular case is where the surface is defined by a point list as well as a face
+  connectivity list.  This means triangles need not be all the same size.  The regular case is 
+  defining just a point list where it is structured in a grid where there is a known row and column
+  count.</p>
+  
+  <p>Grid data is defining planes in space or vertical fence in space.  Mainly used for defining 2D
+  data.</p>
+  
+  <!--==========================================================================================-->
+  <!--==========================================================================================-->
+  <script>HeaderAdd(2, "formatMineGeomInfo", "Information Block");</script>
+
+  <p>After the general information block the next block will be a Geometry Information block.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>infoGeom</td><td>kv</td><td>See below.</td></tr>
+  </table>
+
+  <p>Inside, you will find most of the following key values.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
+   <tr><td>type</td><td>""</td><td>One of the following<br />
+   Point<br />
+   PointCloud<br />
+   Symbol<br />
+   Text<br />
+   Polyline<br />
+   PolylineComplex<br />
+   Surface<br />
+   SurfaceGrid<br />
+   Grid</td></tr>
+   <tr><td>itemList</td><td>kv</td><td>A list of items for the element level.  Any element type can have 
+   element level attributes.</td></tr>
+   <tr><td>itemListPoint</td><td>kv</td><td>A list of items for the point level.  Usually only used
+   on Points, PointCloud, and Polyline types.</td></tr>
+   <tr><td>itemListEdge</td><td>kv</td><td>A list of items for the edge level.  Only for Polyline 
+   types.</td></tr>
+   <tr><td>data</td><td>kv</td><td>See below as to the contents of this which depends on type.</td></tr>
+  </table>
+  
+  <p>For itemList* see the ItemList section below.</p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataPoint", "Point");</script>
+  
+  <p></p>
+
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <!--##########################################################################################-->
+  <script>HeaderAdd(1, "formatMineModel", "Model");</script>
 
   <p>Some of the information found here is based off of the block model formats that are used at
   Hexagon, where I work, but also from information found freely on the internet.</p>
@@ -438,61 +526,53 @@ projectSystem     "" [coordinate system the project is in]
 
   <!--==========================================================================================-->
   <!--==========================================================================================-->
-  <script>HeaderAdd(2, "formatMineModelInfo", "Information Block: Model");</script>
+  <script>HeaderAdd(2, "formatMineModelInfo", "Information Block");</script>
 
   <p>After the general information block the next block will be the Model Information block.</p>
 
-  <pre>
-infoModel kv
- type             "" [model type]
- isSubblocked     bo [true if subblocked]
- subblockType     "" [subblock type]
- subblockOption   Pn [subblock fixed resolution]
- subblockOption   pn [subblock row col resolution]
- subblockOption   n1 [subblock octtree level count]
- origin           PR [origin point]
- colVec           PR [column vector, length if vector is the length of the block] 
- rowVec           PR [row vector, length of the vector is the length of the block]
- levVec           PR [level vector, length of the vector id the length of the block] 
- blockCount       Pn [number of column, row, level blocks]
- isLevVariable    bo [true if variable level heights]
- levList          r4a [number of levels] [length] [length] ...
- itemList         kv [item list count]
-  item kv 
-   id          "" [item id]
-   nameLong    "" [item name]
-   nameShort   "" [item name short]
-   type        ty [item type]
-   min         r4 [item min value]
-   max         r4 [item max value]
-   precision   r4 [item precision]
-   enumList    ""A [enum count] 
-   default     [type] [default value for this item]
-   calculation "" [calculation field value]
-   ...
-   \n
-  ...
-  \n
- \n
-\n
-</pre>
-
-  <p><strong>[model type]</strong> will be one of...</p>
-  
   <table>
-   <tr><th>Value</th><th>Description</th></tr>
-   <tr><td>block     </td><td>For a block model.   </td></tr>
-   <tr><td>seam      </td><td>For a seam model.    </td></tr>
-   <tr><td>surface   </td><td>For a surface model. </td></tr>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>infoModel</td><td>kv</td><td>See below.</td></tr>
   </table>
 
-  <p><strong>[subblock type]</strong> will be one of...</p>
-  
+  <p>Inside, you will find most of the following key values.</p>
+
   <table>
-   <tr><th>Value</th><th>Description</th></tr>
-    <tr><td>fixed</td><td>For a regular division of the block in the east, north, and z directions
-    of the block.<br />
-    <pre>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
+   <tr><td>type          </td><td>""</td><td>The mode type.  One of...<br />
+   Block - For a block model.<br />
+   Seam - For a seam model.<br/>
+   Surface - For a surface model.<br /></td></tr>
+   <tr><td>isSubblocked  </td><td>bo</td><td>True if subblocked.</td></tr>
+   <tr><td>subblockType  </td><td>""</td><td>The subblock type.  One of...<br />
+   Fixed<br />
+   Semi<br />
+   Octree<br />
+   Free<br />
+   (See below for more details.)</td></tr>
+   <tr><td>subblockOption</td><td>Pn</td><td>This subblock option is for Fixed subblocking and will define how many subdivisions are used per block.</td></tr>
+   <tr><td>subblockOption</td><td>pn</td><td>This subblock option is for Semi subblocking and will define how many subdivisions are used for the row and col directions.</td></tr>
+   <tr><td>subblockOption</td><td>n1</td><td>This subblock option is for Octree subblocking and will define how many levels of octree splits are allowed.</td></tr>
+   <tr><td>origin        </td><td>PR</td><td>The top most, minimum point for the model.</td></tr>
+   <tr><td>colVec        </td><td>PR</td><td>The column vector.  This defines the direction of increasing column index.  The length of this vector is the length of the block in this direction. </td></tr>
+   <tr><td>rowVec        </td><td>PR</td><td>The row vector.  This defines the direction of increasing row index.  The length of the vector is the length of the block in this direction.</td></tr>
+   <tr><td>levVec        </td><td>PR</td><td>The level vector.  This defines the direction of increasing level index.  The length of the vector is the length of the block in this direction.  However the length may be unit if the block model is using variable level heights.</td></tr>
+   <tr><td>blockCount    </td><td>Pn</td><td>The number of column, row, and level blocks.</td></tr>
+   <tr><td>isLevVariable </td><td>bo</td><td>True if variable level heights are used.  levList should follow.</td></tr>
+   <tr><td>levList       </td><td>r4</td><td>Always an array of values.  The values will be the length of each level and must match the block level count.</td></tr>
+   <tr><td>itemList      </td><td>kv</td><td>The items stored per block in the model.  This can be an array of Items.  See Item below for item information.</td></tr>
+   <tr><td>data          </td><td>vs</td><td>See below for the contents</td></tr>
+  </table> 
+  
+  <p>See ItemList section for itemList structure.</p>
+   
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelInfoSubblock", "Subblock Type");</script>
+  
+  <p><strong>fixed</strong> For a regular division of the block in the east, north, and z directions
+  of the block.</p>
+  
+  <pre>
 Using just a cross section.
 Level +--+--+--+--+
   |   |  |  |  |  | <--- Each sub-block of the parent block is of uniform size.
@@ -502,11 +582,12 @@ Level +--+--+--+--+
   |   |  |  |  |  |
   V   +--+--+--+--+
       Row or Column --->
-</pre></td></tr>
+</pre>
 
-    <tr><td>semi</td><td>For a regular division of a block in the east and north directions but an
-    infinitely variable z value for block height.<br />
-    <pre>
+  <p><strong>semi</strong> For a regular division of a block in the east and north directions but an
+  infinitely variable z value for block height.</p>
+  
+  <pre>
 +--+--+--+--+
 |  +--+  |  |
 |  |  +--+  |
@@ -514,20 +595,22 @@ Level +--+--+--+--+
 +--+  |  |  |
 +--+--+--+--+
 Uniform divisions in the row and column directions.
-</pre></td></tr>
+</pre>
 
-    <tr><td>octree</td><td>For an oct-tree subvision of a block.<br />
-    <pre>
+  <p><strong>octree</strong> For an oct-tree subvision of a block.</p>
+  
+  <pre>
 +-----+-----+
 |     |     |
 +--+--+-----+  Recursive bisecting the blocks until a limit.
 +--+--+     |
 +--+--+-----+
-</pre></td></tr>
+</pre>
 
-    <tr><td>free</td><td>For a free subdivision of a block where each subblock is individually
-    defined as being some subvolume of the parent.<br />
-    <pre>
+  <p><strong>free</strong> For a free subdivision of a block where each subblock is individually
+  defined as being some subvolume of the parent.</p>
+  
+  <pre>
 +-----------+
 |    +----+ |
 |    |    | |
@@ -535,18 +618,9 @@ Uniform divisions in the row and column directions.
 +--+        | those types of subblocking I have not addressed.
 |  |        |
 +--+--------+
-</pre></td></tr>
-  </table>
+</pre>
 
-
-  <p>Depending on what is set for [subblock type] there will be one of 3 [subblockOption] values.</p>
-  
-  <ul>
-   <li>fixed subblocking requires a Pn to define the number of divisions in the east, north and z directions.</li>
-   <li>semiFixed subblocking requires a pn to define the number of divisions in the east and north directions.</li>
-   <li>octree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.</li>
-   <li>free subblocking does not require an option.</li>
-  </ul>
+  <p>For both block and subblock, indexing of a block in the model will look like the image below.</p>
 
   <pre>
        \   /
@@ -572,67 +646,17 @@ Uniform divisions in the row and column directions.
       |
 </pre>
 
-  <p><strong>origin</strong> - The extreme most point of the first column, first row, and first 
-  level block of the model.</p>
+  <p>The origin is the extreme most point of the first column, first row, and first level block of 
+  the model.</p>
   
-  <p><strong>colVec, rowVec, levVec</strong> - The direction vectors of increasing block index for 
-  the column, row, and level directions.  The length of this vector is the size of the block in the
-  column, row and level directions.  levVec does not need to be sized if the level height is 
-  variable.  It should at least be unit length.  All vectors need not be perpendicular to each other
-  but usually this is the case in most software.  I believe there is one software where colVec and 
-  rowVec are not 90 degrees to the levVec.  Essentially creating sloped levels.</p>
-  
-  <p><strong>blockCount</strong> - The number of column, row, and level blocks.</p>
-  
-  <p><strong>isLevVariable</strong> - Flag to indicate the level heights are not uniform.  This does
-  not need to be present if the levels are a fixed height.</p>
-  
-  <p><strong>levList</strong> - A list of level heights starting from first level.  Only required if
-  isLevVariable is true.</p>
-  
-  <p><strong>itemList</strong> - A key value block for the list of items stored in each block.  Can 
-  be using the array notation for this block if item count is known.</p>
-
-  <p><strong>item</strong> - A key value block describing the item.</p>
-  
-  <p><strong>id</strong> - A short unique string uniquely identifying the item.</p>
-  
-  <p><strong>nameLong</strong> - A 'nice' name for the item.</p>
-  
-  <p><strong>nameShort</strong> - A 'compact' name for the item.</p>
-  
-  <p><strong>type</strong> - What sort of value the item stores.  One of "", r4, r8, n1, n2, n4, n8,
-  i1, i2, i4, i8, en ("en" for enumeration value), +x ("+x" for calculated field)</p>
-  
-  <p><strong>min, max</strong> - limits for an item if a number value.</p>
-  
-  <p><strong>precision</strong> - The accuracy of the number if type is r4 or r8.</p>
-  
-  <p><strong>enumList</strong> - Required only for "en" type.  This lists the enumeration values 
-  available in a string list.</p>
-  
-  <p><strong>default</strong> - default value for this item if block is skipped.</p>
-  
-  <p><strong>calculation</strong> - a formula that is used to calculate the contents of this value.
-  Use $[item id] in the formula to refer to another item value in the current block.  Full 
-  discussion about the formula composition will be discussed elsewhere.</p>
-  
-  <pre>
-Calculation example:
-($ore% * $cu) - $i_am_making_something_up
-</pre>
-
-  <!--==========================================================================================-->
-  <!--==========================================================================================-->
-  <script>HeaderAdd(2, "formatMineModel", "Model Block:");</script>
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineModelInfoData", "Data");</script>
 
   <p>This is where the model data is placed.  The format is slightly different in that it is a key 
   value list but without value headers and potentially optional values depending on the key.</p>
 
-  <pre>model vs</pre>
-
-  <p>The model data will be enclosed in a value stream chunk.  This stream can be in text, e, or z 
-  encodings.  The contents are broken down in key, or key and value pairs.</p>
+  <p>The model data is a value stream chunk.  This stream can be in text, e, or z encodings.  The 
+  contents are broken down in key, or key and value pairs.</p>
 
   <table>
    <tr><th>Key&nbsp;(1&nbsp;Byte)</th><th>Value</th></tr>
@@ -643,13 +667,19 @@ Calculation example:
    <tr><td>C           </td><td>n2 value follows immeadiately.  Jump to current column index + N.</td></tr>
    <tr><td>c           </td><td>No value.  Jump to next column.</td></tr>
    <tr><td>s           </td><td>Defining subblock.  See subblocking information below to deal with the various subblock types.</td></tr>
-   <tr><td>V           </td><td>For the current block or subblock, provide all values for the items defined in the infoModel section in the order they appear in the infoModel (not including calculated items),</td></tr>
-   <tr><td>            </td><td>each value separated by a \n in text mode.  In Binary mode values are using as many bytes as necessary as defined by the items. </td></tr>
-   <tr><td>            </td><td>Increment the column or subblock column (if applicable).</td></tr>
-   <tr><td>            </td><td>(If applicable) If this is the last column or subblock column, column restarts at the first column, increment the row.</td></tr>
-   <tr><td>            </td><td>(If applicable) If this is the last row or subblock row, row restarts at the first row, increment the level.</td></tr>
-   <tr><td>            </td><td>(If applicable) If this is the last subblock level, move to the next parent block following these rules.</td></tr>
-   <tr><td>            </td><td>If this is the last block and last subblock block, there should not be anything else in the value stream.</td></tr>
+   <tr><td>V           </td><td>For the current block or subblock, provide all values for the items 
+   defined in the infoModel section in the order they appear in the infoModel (not including 
+   calculated items), each value separated by a \n in text mode.  In Binary mode values are using as
+   many bytes as necessary as defined by the items.<br />
+   Increment the column or subblock column (if applicable).<br />
+   (If applicable) If this is the last column or subblock column, column restarts at the first 
+   column, increment the row.<br />
+   (If applicable) If this is the last row or subblock row, row restarts at the first row, increment
+   the level.<br />
+   (If applicable) If this is the last subblock level, move to the next parent block following these
+   rules.<br />
+   If this is the last block and last subblock block, there should not be anything else in the value
+   stream.</td></tr>
    <tr><td>v           </td><td>No value.  Copy the last blocks values to the current block.  Increment to the next block.</td></tr>
    <tr><td>.           </td><td>No value.  Indicates end of the subblock data or value stream.</td></tr>
   </table>
@@ -657,23 +687,24 @@ Calculation example:
   <p>The above may not make that much sense yet so here is an example of a 5x5 block model where we
   have 3 r4 values per block.</p>
 
-  <pre>
-File                   What is happening
---------------------   -----------------
-model vs               Start of the model data value stream.  Current block is 0 (first) level, 0 (first) row, 0 (column)
-B2                     Add 2 to the level index.  Current block jumps to 2, 0, 0.  All blocks on levels 0 and 1 have default values.
-R3                     Add 2 to the row index. Curent block jumps to 2, 2, 0.  All blocks on level 2, rows 0 and 1 have default values.
-C2                     Add 2 to the column index.  Current block jumps to 2, 2, 2.  Block 2, 2, 0, and Block 2, 2, 1 have default values.
-v1.2\n2.3\n3.14\n      Block 2, 2, 2 has values 1.2, 2.3, 3.14.  Current block after this line is 2, 2, 2.
-c                      Block 2, 2, 3 get default value.  Current block after this line is 2, 2, 4.
-c                      Block 2, 2, 4 get default value.  Current block after this line is 2, 3, 0.  We jumped to the next row
-s                      Block 2, 3, 0 is subblocked.  Depending on the subblocking used we start at 0, 0, 0 subblock and used the same B, b, R, r, C, c for 
-                       navigating the subblock blocks until we reach the subblock block or a '.' key is reacched.  See below for subblock filling.
-S                      Similar to s but parent block has values as well as having subblocks with values.  First v encountered is for the parent block.
-                       c to jump to the first subblock block.
-...
-.                      Current block can be anything, this indicates that the rest of the model blocks not yet reached are set to default values.
-</pre>
+  <table>
+   <tr><th>File&nbsp;Contents</th><th>What is happening</th></tr>
+   <tr><td>model vs         </td><td>Start of the model data value stream.  Current block is 0 (first) level, 0 (first) row, 0 (column)</td></tr>
+   <tr><td>B2               </td><td>Add 2 to the level index.  Current block jumps to 2, 0, 0.  All blocks on levels 0 and 1 have default values.</td></tr>
+   <tr><td>R3               </td><td>Add 2 to the row index. Curent block jumps to 2, 2, 0.  All blocks on level 2, rows 0 and 1 have default values.</td></tr>
+   <tr><td>C2               </td><td>Add 2 to the column index.  Current block jumps to 2, 2, 2.  Block 2, 2, 0, and Block 2, 2, 1 have default values.</td></tr>
+   <tr><td>v1.2\n2.3\n3.14\n</td><td>Block 2, 2, 2 has values 1.2, 2.3, 3.14.  Current block after this line is 2, 2, 2.</td></tr>
+   <tr><td>c                </td><td>Block 2, 2, 3 get default value.  Current block after this line is 2, 2, 4.</td></tr>
+   <tr><td>c                </td><td>Block 2, 2, 4 get default value.  Current block after this line is 2, 3, 0.  We jumped to the next row</td></tr>
+   <tr><td>s                </td><td>Block 2, 3, 0 is subblocked.  Depending on the subblocking used
+   we start at 0, 0, 0 subblock and used the same B, b, R, r, C, c for navigating the subblock blocks
+   until we reach the subblock block or a '.' key is reacched.  See below for subblock filling.</td></tr>
+   <tr><td>S                </td><td>Similar to s but parent block has values as well as having 
+   subblocks with values.  First v encountered is for the parent block. c to jump to the first 
+   subblock block.</td></tr>
+   <tr><td>...              </td><td>
+   <tr><td>.                </td><td>Current block can be anything, this indicates that the rest of the model blocks not yet reached are set to default values.
+  </table>
 
   <p>Note that there are no \n after every key value pairs.  This is to keep the text representation
   as compact as possible.  In binary the above will look like...</p>
@@ -685,25 +716,19 @@ S                      Similar to s but parent block has values as well as havin
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineModelFixed", "SubBlock: Fixed");</script>
 
-  <p>
-   In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the
-   subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as
-   for the parent blocks.
-  </p>
+  <p>In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the
+  subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for
+  the parent blocks.</p>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineModelSemi", "SubBlock: Semi");</script>
 
-  <p>
-   In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into
-   the subblocks as defined in the infoModel section.  One difference...
-  </p>
+  <p>In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into
+  the subblocks as defined in the infoModel section.  One difference...</p>
 
-  <p>
-   In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.
-   This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level
-   subblocks will depend on how many times H is used for the same column.
-  </p>
+  <p>In this scheme of subblocking, there is an infinite variability in the z direction for each 
+  subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The 
+  number of level subblocks will depend on how many times H is used for the same column.</p>
 
   <table>
    <tr><th>Key</th><th>Value</th></tr>
@@ -738,6 +763,39 @@ S                      Similar to s but parent block has values as well as havin
    <tr><th>Key</th><th>Value</th></tr>
    <tr><td>c</td><td>6 x r4 values follow.  First 3 r4 values are percents for the min point and the second 3 r4 values are percents for the max point of the subblock.</td></tr>
    <tr><td>.</td><td>Indicates we are done with the subblocking and to process to the next parent block.</td></tr>
+  </table>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(1, "formatMineItemList", "ItemList");</script>
+  
+  <p>All item lists are structured as a 'kv'.  An item list will list all the items that each data 
+  point/slot/block/assay will have associated with it.  The Item list is just a simple list of items.
+  Items defined how some value is recorded.</p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(2, "formatMineModelInfoItem", "Item");</script>
+  
+  <p>Each item is also a key-value block.</p>
+   
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
+   <tr><td>item</td><td>kv</td><td>See below.</td></tr>
+  </table>
+  
+  <p>Inside, you will find most of the following key values.</p>
+  
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
+   <tr><td>id         </td><td>""</td><td>The short identifier for the item.</td></tr>
+   <tr><td>nameLong   </td><td>""</td><td>The nice, longer name for the item.</td></tr>
+   <tr><td>nameShort  </td><td>""</td><td>The shorter name for the item.</td></tr>
+   <tr><td>type       </td><td>ty</td><td>The type of value associated with this item.  One of... "", i1, i2, i4, i8, n1, n2, n4, n8, r4, r8, en (enumerated field), +x (calculated field)</td></tr>
+   <tr><td>min        </td><td>r4</td><td>The minimum value for this item, if available or applicable.</td></tr>
+   <tr><td>max        </td><td>r4</td><td>The maximum value for this item, if available or applicable.</td></tr>
+   <tr><td>precision  </td><td>r4</td><td>The precision value for this item, if available or applicable.  I.E. 0.001 if the value is accurate to that amount.</td></tr>
+   <tr><td>enumList   </td><td>""</td><td>The list of enum values if type above is "en".  What is store in the block values is the index into this list.</td></tr>
+   <tr><td>default    </td><td>[type]</td><td>Depending on "type" above the [type] here will match.  This defines a default value for blocks that are not specifically set.</td></tr>
+   <tr><td>calculation</td><td>""</td><td>This item is a calculated field.  This specifies the formula used for this field.</td></tr>
   </table>
 
 

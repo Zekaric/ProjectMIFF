@@ -449,36 +449,37 @@ function UpdateToc()
   
   <!--==========================================================================================-->
   <!--==========================================================================================-->
-  <script>HeaderAdd(2, "formatMineGeomInfo", "Information Block");</script>
+  <script>HeaderAdd(2, "formatMineGeomInfo", "Geometry Block");</script>
 
-  <p>After the general information block the next block will be a Geometry Information block.</p>
+  <p>After the general information block the next block will be a Geometry Information block.  There
+  can, and probably will, be multiple of these Geometry blocks in a single file.</p>
 
   <table>
    <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>infoGeom</td><td>kv</td><td>See below.</td></tr>
+   <tr><td>geom</td><td>kv</td><td>See below.</td></tr>
   </table>
 
   <p>Inside, you will find most of the following key values.</p>
 
   <table>
    <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th>
-   <tr><td>type</td><td>""</td><td>One of the following<br />
-   Point<br />
-   PointCloud<br />
-   Symbol<br />
-   Text<br />
-   Polyline<br />
-   PolylineComplex<br />
-   Surface<br />
-   SurfaceGrid<br />
-   Grid</td></tr>
    <tr><td>itemList</td><td>kv</td><td>A list of items for the element level.  Any element type can have 
    element level attributes.</td></tr>
    <tr><td>itemListPoint</td><td>kv</td><td>A list of items for the point level.  Usually only used
    on Points, PointCloud, and Polyline types.</td></tr>
    <tr><td>itemListEdge</td><td>kv</td><td>A list of items for the edge level.  Only for Polyline 
    types.</td></tr>
-   <tr><td>data</td><td>kv</td><td>See below as to the contents of this which depends on type.</td></tr>
+   <tr><td>point<br />
+   pointCloud<br />
+   text<br />
+   symbol<br />
+   polyline<br />
+   polylineComplex<br />
+   surface<br />
+   surfaceGrid<br />
+   grid</td><td>kv</td><td>It will be one of the keys to the left.  And see below as to the contents
+   of this which depends on the key.  There can be more than one of these kv inside the geometry
+   block</td></tr>
   </table>
   
   <p>For itemList* see the ItemList section below.</p>
@@ -486,7 +487,90 @@ function UpdateToc()
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineGeomInfoDataPoint", "Point");</script>
   
-  <p></p>
+  <p>This will allow the storage of point data where each point in the collection of points is its
+  own entity and not necessarily related to any neighboring point.  For space all points are grouped
+  together.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
+  </table>
+  
+  <p>The contents of data is a simpler data stream.</p>
+  
+  <pre>[n4:point count] [PR, Point] [item values] ... [PR, Point] [item values] ...</pre>
+  
+  <p>The first part of the stream is the point count.  This will indicate how many points are 
+  stored.  Each point will have the the point triplet as well as all the item values in the order
+  they were defined.  This pattern is duplicated for as many times as dictated in point count.</p>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataPointCloud", "Point Cloud");</script>
+  
+  <p>In a way it is almost exactly like the point above except there can be element level item 
+  values that the group of points will share.  The group of points are considered one entity in the
+  end.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
+   <tr><td>itemList</td><td>vs</td><td>See below on the value stream.</td></tr>
+  </table>
+  
+  <p>The contents of data is a simpler data stream.</p>
+  
+  <pre>[n4:point count] [[PR:location] [item values]]*</pre>
+  
+  <p>The first part of the stream is the point count.  This will indicate how many points are 
+  stored.  Each point will have the the point triplet as well as all the item values in the order
+  they were defined.  This pattern is duplicated for as many times as dictated in point count.</p>
+  
+  <p>itemList is the item values for the entire point cloud instead of each point in the cloud.  
+  The values are in the order they are listed and their size are as they are defined by the item.</p>
+  
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataText", "Text");</script>
+  
+  <p>This will allow the storage of text data where each text element in the collection of text 
+  elements is its own entity and not necessarily related to any neighboring point.  For space all
+  text elements are grouped together.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
+  </table>
+  
+  <p>The contents of data is a simpler data stream.</p>
+  
+  <pre>[n4:text count] [[FR:location triangle] [en:fixed,forward,upright] [bo:isBlockAlignmentFlipping, isAlignmentFlipping, isRelativeSized] ["":font] [r4:font size] [en:block alignment] [en:line alignment] ["":text] [item values]]*</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataSym", "Symbol");</script>
+  
+  <p>This will allow the storage of text data where each text element in the collection of text 
+  elements is its own entity and not necessarily related to any neighboring point.  For space all
+  text elements are grouped together.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
+  </table>
+
+  <p>The contents of data is a simpler data stream.</p>
+  
+  <pre>[n4:text count] [[FR:location triangle] [en:fixed,forward,upright] [bo:isFlipping, isRelativeSized] ["":symbol] [item values]]*</pre>
+
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataPoly", "Polyline");</script>
+  
+  <p>This will allow the storage of polyline data where each polyline in the collection of polylines 
+  is its own entity and not necessarily related to any neighboring polyline.</p>
+
+  <table>
+   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
+   <tr><td>itemList</td><td>vs</td><td>See below on the value stream.</td></tr>
+   <tr><td>data</td><td>vs</td><td>The list of point lists for each of the simple polylines.</td></tr>
+  </table>
 
   <!--##########################################################################################-->
   <!--##########################################################################################-->
@@ -526,13 +610,15 @@ function UpdateToc()
 
   <!--==========================================================================================-->
   <!--==========================================================================================-->
-  <script>HeaderAdd(2, "formatMineModelInfo", "Information Block");</script>
+  <script>HeaderAdd(2, "formatMineModelInfo", "Model Block");</script>
 
-  <p>After the general information block the next block will be the Model Information block.</p>
+  <p>After the general information block the next block will be the model block.  Typically in a 
+  single model file you would only have just the one model.  However there is nothing restricting
+  the format to have more than one model block.</p>
 
   <table>
    <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>infoModel</td><td>kv</td><td>See below.</td></tr>
+   <tr><td>model</td><td>kv</td><td>See below.</td></tr>
   </table>
 
   <p>Inside, you will find most of the following key values.</p>
@@ -566,6 +652,35 @@ function UpdateToc()
   
   <p>See ItemList section for itemList structure.</p>
    
+  <p>For both block and subblock, indexing of a block in the model will look like the image below.</p>
+
+  <pre>
+       \   /
+        \ /
+         +  Column 1
+        / \
+ Row 1 /   \   /
+      /     \ /
+     /Lev 0  +
+\   / Row 0 /|
+ \ /  Col 0/ |
+  +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
+  |\     /   |/
+  | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
+\ |  \ /    /|
+ \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
+  +   |   /
+  |\  | <--------- levVec (Length can be block size or unit, depends see below. Direction is direction of increasing level index.)
+  | \ | /
+     \|/
+      +
+      | Level 1
+      |
+</pre>
+
+  <p>The origin is the extreme most point of the first column, first row, and first level block of 
+  the model.</p>
+  
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineModelInfoSubblock", "Subblock Type");</script>
   
@@ -620,35 +735,6 @@ Uniform divisions in the row and column directions.
 +--+--------+
 </pre>
 
-  <p>For both block and subblock, indexing of a block in the model will look like the image below.</p>
-
-  <pre>
-       \   /
-        \ /
-         +  Column 1
-        / \
- Row 1 /   \   /
-      /     \ /
-     /Lev 0  +
-\   / Row 0 /|
- \ /  Col 0/ |
-  +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
-  |\     /   |/
-  | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
-\ |  \ /    /|
- \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
-  +   |   /
-  |\  | <--------- levVec (Length can be block size or unit, depends see below. Direction is direction of increasing level index.)
-  | \ | /
-     \|/
-      +
-      | Level 1
-      |
-</pre>
-
-  <p>The origin is the extreme most point of the first column, first row, and first level block of 
-  the model.</p>
-  
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineModelInfoData", "Data");</script>
 
@@ -714,14 +800,14 @@ Uniform divisions in the row and column directions.
 </pre>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "formatMineModelFixed", "SubBlock: Fixed");</script>
+  <script>HeaderAdd(4, "formatMineModelFixed", "SubBlock: Fixed");</script>
 
   <p>In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the
   subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for
   the parent blocks.</p>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "formatMineModelSemi", "SubBlock: Semi");</script>
+  <script>HeaderAdd(4, "formatMineModelSemi", "SubBlock: Semi");</script>
 
   <p>In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into
   the subblocks as defined in the infoModel section.  One difference...</p>
@@ -745,7 +831,7 @@ Uniform divisions in the row and column directions.
   different number of levels that others.</p>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "formatMineModelTree", "SubBlock: Octree");</script>
+  <script>HeaderAdd(4, "formatMineModelTree", "SubBlock: Octree");</script>
 
   <p>In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we
   are already at a subblock then that subblock will be split into small 8 uniform pieces.  This
@@ -754,7 +840,7 @@ Uniform divisions in the row and column directions.
   <p>The 's' key need to preceed the v record.</p>
 
   <!---------------------------------------------------------------------------------------------->
-  <script>HeaderAdd(3, "formatMineModelFree", "SubBlock: Free");</script>
+  <script>HeaderAdd(4, "formatMineModelFree", "SubBlock: Free");</script>
 
   <p>In the free block case, an 's' key will indicate the parent block is subblocked.  However after
   that you will need to define the blocks manually.</p>

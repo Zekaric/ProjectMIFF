@@ -477,7 +477,7 @@ function UpdateToc()
    polylineComplex<br />
    surface<br />
    surfaceGrid<br />
-   grid</td><td>kv</td><td>It will be one of the keys to the left.  And see below as to the contents
+   grid</td><td>vs</td><td>It will be one of the keys to the left.  And see below as to the contents
    of this which depends on the key.  There can be more than one of these kv inside the geometry
    block</td></tr>
   </table>
@@ -490,15 +490,8 @@ function UpdateToc()
   <p>This will allow the storage of point data where each point in the collection of points is its
   own entity and not necessarily related to any neighboring point.  For space all points are grouped
   together.</p>
-
-  <table>
-   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
-  </table>
   
-  <p>The contents of data is a simpler data stream.</p>
-  
-  <pre>[n4:point count] [PR, Point] [item values] ... [PR, Point] [item values] ...</pre>
+  <pre>[n4:point count] [[PR, Point] [elem level item values]]*</pre>
   
   <p>The first part of the stream is the point count.  This will indicate how many points are 
   stored.  Each point will have the the point triplet as well as all the item values in the order
@@ -510,23 +503,12 @@ function UpdateToc()
   <p>In a way it is almost exactly like the point above except there can be element level item 
   values that the group of points will share.  The group of points are considered one entity in the
   end.</p>
-
-  <table>
-   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
-   <tr><td>itemList</td><td>vs</td><td>See below on the value stream.</td></tr>
-  </table>
   
-  <p>The contents of data is a simpler data stream.</p>
-  
-  <pre>[n4:point count] [[PR:location] [item values]]*</pre>
+  <pre>[elem level item values] [n4:point count] [[PR:location] [point level item values]]*</pre>
   
   <p>The first part of the stream is the point count.  This will indicate how many points are 
   stored.  Each point will have the the point triplet as well as all the item values in the order
   they were defined.  This pattern is duplicated for as many times as dictated in point count.</p>
-  
-  <p>itemList is the item values for the entire point cloud instead of each point in the cloud.  
-  The values are in the order they are listed and their size are as they are defined by the item.</p>
   
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineGeomInfoDataText", "Text");</script>
@@ -534,13 +516,6 @@ function UpdateToc()
   <p>This will allow the storage of text data where each text element in the collection of text 
   elements is its own entity and not necessarily related to any neighboring point.  For space all
   text elements are grouped together.</p>
-
-  <table>
-   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
-  </table>
-  
-  <p>The contents of data is a simpler data stream.</p>
   
   <pre>[n4:text count] [[FR:location triangle] [en:fixed,forward,upright] [bo:isBlockAlignmentFlipping, isAlignmentFlipping, isRelativeSized] ["":font] [r4:font size] [en:block alignment] [en:line alignment] ["":text] [item values]]*</pre>
 
@@ -550,27 +525,39 @@ function UpdateToc()
   <p>This will allow the storage of text data where each text element in the collection of text 
   elements is its own entity and not necessarily related to any neighboring point.  For space all
   text elements are grouped together.</p>
-
-  <table>
-   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>data</td><td>vs</td><td>See below on the value stream.</td></tr>
-  </table>
-
-  <p>The contents of data is a simpler data stream.</p>
   
-  <pre>[n4:text count] [[FR:location triangle] [en:fixed,forward,upright] [bo:isFlipping, isRelativeSized] ["":symbol] [item values]]*</pre>
+  <pre>[n4:symbol count] [[FR:location triangle] [en:fixed,forward,upright] [bo:isFlipping, isRelativeSized] ["":symbol] [item values]]*</pre>
 
   <!---------------------------------------------------------------------------------------------->
   <script>HeaderAdd(3, "formatMineGeomInfoDataPoly", "Polyline");</script>
   
   <p>This will allow the storage of polyline data where each polyline in the collection of polylines 
   is its own entity and not necessarily related to any neighboring polyline.</p>
+  
+  <pre>[n4:poly count] [[elem level item values] [n4:point count] [[PR:points] [point level item values]]*]*</pre>
+  
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataPolyComplex", "Complex Polyline");</script>
+  
+  <p>This will allow the storage of complex polyline data where each complex polyline in the 
+  collection of polylines is its own entity and not necessarily related to any neighboring 
+  polyline.</p>
+  
+  <pre>[n4:poly count] [[elem level item values] [n4:complex poly count] [[n4:point count] [[PR:points] [point level item values]]*]*]*</pre>
+  
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataSurface", "Surface");</script>
+  
+  <p>This will allow the storage of irregular surface data.</p>
+  
+  <pre>[n4:surface count] [[elem level item values] [n4:point count] [[PR:point] [point level item values]]* [n4:edge count] [[pI:edge indicies] [edge level item values]]* [n4:face count] [[PI:face indicies] [face level item values]]*]</pre>
 
-  <table>
-   <tr><th>Key</th><th>Value&nbsp;Header</th><th>Value</th></tr>
-   <tr><td>itemList</td><td>vs</td><td>See below on the value stream.</td></tr>
-   <tr><td>data</td><td>vs</td><td>The list of point lists for each of the simple polylines.</td></tr>
-  </table>
+  <!---------------------------------------------------------------------------------------------->
+  <script>HeaderAdd(3, "formatMineGeomInfoDataSurfaceGrid", "Grid Surface");</script>
+  
+  <p>This will allow the storage of irregular surface data.</p>
+  
+  <pre>[n4:surface count] [[elem level item values] [n4:column point count] [n4:row point count] [[PR:point] [point level item values]]* [edge level item values]* [face level item values]*]</pre>
 
   <!--##########################################################################################-->
   <!--##########################################################################################-->

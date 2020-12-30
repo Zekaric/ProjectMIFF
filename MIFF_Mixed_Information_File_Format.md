@@ -172,95 +172,95 @@ Value header is as follows.
 
 **[type flag]** is one of:
 
-|
-|
-| 3 Letter Type Code| Description|
-| [.]| Key-Value block.|
-| "."| String (UTF8) data.|
-| Azs| Azimuth (strike) using r4. Value in degrees|
-| Azd| Azimuth (dip direction) using r4. Value in degrees|
-| ADd| Azimuth and Dip using r4. Azimuth in degrees. Dip in degrees|
-| AD%| Azimuth and Dip using r4. Azimuth in degrees. Dip in percent|
-| AD:| Azimuth and Dip using r4. Azimuth in degrees. Dip in ratio 1:XXX|
-| bin| Binary data.|
-| boo| Boolean value.|
-| c.1| Color (RGB) using n1.|
-| ca1| Color (RGBA) using n1.|
-| c.f| Color (RGB) using r4.|
-| caf| Color (RGBA) using r4.|
-| cn4| Count same as n4.|
-| cn8| Count same as n8.|
-| Did| Dip using r4. Value in degrees|
-| Di%| Dip using r4. Value in percent|
-| Di:| Dip using r4. Value in ratio 1:XXX|
-| g.1| Graphic using c3.|
-| ga1| Graphic using c4.|
-| gfl| Graphic as an inline included file.|
-| glk| Graphic as a link to a file.|
-| g.f| Graphic using C3.|
-| gaf| Graphic using C4.|
-| i.1| Integer of 1 byte.|
-| i.2| Integer of 2 bytes.|
-| i.4| Integer of 4 bytes.|
-| i.8| Integer of 8 bytes.|
-| id4| Id value, same as n4.  Potentially not unique, user controlled value.|
-| id8| Id value, same as n8.  Potentially not unique, user controlled value.|
-| idg| GUID value.  Must be unique in a given MIFF file.  128 bit value.|
-| in4| Index same as n4.|
-| in8| Index same as n8.|
-| m33| 3x3 matrix using r4.|
-| M33| 3x3 matrix using r8.|
-| m44| 4x4 matrix using r4.|
-| M44| 4x4 matrix using r8.|
-| n.1| Natural of 1 byte.|
-| n.2| Natural of 2 bytes.|
-| n.4| Natural of 4 bytes.|
-| n.8| Natural of 8 bytes.|
-| of4| Offset same as n4.|
-| of8| Offset same as n8.|
-| p2r| 2d value using r4.|
-| p2R| 2d value using r8.|
-| p2i| 2d value using i4.|
-| p2I| 2d value using i8.|
-| p2n| 2d value using n4.|
-| p2N| 2d value using n8.|
-| p3r| 3d value using r4.|
-| p3R| 3d value using r8.|
-| p3i| 3d value using i4.|
-| p3I| 3d value using i8.|
-| p3n| 3d value using n4.|
-| p3N| 3d value using n8.|
-| r.4| Real of 4 bytes.|
-| r.8| Real of 8 bytes.|
-| sz4| Size same as n4.|
-| sz8| Size same as n8.|
-| td.| Time, date only.|
-| t.t| Time, time only.|
-| tdt| Time, date and time.|
-| typ| Type value.  One of these 3 letter type codes|
-| vst| Value stream.  The contents deviates from the rest of the format.  Representations will explained where they are used.
+| 3 Letter Type Code | Description |
+| --- | --- |
+| [.] | Key-Value block. |
+| "." | String (UTF8) data. |
+| Azs | Azimuth (strike) using r4. Value in degrees |
+| Azd | Azimuth (dip direction) using r4. Value in degrees |
+| ADd | Azimuth and Dip using r4. Azimuth in degrees. Dip in degrees |
+| AD% | Azimuth and Dip using r4. Azimuth in degrees. Dip in percent |
+| AD: | Azimuth and Dip using r4. Azimuth in degrees. Dip in ratio 1:XXX |
+| bin | Binary data. |
+| boo | Boolean value. |
+| c.1 | Color (RGB) using n1. |
+| ca1 | Color (RGBA) using n1. |
+| c.f | Color (RGB) using r4. |
+| caf | Color (RGBA) using r4. |
+| cn4 | Count same as n4. |
+| cn8 | Count same as n8. |
+| Did | Dip using r4. Value in degrees |
+| Di% | Dip using r4. Value in percent |
+| Di: | Dip using r4. Value in ratio 1:XXX |
+| g.1 | Graphic using c3. |
+| ga1 | Graphic using c4. |
+| gfl | Graphic as an inline included file. |
+| glk | Graphic as a link to a file. |
+| g.f | Graphic using C3. |
+| gaf | Graphic using C4. |
+| i.1 | Integer of 1 byte. |
+| i.2 | Integer of 2 bytes. |
+| i.4 | Integer of 4 bytes. |
+| i.8 | Integer of 8 bytes. |
+| id4 | Id value, same as n4.  Potentially not unique, user controlled value. |
+| id8 | Id value, same as n8.  Potentially not unique, user controlled value. |
+| idg | GUID value.  Must be unique in a given MIFF file.  128 bit value. |
+| in4 | Index same as n4. |
+| in8 | Index same as n8. |
+| m33 | 3x3 matrix using r4. |
+| M33 | 3x3 matrix using r8. |
+| m44 | 4x4 matrix using r4. |
+| M44 | 4x4 matrix using r8. |
+| n.1 | Natural of 1 byte. |
+| n.2 | Natural of 2 bytes. |
+| n.4 | Natural of 4 bytes. |
+| n.8 | Natural of 8 bytes. |
+| of4 | Offset same as n4. |
+| of8 | Offset same as n8. |
+| p2r | 2d value using r4. |
+| p2R | 2d value using r8. |
+| p2i | 2d value using i4. |
+| p2I | 2d value using i8. |
+| p2n | 2d value using n4. |
+| p2N | 2d value using n8. |
+| p3r | 3d value using r4. |
+| p3R | 3d value using r8. |
+| p3i | 3d value using i4. |
+| p3I | 3d value using i8. |
+| p3n | 3d value using n4. |
+| p3N | 3d value using n8. |
+| r.4 | Real of 4 bytes. |
+| r.8 | Real of 8 bytes. |
+| sz4 | Size same as n4. |
+| sz8 | Size same as n8. |
+| td. | Time, date only. |
+| t.t | Time, time only. |
+| tdt | Time, date and time. |
+| typ | Type value.  One of these 3 letter type codes |
+| vst | Value stream.  The contents deviates from the rest of the format.  Representations will explained where they are used. |
+
 
 Why have cn4, cn8, sz4, sz8, ix4, ix8, of4, and of8 when n4 and n8 would suffice?  The extra semantic information about what we are storing may be useful and it separates these values with a hard coded representation.  Potentially in the future, the representation may change to accommodate larger values.  In which case older MIFF files need not have to change.
 
 **[array and encoding flag]** is one of:
 
-|
-|
-| Encoding Code| Description|
-| [space]| Single value, depending on type of data, values is stored readable in text format or base64 encoded.|
-| A| Array of values, depending on type of data, values is stored readable in text format or base64 encoded.|
-| z| Single value.  Data is Zlib compressed then base64 encoded.|
-| Z| Array of values.  Array is Zlib compressed then base64 encoded.
+| Encoding Code | Description |
+| --- | --- |
+| - | Single value, depending on type of data, values is stored readable in text format or Base64 encoded. |
+| = | Array of values, depending on type of data, values is stored readable in text format or Base64 encoded. |
+| z | Single value.  Data is Zlib compressed then Base64 encoded. |
+| Z | Array of values.  Array is Zlib compressed then Base64 encoded. |
+
 
 **[array count]** will only present when A, and Z are used.  This will be an unsigned integer value indicating how many items are in the array.
 
 **[compressed size]** will only present when z and Z are used.  This will be an unsigned integer value indicating the raw, in memory byte count of the compressed data buffer.
 
-A is used to indicate an array of values.  If used the array is either too small to really need compression or too random that compression will not really reduce the byte count.
+= is used to indicate an array of values.  If used the array is either too small to really need compression or too random that compression will not really reduce the byte count.
 
-z, and Z will generate a base64 encoded string in the Text format.  This string lives on one line, there are no '\n' embedded in the encoding.
+z, and Z will generate a Base64 encoded string in the Text format.  This string lives on one line, there are no '\n' embedded in the encoding.
 
-What is base64 encoded and what isn't.  If the value being stored is a floating point value, it will be base64 encoded to maintain precision of the value.  All string, integer, or natural (unsigned integer) numbers are written unencoded.
+What is Base64 encoded and what isn't.  If the value being stored is a floating point value, it will be Base64 encoded to maintain precision of the value.  All string, integer, or natural (unsigned integer) numbers are written unencoded.
 
 #### 2.2.1.3 - Value
 
@@ -353,11 +353,11 @@ As defined above the value header is as follows
 
 [type flag] and [array and encoding flag] is a string of 4 characters.
 
-If combined with '-' then the value is a single value, possibly base64 encoded if it represents floating point data.
+If combined with '-' then the value is a single value, possibly Base64 encoded if it represents floating point data.
 
-If combined with '=' then the value is an array of the given type, possibly base64 encoded if it represents floating point data.
+If combined with '=' then the value is an array of the given type, possibly Base64 encoded if it represents floating point data.
 
-If combined with 'z' or 'Z' then the value is treated as binary, reordered to be Big Endian, compressed using zlib, and encoded into a string using base64.
+If combined with 'z' or 'Z' then the value is treated as binary, reordered to be Big Endian, compressed using zlib, and encoded into a string using Base64.
 
 [array count] will be an unsigned integer value in readable UTF8 indicating how many values in the array.  Only present when A, or Z are used.
 
@@ -366,7 +366,7 @@ If combined with 'z' or 'Z' then the value is treated as binary, reordered to be
 Examples: (adding \n to indicate the necessity of this line.)
 
 ```
-image g.1z 564 64 64 [base64 zip compressed byte stream]\n
+image g.1z 564 64 64 [Base64 zip compressed byte stream]\n
 
 
 count n.1- 128\n
@@ -453,9 +453,9 @@ There can only be 1 separator between the byte count and the start of the string
 
 For an array of strings, the first character of the the next line will be the start of the first string in the array.  The line after that will be the second string.  No lines will have any leading spaces.  Any space visible is part of the string.
 
-'z' encoding, the string is compressed first before converting to base64.
+'z' encoding, the string is compressed first before converting to Base64.
 
-'Z' encoding, unlike 'A', the string array is treated as one big buffer separated by NULL values and then compressed and converted to base64.
+'Z' encoding, unlike 'A', the string array is treated as one big buffer separated by NULL values and then compressed and converted to Base64.
 
 ```
 string "."- 206 <- There can only be one separator.  Otherwise those extra separators are part of the string.  This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string\n
@@ -470,37 +470,37 @@ stringList "."= 3\n
 #### 2.3.5.3 - Simple values
 
 
-|
-|
-| Type Code| Representation|
-| cn4, cn8, i.1, i.2, i.4, i.8, id4, id8, in4, in8, n.1, n.2, n.4, n.8, of4, of8, sz4, sz8| 1 human readable number.|
-| Azs, Azd, Did, Di%, Di:, r.4, r.8| 1 base64 encoded floating point number|
-| p2i, p2I, p2n, p2N| 2 human readable numbers separated by at least one separator.|
-| ADd, AD%, AD:, p2r, p2R| 2 base64 encoded floating point numbers.|
-| p3i, p3I, p3n, p3N, c.1| 3 human readable numbers separated by at least one separator.|
-| p3r, p3R, c.f| 3 base64 encoded floating point numbers.|
-| ca1| 4 human readable numbers separated by at least one separator.|
-| caf| 4 base64 encoded floating point numbers.|
-| m33, M33| 9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.|
-| m44, M44| 16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
+| Type Code | Representation |
+| --- | --- |
+| cn4, cn8, i.1, i.2, i.4, i.8, id4, id8, in4, in8, n.1, n.2, n.4, n.8, of4, of8, sz4, sz8 | 1 human readable number. |
+| Azs, Azd, Did, Di%, Di:, r.4, r.8 | 1 Base64 encoded floating point number |
+| p2i, p2I, p2n, p2N | 2 human readable numbers separated by at least one separator. |
+| ADd, AD%, AD:, p2r, p2R | 2 Base64 encoded floating point numbers. |
+| p3i, p3I, p3n, p3N, c.1 | 3 human readable numbers separated by at least one separator. |
+| p3r, p3R, c.f | 3 Base64 encoded floating point numbers. |
+| ca1 | 4 human readable numbers separated by at least one separator. |
+| caf | 4 Base64 encoded floating point numbers. |
+| m33, M33 | 9 Base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom. |
+| m44, M44 | 16 Base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom. |
+
 
 If using 'A' array flag the above is repeated as many times as there are array elements.  Each array element will be separated by at least one separator.
 
 ```
 OneInt               i.4-   1024\n
 ManyInt              i.4= 8 1 2 4 8 16 32 64 128\n
-OneMatrix            m33-   [base64 encoded matrix]\n
-ManyMatrix           m33= 3 [base64 encoded matrix] [base64 encoded matrix] [base64 encoded matrix]\n
-ManyMatrixCompressed m44Z 9 [compressed byted count] [base64 encoded compressed data]\n
+OneMatrix            m33-   [Base64 encoded matrix]\n
+ManyMatrix           m33= 3 [Base64 encoded matrix] [Base64 encoded matrix] [Base64 encoded matrix]\n
+ManyMatrixCompressed m44Z 9 [compressed byted count] [Base64 encoded compressed data]\n
 ```
 
 AD: and Di:, the ratio for the dip portion is 1 : [value].  [value] is what is stored.  It is an r4 value.
 
 c.f and caf, the values are r4 and typically range between 0.0 and 1.0.
 
-If base64 encoded then byte swap to network order before encoding.
+If Base64 encoded then byte swap to network order before encoding.
 
-If using 'z' or 'Z' encoding flag, byte swap to network order compress the values using zlib and then write out the base64 string representation of the compressed buffer.
+If using 'z' or 'Z' encoding flag, byte swap to network order compress the values using zlib and then write out the Base64 string representation of the compressed buffer.
 
 #### 2.3.5.4 - Binary values, bin
 
@@ -508,20 +508,20 @@ If using 'z' or 'Z' encoding flag, byte swap to network order compress the value
 The binary data will have a header of 1 natural value before the binary data.  This value indicates the byte count of the binary data.  This byte count is not included when using Base64 or Zlib compression.  However the binary data will honor Base64 and Zlib compression if used.
 
 ```
-binKey1 bin- 10 [base64 encoded binary data]\n
+binKey1 bin- 10 [Base64 encoded binary data]\n
 
 
 binKey2 bin= 2\n
-10 [base64 encoded binary data]\n
-10 [base64 encoded binary data]\n
+10 [Base64 encoded binary data]\n
+10 [Base64 encoded binary data]\n
 
 
-binKey3 binz 1024 [compressed byte count] [base64 encoded binary data]\n*
+binKey3 binz 1024 [compressed byte count] [Base64 encoded binary data]\n*
 
 
 binKey2 binZ 2\n
-10240 [compressed byte count] [base64 encoded binary data]\n
-10240 [compressed byte count] [base64 encoded binary data]\n
+10240 [compressed byte count] [Base64 encoded binary data]\n
+10240 [compressed byte count] [Base64 encoded binary data]\n
 ```
 
 Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they should be on the hook to define what the contents of the blob means.  If they do not, then they are being bad citizens and should be shamed!  SHAMED I SAY!
@@ -537,7 +537,7 @@ By default, the value will be 't' for true, or 'f' for false.
 
 'A' encoding flag, the value will be a string of 't' or 'f' letters with no separator in between to save some space.
 
-'Z' will take the bitmap and compress it first before encoding it with base64.  Bitmap being...
+'Z' will take the bitmap and compress it first before encoding it with Base64.  Bitmap being...
 
 ```
 Byte 0                            Byte 1
@@ -547,7 +547,7 @@ Byte 0                            Byte 1
 2^7 2^6 ...                 2^0   2^8 ...
 ```
 
-0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
+0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to Base64.
 
 'z' encoding flag is never used with this type.
 
@@ -572,20 +572,20 @@ Images are written out row by row, left to right, top to bottom.
 Array of graphics will place each graphic on a separate line similar to string encoding.
 
 ```
-image g.1- 2 2 [base64 encoded data]\n
+image g.1- 2 2 [Base64 encoded data]\n
 
 
 image g.1= 2\n
-2 2 [base64 encoded data]\n
-2 2 [base64 encoded data]\n
+2 2 [Base64 encoded data]\n
+2 2 [Base64 encoded data]\n
 
 
-image g.1z 564 2 2 [base64 encoded data]\n
+image g.1z 564 2 2 [Base64 encoded data]\n
 
 
 image g.1Z 2\n
-564 2 2 [base64 encoded data]\n
-564 2 2 [base64 encoded data]\n
+564 2 2 [Base64 encoded data]\n
+564 2 2 [Base64 encoded data]\n
 ```
 
 **gfl**
@@ -594,15 +594,15 @@ image g.1Z 2\n
 gf [three letter file format] [file size] [file data]
 ```
 
-gf graphic option will have a 3 letter image identifier for the file type, an unsigned integer for the file size, and then the file that represents the image, copied verbatum into the value portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z, and Z are never used.
+gf graphic option will have a 3 letter image identifier for the file type, an unsigned integer for the file size, and then the file that represents the image, copied verbatum into the value portion.  There is never any compression applied.  The data is always Base64 encoded.  e, E, z, and Z are never used.
 
 ```
-imageFile gfl- png 1024 [base64 encoding of a png file data]\n
+imageFile gfl- png 1024 [Base64 encoding of a png file data]\n
 
 
 imageFileList gfl= 2\n
-jpg 2048 [base64 encoding of a jpg file 1 data]\n
-tif 4096 [base64 encoding of a tiff file 2 data]\n
+jpg 2048 [Base64 encoding of a jpg file 1 data]\n
+tif 4096 [Base64 encoding of a tiff file 2 data]\n
 ```
 
 **glk**
@@ -650,7 +650,7 @@ tdt [YYYY] [MM] [DD] [HH] [MM] [SS]\n
 
 [time] values are only stored one way in Text, "HH MM SS" where HH, MM, SS are unsigned integers.  HH is 24 hour Greenwich Time zone, no daylights correction, No other time zones.
 
-Binary representation if encoded as base64 will be n2 for year and n1 for all other values and ordered in the same year, month, day, hour, minute, second.
+Binary representation if encoded as Base64 will be n2 for year and n1 for all other values and ordered in the same year, month, day, hour, minute, second.
 
 ```
 date tdt 2019 01 31 20 30 40\n
@@ -740,24 +740,24 @@ Array of strings will have as many of these pairs as found in the array.
 
 Simple value encoding.  Based on what is being stored the byte streams only look slighly different.
 
-|
-|
-| Type| Byte Count|
-| i.1, n.1| 1|
-| i.2, n.2| 2|
-| c.1| 3 (3 x 1 Byte)|
-| Azd, Azd, Did, Di%, Di:, i.4, in4, n.4, r.4, of4, sz4| 4|
-| ca1| 4 (4 x 1 Byte)|
-| i.8, in7, n.8, r.8| 8|
-| ADd, AD%, AD:, p2i, p2n, p2r| 8 (2 x 4 Byte)|
-| c.f, p3i, p3n, p3r| 12 (3 x 4 Byte)|
-| p2I, p2N, p2R| 16 (2 x 8 Byte)|
-| p3I, p3N, p3R| 24 (3 x 8 Byte)|
-| caf| 32 (4 x 8 Byte)|
-| m33| 36 (9 x 4 Byte)|
-| M33| 64 (9 x 8 Byte)|
-| m33| 72 (16 x 4 Byte)|
-| M44| 128 (16 x 8 Byte)
+| Type | Byte Count |
+| --- | --- |
+| i.1, n.1 | 1 |
+| i.2, n.2 | 2 |
+| c.1 | 3 (3 x 1 Byte) |
+| Azd, Azd, Did, Di%, Di:, i.4, in4, n.4, r.4, of4, sz4 | 4 |
+| ca1 | 4 (4 x 1 Byte) |
+| i.8, in7, n.8, r.8 | 8 |
+| ADd, AD%, AD:, p2i, p2n, p2r | 8 (2 x 4 Byte) |
+| c.f, p3i, p3n, p3r | 12 (3 x 4 Byte) |
+| p2I, p2N, p2R | 16 (2 x 8 Byte) |
+| p3I, p3N, p3R | 24 (3 x 8 Byte) |
+| caf | 32 (4 x 8 Byte) |
+| m33 | 36 (9 x 4 Byte) |
+| M33 | 64 (9 x 8 Byte) |
+| m33 | 72 (16 x 4 Byte) |
+| M44 | 128 (16 x 8 Byte) |
+
 
 The values are simply encoded as such.
 
@@ -811,9 +811,9 @@ Byte 0                            Byte 1
 2^7 2^6 ...                 2^0   2^8 ...
 ```
 
-0, 1, 2, ... indicates the index into the array and how it relates to the bytes.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
+0, 1, 2, ... indicates the index into the array and how it relates to the bytes.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to Base64.
 
-'Z' will take the above bitmap and compress it first before encoding it with base64.
+'Z' will take the above bitmap and compress it first before encoding it with Base64.
 
 #### 2.4.2.6 - Graphic values, g&#42;, G&#42;
 

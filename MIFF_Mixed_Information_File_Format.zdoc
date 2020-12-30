@@ -99,7 +99,6 @@ hhhh	|chapter| - Value Header
 	|b [type flag] b| is one of:
 
 t[
-t-
 thx	3 Letter Type Code
 th*	Description
 
@@ -366,33 +365,32 @@ tc	Value stream.  The contents deviates from the rest of the format.  Representa
 	|b [array and encoding flag] b| is one of:
 
 t[
-t-
 thx	Encoding Code
 th*	Description
 
 t-
-tc	[space] 
-tc	Single value, depending on type of data, values is stored readable in text format or base64 encoded.
+tc	-
+tc	Single value, depending on type of data, values is stored readable in text format or Base64 encoded.
 
 t-
-tc	A
-tc	Array of values, depending on type of data, values is stored readable in text format or base64 encoded.
+tc	=
+tc	Array of values, depending on type of data, values is stored readable in text format or Base64 encoded.
 
 t-
 tc	z
-tc	Single value.  Data is Zlib compressed then base64 encoded.
+tc	Single value.  Data is Zlib compressed then Base64 encoded.
 
 t-
 tc	Z
-tc	Array of values.  Array is Zlib compressed then base64 encoded.
+tc	Array of values.  Array is Zlib compressed then Base64 encoded.
 
 ]
 
 	|b [array count] b| will only present when A, and Z are used.  This will be an unsigned integer value indicating how many items are in the array.
 	|b [compressed size] b| will only present when z and Z are used.  This will be an unsigned integer value indicating the raw, in memory byte count of the compressed data buffer.
-	A is used to indicate an array of values.  If used the array is either too small to really need compression or too random that compression will not really reduce the byte count.
-	z, and Z will generate a base64 encoded string in the Text format.  This string lives on one line, there are no '\n' embedded in the encoding.
-	What is base64 encoded and what isn't.  If the value being stored is a floating point value, it will be base64 encoded to maintain precision of the value.  All string, integer, or natural (unsigned integer) numbers are written unencoded.
+	= is used to indicate an array of values.  If used the array is either too small to really need compression or too random that compression will not really reduce the byte count.
+	z, and Z will generate a Base64 encoded string in the Text format.  This string lives on one line, there are no '\n' embedded in the encoding.
+	What is Base64 encoded and what isn't.  If the value being stored is a floating point value, it will be Base64 encoded to maintain precision of the value.  All string, integer, or natural (unsigned integer) numbers are written unencoded.
 
 
 hhhh	|chapter| - Value
@@ -464,21 +462,21 @@ hhhh	|chapter| - Value Header
 .	[type flag][array and encoding flag] [array count] [compressed size]
 
 	[type flag] and [array and encoding flag] is a string of 4 characters.
-	If combined with '-' then the value is a single value, possibly base64 encoded if it represents floating point data.
-	If combined with '=' then the value is an array of the given type, possibly base64 encoded if it represents floating point data.
-	If combined with 'z' or 'Z' then the value is treated as binary, reordered to be Big Endian, compressed using zlib, and encoded into a string using base64.
+	If combined with '-' then the value is a single value, possibly Base64 encoded if it represents floating point data.
+	If combined with '=' then the value is an array of the given type, possibly Base64 encoded if it represents floating point data.
+	If combined with 'z' or 'Z' then the value is treated as binary, reordered to be Big Endian, compressed using zlib, and encoded into a string using Base64.
 	[array count] will be an unsigned integer value in readable UTF8 indicating how many values in the array.  Only present when A, or Z are used.
 	[compressed size] will be an unsigned integer value in readable UTF8 indicating the raw, in memory byte count of the compressed data.  Only present when z and Z are used.
 	Examples: (adding \n to indicate the necessity of this line.)
 
 .[
-image g.1z 564 64 64 [base64 zip compressed byte stream]\n
+CompressedGraphic g.1z 564 64 64 [Base64 zip compressed byte stream]\n
 
-count n.1- 128\n
+SingleNatural n.1- 128\n
 
-string "."- 110 This is a string.\n<- This is written as \ and n.  This is really a multiline string!  This \ and n is not ->\n
+SingleString "."- 110 This is a string.\n<- This is written as \ and n.  This is really a multiline string!  This \ and n is not ->\n
 
-pointList p2i= 5 10 20 0 20 20 0 20 50 0 10\n
+ArrayOfPoints p2i= 5 10 20 0 20 20 0 20 50 0 10\n
 ]
 
 
@@ -548,8 +546,8 @@ hhhh	|chapter| - String values, "."
 	There can only be 1 separator between the byte count and the start of the string.  If there exists more than one separator then the extra separators are part of the string. 
 	'A' array flag, the individual strings will reside on their own line.  Meaning, as soon as a string is finished '\n' will immediately follow.  There will be as many lines as there are array elements.
 	For an array of strings, the first character of the the next line will be the start of the first string in the array.  The line after that will be the second string.  No lines will have any leading spaces.  Any space visible is part of the string.
-	'z' encoding, the string is compressed first before converting to base64.
-	'Z' encoding, unlike 'A', the string array is treated as one big buffer separated by NULL values and then compressed and converted to base64.
+	'z' encoding, the string is compressed first before converting to Base64.
+	'Z' encoding, unlike 'A', the string array is treated as one big buffer separated by NULL values and then compressed and converted to Base64.
 
 .[
 string "."- 206 <- There can only be one separator.  Otherwise those extra separators are part of the string.  This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string\n
@@ -564,7 +562,6 @@ stringList "."= 3\n
 hhhh	|chapter| - Simple values
 
 t[
-t-
 thx	Type Code
 th*	Representation
 
@@ -574,7 +571,7 @@ tc	1 human readable number.
 
 t-
 tc	Azs,|_|Azd,|_|Did,|_|Di%,|_|Di:,|_|r.4,|_|r.8
-tc	1 base64 encoded floating point number
+tc	1 Base64 encoded floating point number
 
 t-
 tc	p2i,|_|p2I,|_|p2n,|_|p2N
@@ -582,7 +579,7 @@ tc	2 human readable numbers separated by at least one separator.
 
 t-
 tc	ADd,|_|AD%,|_|AD:,|_|p2r,|_|p2R
-tc	2 base64 encoded floating point numbers.
+tc	2 Base64 encoded floating point numbers.
 
 t-
 tc	p3i,|_|p3I,|_|p3n,|_|p3N,|_|c.1
@@ -590,7 +587,7 @@ tc	3 human readable numbers separated by at least one separator.
 
 t-
 tc	p3r,|_|p3R,|_|c.f
-tc	3 base64 encoded floating point numbers.
+tc	3 Base64 encoded floating point numbers.
 
 t-
 tc	ca1
@@ -598,15 +595,15 @@ tc	4 human readable numbers separated by at least one separator.
 
 t-
 tc	caf
-tc	4 base64 encoded floating point numbers.
+tc	4 Base64 encoded floating point numbers.
 
 t-
 tc	m33,|_|M33
-tc	9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
+tc	9 Base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
 
 t-
 tc	m44,|_|M44
-tc	16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
+tc	16 Base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
 
 ]
 
@@ -615,15 +612,15 @@ tc	16 base64 encoded floating point numbers.  Columns written out left to right 
 .[
 OneInt               i.4-   1024\n
 ManyInt              i.4= 8 1 2 4 8 16 32 64 128\n
-OneMatrix            m33-   [base64 encoded matrix]\n
-ManyMatrix           m33= 3 [base64 encoded matrix] [base64 encoded matrix] [base64 encoded matrix]\n
-ManyMatrixCompressed m44Z 9 [compressed byted count] [base64 encoded compressed data]\n
+OneMatrix            m33-   [Base64 encoded matrix]\n
+ManyMatrix           m33= 3 [Base64 encoded matrix] [Base64 encoded matrix] [Base64 encoded matrix]\n
+ManyMatrixCompressed m44Z 9 [compressed byted count] [Base64 encoded compressed data]\n
 ]
 
 	AD: and Di:, the ratio for the dip portion is 1 : [value].  [value] is what is stored.  It is an r4 value.
 	c.f and caf, the values are r4 and typically range between 0.0 and 1.0.
-	If base64 encoded then byte swap to network order before encoding.
-	If using 'z' or 'Z' encoding flag, byte swap to network order compress the values using zlib and then write out the base64 string representation of the compressed buffer.
+	If Base64 encoded then byte swap to network order before encoding.
+	If using 'z' or 'Z' encoding flag, byte swap to network order compress the values using zlib and then write out the Base64 string representation of the compressed buffer.
 
 
 hhhh	|chapter| - Binary values, bin
@@ -631,17 +628,17 @@ hhhh	|chapter| - Binary values, bin
 	The binary data will have a header of 1 natural value before the binary data.  This value indicates the byte count of the binary data.  This byte count is not included when using Base64 or Zlib compression.  However the binary data will honor Base64 and Zlib compression if used.
 
 .[
-binKey1 bin- 10 [base64 encoded binary data]\n
+binKey1 bin- 10 [Base64 encoded binary data]\n
 
 binKey2 bin= 2\n
-10 [base64 encoded binary data]\n
-10 [base64 encoded binary data]\n
+10 [Base64 encoded binary data]\n
+10 [Base64 encoded binary data]\n
 
-binKey3 binz 1024 [compressed byte count] [base64 encoded binary data]\n*
+binKey3 binz 1024 [compressed byte count] [Base64 encoded binary data]\n*
 
 binKey2 binZ 2\n
-10240 [compressed byte count] [base64 encoded binary data]\n
-10240 [compressed byte count] [base64 encoded binary data]\n
+10240 [compressed byte count] [Base64 encoded binary data]\n
+10240 [compressed byte count] [Base64 encoded binary data]\n
 ]
 
 	Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they should be on the hook to define what the contents of the blob means.  If they do not, then they are being bad citizens and should be shamed!  SHAMED I SAY!
@@ -653,7 +650,7 @@ hhhh	|chapter| - Boolean values, boo
 	Boolean data is a little different than the basic types above.
 	By default, the value will be 't' for true, or 'f' for false.
 	'A' encoding flag, the value will be a string of 't' or 'f' letters with no separator in between to save some space.
-	'Z' will take the bitmap and compress it first before encoding it with base64.  Bitmap being...
+	'Z' will take the bitmap and compress it first before encoding it with Base64.  Bitmap being...
 .[
 Byte 0                            Byte 1
 +---+---+---+---+---+---+---+---+ +---  ...
@@ -662,7 +659,7 @@ Byte 0                            Byte 1
  2^7 2^6 ...                 2^0   2^8 ...
 ]
 
-	0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
+	0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to Base64.
 	'z' encoding flag is never used with this type.
 
 .[
@@ -682,31 +679,31 @@ hhhh	|chapter| - Graphic values, g*, G*
 	Array of graphics will place each graphic on a separate line similar to string encoding.
 
 .[
-image g.1- 2 2 [base64 encoded data]\n
+SingleGraphic g.1- 2 2 [Base64 encoded data]\n
 
-image g.1= 2\n
-2 2 [base64 encoded data]\n
-2 2 [base64 encoded data]\n
+ArrayOfGraphics g.1= 2\n
+2 2 [Base64 encoded data]\n
+2 2 [Base64 encoded data]\n
 
-image g.1z 564 2 2 [base64 encoded data]\n
+SingleCompressedGraphic g.1z 564 2 2 [Base64 encoded data]\n
 
-image g.1Z 2\n
-564 2 2 [base64 encoded data]\n
-564 2 2 [base64 encoded data]\n
+ArrayOfCompressedGraphics g.1Z 2\n
+564 2 2 [Base64 encoded data]\n
+564 2 2 [Base64 encoded data]\n
 ]
 
 	|b gfl b|
 
 .	gf [three letter file format] [file size] [file data]
 
-	gf graphic option will have a 3 letter image identifier for the file type, an unsigned integer for the file size, and then the file that represents the image, copied verbatum into the value portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z, and Z are never used.
+	gf graphic option will have a 3 letter image identifier for the file type, an unsigned integer for the file size, and then the file that represents the image, copied verbatum into the value portion.  There is never any compression applied.  The data is always Base64 encoded.  e, E, z, and Z are never used.
 
 .[
-imageFile gfl- png 1024 [base64 encoding of a png file data]\n
+imageFile gfl- png 1024 [Base64 encoding of a png file data]\n
 
 imageFileList gfl= 2\n
-jpg 2048 [base64 encoding of a jpg file 1 data]\n
-tif 4096 [base64 encoding of a tiff file 2 data]\n
+jpg 2048 [Base64 encoding of a jpg file 1 data]\n
+tif 4096 [Base64 encoding of a tiff file 2 data]\n
 ]
 
 	|b glk b|
@@ -745,7 +742,7 @@ tdt [YYYY] [MM] [DD] [HH] [MM] [SS]\n
 
 	[date] values are only stored one way in Text, "YYYY MM DD" where YYYY, MM, DD are unsigned integers.  MM and DD are 0 padded.
 	[time] values are only stored one way in Text, "HH MM SS" where HH, MM, SS are unsigned integers.  HH is 24 hour Greenwich Time zone, no daylights correction, No other time zones.
-	Binary representation if encoded as base64 will be n2 for year and n1 for all other values and ordered in the same year, month, day, hour, minute, second.
+	Binary representation if encoded as Base64 will be n2 for year and n1 for all other values and ordered in the same year, month, day, hour, minute, second.
 
 .	date tdt 2019 01 31 20 30 40\n
 
@@ -820,7 +817,6 @@ hhhh	|chapter| - Simple values
 	Simple value encoding.  Based on what is being stored the byte streams only look slighly different.
 
 t[
-t-
 thx	Type
 th*	Byte Count
 
@@ -925,8 +921,8 @@ Byte 0                            Byte 1
  2^7 2^6 ...                 2^0   2^8 ...                   
 ]
 
-	0, 1, 2, ... indicates the index into the array and how it relates to the bytes.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
-	'Z' will take the above bitmap and compress it first before encoding it with base64.
+	0, 1, 2, ... indicates the index into the array and how it relates to the bytes.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to Base64.
+	'Z' will take the above bitmap and compress it first before encoding it with Base64.
 
 hhhh	|chapter| - Graphic values, g*, G*
 

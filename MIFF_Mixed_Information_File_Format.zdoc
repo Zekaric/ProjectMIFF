@@ -34,7 +34,7 @@ hh	|chapter| - Disclosure
 	I, Robbert de Groot, have been a professional Software Developer since 1995.
 	This format is currently not sanctioned by any software vendor.  This was a thought on developing something in place of existing options.
 	I can be reached at the following two email addresses.
-	robbert.degroot@hexagon.com<br />zekaric@gmail.com
+	robbert.degroot@hexagon.com|line|zekaric@gmail.com
 
 
 h	|chapter| - MIFF Format: Base
@@ -569,27 +569,27 @@ thx	Type Code
 th*	Representation
 
 t-
-tc	cn4,&nbsp;cn8,&nbsp;i.1,&nbsp;i.2,&nbsp;i.4,&nbsp;i.8,&nbsp;id4,&nbsp;id8,&nbsp;in4,&nbsp;in8,&nbsp;n.1,&nbsp;n.2,&nbsp;n.4,&nbsp;n.8,&nbsp;of4,&nbsp;of8,&nbsp;sz4,&nbsp;sz8
+tc	cn4,|_|cn8,|_|i.1,|_|i.2,|_|i.4,|_|i.8,|_|id4,|_|id8,|_|in4,|_|in8,|_|n.1,|_|n.2,|_|n.4,|_|n.8,|_|of4,|_|of8,|_|sz4,|_|sz8
 tc	1 human readable number.
 
 t-
-tc	Azs,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;r.4,&nbsp;r.8
+tc	Azs,|_|Azd,|_|Did,|_|Di%,|_|Di:,|_|r.4,|_|r.8
 tc	1 base64 encoded floating point number
 
 t-
-tc	p2i,&nbsp;p2I,&nbsp;p2n,&nbsp;p2N
+tc	p2i,|_|p2I,|_|p2n,|_|p2N
 tc	2 human readable numbers separated by at least one separator.
 
 t-
-tc	ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2r,&nbsp;p2R
+tc	ADd,|_|AD%,|_|AD:,|_|p2r,|_|p2R
 tc	2 base64 encoded floating point numbers.
 
 t-
-tc	p3i,&nbsp;p3I,&nbsp;p3n,&nbsp;p3N,&nbsp;c.1
+tc	p3i,|_|p3I,|_|p3n,|_|p3N,|_|c.1
 tc	3 human readable numbers separated by at least one separator.
 
 t-
-tc	p3r,&nbsp;p3R,&nbsp;c.f
+tc	p3r,|_|p3R,|_|c.f
 tc	3 base64 encoded floating point numbers.
 
 t-
@@ -601,11 +601,11 @@ tc	caf
 tc	4 base64 encoded floating point numbers.
 
 t-
-tc	m33,&nbsp;M33
+tc	m33,|_|M33
 tc	9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
 
 t-
-tc	m44,&nbsp;M44
+tc	m44,|_|M44
 tc	16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
 
 ]
@@ -825,11 +825,11 @@ thx	Type
 th*	Byte Count
 
 t-
-tc	i.1,&nbsp;n.1
+tc	i.1,|_|n.1
 tc	1
 
 t-
-tc	i.2,&nbsp;n.2
+tc	i.2,|_|n.2
 tc	2
 
 t-
@@ -837,7 +837,7 @@ tc	c.1
 tc	3 (3 x 1 Byte)
 
 t-
-tc	Azd,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;i.4,&nbsp;in4,&nbsp;n.4,&nbsp;r.4,&nbsp;of4,&nbsp;sz4
+tc	Azd,|_|Azd,|_|Did,|_|Di%,|_|Di:,|_|i.4,|_|in4,|_|n.4,|_|r.4,|_|of4,|_|sz4
 tc	4
 
 t-
@@ -845,23 +845,23 @@ tc	ca1
 tc	4 (4 x 1 Byte)
 
 t-
-tc	i.8,&nbsp;in7,&nbsp;n.8,&nbsp;r.8
+tc	i.8,|_|in7,|_|n.8,|_|r.8
 tc	8
 
 t-
-tc	ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2i,&nbsp;p2n,&nbsp;p2r
+tc	ADd,|_|AD%,|_|AD:,|_|p2i,|_|p2n,|_|p2r
 tc	8 (2 x 4 Byte)
 
 t-
-tc	c.f,&nbsp;p3i,&nbsp;p3n,&nbsp;p3r
+tc	c.f,|_|p3i,|_|p3n,|_|p3r
 tc	12 (3 x 4 Byte)
 
 t-
-tc	p2I,&nbsp;p2N,&nbsp;p2R
+tc	p2I,|_|p2N,|_|p2R
 tc	16 (2 x 8 Byte)
 
 t-
-tc	p3I,&nbsp;p3N,&nbsp;p3R
+tc	p3I,|_|p3N,|_|p3R
 tc	24 (3 x 8 Byte)
 
 t-

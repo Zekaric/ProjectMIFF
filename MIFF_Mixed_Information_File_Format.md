@@ -89,7 +89,7 @@ This format is currently not sanctioned by any software vendor.  This was a thou
 
 I can be reached at the following two email addresses.
 
-robbert.degroot@hexagon.com&#60;br /&#62;zekaric@gmail.com
+robbert.degroot@hexagon.com<br />zekaric@gmail.com
 
 # 2 - MIFF Format: Base
 
@@ -473,16 +473,16 @@ stringList "."= 3\n
 |
 |
 | Type Code| Representation|
-| cn4,&nbsp;cn8,&nbsp;i.1,&nbsp;i.2,&nbsp;i.4,&nbsp;i.8,&nbsp;id4,&nbsp;id8,&nbsp;in4,&nbsp;in8,&nbsp;n.1,&nbsp;n.2,&nbsp;n.4,&nbsp;n.8,&nbsp;of4,&nbsp;of8,&nbsp;sz4,&nbsp;sz8| 1 human readable number.|
-| Azs,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;r.4,&nbsp;r.8| 1 base64 encoded floating point number|
-| p2i,&nbsp;p2I,&nbsp;p2n,&nbsp;p2N| 2 human readable numbers separated by at least one separator.|
-| ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2r,&nbsp;p2R| 2 base64 encoded floating point numbers.|
-| p3i,&nbsp;p3I,&nbsp;p3n,&nbsp;p3N,&nbsp;c.1| 3 human readable numbers separated by at least one separator.|
-| p3r,&nbsp;p3R,&nbsp;c.f| 3 base64 encoded floating point numbers.|
+| cn4, cn8, i.1, i.2, i.4, i.8, id4, id8, in4, in8, n.1, n.2, n.4, n.8, of4, of8, sz4, sz8| 1 human readable number.|
+| Azs, Azd, Did, Di%, Di:, r.4, r.8| 1 base64 encoded floating point number|
+| p2i, p2I, p2n, p2N| 2 human readable numbers separated by at least one separator.|
+| ADd, AD%, AD:, p2r, p2R| 2 base64 encoded floating point numbers.|
+| p3i, p3I, p3n, p3N, c.1| 3 human readable numbers separated by at least one separator.|
+| p3r, p3R, c.f| 3 base64 encoded floating point numbers.|
 | ca1| 4 human readable numbers separated by at least one separator.|
 | caf| 4 base64 encoded floating point numbers.|
-| m33,&nbsp;M33| 9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.|
-| m44,&nbsp;M44| 16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
+| m33, M33| 9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.|
+| m44, M44| 16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
 
 If using 'A' array flag the above is repeated as many times as there are array elements.  Each array element will be separated by at least one separator.
 
@@ -743,16 +743,16 @@ Simple value encoding.  Based on what is being stored the byte streams only look
 |
 |
 | Type| Byte Count|
-| i.1,&nbsp;n.1| 1|
-| i.2,&nbsp;n.2| 2|
+| i.1, n.1| 1|
+| i.2, n.2| 2|
 | c.1| 3 (3 x 1 Byte)|
-| Azd,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;i.4,&nbsp;in4,&nbsp;n.4,&nbsp;r.4,&nbsp;of4,&nbsp;sz4| 4|
+| Azd, Azd, Did, Di%, Di:, i.4, in4, n.4, r.4, of4, sz4| 4|
 | ca1| 4 (4 x 1 Byte)|
-| i.8,&nbsp;in7,&nbsp;n.8,&nbsp;r.8| 8|
-| ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2i,&nbsp;p2n,&nbsp;p2r| 8 (2 x 4 Byte)|
-| c.f,&nbsp;p3i,&nbsp;p3n,&nbsp;p3r| 12 (3 x 4 Byte)|
-| p2I,&nbsp;p2N,&nbsp;p2R| 16 (2 x 8 Byte)|
-| p3I,&nbsp;p3N,&nbsp;p3R| 24 (3 x 8 Byte)|
+| i.8, in7, n.8, r.8| 8|
+| ADd, AD%, AD:, p2i, p2n, p2r| 8 (2 x 4 Byte)|
+| c.f, p3i, p3n, p3r| 12 (3 x 4 Byte)|
+| p2I, p2N, p2R| 16 (2 x 8 Byte)|
+| p3I, p3N, p3R| 24 (3 x 8 Byte)|
 | caf| 32 (4 x 8 Byte)|
 | m33| 36 (9 x 4 Byte)|
 | M33| 64 (9 x 8 Byte)|

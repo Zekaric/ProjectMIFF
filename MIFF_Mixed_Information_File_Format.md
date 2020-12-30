@@ -1,0 +1,880 @@
+
+# M.I.F.F.: Mixed Information File Format
+
+
+**Author:** Robbert de Groot
+
+**Date:** 2019-05-15
+
+**Copyright:** 2019, Robbert de Groot
+
+**License (Library):** MIT License.
+
+**License (Document):** Creative Commons Attribution-NoDerivs.[LINK](https://creativecommons.org/licenses/by-nd:4.0) (CC BY-ND)
+
+## Table Of Contents:
+
+**1 - M.I.F.F.**<br />
+    1.1 - Discussion<br />
+    1.2 - Goals<br />
+    1.3 - Disclosure<br />
+**2 - MIFF Format: Base**<br />
+    2.1 - File Header<br />
+    2.2 - Content<br />
+        2.2.1 - Key Value Format<br />
+            2.2.1.1 - Key<br />
+            2.2.1.2 - Value Header<br />
+            2.2.1.3 - Value<br />
+    2.3 - Text Format<br />
+        2.3.1 - Whitespace Characters<br />
+        2.3.2 - Separator Characters<br />
+        2.3.3 - Printable Characters<br />
+        2.3.4 - Key Value Format<br />
+            2.3.4.1 - Key<br />
+            2.3.4.2 - Value Header<br />
+            2.3.4.3 - Value<br />
+        2.3.5 - Value Specifics<br />
+            2.3.5.1 - Key-Value Block, [.]<br />
+            2.3.5.2 - String values, "."<br />
+            2.3.5.3 - Simple values<br />
+            2.3.5.4 - Binary values, bin<br />
+            2.3.5.5 - Boolean values, boo<br />
+            2.3.5.6 - Graphic values, g&#42;, G&#42;<br />
+            2.3.5.7 - Type value, typ<br />
+            2.3.5.8 - Time value, t&#42;<br />
+            2.3.5.9 - Value stream, vst<br />
+    2.4 - Binary<br />
+        2.4.1 - Key Value Format<br />
+            2.4.1.1 - Key<br />
+            2.4.1.2 - Value Header<br />
+            2.4.1.3 - Value<br />
+        2.4.2 - Value Specifics<br />
+            2.4.2.1 - Key-Value Block<br />
+            2.4.2.2 - String values, "."<br />
+            2.4.2.3 - Simple values<br />
+            2.4.2.4 - Binary, bin<br />
+            2.4.2.5 - Boolean , boo<br />
+            2.4.2.6 - Graphic values, g&#42;, G&#42;<br />
+            2.4.2.7 - Type value, typ<br />
+            2.4.2.8 - Time value, t&#42;<br />
+            2.4.2.9 - Value stream, vst<br />
+**3 - Design Decisions:**<br />
+
+# 1 - M.I.F.F.
+
+
+## 1.1 - Discussion
+
+
+What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.
+
+It started life because of a need for a reduced data storage format for larger amounts of data.  See Mining Interchange MIFF since that was the reason for this document.
+
+## 1.2 - Goals
+
+
+
+* **Simple**  The format should be simple for the developers to export their data.  And still fairly simple to re-import that data.
+
+* **Brief**  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+
+* **Flexible**  The format needs to be able to accomodate change or specific data.  A years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
+
+## 1.3 - Disclosure
+
+
+I, Robbert de Groot, have been a professional Software Developer since 1995.
+
+This format is currently not sanctioned by any software vendor.  This was a thought on developing something in place of existing options.
+
+I can be reached at the following two email addresses.
+
+robbert.degroot@hexagon.com&#60;br /&#62;zekaric@gmail.com
+
+# 2 - MIFF Format: Base
+
+
+There are two representations of the format.  A Text file and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
+
+A MIFF format is essentially a collection of key value pairs.  Values can be a collection of further key value pairs.  Meaning nesting can be possible.
+
+The intent with this format is to make only one read pass over the file.  There is no focus on making the file random accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is just to be a transfer file from one program to another.
+
+Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in network (big endian) order.
+
+## 2.1 - File Header
+
+
+There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
+
+```
+"MIFF       1TXT\n[Sub-Format Name]\n[Sub-Format Version]\n"
+```
+
+or
+
+```
+"MIFF       1BIN\n[Sub-Format Name]\n[Sub-Format Version]\n"
+```
+
+"MIFF" indicates the base file format type.
+
+"       1" indicates the MIFF file format version.  Currently at version 1.  This will only use whole numbers instead of the usual XX.XX.XX.XX versioning of software.  This is written in 8 char hex.
+
+"TXT\n" and "BIN\n" indicate the content organization.  TXT for text, and BIN for binary.  "\n" is a line feed character.  This is part of the string.  MIFF Text files will only use \n for line endings and never \n\r or \r\n or any other character.
+
+[Sub-Format Name] will be a UTF8 string and defines the format of what is being stored in the file.
+
+[Sub-Format Version] will always be an unsigned 4 byte value.  Like the MIFF version, this is written in 8 char hex.
+
+## 2.2 - Content
+
+
+Before going into the specifics of the text format and the binary format we will cover what a key value pair will look like at a high level.
+
+### 2.2.1 - Key Value Format
+
+
+```
+[key] [value header] [value]\n
+```
+
+**[key]** will be a string that will somewhat uniquely identify the value.
+
+**[value header]** will be an code of characters that will dictate what the value will look like.
+
+**[value]** will depend on the [value header] on what is contained here.
+
+#### 2.2.1.1 - Key
+
+
+Keys are always a single string of characters and are limited to printable UNICODE code points.  Meaning no whitespace of any kind inside a key.
+
+```
+12345
+;':][.,<>]'
+a_b_c
+$cost
+```
+
+The key can be nonsense or just a number.  As long it does not include any whitespace.
+
+#### 2.2.1.2 - Value Header
+
+
+There are quite a few different value types and encodings.  Each value is prepended with a header explaining the data you will be reading.
+
+Value header is as follows.
+
+```
+[type flag][array and encoding flag] [array count] [compressed size]
+```
+
+**[type flag]** is one of:
+
+|
+|
+| 3 Letter Type Code| Description|
+| [.]| Key-Value block.|
+| "."| String (UTF8) data.|
+| Azs| Azimuth (strike) using r4. Value in degrees|
+| Azd| Azimuth (dip direction) using r4. Value in degrees|
+| ADd| Azimuth and Dip using r4. Azimuth in degrees. Dip in degrees|
+| AD%| Azimuth and Dip using r4. Azimuth in degrees. Dip in percent|
+| AD:| Azimuth and Dip using r4. Azimuth in degrees. Dip in ratio 1:XXX|
+| bin| Binary data.|
+| boo| Boolean value.|
+| c.1| Color (RGB) using n1.|
+| ca1| Color (RGBA) using n1.|
+| c.f| Color (RGB) using r4.|
+| caf| Color (RGBA) using r4.|
+| cn4| Count same as n4.|
+| cn8| Count same as n8.|
+| Did| Dip using r4. Value in degrees|
+| Di%| Dip using r4. Value in percent|
+| Di:| Dip using r4. Value in ratio 1:XXX|
+| g.1| Graphic using c3.|
+| ga1| Graphic using c4.|
+| gfl| Graphic as an inline included file.|
+| glk| Graphic as a link to a file.|
+| g.f| Graphic using C3.|
+| gaf| Graphic using C4.|
+| i.1| Integer of 1 byte.|
+| i.2| Integer of 2 bytes.|
+| i.4| Integer of 4 bytes.|
+| i.8| Integer of 8 bytes.|
+| id4| Id value, same as n4.  Potentially not unique, user controlled value.|
+| id8| Id value, same as n8.  Potentially not unique, user controlled value.|
+| idg| GUID value.  Must be unique in a given MIFF file.  128 bit value.|
+| in4| Index same as n4.|
+| in8| Index same as n8.|
+| m33| 3x3 matrix using r4.|
+| M33| 3x3 matrix using r8.|
+| m44| 4x4 matrix using r4.|
+| M44| 4x4 matrix using r8.|
+| n.1| Natural of 1 byte.|
+| n.2| Natural of 2 bytes.|
+| n.4| Natural of 4 bytes.|
+| n.8| Natural of 8 bytes.|
+| of4| Offset same as n4.|
+| of8| Offset same as n8.|
+| p2r| 2d value using r4.|
+| p2R| 2d value using r8.|
+| p2i| 2d value using i4.|
+| p2I| 2d value using i8.|
+| p2n| 2d value using n4.|
+| p2N| 2d value using n8.|
+| p3r| 3d value using r4.|
+| p3R| 3d value using r8.|
+| p3i| 3d value using i4.|
+| p3I| 3d value using i8.|
+| p3n| 3d value using n4.|
+| p3N| 3d value using n8.|
+| r.4| Real of 4 bytes.|
+| r.8| Real of 8 bytes.|
+| sz4| Size same as n4.|
+| sz8| Size same as n8.|
+| td.| Time, date only.|
+| t.t| Time, time only.|
+| tdt| Time, date and time.|
+| typ| Type value.  One of these 3 letter type codes|
+| vst| Value stream.  The contents deviates from the rest of the format.  Representations will explained where they are used.
+
+Why have cn4, cn8, sz4, sz8, ix4, ix8, of4, and of8 when n4 and n8 would suffice?  The extra semantic information about what we are storing may be useful and it separates these values with a hard coded representation.  Potentially in the future, the representation may change to accommodate larger values.  In which case older MIFF files need not have to change.
+
+**[array and encoding flag]** is one of:
+
+|
+|
+| Encoding Code| Description|
+| [space]| Single value, depending on type of data, values is stored readable in text format or base64 encoded.|
+| A| Array of values, depending on type of data, values is stored readable in text format or base64 encoded.|
+| z| Single value.  Data is Zlib compressed then base64 encoded.|
+| Z| Array of values.  Array is Zlib compressed then base64 encoded.
+
+**[array count]** will only present when A, and Z are used.  This will be an unsigned integer value indicating how many items are in the array.
+
+**[compressed size]** will only present when z and Z are used.  This will be an unsigned integer value indicating the raw, in memory byte count of the compressed data buffer.
+
+A is used to indicate an array of values.  If used the array is either too small to really need compression or too random that compression will not really reduce the byte count.
+
+z, and Z will generate a base64 encoded string in the Text format.  This string lives on one line, there are no '\n' embedded in the encoding.
+
+What is base64 encoded and what isn't.  If the value being stored is a floating point value, it will be base64 encoded to maintain precision of the value.  All string, integer, or natural (unsigned integer) numbers are written unencoded.
+
+#### 2.2.1.3 - Value
+
+
+The value header generally indicates what will be stored in the value of the key value pair.  It then becomes an issue on how it is represented in the two types of files.  See their respective sections for the details.
+
+## 2.3 - Text Format
+
+
+The text format is a UTF8 text file.  UTF8 is the 1 byte UNICODE format for text.  The base format only uses the ASCII characters (first 128 UNICODE character codes).  UTF8 mainly comes into play with the string data being stored.
+
+The format is only somewhat human readable, and only somewhat text editor friendly, but it really is not meant to be "human friendly."  What I mean is that you will be able to look at the format in a text editor (if the text editor is capable of handling really large files with really long lines) and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.
+
+The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or may not be seeing the whole file.
+
+All lines are terminated with a UNIX '\n'.  NOT an MSDOS/Windows \r\n or a MAC \n\r ending or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.  No exceptions.
+
+'\r' (Cursor Return) should not appear anywhere in the format unless writted explicitely as '\', 'r' characters.  Meaning that it has been 'escaped' and that will only be in string values.
+
+### 2.3.1 - Whitespace Characters
+
+
+A whitespace character is any character that does not make a blemish on a piece of paper if printed out; this includes control characters like bell, NULL, form feed, etc.
+
+### 2.3.2 - Separator Characters
+
+
+MIFF limits what white space characters can be used as separators.
+
+```
+' ' (space), '\t' (Tab)
+```
+
+If you see any other whitespace characters used as a separator in the MIFF file then the file is not MIFF.
+
+### 2.3.3 - Printable Characters
+
+
+Just to be clear what a printable character is.  If you had a blank piece of paper with just one character on it, if the character makes a mark, it is printable.  If it does not make a mark, it is not printable (like spaces, control characters, etc.)
+
+### 2.3.4 - Key Value Format
+
+
+The text file key value format looks like this.
+
+```
+[key] [value header] [value]\n
+```
+
+There can be leading separators before the [key] but these will be ignored.
+
+There has to be at least one separator between [key] and [value header].
+
+There has to be at least one separator between [value header] and the [value].
+
+Any extra separators in the line will be ignored.
+
+To terminate the key value pair use a single '\n' character.
+
+To be clear...
+
+**Valid:** spaces and tabs can be used to indent and separate the parts.
+
+```
+\t\t[key]\t[value header]\t\t\t[value]\n
+```
+
+**Invalid:**Absolutely no "\n" anywhere before or within the key value line&#42;.  '\n' characters indicate a termination of a kv block so any extra '\n' characters will cause problems.
+
+```
+\n\n\n[key]\n[value header]\n[value]\n
+\n[key] [value header] [value]\n
+```
+
+&#42; There are cases where the [value] will be broken up by '\n' characters but this will be indicated below.
+
+#### 2.3.4.1 - Key
+
+
+See MIFF Format: Base / Content / Key Value Format / Key section for key information.
+
+#### 2.3.4.2 - Value Header
+
+
+As defined above the value header is as follows
+
+```
+[type flag][array and encoding flag] [array count] [compressed size]
+```
+
+[type flag] and [array and encoding flag] is a string of 4 characters.
+
+If combined with '-' then the value is a single value, possibly base64 encoded if it represents floating point data.
+
+If combined with '=' then the value is an array of the given type, possibly base64 encoded if it represents floating point data.
+
+If combined with 'z' or 'Z' then the value is treated as binary, reordered to be Big Endian, compressed using zlib, and encoded into a string using base64.
+
+[array count] will be an unsigned integer value in readable UTF8 indicating how many values in the array.  Only present when A, or Z are used.
+
+[compressed size] will be an unsigned integer value in readable UTF8 indicating the raw, in memory byte count of the compressed data.  Only present when z and Z are used.
+
+Examples: (adding \n to indicate the necessity of this line.)
+
+```
+image g.1z 564 64 64 [base64 zip compressed byte stream]\n
+
+
+count n.1- 128\n
+
+
+string "."- 110 This is a string.\n<- This is written as \ and n.  This is really a multiline string!  This \ and n is not ->\n
+
+
+pointList p2i= 5 10 20 0 20 20 0 20 50 0 10\n
+```
+
+#### 2.3.4.3 - Value
+
+
+Some of the types are a bit more complex so they will have a specific representation in the text file.
+
+### 2.3.5 - Value Specifics
+
+
+#### 2.3.5.1 - Key-Value Block, [.]
+
+
+Key-Value blocks are special.  They are needed to allow nesting of key values.  The last line of a block needs to be a comletely empty line with nothing on it but a \n to indicate that the block is terminated.
+
+```
+docInfo [.]-\n
+title  "."- 40 M.I.F.F.: Mixed Information File Format\n
+author "."- 17 Robbert de Groot\n
+\n
+```
+
+To be clear on how it works.  Leading separators before the key are unnecessary and are only here for clarity.  Leading separators before a \n are allowed but are wasteful.
+
+```
+level1 [.]-\n
+level2 [.]-\n
+level3 [.]-\n
+...
+\n
+anotherLevel3 [.]-\n
+\n
+\n
+anotherLevel2 [.]-\n
+\n
+\n
+anotherLevel1 [.]-\n
+...
+\n
+```
+
+Key value bocks can have an '=' array specifier and a array count.  This is useful for an array of a complex type.
+
+```
+itemList [.]= 2\n
+item [.]-\n
+name "."- 7 item A\n
+value i.4- 0\n
+\n
+item [.]-\n
+name "."- 7 item B\n
+value i.4- 10\n
+\n
+\n
+```
+
+z, and Z are never used with "[.]".
+
+#### 2.3.5.2 - String values, "."
+
+
+String values are sort of the odd one out with all the other data types.  The other data types have a known size based on their input while strings are variable in size.  So encoding them will be slightly different.
+
+All string values have a byte count that follows the value.  This byte count will be the number of bytes required to store the string in memory, not including the \n key-value record ending.
+
+If no compression flag, all strings will have their cursor return and line feed characters replaced with "\" + "r" and "\" + "n" respectively when written to the file.  If your string already has a \r and \n inside then the slash will be escaped, \\r and \\n respectively, so that they do not get converted when reading them back in.  Other slash character pairs will not need escaping.
+
+Even though \n is strictly followed for the text format, we convert \r as well because text editors will attempt to honor \r or complain about inconsistent line endings and mess things up.
+
+Strings are placed on one line even if they define a multi-line string.  With the above replacement of cursor return and line feeds this can be done.
+
+There can only be 1 separator between the byte count and the start of the string.  If there exists more than one separator then the extra separators are part of the string.
+
+'A' array flag, the individual strings will reside on their own line.  Meaning, as soon as a string is finished '\n' will immediately follow.  There will be as many lines as there are array elements.
+
+For an array of strings, the first character of the the next line will be the start of the first string in the array.  The line after that will be the second string.  No lines will have any leading spaces.  Any space visible is part of the string.
+
+'z' encoding, the string is compressed first before converting to base64.
+
+'Z' encoding, unlike 'A', the string array is treated as one big buffer separated by NULL values and then compressed and converted to base64.
+
+```
+string "."- 206 <- There can only be one separator.  Otherwise those extra separators are part of the string.  This is a single string value.\nBut multiline. Only \\r and \\n need escaping and not other \s in the string\n
+
+
+stringList "."= 3\n
+62 This is string 1, line 1.\\r\\nThis is string1, line 2.\\r\\n\n
+18 This is string 2.\n
+18 This is string 3.\n
+```
+
+#### 2.3.5.3 - Simple values
+
+
+|
+|
+| Type Code| Representation|
+| cn4,&nbsp;cn8,&nbsp;i.1,&nbsp;i.2,&nbsp;i.4,&nbsp;i.8,&nbsp;id4,&nbsp;id8,&nbsp;in4,&nbsp;in8,&nbsp;n.1,&nbsp;n.2,&nbsp;n.4,&nbsp;n.8,&nbsp;of4,&nbsp;of8,&nbsp;sz4,&nbsp;sz8| 1 human readable number.|
+| Azs,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;r.4,&nbsp;r.8| 1 base64 encoded floating point number|
+| p2i,&nbsp;p2I,&nbsp;p2n,&nbsp;p2N| 2 human readable numbers separated by at least one separator.|
+| ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2r,&nbsp;p2R| 2 base64 encoded floating point numbers.|
+| p3i,&nbsp;p3I,&nbsp;p3n,&nbsp;p3N,&nbsp;c.1| 3 human readable numbers separated by at least one separator.|
+| p3r,&nbsp;p3R,&nbsp;c.f| 3 base64 encoded floating point numbers.|
+| ca1| 4 human readable numbers separated by at least one separator.|
+| caf| 4 base64 encoded floating point numbers.|
+| m33,&nbsp;M33| 9 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.|
+| m44,&nbsp;M44| 16 base64 encoded floating point numbers.  Columns written out left to right before moving to the next row.  Rows written out top to bottom.
+
+If using 'A' array flag the above is repeated as many times as there are array elements.  Each array element will be separated by at least one separator.
+
+```
+OneInt               i.4-   1024\n
+ManyInt              i.4= 8 1 2 4 8 16 32 64 128\n
+OneMatrix            m33-   [base64 encoded matrix]\n
+ManyMatrix           m33= 3 [base64 encoded matrix] [base64 encoded matrix] [base64 encoded matrix]\n
+ManyMatrixCompressed m44Z 9 [compressed byted count] [base64 encoded compressed data]\n
+```
+
+AD: and Di:, the ratio for the dip portion is 1 : [value].  [value] is what is stored.  It is an r4 value.
+
+c.f and caf, the values are r4 and typically range between 0.0 and 1.0.
+
+If base64 encoded then byte swap to network order before encoding.
+
+If using 'z' or 'Z' encoding flag, byte swap to network order compress the values using zlib and then write out the base64 string representation of the compressed buffer.
+
+#### 2.3.5.4 - Binary values, bin
+
+
+The binary data will have a header of 1 natural value before the binary data.  This value indicates the byte count of the binary data.  This byte count is not included when using Base64 or Zlib compression.  However the binary data will honor Base64 and Zlib compression if used.
+
+```
+binKey1 bin- 10 [base64 encoded binary data]\n
+
+
+binKey2 bin= 2\n
+10 [base64 encoded binary data]\n
+10 [base64 encoded binary data]\n
+
+
+binKey3 binz 1024 [compressed byte count] [base64 encoded binary data]\n*
+
+
+binKey2 binZ 2\n
+10240 [compressed byte count] [base64 encoded binary data]\n
+10240 [compressed byte count] [base64 encoded binary data]\n
+```
+
+Binary blobs are dangerous and should be used rarely if at all.  If someone uses them then they should be on the hook to define what the contents of the blob means.  If they do not, then they are being bad citizens and should be shamed!  SHAMED I SAY!
+
+However this is here as a catchall just in case.
+
+#### 2.3.5.5 - Boolean values, boo
+
+
+Boolean data is a little different than the basic types above.
+
+By default, the value will be 't' for true, or 'f' for false.
+
+'A' encoding flag, the value will be a string of 't' or 'f' letters with no separator in between to save some space.
+
+'Z' will take the bitmap and compress it first before encoding it with base64.  Bitmap being...
+
+```
+Byte 0                            Byte 1
++---+---+---+---+---+---+---+---+ +---  ...
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | | 8
++---+---+---+---+---+---+---+---+ +--- ...
+2^7 2^6 ...                 2^0   2^8 ...
+```
+
+0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
+
+'z' encoding flag is never used with this type.
+
+```
+OneBoolean  boo-    t\n
+ManyBoolean boo= 10 tttttfffff\n
+```
+
+#### 2.3.5.6 - Graphic values, g&#42;, G&#42;
+
+
+**g.1, ga1, g.f, gaf**
+
+```
+[g.1|ga1|g.f|gaf] [pixel count with] [pixel count height] [pixel buffer]
+```
+
+g.1, ga1, g.f, and gaf graphic options will have a header of 2 unsigned integer values before the image data.  These values indicate width and height of the graphic.  These values are not included in the Base64 or Zlib compression if compression is used.  However the image data will honor Base64 or Zlib compression if used.
+
+Images are written out row by row, left to right, top to bottom.
+
+Array of graphics will place each graphic on a separate line similar to string encoding.
+
+```
+image g.1- 2 2 [base64 encoded data]\n
+
+
+image g.1= 2\n
+2 2 [base64 encoded data]\n
+2 2 [base64 encoded data]\n
+
+
+image g.1z 564 2 2 [base64 encoded data]\n
+
+
+image g.1Z 2\n
+564 2 2 [base64 encoded data]\n
+564 2 2 [base64 encoded data]\n
+```
+
+**gfl**
+
+```
+gf [three letter file format] [file size] [file data]
+```
+
+gf graphic option will have a 3 letter image identifier for the file type, an unsigned integer for the file size, and then the file that represents the image, copied verbatum into the value portion.  There is never any compression applied.  The data is always base64 encoded.  e, E, z, and Z are never used.
+
+```
+imageFile gfl- png 1024 [base64 encoding of a png file data]\n
+
+
+imageFileList gfl= 2\n
+jpg 2048 [base64 encoding of a jpg file 1 data]\n
+tif 4096 [base64 encoding of a tiff file 2 data]\n
+```
+
+**glk**
+
+```
+glk [byte count of string] [string of path to file]
+```
+
+glk graphic option simple contains a link to an image file.  This path should be relative to the MIFF file if not right next to the MIFF file.  However this is up to the software writing the MIFF file.  z, and Z are never used for this type.
+
+```
+imageFileLink glk- 30 \path\to\image\file\image.png\n
+
+
+imageFileLinkList glk= 2\n
+31 \path\to\image\file\image1.png\n
+31 \path\to\image\file\image2.png\n
+```
+
+#### 2.3.5.7 - Type value, typ
+
+
+typ stores a 3 letter type format.  Used for describing what something external to the base format will store as a value.
+
+```
+typ [3 letter type value]
+```
+
+```
+type typ m33
+```
+
+#### 2.3.5.8 - Time value, t&#42;
+
+
+td., t.t, tdt store time values.
+
+```
+td. [YYYY] [MM] [DD]\n
+t.t [HH] [MM] [SS]\n
+tdt [YYYY] [MM] [DD] [HH] [MM] [SS]\n
+```
+
+[date] values are only stored one way in Text, "YYYY MM DD" where YYYY, MM, DD are unsigned integers.  MM and DD are 0 padded.
+
+[time] values are only stored one way in Text, "HH MM SS" where HH, MM, SS are unsigned integers.  HH is 24 hour Greenwich Time zone, no daylights correction, No other time zones.
+
+Binary representation if encoded as base64 will be n2 for year and n1 for all other values and ordered in the same year, month, day, hour, minute, second.
+
+```
+date tdt 2019 01 31 20 30 40\n
+```
+
+#### 2.3.5.9 - Value stream, vst
+
+
+A Value Stream is a departure of the base format.  It is meant to be used to compress the data storage more with a simpler key value structure which will be dictated by the format that uses MIFF as a base format.
+
+Keys will typically be 1 byte.  Values will be a known sized based on the key or other information of the format.
+
+## 2.4 - Binary
+
+
+The Binary file will to match the Text file 1-1.  Everything within '[]' is a byte sequence of a known size.  Each byte seqence is separated here with a comma but is immediately following after previous byte sequence.
+
+A byte sequence is [[size]:[name]], where size is a number indicating the number of bytes this sequence takes up.
+
+### 2.4.1 - Key Value Format
+
+
+```
+[1 Byte:key string byte count],[key string byte count:key value],[4 Bytes:value header],[[4 Bytes;array count]],[[4 Bytes:compress buffer size]],[*:value]
+```
+
+#### 2.4.1.1 - Key
+
+
+[key string byte count] is the first byte sequence and defines how long the key string is in bytes.
+
+[key] is the second byte sequence and defines the key of the key value pair.  The length of which was defined by [key string byte count] above.  This means keys can not exceed 255 bytes.  No null terminator is used for the key.  key string byte count cannot be 0.
+
+#### 2.4.1.2 - Value Header
+
+
+[value header] is the third byte sequence and is 4 bytes.  3 bytes for the value type 3 letter identifier and 1 bytes for the array and encoding letter.  See MIFF Format: Base / Content / Value Header section for an explanation.
+
+'-' is used for an uncompressed single value.
+
+'=' is used for an uncompressed array of values.
+
+'z' and 'Z' will apply Zlib compression to the binary data.
+
+[array count] and [compress buffer size] are only present when certain value header conditions are present.  Meaning [array count] byte sequence is only present when storing an array of values ('=' or 'Z' are present); [compress buffer size] is only present when the value is compressed with zlib compression routines ('z' or 'Z' are present.)  If neither of these are present in the value header then these byte sequences are not present.
+
+Both [array count] and [compress buffer size] are 4 byte unsigned integers stored in network order.
+
+#### 2.4.1.3 - Value
+
+
+[value] field will vary wildly depending on the [value header], [array count], and [compress buffer size] values.  But it will be a known size given all that information.
+
+### 2.4.2 - Value Specifics
+
+
+#### 2.4.2.1 - Key-Value Block
+
+
+This indicates the start of a Key-Value block.  There technically is no value.  The next byte after the [value header] is the start of the first key in the block.
+
+A block is terminated when the [key string length] is equal to 0.
+
+```
+[8],["itemList"],["[.]-"],
+[> 0 key string length],...
+[> 0 key string length],...
+[> 0 key string length],...
+[0]
+```
+
+Hopefully the above explains it.  I have defined an "itemList" key which starts the key value block.  If the next key value has a key string length that is &#62; 0 then it is part of the itemList key value block.  The last key string length is 0 which indicates that the block is done.  Anything that follows the block is a new key value thing.
+
+#### 2.4.2.2 - String values, "."
+
+
+```
+[[4:string length][string length:string]]]
+```
+
+Each string is prefixed with a [string length], the byte count of the UTF8 string.  Then you just dump out the string in UTF8 format.
+
+Array of strings will have as many of these pairs as found in the array.
+
+#### 2.4.2.3 - Simple values
+
+
+Simple value encoding.  Based on what is being stored the byte streams only look slighly different.
+
+|
+|
+| Type| Byte Count|
+| i.1,&nbsp;n.1| 1|
+| i.2,&nbsp;n.2| 2|
+| c.1| 3 (3 x 1 Byte)|
+| Azd,&nbsp;Azd,&nbsp;Did,&nbsp;Di%,&nbsp;Di:,&nbsp;i.4,&nbsp;in4,&nbsp;n.4,&nbsp;r.4,&nbsp;of4,&nbsp;sz4| 4|
+| ca1| 4 (4 x 1 Byte)|
+| i.8,&nbsp;in7,&nbsp;n.8,&nbsp;r.8| 8|
+| ADd,&nbsp;AD%,&nbsp;AD:,&nbsp;p2i,&nbsp;p2n,&nbsp;p2r| 8 (2 x 4 Byte)|
+| c.f,&nbsp;p3i,&nbsp;p3n,&nbsp;p3r| 12 (3 x 4 Byte)|
+| p2I,&nbsp;p2N,&nbsp;p2R| 16 (2 x 8 Byte)|
+| p3I,&nbsp;p3N,&nbsp;p3R| 24 (3 x 8 Byte)|
+| caf| 32 (4 x 8 Byte)|
+| m33| 36 (9 x 4 Byte)|
+| M33| 64 (9 x 8 Byte)|
+| m33| 72 (16 x 4 Byte)|
+| M44| 128 (16 x 8 Byte)
+
+The values are simply encoded as such.
+
+```
+[bytes count:value]
+```
+
+Again, multi-byte values are store in big endian (network order).
+
+Arrays of these values are simply repeating the above as many times necessary for the array.
+
+#### 2.4.2.4 - Binary, bin
+
+
+Binary encoding is like string encoding.  We need a byte count before the buffer data.
+
+```
+[4:byte count][byte count:buffer data]
+```
+
+byte count will never be compressed when compression is used but buffer data will.
+
+Array of binaries will have as many of these pairs as found in the array.
+
+#### 2.4.2.5 - Boolean , boo
+
+
+Boolean data is a little different than the basic types above.
+
+**Single Value**
+
+```
+[1:Byte]
+```
+
+The value will be 't' for true, or 'f' for false.
+
+**Array of Values**
+
+```
+[(Array Count) / 8:Bytes]
+```
+
+'=' encoding flag will mean the flags are encoded in to a bit map where...
+
+```
+Byte 0                            Byte 1
++---+---+---+---+---+---+---+---+ +---  ...
+| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | | 8
++---+---+---+---+---+---+---+---+ +--- ...
+2^7 2^6 ...                 2^0   2^8 ...
+```
+
+0, 1, 2, ... indicates the index into the array and how it relates to the bytes.  So each bit will either be 1 (true) or 0 (false).  This byte stream then gets converted to base64.
+
+'Z' will take the above bitmap and compress it first before encoding it with base64.
+
+#### 2.4.2.6 - Graphic values, g&#42;, G&#42;
+
+
+**g.1, ga1, g.f, gaf**
+
+```
+[4:width][4:height][width * height * size of [c.1|ca1|c.f|caf]:graphic data]
+```
+
+Raw graphic data size will be (unsigned integer) width &#42; (unsigned integer) height &#42; size of the color item.  It will be the compressed size in the file if compression is used but the raw size in memory.
+
+**gfl**
+
+```
+[3 Bytes:three letter file format][4:image file size][image file size:binary buffer of the image file]
+```
+
+**glk**
+
+```
+[4:string length][string length:file path]
+```
+
+#### 2.4.2.7 - Type value, typ
+
+
+```
+[3 Byte:3 letter Type Identifier]
+```
+
+The three letter identifier as defined in MIFF Format: Base / Content / Key Value Format / Value Header Section
+
+#### 2.4.2.8 - Time value, t&#42;
+
+
+td., t.t, tdt store time values.
+
+```
+td. = [n2:Year Value][n1:Month Value][n1:Day Value]
+t.t = [n1:Hour Value][n1:Minute Value][n1:Second Value]
+tdt = [n2:Year Value][n1:Month Value][n1:Day Value][n1:Hour Value][n1:Minute Value][n1:Second Value]
+```
+
+Year value is the present year as is.  Month value is the month value starting at 1 being January.  Similarly Day starts at 1.
+
+Hour value is 24 hour Greenwich Time zone, no daylights correction starting at 0.  Minute and Second are both starting at 0.
+
+#### 2.4.2.9 - Value stream, vst
+
+
+A Value Stream is a departure of the base format.  It is meant to be used to compress the data storage more with a simpler key value structure which will be dictated by the format that uses MIFF as a base format.
+
+Keys will typically be 1 byte.  Values will be a known sized based on the key or other information of the format.
+
+# 3 - Design Decisions:
+
+
+****Why not XML or JSON?****<br>
+    I did not take XML as a format because it is too verbose.  JSON is very flexible but I also find it is still unnecessarily verbose.  Better than XML but still unacceptable in my opinion.  Considering the data, I do not want a format that would cause too much data bloat.  There will always be some bloat happening but it should be mitigated in my opinion.
+
+****Why network order for multibyte data types?****<br>
+    In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows NT.  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but just very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler.
+

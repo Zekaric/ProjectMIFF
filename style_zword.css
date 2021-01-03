@@ -49,3 +49,5 @@ ul.zword p.zword,  ol.zword p.zword  { font-size: 1.0rem; margin: 0rem; }
 
 dl.zword          { font-size: 1.0rem; margin-bottom: 0.5rem; margin-left: 3.5rem; }
 dd.zword          { font-size: 1.0rem; margin-bottom: 0.0rem; margin-left: 5.0rem; }
+
+code              { font-size: 1.0rem; font-family: monospace; white-space: pre; }

@@ -424,7 +424,7 @@ $cost
 <p class="zword"><strong>Invalid:</strong> Absolutely no "\n" anywhere before or within the key value line*.  Absolutely no blank lines as they have specific meaning in the format.</p>
 <pre class="zword">
 \n\n\n[key]\n[value header]\n[value]\n
-\n[key] [value header] [value]\n
+ \n[key] [value header] [value]\n
 </pre>
 <p class="zword">* There are cases where the [value] will be broken up by '\n' characters but this will be indicated where that will happen.  In general most key value lines live on a single line.</p>
 
@@ -957,7 +957,7 @@ Byte 0                            Byte 1
 +---+---+---+---+---+---+---+---+ +---  ...
 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | | 8
 +---+---+---+---+---+---+---+---+ +--- ...
-2^7 2^6 ...                 2^0   2^8 ...
+ 2^7 2^6 ...                 2^0   2^8 ...
 </pre>
 <p class="zword">0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).</p>
 <p class="zword">'z' encoding flag is never used with this type.</p>

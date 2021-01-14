@@ -327,7 +327,7 @@ To be clear...
 
 ```
 \n\n\n[key]\n[value header]\n[value]\n
-\n[key] [value header] [value]\n
+ \n[key] [value header] [value]\n
 ```
 
 &#42; There are cases where the [value] will be broken up by '\n' characters but this will be indicated where that will happen.  In general most key value lines live on a single line.
@@ -941,7 +941,7 @@ Byte 0                            Byte 1
 +---+---+---+---+---+---+---+---+ +---  ...
 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | | 8
 +---+---+---+---+---+---+---+---+ +--- ...
-2^7 2^6 ...                 2^0   2^8 ...
+ 2^7 2^6 ...                 2^0   2^8 ...
 ```
 
 0, 1, 2, ... Indicates the index into the array of booleans.  So each bit will either be 1 (true) or 0 (false).

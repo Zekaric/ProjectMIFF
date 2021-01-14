@@ -1,10 +1,10 @@
 H	M.I.F.F.: Mixed Information File Format
 
-	|b |. Author:             .| b| Robbert de Groot
-	|b |. Date:               .| b| 2019-05-15
-	|b |. Copyright:          .| b| 2019, Robbert de Groot
-	|b |. License (Library):  .| b| MIT License.
-	|b |. License (Document): .| b| Creative Commons Attribution-NoDerivs.|link |https://creativecommons.org/licenses/by-nd:4.0| link |(CC BY-ND)| link|
+	|b ||. |Author:            | .|| b| Robbert de Groot
+	|b ||. |Date:              | .|| b| 2019-05-15
+	|b ||. |Copyright:         | .|| b| 2019, Robbert de Groot
+	|b ||. |License (Library): | .|| b| MIT License.
+	|b ||. |License (Document):| .|| b| Creative Commons Attribution-NoDerivs.|link |https://creativecommons.org/licenses/by-nd:4.0| link |(CC BY-ND)| link|
 
 HH	Table Of Contents:
 
@@ -22,17 +22,17 @@ hh	|chapter| - Discussion
 hh	|chapter| - Goals
 
 :[
--	|b |. Simple   .| b|  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
--	|b |. Brief    .| b|  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
--	|b |. Flexible .| b|  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
--	|b |. Accurate .| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
+-	|b ||. |Simple  | .|| b|  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
+-	|b ||. |Brief   | .|| b|  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+-	|b ||. |Flexible| .|| b|  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
+-	|b ||. |Accurate| .|| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 ]
 
 hh	|chapter| - Design Decisions:
 
 =[
--	|b Why not XML or JSON? b|	I find XML are too verbose.  JSON is much better than XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I can't claim MIFF is better, just different.
--	|b Why Big Endian for multibyte data types? b|	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows NT.  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but just very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler.
+-	|b |Why not XML or JSON?| b|	I find XML are too verbose.  JSON is much better than XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I can't claim MIFF is better, just different.
+-	|b |Why Big Endian for multibyte data types?| b|	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows NT.  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but just very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler.
 ]
 
 hh	|chapter| - Disclosure
@@ -83,17 +83,17 @@ hh	|chapter| - Content
 
 hhh	|chapter| - Numbers
 
-	|b Natural numbers b| (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
-	|b Integer numbers b| are numbers are positive and negative whole numbers.
-	|b Real numbers    b|(floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
+	|b |Natural numbers| b| (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
+	|b |Integer numbers| b| are numbers are positive and negative whole numbers.
+	|b |Real numbers   | b|(floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
 
 hhh	|chapter| - Key Value Composition
 
 .	[key] [value header] [value]\n
 
-	|b [key]          b| will be a string that will somewhat uniquely identify the value.  A key can not be longer than 255 Bytes in UTF8 format.  Longer keys will be truncated.
-	|b [value header] b| will be an code (binary) or sequence of characters (text) that will dictate what the value will look like.
-	|b [value]        b| will depend on the |b [value header] b| on what is contained here.
+	|b |[key]         | b| will be a string that will somewhat uniquely identify the value.  A key can not be longer than 255 Bytes in UTF8 format.  Longer keys will be truncated.
+	|b |[value header]| b| will be an code (binary) or sequence of characters (text) that will dictate what the value will look like.
+	|b |[value]       | b| will depend on the |b |[value header]| b| on what is contained here.
 
 hhhh	|chapter| - Key
 
@@ -122,7 +122,7 @@ thx	Text Type Code
 th*	Description
 
 t-
-tcx	|line||b Block Types b||line|
+tcx	|line||b |Block Types| b||line|
 
 t-
 tcx	1
@@ -135,7 +135,7 @@ tcx	[...]
 tc	Value stream.  The contents deviates from the rest of the format.  Representations will explained where they are used.
 
 t-
-tcx	|line||b Embedded Types b||line|
+tcx	|line||b |Embedded Types| b||line|
 
 t-
 tcx	3
@@ -148,7 +148,7 @@ tcx	file
 tc	File data.
 
 t-
-tcx	|line||b Basic Types b||line|
+tcx	|line||b |Basic Types| b||line|
 
 t-
 tcx	5
@@ -181,7 +181,7 @@ tcx	r4, r8, r10
 tc	A real value using 4 (float), 8 (double), or 10 (long double) Bytes.
 
 t-
-tcx	|line||b Complex Types b||line|
+tcx	|line||b |Complex Types| b||line|
 
 t-
 tcx	60, 61
@@ -299,7 +299,7 @@ tcx	times4, timems4, timeus4,|line|times8, timems8, timeus8
 tc	A time difference as a second value, millisecond value, microsecond value.
 
 t-
-tcx	|line||b User Type b||line|
+tcx	|line||b |User Type| b||line|
 
 t-
 tcx	8
@@ -395,11 +395,11 @@ hhh	|chapter| - Key Value Format
 	Any extra separators in the line will be ignored.
 	To terminate the key value pair use a single '\n' character.
 	To be clear...
-	|b Valid: b| spaces and tabs can be used to indent and separate the parts although rather wasteful of space.
+	|b |Valid:| b| spaces and tabs can be used to indent and separate the parts although rather wasteful of space.
 
 .	\t\t[key]\t[value header]\t\t\t[value]\n
 
-	|b Invalid: b| Absolutely no "\n" anywhere before or within the key value line*.  Absolutely no blank lines as they have specific meaning in the format.
+	|b |Invalid:| b| Absolutely no "\n" anywhere before or within the key value line*.  Absolutely no blank lines as they have specific meaning in the format.
 
 .[
 \n\n\n[key]\n[value header]\n[value]\n
@@ -416,7 +416,7 @@ hhhh	|chapter| - Value Header
 .	[type code][array and compression flag] [[array count]] [[compressed byte count]]
 
 	However it can vary slightly depending on the Type Code being used.  See section 3 for accurate representation.
-	|b [type flag] b| and |b [array and compression flag] b| is a string.  No space between the two.
+	|b |[type flag]| b| and |b |[array and compression flag]| b| is a string.  No space between the two.
 	[array count] will be a natural number (n4) value in readable UTF8 indicating how many values in the array.  Only present when =, or Z are used.
 	[compressed byte count] will be a natural number (n4) in readable UTF8 indicating the byte count of the compressed data.  Only present when z and Z are used.
 
@@ -1263,7 +1263,7 @@ Binary                                                     Text
 ...
 ]
 
-	|b [pixel buffer] b| will always be Base64 encoded and one long stream.  Do not break down in rows.
+	|b |[pixel buffer]| b| will always be Base64 encoded and one long stream.  Do not break down in rows.
 	Images are written out left to right, top to bottom.  Top left pixel written out first, then the second pixel from the left top row is next, and so on.  There is no byte alignment or packing.
 	Array of graphics will place each graphic on a separate line similar to string encoding.
 

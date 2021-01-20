@@ -155,6 +155,7 @@ MineInfo []-
 :[
 -	|b |Information block| b| to hold general information about the project.  This must be the first block.
 -	|b |Item List block| b| to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
+-	|b |Image List block| b| to hold the images.  Images can be used for texturing, symbols, etc.
 -	|b |Geometry Block| b| to hold geometry information.  There can be more than one Geoemtry block.
 -	|b |Drillhole block| b| to hold drillhole information.  Item List block must already be defined or else you are not providing assay or survey values with your drillhole data.  There can be more than one Drillhole block.
 -	|b |Model Block| b| to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.

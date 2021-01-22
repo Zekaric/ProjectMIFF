@@ -21,18 +21,20 @@
 **2 - MI-MIFF Format**<br />
     2.1 - Header<br />
 **3 - Mine Information Block (MIB)**<br />
-    3.1 - Information Block<br />
-    3.2 - Item List Data<br />
-        3.2.1 - Item Data<br />
-    3.3 - Drillhole Data<br />
-    3.4 - Geometry Data<br />
-    3.5 - Model Data<br />
-        3.5.1 - Model Information<br />
-    3.6 - Model Block:<br />
-        3.6.1 - SubBlock: Fixed<br />
-        3.6.2 - SubBlock: Semi<br />
-        3.6.3 - SubBlock: Octree<br />
-        3.6.4 - SubBlock: Free<br />
+    3.1 - Type List Block<br />
+    3.2 - Information Block<br />
+    3.3 - Item List Data<br />
+        3.3.1 - Item Data<br />
+    3.4 - Drillhole Data<br />
+    3.5 - Geometry List Data<br />
+        3.5.1 - Geometry Data<br />
+    3.6 - Model Data<br />
+        3.6.1 - Model Information<br />
+    3.7 - Model Block:<br />
+        3.7.1 - SubBlock: Fixed<br />
+        3.7.2 - SubBlock: Semi<br />
+        3.7.3 - SubBlock: Octree<br />
+        3.7.4 - SubBlock: Free<br />
 
 # 1 - M.I. M.I.F.F.
 
@@ -42,7 +44,7 @@
 
 What is the purpose of M.I. M.I.F.F. (MI-MIFF)?  MI-MIFF is intended to be a file format for exporting and importing data from one mining software package to another software package.
 
-I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently each software package attempts to do its best at supporting competitor file formats but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, list DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.
+I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently each software package attempts to do its best at supporting competitor file formats (reading only) but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, like DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.
 
 A lot of the client's time is lost with all this work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with an Information format is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard part of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.
 
@@ -71,9 +73,9 @@ This format is currently not sanctioned by any software vendor, including Hexago
 
 So, I thought I would try my hand at defining a format what I think would be good as an Information format.  I am trying to write MIFF independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.
 
-If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at either of the following two email addresses.
+If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at the following email address.
 
-robbert.degroot@hexagon.com<br />zekaric@gmail.com
+zekaric@gmail.com
 
 # 2 - MI-MIFF Format
 
@@ -164,9 +166,13 @@ See MIFF format on how to represent in binary.
 Inside a MIB you will have the following blocks.
 
 
+* **Type List block** to hold the user types that are used in the format.
+
 * **Information block** to hold general information about the project.  This must be the first block.
 
 * **Item List block** to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
+
+* **Image List block** to hold the images.  Images can be used for texturing, symbols, etc.
 
 * **Geometry Block** to hold geometry information.  There can be more than one Geoemtry block.
 
@@ -174,7 +180,183 @@ Inside a MIB you will have the following blocks.
 
 * **Model Block** to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.
 
-## 3.1 - Information Block
+## 3.1 - Type List Block
+
+
+This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.
+
+```
+typeList []-\n
+ date             userType-\n
+  year            i4-\n
+  mon             n1- Jan = 1, Dec = 12\n
+  day             n1- day 1 = 1, day 31 = 31\n
+ \n
+ time             userType-\n
+  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
+  min             n1- 0 - 59\n
+  sec             n1- 0 - 59\n
+ \n
+ dateTime         userType-\n
+  year            i4-\n
+  mon             n1- Jan = 1, Dec = 12\n
+  day             n1- day 1 = 1, day 31 = 31\n
+  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
+  min             n1- 0 - 59\n
+  sec             n1- 0 - 59\n
+ \n
+ imageId          userType-\n
+  id              n4-\n
+ \n
+ enumCode         userType- There should be enum definitions for all your enums.\n
+  code            n4- This can vary.  Use an appropriat size n* to cover the values.\n
+ \n
+ enumValue        userType-\n
+  code            enumCode-\n
+  value           ""-\n
+ \n
+ enumList         enumValue= 3\n
+  0\n
+  `value1\n
+  1\n
+  `value2\n
+  999\n
+  `value3\n
+ \n
+ azimuth          userType-\n
+  degree          r4- North = 0.0, East = 90.0, South = 180.0, and West = 270.0\n
+ \n
+ dipDegree        userType-\n
+  degree          r4- Up = -90, down = 90, level = 0\n
+ \n
+ dipRatio         userType-\n
+  ratio           r4- 1 : value\n
+ \n
+ matrix           userType- 4x4 matrix\n
+  value           r8= 16 top row first, left to right, then second row, etc.\n
+ \n
+ color            userType- simple rgb\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+ \n
+ colorA           userType- simple rgba\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+  a               n1-\n
+ \n
+ normal           userType- normal vector, mush be unit length.\n
+  easting         r4-\n
+  northing        r4-\n
+  elevation       r4-\n
+ \n
+ point            userType- easting, northing, and elevation in the specified coordinate system.\n
+  easting         r8-\n
+  northing        r8-\n
+  elevation       r8-\n
+ \n
+ texturePoint     userType- texture coordinate\n
+  u               r4-\n
+  v               r4-\n
+ \n
+ planeOUR         userType- Z axis is cross product of up and right.\n
+  origin          point- the origin point of the plane.\n
+  up              point- the point 1 unit in the up/north direction of the plane.\n
+  right           point- the point 1 unit in the right/east direction of the plane.\n
+ \n
+ planeEquation    userType- ax + by + cz + d = 0\n
+  a               r8-\n
+  b               r8-\n
+  c               r8-\n
+  d               r8-\n
+ \n
+ enumCodePolyOption userType-\n
+  code            n1\n
+ \n
+ enumListPolyOption enumCodePolyOption= 3\n
+  0 no options\n
+  1 node coloring\n
+  2 line coloring\n
+ \n
+ polyline         userType-\n
+  pointCount      n4-\n
+  pointList       point* pointCount points in the point list.  Order is important.  Polygons have dup end point\n
+  polyOption      enumCodePolyOption-\n
+  colorList       color*  color per point.\n
+ \n
+ enumCodeSurfaceOption userType-\n
+  code            n1\n
+ \n
+ enumListSurfaceOption enumCodeSurfaceOption= 8\n
+    0 no options\n
+    1 node coloring\n
+    2 face coloring\n
+   10 normals\n
+   11 normals node coloring\n
+   12 normals face coloring\n
+  100 textured\n
+  110 textured and normals\n
+ \n
+ surfaceFace      userType-\n
+  pointListIndex  n4= 3  A triangle where the values are indicies into a pointList.\n
+ \n
+ surface          userType-\n
+  pointCount      n4-\n
+  faceCount       n4-\n
+  pointList       point*        pointCount points in the point list.  Order is not important.\n
+  faceList        surfaceFace*  faceCount faces in the face list.
+  surfaceOption   enumCodeSurfaceOption- \n
+  colorList       color*        color per face.\n
+  uvList          texturePoint* texture point per point.\n
+  texture         imageId-      image id.\n
+  normalList      normal*       normal per point.\n
+ \n
+ enumCodeMeshOption userType-\n
+  code            n1\n
+ \n
+ enumListMeshOption enumCodeMeshOption= 16\n
+     0 no options\n
+     1 face vis\n
+    10 node coloring\n
+    11 node coloring and face vis\n
+    20 face coloring\n
+    21 face coloring and face vis\n
+   100 normals\n
+   101 normals and face vis\n
+   110 normals node coloring\n
+   111 normals node coloring and face vis\n
+   120 normals face coloring\n
+   121 normals face coloring and face vis\n
+  1000 textured\n
+  1001 textured and face vis\n
+  1100 textured and normals\n
+  1101 textured and normals and face vis\n
+ \n
+ mesh             userType-\n
+  pointCountX     n4-\n
+  pointCountY     n4-\n
+  pointList       point*        pointCountX * pointCountY points in the point list.  Order is important.\n
+  mechOption      enumCodeMeshOption-\n
+  faceVisList     bool*         face visibility list.  0 size if all faces are visible.
+  colorList       color*        0 size if not node or face coloring.
+  textureUVList   texturePoint* texture uv per point.\n
+  textureId       imageId-      image id.\n
+  normalList      normal*       normal per point.\n
+ \n
+ textGeneric      userType-\n
+  location        planeOUR-\n
+  value           ""-\n
+ \n
+ formula          userType-
+  text            ""-\n
+ \n
+\n
+```
+
+All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.
+
+## 3.2 - Information Block
 
 
 Common to all MI-MIFF files for any of the types above, there will be an information block providing general, project wide information.
@@ -185,17 +367,17 @@ Inside the information block we have the following possible key values.  Not all
 
 ```
 info []-
- type              ""-   [file type]
- company           ""-   [company name]
- copyright         ""-   [copyright if any]
- author            ""-   [client employee name]
- software          ""-   [software preparing this file]
- softwareVersion   ""-   [software version]
- comment           ""-   [comments]
- projectSystem     ""-   [coordinate system the project is in]
- projectName       ""-   [name of project area]
- projectMin        v3r8- [minimum project area point]
- projectMax        v3r8- [maximum project area point]
+ type              ""-    [file type]
+ company           ""-    [company name]
+ copyright         ""-    [copyright if any]
+ author            ""-    [client employee name]
+ software          ""-    [software preparing this file]
+ softwareVersion   ""-    [software version]
+ comment           ""-    [comments]
+ projectSystem     ""-    [coordinate system the project is in]
+ projectName       ""-    [name of project area]
+ projectMin        point- [minimum project area point]
+ projectMax        point- [maximum project area point]
 \n
 ```
 
@@ -215,7 +397,7 @@ Most keys are self explanatory.
 
 **[projectMin]** and **[projectMax]** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.
 
-## 3.2 - Item List Data
+## 3.3 - Item List Data
 
 
 Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.
@@ -227,7 +409,7 @@ itemList []= [item list count]
 
 An item list is just a collection of items.  It should be known how many items are being tracked so this list is often using the array flag with the key-value block.
 
-### 3.2.1 - Item Data
+### 3.3.1 - Item Data
 
 
 Within the itemList you will only find Item Key-Value blocks.
@@ -236,53 +418,151 @@ Item data will describe the value that will be stored in the various places wher
 
 ```
 item []-
- id          ""-     [item id]
- nameLong    ""-     [item name]
- nameShort   ""-     [item name short]
- type        type    [item type]
- min         [type]- [item min value]
- max         [type]- [item max value]
- precision   r4-     [item precision]
- enumList    ""=     [enum count]
-  [[id of enum, id4] [name of enum, ""]]*
- default     [type]- [default value for this item, missing value otherwise.]
- calculation ""-     [calculation field value]
+ id          ""-          [item id]
+ nameLong    ""-          [item name]
+ nameShort   ""-          [item name short]
+ type        type-        [item type]
+ min         [item type]- [item min value]
+ max         [item type]- [item max value]
+ precision   [item type]- [item precision]
+ default     [item type]- [default value for this item, missing value otherwise.]
+ calculation ""-          [calculation field value]
  ...
 \n
 ```
 
-Each item will have a unique **id**.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  Is has to be unique compared to any other items in the item list.
+Each item will have a unique **id**.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.
 
-**nameLong** and **nameShort** are two names for this item.  These names may not be unique.  There can be multiple items with the same names but with different ids.
+**nameLong** and **nameShort** are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.
 
-**type** will define the value being stored for this item.  One of "", r4, r8, n1, n2, n4, n8, i1, i2, i4, i8, time, timedate, timehour, en ("en" for enumeration value), + ("+" for calculated field)
+**type** will define the value being stored for this item.  Any of "", r&#42;, n&#42;, i&#42;, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)
 
-**min| b<sub>b |max** define the limits for an item if a number value using the above type.  If these are missing then the range is the full range as defines by the type.
+**min| b<sub>b |max** define the limits for an item.  Only applicable if item type is a r&#42;, n&#42;, or i&#42;.  If these are missing then the range is the full range as defined by the type.
 
-**precision** is the accuracy of the number if type is r4 or r8.
-
-**enumList** required only for "en" type.  This lists the enumeration values available in a string list.  Each enum has an id (type id4) and a name (type "").
+**precision** is the accuracy of the number.  Only applicable if item type is a r&#42;.
 
 **default** will define the default value for this item if block is skipped.  If this is missing then the default value is 'missing'.
 
-**calculation** is required if type above is "+".  This will define a formula that is used to calculate the contents of this value.  Use "@[item id]@" in the formula to refer to another item value in the current block.  Full discussion about the formula composition will be discussed elsewhere.
+**calculation** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item id]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.
+
+When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'missing value' as well.  If this is all the values that need to be recorded then we don't really need to use a full r4 or r8 to store it.  We will be storing instead an n&#42; value such that the n value, multiplied by the precision and added to the min value will recover the r value which is being stored.  In this case, 102 values only requires an n1 to encode all the values in the range.
 
 ```
 Calculation example:
 (@ore%@ * @cu@) - @i_am_making_something_up@
 ```
 
-## 3.3 - Drillhole Data
+Missing values for the various types
+
+| Type | Missing Value Binary | Missing Value Text |
+| --- | --- | --- |
+| r4, r8 | FLT_MAX, DBL_MAX | FLT_MAX, DBL_MAX |
+| i&#42;, n&#42; | MAX value for the size | "-" without the quotes |
+| date, dateTime | year is MAX value for that field. | "-" without the quotes |
+| time | hour is MAX value for that field. | "-" without the quotes |
+| enumCode | MAX value for the code. | "-" without the quotes |
+| "" | 0 string length.  An actual 0 string will have 1 character and that character will 0. |
+
+
+Examples:
+
+```
+item []-\n
+ id        ""-   `cu\n
+ nameLong  ""-   `Copper\n
+ nameShort ""-   `cu\n
+ type      type- r4\n
+ min       r4-   [base64 0]\n
+ max       r4-   [base64 5]\n
+ precision r4-   [base64 0.01]\n
+ default   r4-   [base64 missing value]\n
+\n
+
+
+enumCodeRockType  userType-\n
+ enumCode  n1-\n
+\n
+enumValueRockType userType-\n
+ enumCode  enumCodeRockType-\n
+ enumValue ""-\n
+\n
+enumListRockType enumValueRockType= 3\n
+ 0\n
+ `Granite\n
+ 1\n
+ `Sandstone\n
+ 2\n
+ `Shale\n
+\n
+item []-\n
+ id        ""-              `rt\n
+ nameLong  ""-              `Rock Type\n
+ nameShort ""-              `rock\n
+ type      type-            enumCodeRockType\n
+ default   enumCodeRockType -\n
+\n
+```
+
+An enumeration requires the enumeration usertypes defined before the item is defined.  Usually in the Type List and not here.
+
+## 3.4 - Drillhole Data
 
 
 Drillhole data holds information about drillholes.
 
-## 3.4 - Geometry Data
+## 3.5 - Geometry List Data
 
 
-Geometry data holds information that does not fall into Drillhole or Model categories.  This will hold thinks like topography polylines and surfaces.  Stope solids.  Pit cuts etc.
+Geometry List will hold geometric data like points, polylines, polygons, surfaces, text, that live in the project space.
 
-## 3.5 - Model Data
+```
+geometryList []-\n
+...
+\n
+```
+
+### 3.5.1 - Geometry Data
+
+
+Within the geometryList you will only find geometry Key-Value blocks.
+
+```
+geom []-\n
+ id       ""-          [geom id]\n
+ type     type-        [geom type]\n
+ data     [geom type]-
+  ...
+ geomAttr []-\n
+  [item id] [item type]- ...\n
+  ...
+ \n
+ pointAttr []= [pointCount]\n
+  pnt []-\n
+   [item id] [item type]- ...\n
+   ...
+  \n
+  ...
+ segmentAttr []= [pointCount]\n
+  seg []-\n
+   [item id] [item type]- ...\n
+   ...
+  \n
+  ...
+```
+
+Each geom has a unique id.
+
+Each geom will have a type.  One of point, poly, surface, grid, text.
+
+Each geom will have data of the given type.
+
+Each geom may have an optional geomAttr key value block.  Inside are item values for the geometry.  See the Item Data section on what to store here.
+
+If the geometry is a poly, then there may be an optional pointAttr Key-Value block which contains pnt Key-Value blocks, 1 for each point in the polyline.  Inside are item values for that point.
+
+If the geometry is a poly, then there may be an optional segmentAttr Key-Value block which contains seg Key-Value blocks, 1 for each segment in the polyline.  Inside are item values for that segment.
+
+## 3.6 - Model Data
 
 
 Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.
@@ -306,7 +586,7 @@ There are 3 basic model formats that are in use as Hexagon.
 
 Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.
 
-### 3.5.1 - Model Information
+### 3.6.1 - Model Information
 
 
 After the general information block the next block will be the Model Information block.
@@ -441,7 +721,7 @@ Depending on what is set for [subblock type] there will be one of 3 [subblockOpt
 
 **levList** - A list of level heights starting from first level.  Only required if isLevVariable is true.
 
-## 3.6 - Model Block:
+## 3.7 - Model Block:
 
 
 This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.
@@ -520,12 +800,12 @@ In binary the above will look like...
 [n1:0]
 ```
 
-### 3.6.1 - SubBlock: Fixed
+### 3.7.1 - SubBlock: Fixed
 
 
 In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.
 
-### 3.6.2 - SubBlock: Semi
+### 3.7.2 - SubBlock: Semi
 
 
 In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...
@@ -542,14 +822,14 @@ If H or h follows an H or h then the previous block will be holding default valu
 
 If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.
 
-### 3.6.3 - SubBlock: Octree
+### 3.7.3 - SubBlock: Octree
 
 
 In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.
 
 The 's' key need to preceed the v record.
 
-### 3.6.4 - SubBlock: Free
+### 3.7.4 - SubBlock: Free
 
 
 In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.

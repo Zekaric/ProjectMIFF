@@ -68,43 +68,44 @@ What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file fo
 
 
 
-* **`Simple  `**  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
+* **Simple  **  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
 
-* **`Brief   `**  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+* **Brief   **  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
 
-* **`Flexible`**  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
+* **Flexible**  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
 
-* **`Accurate`**  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
+* **Accurate**  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 
 ## 1.3 - Design Decisions:
 
 
-****Why not XML or JSON?****<br>
-    I find XML are too verbose.  JSON is much better than XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I can't claim MIFF is better, just different.
+**Why not XML or JSON?**
 
-****Why Big Endian for multibyte data types?****<br>
-    In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows NT.  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but just very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler.
+I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I won't claim MIFF is better, it is just different.
 
+**Why Big Endian for multibyte data types?**
+
+In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format isn't meant to be good in performance; its main goal is to be good in getting data moved from one place to another.
 
 ## 1.4 - Disclosure
 
 
 I, Robbert de Groot, have been a professional Software Developer since 1995.
 
-This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing options which I find lacking in some fashion.
+This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing options which I find lacking or distasteful in some fashion.
 
-I can be reached at the following two email addresses.
+I can be reached at the following email address.
 
-robbert.degroot@hexagon.com<br />zekaric@gmail.com
+zekaric@gmail.com
 
 # 2 - Format: Base
 
 
 There are two representations of the format.  A Text file and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
 
-A MIFF format is essentially a collection of key value pairs.  Values can be a collection of further key value pairs.  Meaning nesting is possible.
+A MIFF format is essentially a collection of key value pairs.  Values are typed.  Nesting and user types are allowed.
 
-The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file from one program to another.
+The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file format to move data from one program to another.
 
 Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 but without any line feeds, cursor returns to break up the buffer.
 
@@ -133,13 +134,13 @@ Second line is the sub format of the MIFF file and the version of the sub format
 
 "MIFF_TXT" on the first line indicates that after the second line we will see key value pairs in text MIFF representation.  "MIFF_BIN" means that after the \n of the second line we will see the key value pairs in the binary MIFF representation.
 
-"n8-" indicates that the version number is a natural number using 8 Bytes.  Natural number being unsigned integer for programmers.
+"n8-" indicates that the version number is a single natural number using 8 Bytes.  Natural number being unsigned integer if programmers are wondering.
 
 Currently MIFF is at version 1.  This will only use whole numbers instead of the usual XX.XX.XX.XX versioning of software.  This is written as a readable decimal number.
 
 [Sub-Format Name] will be a UTF8 string and defines the format of what is being stored in the file.  Do not include spaces in this name.
 
-Like the first line we have "n8" and a [Sub-Format Version].
+Like the first line we have a single natural number for version of this sub-format.
 
 ## 2.2 - Content
 
@@ -198,16 +199,16 @@ A value header is comprised of a type code and an array and compression flag.
 | 2 | [...] | Value stream block.  The contents deviates from the rest of the format.  Representations will explained where they are used. |
 | <br />**Embedded Types**<br /> |
 | 3 | ... | Binary data. |
-| 4 | file | File data. |
+| 4 | file | And embedded file. |
 | <br />**Basic Types**<br /> |
 | 5 | type | Type value.  One of these type codes or user type code. |
-| 6 | "" | String (UTF8) data.  Or an array of n1.  Can be anything. |
+| 6 | "" | String (UTF8) data, can be of any length. |
 | 7 | path | A specific string value that represents a relative path (relative to the MIFF file location.) |
 | 8 | userType | A series of key-type pairs.  You can define up to 4031 new types maximum. |
 | 10 | bool | Boolean value. |
-| 11, 12, 13, 14, 15, 16,  17,  18,  19,   20 | i1, i2, i3, i4, i8, i16, i32, i64, i128, i256 | An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful to someone. |
-| 31, 32, 33, 34, 35, 36,  37,  38,  39,   40 | n1, n2, n3, n4, n8, n16, n32, n64, n128, n256 | A natural number using 1 to 16 Bytes.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like i3, but I include these byte counts because they may be useful to someone. |
-| 51, 52, 53,  54,  55,  56,   57 | r4, r8, r16, r32, r64, r128, r256 | A real value using 4 (float), 8 (double).  I do realize there are no standards for r16, r32, r64, or r128 but these are just placeholders for the future. |
+| 11, 12, 13, 14, 15, 16,  17,  18,  19,   20 | i1, i2, i3, i4, i8, i16, i32, i64, i128, i256 | An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
+| 31, 32, 33, 34, 35, 36,  37,  38,  39,   40 | n1, n2, n3, n4, n8, n16, n32, n64, n128, n256 | A natural number using 1 to 16 Bytes.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like i3, but I include these byte counts because they may be useful in certain cases. |
+| 51, 52, 53,  54,  55,  56,   57 | r4, r8, r16, r32, r64, r128, r256 | A real value using 4 (float), 8 (double).  I do realize there are no standards for r16, r32, r64, or r128 but these are just placeholders for the future if they ever become standard. |
 | 64 and higher | [user type name] | Depends on what the user type defines. |
 
 
@@ -280,13 +281,13 @@ All real numbers are stored as a Base64 string.  No exceptions.  This is to ensu
 [key] [value header] [value]\n
 ```
 
-There can be leading separators before the [key] but these will be ignored.
+There can be leading separators before the [key] but these will be ignored/trimmed off.
 
 There has to be at least one separator between [key] and [value header].
 
 There has to be at least one separator between [value header] and the [value].
 
-Any extra separators in the line will be ignored.
+Any extra separators in the line will be ignored/trimmed off.
 
 To terminate the key value pair use a single '\n' character.
 
@@ -406,7 +407,7 @@ Key value bocks can have an Array flag set.  This is useful for an array of a co
 
 In this case there is no blank line (text) or 0 key count (binary) terminator since the key value count is known.
 
-Chunk and Compression flags are never used with this value type.
+Compression flags are never used with this value type.
 
 To be clear on how it works.  In the text file leading separators before the key are unnecessary and are only here for clarity.  Leading separators before a \n are allowed but are wasteful.
 
@@ -1036,7 +1037,7 @@ If no compression is used then before the string starts you need to define the e
 
 Multi-line strings are placed on one line.  With the escapement of these control characters (\n, \r etc.) this can be done.
 
-There can only be no separators between the escape character and the start of the string.  If separators exist between this escape character and the start of the string, then those separators are part of the string.
+There cannot be any separators between the escape character and the start of the string.  If separators exist between this escape character and the start of the string, then those separators are part of the string.
 
 ```
 string1 ""- \<-escape character being used.  No separators after this character.  Otherwise those separators are part of the string.  This is a single string value.\nBut multiline.\n
@@ -1084,20 +1085,20 @@ Binary                                                     Text
 
 [n1                        :key byte count]                [key] bool- [boolean value]\n
 [n1 * key byte count       :key]
-[n2                        :value header  - 00|00|7]
+[n2                        :value header  - 00|00|10]
 [n1                        :boolean value - 't'|'f']
 
 
 [n1                        :key byte count]                [key] bool= [array count] [boolean value] * (array count)\n
 [n1 * key byte count       :key]
-[n2                        :value header  - 00|01|7]
+[n2                        :value header  - 00|01|10]
 [n4                        :array count]
 [n1 * (array count / 8)    :boolean value]
 
 
 [n1                        :key byte count]                [key] boolZ [array count] [compressed byte count] [Base64 compressed data]\n
 [n1 * key byte count       :key]
-[n2                        :value header  - 01|01|7]
+[n2                        :value header  - 01|01|10]
 [n4                        :array count]
 [n4                        :compressed byte count]
 [n1 * compressed byte count:compressed data]
@@ -1105,7 +1106,7 @@ Binary                                                     Text
 
 [n1                        :key byte count]                [key] boolC [array count] [chunk byte count]\n
 [n1 * key byte count       :key]                           [compressed byte count] [Base64 compressed data]\n
-[n2                        :value header  - 10|01|7]       [compressed byte count] [Base64 compressed data]\n
+[n2                        :value header  - 10|01|10]       [compressed byte count] [Base64 compressed data]\n
 [n4                        :array count]                   ...
 [n4                        :chunk byte count]
 [n4                        :compressed byte count]
@@ -1141,20 +1142,20 @@ Binary                                                     Text
 
 [n1                        :5]                             Bool1 bool- t\n
 [n1 * 5                    :Bool1]
-[n2                        :00|00|7]
+[n2                        :00|00|10]
 [n1                        :t]
                        
 
 [n1                        :5]                             Bool2 bool= 10 tttttfffff\n
 [n1 * 5                    :Bool2]
-[n2                        :00|01|7]
+[n2                        :00|01|10]
 [n4                        :array count]
 [n1 * (array count / 8)    :boolean value]
 
 
 [n1                        :5]                             Bool3 boolZ 1024 25 ...\n
 [n1 * 5                    :Bool3]
-[n2                        :01|01|7]
+[n2                        :01|01|10]
 [n4                        :array count]
 [n4                        :compressed byte count]
 [n1 * compressed byte count:compressed data]
@@ -1261,7 +1262,7 @@ Binary                                                     Text
 
 
 [n1      :4]                                               *Nat n4= 8 1 2 4 8 16 32 64 128\n
-[n1 * 4  :NNat]
+[n1 * 4  :*Nat]
 [n2      :00|01|34]
 [n4      :8]
 [n4      :1]
@@ -1335,7 +1336,7 @@ Binary                                                     Text
 
 In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.  In the text file, the key for the user type is the user type code.
 
-The different between the single value and array value is the inclusion of a count.  They both will permit the definition of multiple items.  In the binary case, if not using the array case we need a 0 key byte count terminator.
+The difference between the single value and array value is the inclusion of a count.  They both will permit the definition of multiple items.  In the binary case, if not using the array case we need a 0 key byte count terminator.
 
 [array count] after the [value header] of a type item is optional and only required if the value header defines an array.
 
@@ -1519,8 +1520,6 @@ Binary                                                     Text
 [n1      :5]
 
 
-
-
 [n1      :14]                                              ContactList2 TypeContact= 2\n
 [n1 * 14 :ContactList2]                                    `Robbert\n
 [n2      :01|01|64]                                        `de Groot\n
@@ -1549,8 +1548,6 @@ Binary                                                     Text
 [n1      :30]
 [n1      :40]
 [n1      :50]
-
-
 
 
 [n1      :14]                                              ContactList TypeContactz 521 95 ...\n

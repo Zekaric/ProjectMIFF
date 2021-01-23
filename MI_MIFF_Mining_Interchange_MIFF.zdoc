@@ -11,6 +11,7 @@ HH	Table Of Contents:
 toc
 
 
+
 h	|chapter| - M.I. M.I.F.F.
 
 
@@ -41,6 +42,7 @@ hh	|chapter| - Disclosure
 	So, I thought I would try my hand at defining a format what I think would be good as an Information format.  I am trying to write MIFF independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.
 	If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at the following email address.
 	zekaric@gmail.com
+
 
 
 h	|chapter| - MI-MIFF Format
@@ -120,6 +122,7 @@ tc	for only Model related data.
 	This information is duplicated inside the file so reading in the file will confirm with the extension but it will help the user if the extension is properly set and will make it easier on the software on how to read in the file if these are properly set.
 
 
+
 hh	|chapter| - Header
 
 	MIFF has fields for a Sub-Format Name and Version.  For a MI-MIFF file this will be set to...
@@ -138,6 +141,7 @@ tc	1
 
 ]
 
+
 h	|chapter| - Mine Information Block (MIB)
 
 	An MIB is not limited to live in just an MI MIFF file.  Also multiple MIBs could potentially live in one MI MIFF files where each MIB represents a totally different mining project.
@@ -153,8 +157,8 @@ MineInfo []-
 	Inside a MIB you will have the following blocks.
 
 :[
--	|b |Type List block| b| to hold the user types that are used in the format.  
 -	|b |Information block| b| to hold general information about the project.  This must be the first block.
+-	|b |Type List block| b| to hold the user types that are used in the format.  
 -	|b |Item List block| b| to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
 -	|b |Image List block| b| to hold the images.  Images can be used for texturing, symbols, etc.
 -	|b |Geometry Block| b| to hold geometry information.  There can be more than one Geoemtry block.
@@ -162,180 +166,7 @@ MineInfo []-
 -	|b |Model Block| b| to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.
 ]
 
-hh	|chapter| - Type List Block
 
-	This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.
-
-.[
-typeList []-\n
- date             userType-\n
-  year            i4-\n
-  mon             n1- Jan = 1, Dec = 12\n
-  day             n1- day 1 = 1, day 31 = 31\n
- \n              
- time             userType-\n
-  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
-  min             n1- 0 - 59\n
-  sec             n1- 0 - 59\n
- \n              
- dateTime         userType-\n
-  year            i4-\n
-  mon             n1- Jan = 1, Dec = 12\n
-  day             n1- day 1 = 1, day 31 = 31\n
-  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
-  min             n1- 0 - 59\n
-  sec             n1- 0 - 59\n
- \n              
- imageId          userType-\n
-  id              n4-\n
- \n
- enumCode         userType- There should be enum definitions for all your enums.\n
-  code            n4- This can vary.  Use an appropriat size n* to cover the values.\n
- \n
- enumValue        userType-\n
-  code            enumCode-\n
-  value           ""-\n
- \n
- enumList         enumValue= 3\n
-  0\n
-  `value1\n
-  1\n
-  `value2\n
-  999\n
-  `value3\n
- \n
- azimuth          userType-\n
-  degree          r4- North = 0.0, East = 90.0, South = 180.0, and West = 270.0\n
- \n              
- dipDegree        userType-\n
-  degree          r4- Up = -90, down = 90, level = 0\n
- \n              
- dipRatio         userType-\n
-  ratio           r4- 1 : value\n
- \n              
- matrix           userType- 4x4 matrix\n
-  value           r8= 16 top row first, left to right, then second row, etc.\n
- \n              
- color            userType- simple rgb\n
-  r               n1-\n
-  g               n1-\n
-  b               n1-\n
- \n
- colorA           userType- simple rgba\n
-  r               n1-\n
-  g               n1-\n
-  b               n1-\n
-  a               n1-\n
- \n
- normal           userType- normal vector, mush be unit length.\n
-  easting         r4-\n
-  northing        r4-\n
-  elevation       r4-\n
- \n              
- point            userType- easting, northing, and elevation in the specified coordinate system.\n
-  easting         r8-\n
-  northing        r8-\n
-  elevation       r8-\n
- \n              
- texturePoint     userType- texture coordinate\n
-  u               r4-\n
-  v               r4-\n
- \n              
- planeOUR         userType- Z axis is cross product of up and right.\n
-  origin          point- the origin point of the plane.\n
-  up              point- the point 1 unit in the up/north direction of the plane.\n
-  right           point- the point 1 unit in the right/east direction of the plane.\n
- \n              
- planeEquation    userType- ax + by + cz + d = 0\n
-  a               r8-\n
-  b               r8-\n
-  c               r8-\n
-  d               r8-\n
- \n
- enumCodePolyOption userType-\n
-  code            n1\n
- \n
- enumListPolyOption enumCodePolyOption= 3\n
-  0 no options\n
-  1 node coloring\n
-  2 line coloring\n
- \n
- polyline         userType-\n
-  pointCount      n4-\n
-  pointList       point* pointCount points in the point list.  Order is important.  Polygons have dup end point\n
-  polyOption      enumCodePolyOption-\n
-  colorList       color*  color per point.\n
- \n
- enumCodeSurfaceOption userType-\n
-  code            n1\n
- \n
- enumListSurfaceOption enumCodeSurfaceOption= 8\n
-    0 no options\n
-    1 node coloring\n
-    2 face coloring\n
-   10 normals\n
-   11 normals node coloring\n
-   12 normals face coloring\n
-  100 textured\n
-  110 textured and normals\n
- \n
- surfaceFace      userType-\n
-  pointListIndex  n4= 3  A triangle where the values are indicies into a pointList.\n
- \n
- surface          userType-\n
-  pointCount      n4-\n
-  faceCount       n4-\n
-  pointList       point*        pointCount points in the point list.  Order is not important.\n
-  faceList        surfaceFace*  faceCount faces in the face list.  
-  surfaceOption   enumCodeSurfaceOption- \n
-  colorList       color*        color per face.\n
-  uvList          texturePoint* texture point per point.\n
-  texture         imageId-      image id.\n
-  normalList      normal*       normal per point.\n
- \n
- enumCodeMeshOption userType-\n
-  code            n1\n
- \n
- enumListMeshOption enumCodeMeshOption= 16\n
-     0 no options\n
-     1 face vis\n
-    10 node coloring\n
-    11 node coloring and face vis\n
-    20 face coloring\n
-    21 face coloring and face vis\n
-   100 normals\n
-   101 normals and face vis\n
-   110 normals node coloring\n
-   111 normals node coloring and face vis\n
-   120 normals face coloring\n
-   121 normals face coloring and face vis\n
-  1000 textured\n
-  1001 textured and face vis\n
-  1100 textured and normals\n
-  1101 textured and normals and face vis\n
- \n
- mesh             userType-\n
-  pointCountX     n4-\n
-  pointCountY     n4-\n
-  pointList       point*        pointCountX * pointCountY points in the point list.  Order is important.\n
-  mechOption      enumCodeMeshOption-\n
-  faceVisList     bool*         face visibility list.  0 size if all faces are visible.
-  colorList       color*        0 size if not node or face coloring.
-  textureUVList   texturePoint* texture uv per point.\n
-  textureId       imageId-      image id.\n
-  normalList      normal*       normal per point.\n  
- \n
- textGeneric      userType-\n
-  location        planeOUR-\n
-  value           ""-\n
- \n
- formula          userType-
-  text            ""-\n
- \n
-\n
-]
-
-	All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.
 
 hh	|chapter| - Information Block
 
@@ -390,7 +221,197 @@ tc	Only holds model data.
 	|b |[projectSystem]| b| will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Specifying the system here will mean all coordinate values will be in that system.  Like "WGS84" or "NAD27".  Even the [projectMin] and [projectMax] will be in this system.  Use "local" to indicate that the project coordinates are in a local flat earth space.
 	|b |[projectMin]| b| and |b |[projectMax]| b| should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.
 
-hh	|chapter| - Item List Data
+
+
+hh	|chapter| - Type List Block
+
+	This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.
+
+.[
+typeList []-\n
+ id               userType-\n
+  value           ""-\n
+ \n
+ date             userType-\n
+  year            i4-\n
+  mon             n1-                  Jan = 1, Dec = 12\n
+  day             n1-                  day 1 = 1, day 31 = 31\n
+ \n              
+ time             userType-\n
+  hour            n1-                  24 hour time, GMT time zone, no daylights, midnight = 0\n
+  min             n1-                  0 - 59\n
+  sec             n1-                  0 - 59\n
+ \n              
+ dateTime         userType-\n
+  year            i4-\n
+  mon             n1-                  Jan = 1, Dec = 12\n
+  day             n1-                  day 1 = 1, day 31 = 31\n
+  hour            n1-                  24 hour time, GMT time zone, no daylights, midnight = 0\n
+  min             n1-                  0 - 59\n
+  sec             n1-                  0 - 59\n
+ \n              
+ imageId          userType-\n
+  id              n4-\n
+ \n
+ enumCode         userType-            There should be enum definitions for all your enums.\n
+  code            n4-                  This can vary.  Use an appropriat size n* to cover the values.\n
+ \n
+ enumValue        userType-\n
+  code            enumCode-\n
+  value           ""-\n
+ \n
+ enumList         enumValue= 3\n
+  0\n
+  `value1\n
+  1\n
+  `value2\n
+  999\n
+  `value3\n
+ \n
+ azimuth          userType-\n
+  degree          r4-                  North = 0.0, East = 90.0, South = 180.0, and West = 270.0\n
+ \n              
+ dipDegree        userType-\n
+  degree          r4-                  Up = -90, down = 90, level = 0\n
+ \n              
+ dipRatio         userType-\n
+  ratio           r4-                  1 : value\n
+ \n              
+ matrix           userType- 4x4 matrix\n
+  value           r8= 16               top row first, left to right, then second row, etc.\n
+ \n              
+ color            userType-            simple rgb\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+ \n
+ colorA           userType-            simple rgba\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+  a               n1-\n
+ \n
+ normal           userType-            normal vector, mush be unit length.\n
+  easting         r4-\n
+  northing        r4-\n
+  elevation       r4-\n
+ \n              
+ point            userType-            easting, northing, and elevation to be obvious on order.\n
+  easting         r8-\n
+  northing        r8-\n
+  elevation       r8-\n
+ \n              
+ textureUV        userType-            texture coordinate\n
+  u               r4-\n
+  v               r4-\n
+ \n              
+ planeOUR         userType-            Z axis is cross product of up and right.\n
+  origin          point-               the origin point of the plane.\n
+  up              point-               the point 1 unit in the up/north direction of the plane.\n
+  right           point-               the point 1 unit in the right/east direction of the plane.\n
+ \n              
+ planeEquation    userType-  ax + by + cz + d = 0\n
+  a               r8-\n
+  b               r8-\n
+  c               r8-\n
+  d               r8-\n
+ \n
+ enumCodePointGroupOption userType-\n
+  code            n1\n
+ \n
+ enumListPointGroupOption enumCodePointGroupOption= 3\n
+  0 no options\n
+  1 coloring\n
+ \n
+ pointGroup       userType-\n
+  pointList       point*               pointCount points in the point list.  Order is not important.\n
+  pointOption     enumCodePointOption-\n
+  colorList       color*               color per point.\n*
+ \n
+ enumCodePolyOption userType-\n
+  code            n1\n
+ \n
+ enumListPolyOption enumCodePolyOption= 3\n
+   0 no options\n
+   1 node coloring\n
+   2 line coloring\n
+  10 texture coloring\n
+ \n
+ polyline         userType-\n
+  pointList       point*               pointCount points in the point list.  Order is important.  Polygons have duplicate end point\n
+  polyOption      enumCodePolyOption-\n
+  colorList       color*/colorA*       color per node/line segment depending on option\n
+  textureUV       textureUV*           texture coordinate per point.\n
+  texture         id-                  image id.\n
+ \n
+ enumCodeSurfaceOption userType-\n
+  code            n1\n
+ \n
+ enumListSurfaceOption enumCodeSurfaceOption= 8\n
+    0 no options\n
+    1 node coloring\n
+    2 face coloring\n
+   10 normals\n
+   11 normals with node coloring\n
+   12 normals with face coloring\n
+  100 textured\n
+  110 textured with normals\n
+ \n
+ surfaceFace      userType-\n
+  pointListIndex  n4= 3  A triangle where the values are indicies into a pointList.\n
+ \n
+ surface          userType-\n
+  pointList       point*               Point order is not important.\n
+  faceList        surfaceFace*         faceCount faces in the face list.  
+  surfaceOption   enumCodeSurfaceOption- \n
+  colorList       color*/colorA*       color per node/face depending on option.\n
+  uvList          textureUV*           texture point per point.\n
+  texture         id-                  image id.\n
+  normalList      normal*              normal per point.\n
+ \n
+ enumCodeMeshOption userType-\n
+  code            n1\n
+ \n
+ enumListMeshOption enumCodeMeshOption= 16\n
+     0 no options\n
+     1 face vis\n
+    10 node coloring\n
+    11 node coloring and face vis\n
+    20 face coloring\n
+    21 face coloring and face vis\n
+   100 textured\n
+   101 textured and face vis\n
+   100 textured and normals\n
+   101 textured and normals and face vis\n
+ \n
+ mesh             userType-\n
+  pointCountX     n4-\n
+  pointCountY     n4-\n
+  pointList       point*               pointCountX * pointCountY points in the point list.  x points first then moving onto next y.\n
+  mechOption      enumCodeMeshOption-\n
+  faceVisList     bool*                face visibility list.  0 size if all faces are visible.
+  colorList       color*               0 size if not node or face coloring.
+  textureUVList   textureUV*           texture uv per point.\n
+  textureId       id-                  image id.\n
+ \n
+ textGeneric      userType-\n
+  location        planeOUR-\n
+  value           ""-\n
+ \n
+ formula          userType-
+  text            ""-\n
+ \n
+\n
+]
+
+	All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.
+	For polyline, surface, and mesh, if the options don't require the presense of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.
+	For polyline and surface, the point count and the face count will be part of the point list and face list.
+
+
+
+
+hh	|chapter| - Item List Block
 
 	Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.
 
@@ -408,7 +429,7 @@ hhh	|chapter| - Item Data
 
 .[
 item []- 
- id          ""-          [item id]
+ id          id-          [item id]
  nameLong    ""-          [item name]
  nameShort   ""-          [item name short]
  type        type-        [item type]
@@ -423,7 +444,7 @@ item []-
 
 	Each item will have a unique |b |id| b|.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.
 	|b |nameLong| b| and |b |nameShort| b| are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.
-	|b |type| b| will define the value being stored for this item.  Any of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)
+	|b |type| b| will define the value being stored for this item.  Type is one of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.) 
 	|b |min| b|, |b |max| b| define the limits for an item.  Only applicable if item type is a r*, n*, or i*.  If these are missing then the range is the full range as defined by the type.
 	|b |precision| b| is the accuracy of the number.  Only applicable if item type is a r*.
 	|b |default| b| will define the default value for this item if block is skipped.  If this is missing then the default value is 'missing'.
@@ -440,44 +461,46 @@ Calculation example:
 
 t[
 thx	Type
-th*	Missing Value Binary
-th*	Missing Value Text
+th	Missing Value Binary
+th	Missing Value Text
 
 t-
 tcx	r4, r8
-tc*	FLT_MAX, DBL_MAX
-tc*	FLT_MAX, DBL_MAX
+tc	FLT_MAX, DBL_MAX
+tc	FLT_MAX, DBL_MAX
 
 t-
 tcx	i*, n*
-tc*	MAX value for the size
-tc*	"-" without the quotes
+tc	MAX value for the size
+tc	"-" without the quotes
 
 t-
 tcx	date, dateTime
-tc*	year is MAX value for that field.
-tc*	"-" without the quotes
+tc	year is MAX value for that field.
+tc	"-" without the quotes
 
 t-
 tcx	time
-tc*	hour is MAX value for that field.
-tc*	"-" without the quotes
+tc	hour is MAX value for that field.
+tc	"-" without the quotes
 
 t-
 tcx	enumCode
-tc*	MAX value for the code.
-tc*	"-" without the quotes
+tc	MAX value for the code.
+tc	"-" without the quotes
 
 t-
 tcx	""
-tc*	0 string length.  An actual 0 string will have 1 character and that character will 0.
+tc	0 string length.  An actual 0 string will have 1 character and that character will 0.
+tc	0 string length.  An actual 0 string will have 1 character and that character will 0.
 ]
 
 	Examples:
 
 .[
 item []-\n
- id        ""-   `cu\n
+ id        id-\n
+`cu\n
  nameLong  ""-   `Copper\n
  nameShort ""-   `cu\n
  type      type- r4\n
@@ -503,7 +526,8 @@ enumListRockType enumValueRockType= 3\n
  `Shale\n
 \n
 item []-\n
- id        ""-              `rt\n
+ id        id-\n
+`rt\n
  nameLong  ""-              `Rock Type\n
  nameShort ""-              `rock\n
  type      type-            enumCodeRockType\n
@@ -512,6 +536,45 @@ item []-\n
 ]
 
 	An enumeration requires the enumeration usertypes defined before the item is defined.  Usually in the Type List and not here.
+
+
+
+hh	|chapter| - Image List Block
+
+	Defining the images used by surfaces and such.
+
+.[
+imageList []= [image list count]
+...
+]
+
+hhh	|chapter| - Image
+
+	Defining an image.
+
+.[
+image []-\n
+ id     id- [image id]\n
+ width  n4- [width of image]\n
+ height n4- [height of image]\n
+ pixels [color|colorA][=|Z|C] [pixel count]\n
+...
+\n
+image []-\n
+ id     id- [image id]\n
+ file   file[-|z|c]...
+\n
+image []-\n
+ id     id- [image id]\n
+ path   path- ...
+\n
+]
+
+	The first image defines the image raw, inline.  
+	The second image defines the image embedded as a verbatum copy of the file contents.
+	The third image refers to an image file external to the MIFF file.
+	The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.
+
 
 hh	|chapter| - Drillhole Data
 
@@ -532,35 +595,35 @@ hhh	|chapter| - Geometry Data
 	Within the geometryList you will only find geometry Key-Value blocks.
 
 .[
+attrList id= [item Count]\n
+...
+pointAttrList id= [item count]\n
+...
+lineAttrList id= [item count]\n
+...
+
 geom []-\n
- id       ""-          [geom id]\n
+ id       id-          [geom id]\n
  type     type-        [geom type]\n
  data     [geom type]-
   ...
- geomAttr []-\n
-  [item id] [item type]- ...\n
+ attr [geom attr list user type]-\n
   ...
- \n
- pointAttr []= [pointCount]\n
-  pnt []-\n
-   [item id] [item type]- ...\n
-   ...
-  \n
+ pointAttr [point attr list user type]= [pointCount]\n
   ...
- segmentAttr []= [pointCount]\n
-  seg []-\n
-   [item id] [item type]- ...\n
-   ...
-  \n
+ lineAttr [line attr list user type]= [pointCount]\n
   ...
 ]
 
+	Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.
+	Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.
+	attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.
+	In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.
 	Each geom has a unique id.
-	Each geom will have a type.  One of point, poly, surface, grid, text.
+	Each geom will have a type.  One of point, pointGroup, polyline, surface, mesh, grid, or text.
 	Each geom will have data of the given type.
-	Each geom may have an optional geomAttr key value block.  Inside are item values for the geometry.  See the Item Data section on what to store here.
-	If the geometry is a poly, then there may be an optional pointAttr Key-Value block which contains pnt Key-Value blocks, 1 for each point in the polyline.  Inside are item values for that point.
-	If the geometry is a poly, then there may be an optional segmentAttr Key-Value block which contains seg Key-Value blocks, 1 for each segment in the polyline.  Inside are item values for that segment.
+	Each geom may have an optional geomAttr key value block. 
+	If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.
 
 hh	|chapter| - Model Data
 

@@ -58,8 +58,9 @@
 <p class="zword_toc2"><a href="#3.7">3.7 - Path Values</a></p>
 <p class="zword_toc2"><a href="#3.8">3.8 - Boolean values</a></p>
 <p class="zword_toc2"><a href="#3.9">3.9 - Simple values</a></p>
-<p class="zword_toc2"><a href="#3.10">3.10 - User Type</a></p>
-<p class="zword_toc2"><a href="#3.11">3.11 - User Data</a></p>
+<p class="zword_toc2"><a href="#3.10">3.10 - Key Type</a></p>
+<p class="zword_toc2"><a href="#3.11">3.11 - User Type</a></p>
+<p class="zword_toc2"><a href="#3.12">3.12 - User Data</a></p>
 
 
 <h1 class="zword"><a name="1">1 - M.I.F.F.</a></h1>
@@ -197,6 +198,12 @@ $cost
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>8</td>
+<td class="zword"><nobr>	
+</td>
+<td class="zword">No value, just a key whose presence or absense is enough information.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>9</td>
 <td class="zword"><nobr>userType</td>
 <td class="zword">A series of key-type pairs.  You can define up to 4031 new types maximum.</td>
 </tr>
@@ -1237,7 +1244,19 @@ Binary                                                     Text
 [r4      :3.14159]
 </pre>
 
-<h2 class="zword"><a name="3.10">3.10 - User Type</a></h2>
+<h2 class="zword"><a name="3.10">3.10 - Key Type</a></h2>
+<p class="zword">A simple key only record.  No value.  If the key exists or doesn't exist, that can be enough information for the format.</p>
+<pre class="zword">
+Binary                                                     Text
+
+
+[n1                     :key byte count]                   [key] -\n
+[n1 * key byte count    :key]
+[n2                     :value header - 00|00|8]
+</pre>
+<p class="zword">Only - is ever used with this type.</p>
+
+<h2 class="zword"><a name="3.11">3.11 - User Type</a></h2>
 <p class="zword">A definition of a user type.</p>
 <pre class="zword">
 Binary                                                     Text
@@ -1245,7 +1264,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype- [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|00|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|00|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n1                     :comment byte count]               \n
 [n1 * comment byte count:comment]
@@ -1267,7 +1286,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype= [array count] [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|01|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|01|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n4                     :array count]
 [n1                     :comment byte count]
@@ -1296,7 +1315,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype-\n
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|00|8]                                          NameFamily ""-\n
+[n2     :00|00|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n1     :0]                                                EMail ""-\n
 -no comment-                                               DataFlags n1= 5\n
@@ -1331,7 +1350,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype= 5
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|01|8]                                          NameFamily ""-\n
+[n2     :00|01|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n4     :5]                                                EMail ""-\n
 [n1     :0]                                                DataFlags n1= 5\n
@@ -1370,7 +1389,7 @@ Binary                                                     Text
 
 [n1     :5]                                                Image usertype-\n
 [n1 * 5 :Image]                                            Width  n4- Width in pixels for the image.\n
-[n2     :00|00|8]                                          Height n4- Height in pixels for the image.\n
+[n2     :00|00|9]                                          Height n4- Height in pixels for the image.\n
 [n2     :65]                                               Pixels n1* Width * Height * n1 * 3 pixel values in RGB order.\n
 [n1     :5]                                                \n
 [n1 * 5 :Width]
@@ -1403,7 +1422,7 @@ point userType- This point replaces the above point\n
  \n
 </pre>
 
-<h2 class="zword"><a name="3.11">3.11 - User Data</a></h2>
+<h2 class="zword"><a name="3.12">3.12 - User Data</a></h2>
 <pre class="zword">
 Binary                                                     Text
 

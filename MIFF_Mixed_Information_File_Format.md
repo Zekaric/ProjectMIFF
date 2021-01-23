@@ -53,8 +53,9 @@
     3.7 - Path Values<br />
     3.8 - Boolean values<br />
     3.9 - Simple values<br />
-    3.10 - User Type<br />
-    3.11 - User Data<br />
+    3.10 - Key Type<br />
+    3.11 - User Type<br />
+    3.12 - User Data<br />
 
 # 1 - M.I.F.F.
 
@@ -204,7 +205,9 @@ A value header is comprised of a type code and an array and compression flag.
 | 5 | type | Type value.  One of these type codes or user type code. |
 | 6 | "" | String (UTF8) data, can be of any length. |
 | 7 | path | A specific string value that represents a relative path (relative to the MIFF file location.) |
-| 8 | userType | A series of key-type pairs.  You can define up to 4031 new types maximum. |
+| 8 | 	
+ | No value, just a key whose presence or absense is enough information. |
+| 9 | userType | A series of key-type pairs.  You can define up to 4031 new types maximum. |
 | 10 | bool | Boolean value. |
 | 11, 12, 13, 14, 15, 16,  17,  18,  19,   20 | i1, i2, i3, i4, i8, i16, i32, i64, i128, i256 | An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
 | 31, 32, 33, 34, 35, 36,  37,  38,  39,   40 | n1, n2, n3, n4, n8, n16, n32, n64, n128, n256 | A natural number using 1 to 16 Bytes.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like i3, but I include these byte counts because they may be useful in certain cases. |
@@ -1281,7 +1284,23 @@ Binary                                                     Text
 [r4      :3.14159]
 ```
 
-## 3.10 - User Type
+## 3.10 - Key Type
+
+
+A simple key only record.  No value.  If the key exists or doesn't exist, that can be enough information for the format.
+
+```
+Binary                                                     Text
+
+
+[n1                     :key byte count]                   [key] -\n
+[n1 * key byte count    :key]
+[n2                     :value header - 00|00|8]
+```
+
+Only - is ever used with this type.
+
+## 3.11 - User Type
 
 
 A definition of a user type.
@@ -1292,7 +1311,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype- [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|00|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|00|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n1                     :comment byte count]               \n
 [n1 * comment byte count:comment]
@@ -1314,7 +1333,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype= [array count] [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|01|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|01|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n4                     :array count]
 [n1                     :comment byte count]
@@ -1348,7 +1367,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype-\n
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|00|8]                                          NameFamily ""-\n
+[n2     :00|00|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n1     :0]                                                EMail ""-\n
 -no comment-                                               DataFlags n1= 5\n
@@ -1383,7 +1402,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype= 5
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|01|8]                                          NameFamily ""-\n
+[n2     :00|01|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n4     :5]                                                EMail ""-\n
 [n1     :0]                                                DataFlags n1= 5\n
@@ -1424,7 +1443,7 @@ Binary                                                     Text
 
 [n1     :5]                                                Image usertype-\n
 [n1 * 5 :Image]                                            Width  n4- Width in pixels for the image.\n
-[n2     :00|00|8]                                          Height n4- Height in pixels for the image.\n
+[n2     :00|00|9]                                          Height n4- Height in pixels for the image.\n
 [n2     :65]                                               Pixels n1* Width * Height * n1 * 3 pixel values in RGB order.\n
 [n1     :5]                                                \n
 [n1 * 5 :Width]
@@ -1446,7 +1465,21 @@ Binary                                                     Text
 
 In this situation Pixels is a byte array but the size of it is not known at definition.  Rules on its size may be dictated by who ever set the type.  Comments should be used to make it clear.
 
-## 3.11 - User Data
+If you redefine a userType or reuse a user type code then the previous userType will be replaced with the new one
+
+```
+point userType-\n
+ value r8= 3\n
+ \n
+...
+point userType- This point replaces the above point\n
+ east r8-\n
+ north r8-\n
+ elevation r8-\n
+ \n
+```
+
+## 3.12 - User Data
 
 
 ```

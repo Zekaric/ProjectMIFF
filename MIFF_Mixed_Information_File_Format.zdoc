@@ -168,6 +168,11 @@ tc	A specific string value that represents a relative path (relative to the MIFF
 
 t-
 tcx	8
+tcx	
+tc	No value, just a key whose presence or absense is enough information.
+
+t-
+tcx	9
 tcx	userType
 tc	A series of key-type pairs.  You can define up to 4031 new types maximum.
 
@@ -1218,6 +1223,19 @@ Binary                                                     Text
 [r4      :3.14159]
 ]
 
+hh	|chapter| - Key Type
+
+	A simple key only record.  No value.  If the key exists or doesn't exist, that can be enough information for the format.
+
+.[
+Binary                                                     Text
+
+[n1                     :key byte count]                   [key] -\n
+[n1 * key byte count    :key]                              
+[n2                     :value header - 00|00|8]           
+]
+
+	Only - is ever used with this type.  
 
 hh	|chapter| - User Type
 
@@ -1228,7 +1246,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype- [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|00|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|00|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n1                     :comment byte count]               \n
 [n1 * comment byte count:comment]                          
@@ -1249,7 +1267,7 @@ Binary                                                     Text
 
 [n1                     :key byte count]                   [key] usertype= [array count] [comment]\n
 [n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
-[n2                     :value header - 00|01|8]           [key] [value header] [array count] [comment]\n
+[n2                     :value header - 00|01|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n4                     :array count]                      
 [n1                     :comment byte count]               
@@ -1279,7 +1297,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype-\n
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|00|8]                                          NameFamily ""-\n
+[n2     :00|00|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n1     :0]                                                EMail ""-\n
 -no comment-                                               DataFlags n1= 5\n
@@ -1313,7 +1331,7 @@ Binary                                                     Text
 
 [n1     :11]                                               TypeContact usertype= 5
 [n1 * 11:TypeContact]                                      NameGiven ""-\n
-[n2     :00|01|8]                                          NameFamily ""-\n
+[n2     :00|01|9]                                          NameFamily ""-\n
 [n2     :64]                                               Age n1-\n
 [n4     :5]                                                EMail ""-\n
 [n1     :0]                                                DataFlags n1= 5\n
@@ -1353,7 +1371,7 @@ Binary                                                     Text
 
 [n1     :5]                                                Image usertype-\n
 [n1 * 5 :Image]                                            Width  n4- Width in pixels for the image.\n
-[n2     :00|00|8]                                          Height n4- Height in pixels for the image.\n
+[n2     :00|00|9]                                          Height n4- Height in pixels for the image.\n
 [n2     :65]                                               Pixels n1* Width * Height * n1 * 3 pixel values in RGB order.\n
 [n1     :5]                                                \n
 [n1 * 5 :Width]

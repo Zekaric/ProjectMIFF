@@ -26,20 +26,22 @@
 <p class="zword_toc1"><a href="#2">2 - MI-MIFF Format</a></p>
 <p class="zword_toc2"><a href="#2.1">2.1 - Header</a></p>
 <p class="zword_toc1"><a href="#3">3 - Mine Information Block (MIB)</a></p>
-<p class="zword_toc2"><a href="#3.1">3.1 - Type List Block</a></p>
-<p class="zword_toc2"><a href="#3.2">3.2 - Information Block</a></p>
-<p class="zword_toc2"><a href="#3.3">3.3 - Item List Data</a></p>
+<p class="zword_toc2"><a href="#3.1">3.1 - Information Block</a></p>
+<p class="zword_toc2"><a href="#3.2">3.2 - Type List Block</a></p>
+<p class="zword_toc2"><a href="#3.3">3.3 - Item List Block</a></p>
 <p class="zword_toc3"><a href="#3.3.1">3.3.1 - Item Data</a></p>
-<p class="zword_toc2"><a href="#3.4">3.4 - Drillhole Data</a></p>
-<p class="zword_toc2"><a href="#3.5">3.5 - Geometry List Data</a></p>
-<p class="zword_toc3"><a href="#3.5.1">3.5.1 - Geometry Data</a></p>
-<p class="zword_toc2"><a href="#3.6">3.6 - Model Data</a></p>
-<p class="zword_toc3"><a href="#3.6.1">3.6.1 - Model Information</a></p>
-<p class="zword_toc2"><a href="#3.7">3.7 - Model Block:</a></p>
-<p class="zword_toc3"><a href="#3.7.1">3.7.1 - SubBlock: Fixed</a></p>
-<p class="zword_toc3"><a href="#3.7.2">3.7.2 - SubBlock: Semi</a></p>
-<p class="zword_toc3"><a href="#3.7.3">3.7.3 - SubBlock: Octree</a></p>
-<p class="zword_toc3"><a href="#3.7.4">3.7.4 - SubBlock: Free</a></p>
+<p class="zword_toc2"><a href="#3.4">3.4 - Image List Block</a></p>
+<p class="zword_toc3"><a href="#3.4.1">3.4.1 - Image</a></p>
+<p class="zword_toc2"><a href="#3.5">3.5 - Drillhole Data</a></p>
+<p class="zword_toc2"><a href="#3.6">3.6 - Geometry List Data</a></p>
+<p class="zword_toc3"><a href="#3.6.1">3.6.1 - Geometry Data</a></p>
+<p class="zword_toc2"><a href="#3.7">3.7 - Model Data</a></p>
+<p class="zword_toc3"><a href="#3.7.1">3.7.1 - Model Information</a></p>
+<p class="zword_toc2"><a href="#3.8">3.8 - Model Block:</a></p>
+<p class="zword_toc3"><a href="#3.8.1">3.8.1 - SubBlock: Fixed</a></p>
+<p class="zword_toc3"><a href="#3.8.2">3.8.2 - SubBlock: Semi</a></p>
+<p class="zword_toc3"><a href="#3.8.3">3.8.3 - SubBlock: Octree</a></p>
+<p class="zword_toc3"><a href="#3.8.4">3.8.4 - SubBlock: Free</a></p>
 
 
 <h1 class="zword"><a name="1">1 - M.I. M.I.F.F.</a></h1>
@@ -168,8 +170,8 @@ MineInfo []-
 <p class="zword">See MIFF format on how to represent in binary.</p>
 <p class="zword">Inside a MIB you will have the following blocks.</p>
 <ul class="zword">
-<li class="zword"><strong>Type List block</strong> to hold the user types that are used in the format.</li>
 <li class="zword"><strong>Information block</strong> to hold general information about the project.  This must be the first block.</li>
+<li class="zword"><strong>Type List block</strong> to hold the user types that are used in the format.</li>
 <li class="zword"><strong>Item List block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
 <li class="zword"><strong>Image List block</strong> to hold the images.  Images can be used for texturing, symbols, etc.</li>
 <li class="zword"><strong>Geometry Block</strong> to hold geometry information.  There can be more than one Geoemtry block.</li>
@@ -177,179 +179,7 @@ MineInfo []-
 <li class="zword"><strong>Model Block</strong> to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.</li>
 </ul>
 
-<h2 class="zword"><a name="3.1">3.1 - Type List Block</a></h2>
-<p class="zword">This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.</p>
-<pre class="zword">
-typeList []-\n
- date             userType-\n
-  year            i4-\n
-  mon             n1- Jan = 1, Dec = 12\n
-  day             n1- day 1 = 1, day 31 = 31\n
- \n
- time             userType-\n
-  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
-  min             n1- 0 - 59\n
-  sec             n1- 0 - 59\n
- \n
- dateTime         userType-\n
-  year            i4-\n
-  mon             n1- Jan = 1, Dec = 12\n
-  day             n1- day 1 = 1, day 31 = 31\n
-  hour            n1- 24 hour time in GMT time zone, no daylights adjustment, midnight = 0\n
-  min             n1- 0 - 59\n
-  sec             n1- 0 - 59\n
- \n
- imageId          userType-\n
-  id              n4-\n
- \n
- enumCode         userType- There should be enum definitions for all your enums.\n
-  code            n4- This can vary.  Use an appropriat size n* to cover the values.\n
- \n
- enumValue        userType-\n
-  code            enumCode-\n
-  value           ""-\n
- \n
- enumList         enumValue= 3\n
-  0\n
-  `value1\n
-  1\n
-  `value2\n
-  999\n
-  `value3\n
- \n
- azimuth          userType-\n
-  degree          r4- North = 0.0, East = 90.0, South = 180.0, and West = 270.0\n
- \n
- dipDegree        userType-\n
-  degree          r4- Up = -90, down = 90, level = 0\n
- \n
- dipRatio         userType-\n
-  ratio           r4- 1 : value\n
- \n
- matrix           userType- 4x4 matrix\n
-  value           r8= 16 top row first, left to right, then second row, etc.\n
- \n
- color            userType- simple rgb\n
-  r               n1-\n
-  g               n1-\n
-  b               n1-\n
- \n
- colorA           userType- simple rgba\n
-  r               n1-\n
-  g               n1-\n
-  b               n1-\n
-  a               n1-\n
- \n
- normal           userType- normal vector, mush be unit length.\n
-  easting         r4-\n
-  northing        r4-\n
-  elevation       r4-\n
- \n
- point            userType- easting, northing, and elevation in the specified coordinate system.\n
-  easting         r8-\n
-  northing        r8-\n
-  elevation       r8-\n
- \n
- texturePoint     userType- texture coordinate\n
-  u               r4-\n
-  v               r4-\n
- \n
- planeOUR         userType- Z axis is cross product of up and right.\n
-  origin          point- the origin point of the plane.\n
-  up              point- the point 1 unit in the up/north direction of the plane.\n
-  right           point- the point 1 unit in the right/east direction of the plane.\n
- \n
- planeEquation    userType- ax + by + cz + d = 0\n
-  a               r8-\n
-  b               r8-\n
-  c               r8-\n
-  d               r8-\n
- \n
- enumCodePolyOption userType-\n
-  code            n1\n
- \n
- enumListPolyOption enumCodePolyOption= 3\n
-  0 no options\n
-  1 node coloring\n
-  2 line coloring\n
- \n
- polyline         userType-\n
-  pointCount      n4-\n
-  pointList       point* pointCount points in the point list.  Order is important.  Polygons have dup end point\n
-  polyOption      enumCodePolyOption-\n
-  colorList       color*  color per point.\n
- \n
- enumCodeSurfaceOption userType-\n
-  code            n1\n
- \n
- enumListSurfaceOption enumCodeSurfaceOption= 8\n
-    0 no options\n
-    1 node coloring\n
-    2 face coloring\n
-   10 normals\n
-   11 normals node coloring\n
-   12 normals face coloring\n
-  100 textured\n
-  110 textured and normals\n
- \n
- surfaceFace      userType-\n
-  pointListIndex  n4= 3  A triangle where the values are indicies into a pointList.\n
- \n
- surface          userType-\n
-  pointCount      n4-\n
-  faceCount       n4-\n
-  pointList       point*        pointCount points in the point list.  Order is not important.\n
-  faceList        surfaceFace*  faceCount faces in the face list.
-  surfaceOption   enumCodeSurfaceOption- \n
-  colorList       color*        color per face.\n
-  uvList          texturePoint* texture point per point.\n
-  texture         imageId-      image id.\n
-  normalList      normal*       normal per point.\n
- \n
- enumCodeMeshOption userType-\n
-  code            n1\n
- \n
- enumListMeshOption enumCodeMeshOption= 16\n
-     0 no options\n
-     1 face vis\n
-    10 node coloring\n
-    11 node coloring and face vis\n
-    20 face coloring\n
-    21 face coloring and face vis\n
-   100 normals\n
-   101 normals and face vis\n
-   110 normals node coloring\n
-   111 normals node coloring and face vis\n
-   120 normals face coloring\n
-   121 normals face coloring and face vis\n
-  1000 textured\n
-  1001 textured and face vis\n
-  1100 textured and normals\n
-  1101 textured and normals and face vis\n
- \n
- mesh             userType-\n
-  pointCountX     n4-\n
-  pointCountY     n4-\n
-  pointList       point*        pointCountX * pointCountY points in the point list.  Order is important.\n
-  mechOption      enumCodeMeshOption-\n
-  faceVisList     bool*         face visibility list.  0 size if all faces are visible.
-  colorList       color*        0 size if not node or face coloring.
-  textureUVList   texturePoint* texture uv per point.\n
-  textureId       imageId-      image id.\n
-  normalList      normal*       normal per point.\n
- \n
- textGeneric      userType-\n
-  location        planeOUR-\n
-  value           ""-\n
- \n
- formula          userType-
-  text            ""-\n
- \n
-\n
-</pre>
-<p class="zword">All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.</p>
-
-<h2 class="zword"><a name="3.2">3.2 - Information Block</a></h2>
+<h2 class="zword"><a name="3.1">3.1 - Information Block</a></h2>
 <p class="zword">Common to all MI-MIFF files for any of the types above, there will be an information block providing general, project wide information.</p>
 <p class="zword">This information block will be the very first key value in the file right after the MIFF header.</p>
 <p class="zword">Inside the information block we have the following possible key values.  Not all are required.</p>
@@ -395,7 +225,189 @@ info []-
 <p class="zword"><strong>[projectSystem]</strong> will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Specifying the system here will mean all coordinate values will be in that system.  Like "WGS84" or "NAD27".  Even the [projectMin] and [projectMax] will be in this system.  Use "local" to indicate that the project coordinates are in a local flat earth space.</p>
 <p class="zword"><strong>[projectMin]</strong> and <strong>[projectMax]</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.</p>
 
-<h2 class="zword"><a name="3.3">3.3 - Item List Data</a></h2>
+<h2 class="zword"><a name="3.2">3.2 - Type List Block</a></h2>
+<p class="zword">This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.</p>
+<pre class="zword">
+typeList []-\n
+ id               userType-\n
+  value           ""-\n
+ \n
+ date             userType-\n
+  year            i4-\n
+  mon             n1-                  Jan = 1, Dec = 12\n
+  day             n1-                  day 1 = 1, day 31 = 31\n
+ \n
+ time             userType-\n
+  hour            n1-                  24 hour time, GMT time zone, no daylights, midnight = 0\n
+  min             n1-                  0 - 59\n
+  sec             n1-                  0 - 59\n
+ \n
+ dateTime         userType-\n
+  year            i4-\n
+  mon             n1-                  Jan = 1, Dec = 12\n
+  day             n1-                  day 1 = 1, day 31 = 31\n
+  hour            n1-                  24 hour time, GMT time zone, no daylights, midnight = 0\n
+  min             n1-                  0 - 59\n
+  sec             n1-                  0 - 59\n
+ \n
+ imageId          userType-\n
+  id              n4-\n
+ \n
+ enumCode         userType-            There should be enum definitions for all your enums.\n
+  code            n4-                  This can vary.  Use an appropriat size n* to cover the values.\n
+ \n
+ enumValue        userType-\n
+  code            enumCode-\n
+  value           ""-\n
+ \n
+ enumList         enumValue= 3\n
+  0\n
+  `value1\n
+  1\n
+  `value2\n
+  999\n
+  `value3\n
+ \n
+ azimuth          userType-\n
+  degree          r4-                  North = 0.0, East = 90.0, South = 180.0, and West = 270.0\n
+ \n
+ dipDegree        userType-\n
+  degree          r4-                  Up = -90, down = 90, level = 0\n
+ \n
+ dipRatio         userType-\n
+  ratio           r4-                  1 : value\n
+ \n
+ matrix           userType- 4x4 matrix\n
+  value           r8= 16               top row first, left to right, then second row, etc.\n
+ \n
+ color            userType-            simple rgb\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+ \n
+ colorA           userType-            simple rgba\n
+  r               n1-\n
+  g               n1-\n
+  b               n1-\n
+  a               n1-\n
+ \n
+ normal           userType-            normal vector, mush be unit length.\n
+  easting         r4-\n
+  northing        r4-\n
+  elevation       r4-\n
+ \n
+ point            userType-            easting, northing, and elevation to be obvious on order.\n
+  easting         r8-\n
+  northing        r8-\n
+  elevation       r8-\n
+ \n
+ textureUV        userType-            texture coordinate\n
+  u               r4-\n
+  v               r4-\n
+ \n
+ planeOUR         userType-            Z axis is cross product of up and right.\n
+  origin          point-               the origin point of the plane.\n
+  up              point-               the point 1 unit in the up/north direction of the plane.\n
+  right           point-               the point 1 unit in the right/east direction of the plane.\n
+ \n
+ planeEquation    userType-  ax + by + cz + d = 0\n
+  a               r8-\n
+  b               r8-\n
+  c               r8-\n
+  d               r8-\n
+ \n
+ enumCodePointGroupOption userType-\n
+  code            n1\n
+ \n
+ enumListPointGroupOption enumCodePointGroupOption= 3\n
+  0 no options\n
+  1 coloring\n
+ \n
+ pointGroup       userType-\n
+  pointList       point*               pointCount points in the point list.  Order is not important.\n
+  pointOption     enumCodePointOption-\n
+  colorList       color*               color per point.\n*
+ \n
+ enumCodePolyOption userType-\n
+  code            n1\n
+ \n
+ enumListPolyOption enumCodePolyOption= 3\n
+   0 no options\n
+   1 node coloring\n
+   2 line coloring\n
+  10 texture coloring\n
+ \n
+ polyline         userType-\n
+  pointList       point*               pointCount points in the point list.  Order is important.  Polygons have duplicate end point\n
+  polyOption      enumCodePolyOption-\n
+  colorList       color*/colorA*       color per node/line segment depending on option\n
+  textureUV       textureUV*           texture coordinate per point.\n
+  texture         id-                  image id.\n
+ \n
+ enumCodeSurfaceOption userType-\n
+  code            n1\n
+ \n
+ enumListSurfaceOption enumCodeSurfaceOption= 8\n
+    0 no options\n
+    1 node coloring\n
+    2 face coloring\n
+   10 normals\n
+   11 normals with node coloring\n
+   12 normals with face coloring\n
+  100 textured\n
+  110 textured with normals\n
+ \n
+ surfaceFace      userType-\n
+  pointListIndex  n4= 3  A triangle where the values are indicies into a pointList.\n
+ \n
+ surface          userType-\n
+  pointList       point*               Point order is not important.\n
+  faceList        surfaceFace*         faceCount faces in the face list.
+  surfaceOption   enumCodeSurfaceOption- \n
+  colorList       color*/colorA*       color per node/face depending on option.\n
+  uvList          textureUV*           texture point per point.\n
+  texture         id-                  image id.\n
+  normalList      normal*              normal per point.\n
+ \n
+ enumCodeMeshOption userType-\n
+  code            n1\n
+ \n
+ enumListMeshOption enumCodeMeshOption= 16\n
+     0 no options\n
+     1 face vis\n
+    10 node coloring\n
+    11 node coloring and face vis\n
+    20 face coloring\n
+    21 face coloring and face vis\n
+   100 textured\n
+   101 textured and face vis\n
+   100 textured and normals\n
+   101 textured and normals and face vis\n
+ \n
+ mesh             userType-\n
+  pointCountX     n4-\n
+  pointCountY     n4-\n
+  pointList       point*               pointCountX * pointCountY points in the point list.  x points first then moving onto next y.\n
+  mechOption      enumCodeMeshOption-\n
+  faceVisList     bool*                face visibility list.  0 size if all faces are visible.
+  colorList       color*               0 size if not node or face coloring.
+  textureUVList   textureUV*           texture uv per point.\n
+  textureId       id-                  image id.\n
+ \n
+ textGeneric      userType-\n
+  location        planeOUR-\n
+  value           ""-\n
+ \n
+ formula          userType-
+  text            ""-\n
+ \n
+\n
+</pre>
+<p class="zword">All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.</p>
+<p class="zword">For polyline, surface, and mesh, if the options don't require the presense of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.</p>
+<p class="zword">For polyline and surface, the point count and the face count will be part of the point list and face list.</p>
+
+<h2 class="zword"><a name="3.3">3.3 - Item List Block</a></h2>
 <p class="zword">Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.</p>
 <pre class="zword">
 itemList []= [item list count]
@@ -408,7 +420,7 @@ itemList []= [item list count]
 <p class="zword">Item data will describe the value that will be stored in the various places where the item is being tracked.</p>
 <pre class="zword">
 item []-
- id          ""-          [item id]
+ id          id-          [item id]
  nameLong    ""-          [item name]
  nameShort   ""-          [item name short]
  type        type-        [item type]
@@ -422,7 +434,7 @@ item []-
 </pre>
 <p class="zword">Each item will have a unique <strong>id</strong>.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.</p>
 <p class="zword"><strong>nameLong</strong> and <strong>nameShort</strong> are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.</p>
-<p class="zword"><strong>type</strong> will define the value being stored for this item.  Any of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)</p>
+<p class="zword"><strong>type</strong> will define the value being stored for this item.  Type is one of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)</p>
 <p class="zword"><strong>min</strong>, <strong>max</strong> define the limits for an item.  Only applicable if item type is a r*, n*, or i*.  If these are missing then the range is the full range as defined by the type.</p>
 <p class="zword"><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a r*.</p>
 <p class="zword"><strong>default</strong> will define the default value for this item if block is skipped.  If this is missing then the default value is 'missing'.</p>
@@ -436,43 +448,45 @@ Calculation example:
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Type</th>
-<th class="zword_fill">Missing Value Binary</th>
-<th class="zword_fill">Missing Value Text</th>
+<th class="zword">Missing Value Binary</th>
+<th class="zword">Missing Value Text</th>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>r4, r8</td>
-<td class="zword_fill">FLT_MAX, DBL_MAX</td>
-<td class="zword_fill">FLT_MAX, DBL_MAX</td>
+<td class="zword">FLT_MAX, DBL_MAX</td>
+<td class="zword">FLT_MAX, DBL_MAX</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>i*, n*</td>
-<td class="zword_fill">MAX value for the size</td>
-<td class="zword_fill">"-" without the quotes</td>
+<td class="zword">MAX value for the size</td>
+<td class="zword">"-" without the quotes</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>date, dateTime</td>
-<td class="zword_fill">year is MAX value for that field.</td>
-<td class="zword_fill">"-" without the quotes</td>
+<td class="zword">year is MAX value for that field.</td>
+<td class="zword">"-" without the quotes</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>time</td>
-<td class="zword_fill">hour is MAX value for that field.</td>
-<td class="zword_fill">"-" without the quotes</td>
+<td class="zword">hour is MAX value for that field.</td>
+<td class="zword">"-" without the quotes</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>enumCode</td>
-<td class="zword_fill">MAX value for the code.</td>
-<td class="zword_fill">"-" without the quotes</td>
+<td class="zword">MAX value for the code.</td>
+<td class="zword">"-" without the quotes</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>""</td>
-<td class="zword_fill">0 string length.  An actual 0 string will have 1 character and that character will 0.</td>
+<td class="zword">0 string length.  An actual 0 string will have 1 character and that character will 0.</td>
+<td class="zword">0 string length.  An actual 0 string will have 1 character and that character will 0.</td>
 </tr>
 </tbody></table>
 <p class="zword">Examples:</p>
 <pre class="zword">
 item []-\n
- id        ""-   `cu\n
+ id        id-\n
+`cu\n
  nameLong  ""-   `Copper\n
  nameShort ""-   `cu\n
  type      type- r4\n
@@ -499,7 +513,8 @@ enumListRockType enumValueRockType= 3\n
  `Shale\n
 \n
 item []-\n
- id        ""-              `rt\n
+ id        id-\n
+`rt\n
  nameLong  ""-              `Rock Type\n
  nameShort ""-              `rock\n
  type      type-            enumCodeRockType\n
@@ -508,10 +523,41 @@ item []-\n
 </pre>
 <p class="zword">An enumeration requires the enumeration usertypes defined before the item is defined.  Usually in the Type List and not here.</p>
 
-<h2 class="zword"><a name="3.4">3.4 - Drillhole Data</a></h2>
+<h2 class="zword"><a name="3.4">3.4 - Image List Block</a></h2>
+<p class="zword">Defining the images used by surfaces and such.</p>
+<pre class="zword">
+imageList []= [image list count]
+...
+</pre>
+
+<h3 class="zword"><a name="3.4.1">3.4.1 - Image</a></h3>
+<p class="zword">Defining an image.</p>
+<pre class="zword">
+image []-\n
+ id     id- [image id]\n
+ width  n4- [width of image]\n
+ height n4- [height of image]\n
+ pixels [color|colorA][=|Z|C] [pixel count]\n
+...
+\n
+image []-\n
+ id     id- [image id]\n
+ file   file[-|z|c]...
+\n
+image []-\n
+ id     id- [image id]\n
+ path   path- ...
+\n
+</pre>
+<p class="zword">The first image defines the image raw, inline.</p>
+<p class="zword">The second image defines the image embedded as a verbatum copy of the file contents.</p>
+<p class="zword">The third image refers to an image file external to the MIFF file.</p>
+<p class="zword">The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.</p>
+
+<h2 class="zword"><a name="3.5">3.5 - Drillhole Data</a></h2>
 <p class="zword">Drillhole data holds information about drillholes.</p>
 
-<h2 class="zword"><a name="3.5">3.5 - Geometry List Data</a></h2>
+<h2 class="zword"><a name="3.6">3.6 - Geometry List Data</a></h2>
 <p class="zword">Geometry List will hold geometric data like points, polylines, polygons, surfaces, text, that live in the project space.</p>
 <pre class="zword">
 geometryList []-\n
@@ -519,39 +565,40 @@ geometryList []-\n
 \n
 </pre>
 
-<h3 class="zword"><a name="3.5.1">3.5.1 - Geometry Data</a></h3>
+<h3 class="zword"><a name="3.6.1">3.6.1 - Geometry Data</a></h3>
 <p class="zword">Within the geometryList you will only find geometry Key-Value blocks.</p>
 <pre class="zword">
+attrList id= [item Count]\n
+...
+pointAttrList id= [item count]\n
+...
+lineAttrList id= [item count]\n
+...
+
+
 geom []-\n
- id       ""-          [geom id]\n
+ id       id-          [geom id]\n
  type     type-        [geom type]\n
  data     [geom type]-
   ...
- geomAttr []-\n
-  [item id] [item type]- ...\n
+ attr [geom attr list user type]-\n
   ...
- \n
- pointAttr []= [pointCount]\n
-  pnt []-\n
-   [item id] [item type]- ...\n
-   ...
-  \n
+ pointAttr [point attr list user type]= [pointCount]\n
   ...
- segmentAttr []= [pointCount]\n
-  seg []-\n
-   [item id] [item type]- ...\n
-   ...
-  \n
+ lineAttr [line attr list user type]= [pointCount]\n
   ...
 </pre>
+<p class="zword">Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.</p>
+<p class="zword">Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.</p>
+<p class="zword">attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.</p>
+<p class="zword">In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.</p>
 <p class="zword">Each geom has a unique id.</p>
-<p class="zword">Each geom will have a type.  One of point, poly, surface, grid, text.</p>
+<p class="zword">Each geom will have a type.  One of point, pointGroup, polyline, surface, mesh, grid, or text.</p>
 <p class="zword">Each geom will have data of the given type.</p>
-<p class="zword">Each geom may have an optional geomAttr key value block.  Inside are item values for the geometry.  See the Item Data section on what to store here.</p>
-<p class="zword">If the geometry is a poly, then there may be an optional pointAttr Key-Value block which contains pnt Key-Value blocks, 1 for each point in the polyline.  Inside are item values for that point.</p>
-<p class="zword">If the geometry is a poly, then there may be an optional segmentAttr Key-Value block which contains seg Key-Value blocks, 1 for each segment in the polyline.  Inside are item values for that segment.</p>
+<p class="zword">Each geom may have an optional geomAttr key value block.</p>
+<p class="zword">If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.</p>
 
-<h2 class="zword"><a name="3.6">3.6 - Model Data</a></h2>
+<h2 class="zword"><a name="3.7">3.7 - Model Data</a></h2>
 <p class="zword">Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.</p>
 <p class="zword"><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">Block Model Knowledge For Mining Engineers - An Introduction</a></p>
 <p class="zword">There are 3 basic model formats that are in use as Hexagon.</p>
@@ -565,7 +612,7 @@ geom []-\n
 <p class="zword"><strong>Surface Model</strong> is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.</p>
 <p class="zword">Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
 
-<h3 class="zword"><a name="3.6.1">3.6.1 - Model Information</a></h3>
+<h3 class="zword"><a name="3.7.1">3.7.1 - Model Information</a></h3>
 <p class="zword">After the general information block the next block will be the Model Information block.</p>
 <pre class="zword">
 infoModel []-
@@ -702,7 +749,7 @@ Uniform divisions in the row and column directions.
 <p class="zword"><strong>isLevVariable</strong> - Flag to indicate the level heights are not uniform.  This does not need to be present if the levels are a fixed height.</p>
 <p class="zword"><strong>levList</strong> - A list of level heights starting from first level.  Only required if isLevVariable is true.</p>
 
-<h2 class="zword"><a name="3.7">3.7 - Model Block:</a></h2>
+<h2 class="zword"><a name="3.8">3.8 - Model Block:</a></h2>
 <p class="zword">This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.</p>
 <pre class="zword">
 model [...]-
@@ -820,10 +867,10 @@ B2R2C2v1 2 3cc.\n
 [n1:0]
 </pre>
 
-<h3 class="zword"><a name="3.7.1">3.7.1 - SubBlock: Fixed</a></h3>
+<h3 class="zword"><a name="3.8.1">3.8.1 - SubBlock: Fixed</a></h3>
 <p class="zword">In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.</p>
 
-<h3 class="zword"><a name="3.7.2">3.7.2 - SubBlock: Semi</a></h3>
+<h3 class="zword"><a name="3.8.2">3.8.2 - SubBlock: Semi</a></h3>
 <p class="zword">In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...</p>
 <p class="zword">In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level subblocks will depend on how many times H is used for the same column.</p>
 <table class="zword"><tbody class="zword">
@@ -843,11 +890,11 @@ B2R2C2v1 2 3cc.\n
 <p class="zword">If H or h follows an H or h then the previous block will be holding default values, and the current block will be incremented to the next subblock.  The following H or h will determin the height of the new current block.</p>
 <p class="zword">If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.</p>
 
-<h3 class="zword"><a name="3.7.3">3.7.3 - SubBlock: Octree</a></h3>
+<h3 class="zword"><a name="3.8.3">3.8.3 - SubBlock: Octree</a></h3>
 <p class="zword">In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.</p>
 <p class="zword">The 's' key need to preceed the v record.</p>
 
-<h3 class="zword"><a name="3.7.4">3.7.4 - SubBlock: Free</a></h3>
+<h3 class="zword"><a name="3.8.4">3.8.4 - SubBlock: Free</a></h3>
 <p class="zword">In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">

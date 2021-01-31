@@ -180,7 +180,7 @@ Keys are always a single string of characters and are limited to printable UNICO
 ;':][.,<>]'
 a_b_c
 $cost
-ɃtɃ
+été
 ```
 
 The key can be anything and in any language.  As long it does not include any whitespace.  It should use printable characters only.

@@ -56,9 +56,9 @@ constant:
 
 #define memClearType(TYPE, MEM)                 memset((MEM), 0, sizeof(TYPE))
 #define memCopyTypeArray(COUNT, TYPE, DST, SRC) memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
-#define memCreateType(TYPE)                     (TYPE *)  _memCreate(          sizeof(TYPE))
-#define memCreateTypeArray(COUNT, TYPE)         (TYPE **) _memCreate((COUNT) * sizeof(TYPE))
-#define memDestroy(MEM)                                   _memDestroy(MEM)
+#define memCreateType(TYPE)                     (TYPE *) _memCreate(           sizeof(TYPE))
+#define memCreateTypeArray(COUNT, TYPE)         (TYPE *) _memCreate( (COUNT) * sizeof(TYPE))
+#define memDestroy(MEM)                                  _memDestroy(MEM)
 
 #define _strGetLength(STR)                      wcslen(STR)
 
@@ -78,9 +78,16 @@ static MiffMemDecompress _memDecompress = NULL;
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffC   *_strClone(    MiffN4 const count, MiffC const * const str);
-static MiffC   *_strFromUTF8( MiffN4 const count, MiffN1 const * const utf8);
-static MiffN1  *_UTF8FromStr( MiffN4 const count, MiffC const * const str);
+static MiffBool _MemIsEqual(     MiffN4 const countA, MiffN1 const * const strA, MiffN4 const countB, MiffN1 const * const strB);
+
+static MiffBool _ReadKey(        Miff * const miff, MiffBool isRecordText);
+static MiffBool _ReadValueHeader(Miff * const miff, MiffBool isRecordText);
+static MiffBool _ReadValue8(     Miff * const miff, MiffBool isRecordText);
+
+static MiffC   *_StrClone(       MiffN4 const count,  MiffC const * const str);
+static MiffC   *_StrFromUTF8(    MiffN4 const count,  MiffN1 const * const utf8);
+
+static MiffN1  *_UTF8FromStr(    MiffN4 const count,  MiffC const * const str);
 
 /******************************************************************************
 global:
@@ -89,9 +96,8 @@ function:
 /******************************************************************************
 func: miffCreateReader
 ******************************************************************************/
-Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer1 const getBuffer1Func, 
-   MiffGetBuffer2 const getBuffer2Func, MiffGetBuffer4 const getBuffer4Func, 
-   MiffGetBuffer8 const getBuffer8Func);
+Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer1 getBuffer1Func, 
+   MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, MiffGetBuffer8 getBuffer8Func)
 {
    Miff *miff;
 
@@ -108,7 +114,7 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer1 const getBuf
          getBuffer1Func, 
          getBuffer2Func, 
          getBuffer4Func, 
-         getBuffer8Func)
+         getBuffer8Func))
    {
       memDestroy(miff);
       returnNull;
@@ -122,8 +128,8 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer1 const getBuf
 func: miffCreateReaderContent
 ******************************************************************************/
 MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping, 
-   MiffGetBuffer1 const getBuffer1Func, MiffGetBuffer2 const getBuffer2Func, 
-   MiffGetBuffer4 const getBuffer4Func, MiffGetBuffer8 const getBuffer8Func)
+   MiffGetBuffer1 getBuffer1Func, MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, 
+   MiffGetBuffer8 getBuffer8Func)
 {
    returnFalseIf(
       !_isStarted     ||
@@ -140,12 +146,41 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    miff->getBuffer2     = getBuffer2Func;
    miff->getBuffer4     = getBuffer4Func;
    miff->getBuffer8     = getBuffer8Func;
-   miff->key            = memCreateTypeArray(255, Mn1);
+   miff->key            = memCreateTypeArray(255, MiffN1);
 
    returnFalseIf(!miff->key);
 
-   _readKeyText(miff);
-   if (_strIsEqual())
+   returnFalseIf(!_ReadKey(miff, miffBoolFALSE));
+   if      (_MemIsEqual(miff->keyByteCount, miff->key, 8, (MiffN1 *) "MIFF_BIN"))
+   {
+      miff->isBinary = miffBoolTRUE;
+   }
+   else if (_MemIsEqual(miff->keyByteCount, miff->key, 8, (MiffN1 *) "MIFF_TXT"))
+   {
+      miff->isBinary = miffBoolFALSE;
+   }
+   else
+   {
+      // Header is wrong.
+      returnFalse;
+   }
+
+   returnFalseIf(!_ReadValueHeader(miff, miffBoolFALSE))
+   returnFalseIf(!
+      (miff->valueType    == miffValueTypeN8        &&
+       miff->arrayFlag    == miffArrayFlagIS_SINGLE &&
+       miff->compressFlag == miffCompressionFlagIS_UNCOMPRESSED));
+   returnFalseIf(!_ReadValue8(miff, &miff->version));
+   returnFalseIf(miff->version != 1);
+
+   returnFalseIf(!_ReadKey(miff, miffBoolFALSE));
+   miff->subFormatName = _StrFromUTF8(miff->keyByteCount, miff->key);
+   returnFalseIf(!_ReadValueHeader(miff, miffBoolFALSE));
+   returnFalseIf(!
+      (miff->valueType    == miffValueTypeN8        &&
+       miff->arrayFlag    == miffArrayFlagIS_SINGLE &&
+       miff->compressFlag == miffCompressionFlagIS_UNCOMPRESSED));
+   returnFalseIf(!_ReadValue8(miff, &miff->subFormatVersion));
 
    returnTrue;
 }
@@ -153,10 +188,10 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
 /******************************************************************************
 func: miffCreateWriter
 ******************************************************************************/
-Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer1 const setBuffer1Func, 
-   MiffSetBuffer2 const setBuffer2Func, MiffSetBuffer4 const setBuffer4Func, 
-   MiffSetBuffer8 const setBuffer8Func, MiffBool const isBinary, MiffN4 const subFormatNameLen,
-   MiffC const * const subFormatName, MiffN4 const subFormatVersion)
+Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, 
+   MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, 
+   MiffBool const isBinary, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, 
+   MiffN4 const subFormatVersion)
 {
    Miff *miff;
 
@@ -191,10 +226,9 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer1 const setBuf
 func: miffCreateWriterContent
 ******************************************************************************/
 MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping, 
-   MiffSetBuffer1 const setBuffer1Func, MiffSetBuffer2 const setBuffer2Func, 
-   MiffSetBuffer4 const setBuffer4Func, MiffSetBuffer8 const setBuffer8Func, 
-   MiffBool const isBinary, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, 
-   MiffN4 const subFormatVersion)
+   MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, 
+   MiffSetBuffer8 setBuffer8Func, MiffBool const isBinary, MiffN4 const subFormatNameLen, 
+   MiffC const * const subFormatName, MiffN4 const subFormatVersion)
 {
    returnFalseIf(
       !_isStarted     ||
@@ -214,39 +248,21 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    miff->setBuffer2        = setBuffer2Func;
    miff->setBuffer4        = setBuffer4Func;
    miff->setBuffer8        = setBuffer8Func;
-   miff->subFormatName     = _strClone(subFormatNameLen, subFormatName);
+   miff->subFormatName     = _StrClone(subFormatNameLen, subFormatName);
    miff->subFormatVersion  = subFormatVersion;
-   miff->key               = memCreateTypeArray(255, Mn1);
+   miff->key               = memCreateTypeArray(255, MiffN1);
 
    returnFalseIf(!miff->key);
 
    // Write the miff header.
-   if (isBinary)
-   {
-      returnFalseIf(!_writeKeyText(miff, L"MIFF_BIN"));
-   }
-   else
-   {
-      returnFalseIf(!_writeKeyText(miff, L"MIFF_TXT"));
-   }
-   returnFalseIf(
-      !_writeValueHeaderText(
-         miff, 
-         miffValueTypeN8, 
-         miffArrayFlagIS_SINGLE, 
-         miffCompressionFlagIS_UNCOMPRESSED,
-         0));
-   returnFalseIf(!_writeValueN8Text(miff, 1));
-
-   returnFalseIf(!_writeKeyText(miff, miff->subFormatName));
-   returnFalseIf(
-      !_writeValueHeaderText(
-         miff, 
-         miffValueTypeN8, 
-         miffArrayFlagIS_SINGLE, 
-         miffCompressionFlagIS_UNCOMPRESSED, 
-         0));
-   returnFalseIf(!_writeValueN8Text(miff, miff->subFormatVersion));
+   returnFalseIf(!(
+      _writeKey(            miff, miffBoolFALSE, (isBinary) ? L"MIFF_BIN" : L"MIFF_TXT")                                         &&
+      _writeValueHeaderText(miff, miffBoolFALSE, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressionFlagIS_UNCOMPRESSED, 0) &&
+      _writeValueN8(        miff, miffBoolFALSE, 1)                                                                              &&
+      
+      _writeKeyText(        miff, miffBoolFALSE, miff->subFormatName)                                                            &&
+      _writeValueHeaderText(miff, miffBoolFALSE, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressionFlagIS_UNCOMPRESSED, 0) &&
+      _writeValueN8Text(    miff, miff->subFormatVersion)));
 
    return miff;
 }
@@ -254,7 +270,7 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
 /******************************************************************************
 func: miffDestroy
 ******************************************************************************/
-void *miffDestroy(Miff * const miff)
+void miffDestroy(Miff * const miff)
 {
    returnVoidIf(
       !_isStarted ||
@@ -272,42 +288,256 @@ void miffDestroyContent(Miff * const miff)
       !_isStarted ||
       !miff);
 
-   memDestroy(miff->compressedMem);
    memDestroy(miff->mem);
+   memDestroy(miff->compressMem);
    memDestroy(miff->subFormatName);
    
    memClearType(Miff, miff);
    memDestroy(miff);
 }
 
-MiffBool  miffGetVersion(           Miff * const miff, MiffN4 * const version, MiffBool * const isBinary);
-MiffBool  miffGetVersionSubFormat(  Miff * const miff, MiffC * const subFormatName, MiffN4 * const subFormatVersion);
+/******************************************************************************
+func: miffGetFileFlagIsBinary
+******************************************************************************/
+MiffBool miffGetFileFlagIsBinary(Miff * const miff, MiffBool * const isBinary)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !isBinary);
 
-MiffBool  miffGetKey(               Miff * const miff, MiffC * const key);
-MiffBool  miffGetValueHeader(       Miff * const miff, MiffValueType * const type, MiffValueArrayFlag * const arrayFlag);
-MiffN4    miffGetArrayCount(        Miff * const miff);
-Miff1     miffGetValue1(            Miff * const miff);
-Miff2     miffGetValue2(            Miff * const miff);
-Miff3     miffGetValue3(            Miff * const miff);
-Miff4     miffGetValue4(            Miff * const miff);
-Miff8     miffGetValue8(            Miff * const miff);
-Miff16    miffGetValue16(           Miff * const miff);
-Miff32    miffGetValue32(           Miff * const miff);
-Miff64    miffGetValue64(           Miff * const miff);
-Miff128   miffGetValue128(          Miff * const miff);
-Miff256   miffGetValue256(          Miff * const miff);
+   *isBinary = miff->isBinary;
 
-MiffBool  miffSetKey(               Miff * const miff, MiffC const * const key, MiffValueType const type, MiffValueArrayFlag const arrayFlag, MiffValueCompressionFlag const compressionFlag, MiffN4 const chunkByteCount);
-MiffBool  miffSetValue1(            Miff * const miff, Miff1   const value);
-MiffBool  miffSetValue2(            Miff * const miff, Miff2   const value);
-MiffBool  miffSetValue3(            Miff * const miff, Miff3   const value);
-MiffBool  miffSetValue4(            Miff * const miff, Miff4   const value);
-MiffBool  miffSetValue8(            Miff * const miff, Miff8   const value);
-MiffBool  miffSetValue16(           Miff * const miff, Miff16  const value);
-MiffBool  miffSetValue32(           Miff * const miff, Miff32  const value);
-MiffBool  miffSetValue64(           Miff * const miff, Miff64  const value);
-MiffBool  miffSetValue128(          Miff * const miff, Miff128 const value);
-MiffBool  miffSetValue256(          Miff * const miff, Miff256 const value);
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetFileVersion
+******************************************************************************/
+MiffBool miffGetFileVersion(Miff * const miff, MiffN4 * const version)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !version);
+
+   *version = miff->version;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetFileVersionSubFormat
+******************************************************************************/
+MiffBool miffGetFileVersionSubFormat(Miff * const miff, MiffC ** const subFormatName, 
+   MiffN4 * const subFormatVersion)
+{
+   returnFalseIf(
+      !_isStarted    ||
+      !miff          ||
+      !subFormatName ||
+      !subFormatVersion);
+
+   *subFormatName    = miff->subFormatName;
+   *subFormatVersion = miff->subFormatVersion;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetKey
+******************************************************************************/
+MiffBool miffGetKey(Miff * const miff, MiffC ** const key)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !key);
+
+   *key = miff->key;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetNextRecord
+******************************************************************************/
+MiffBool miffGetNextRecord(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValueHeader
+******************************************************************************/
+MiffBool miffGetValueHeader(Miff * const miff, MiffValueType * const valueType, 
+   MiffArrayFlag * const arrayFlag, MiffCompressFlag * const compressFlag)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !valueType  ||
+      !arrayFlag);
+
+   *valueType    = miff->valueType;
+   *arrayFlag    = miff->arrayFlag;
+   *compressFlag = miff->compressFlag;
+}
+
+/******************************************************************************
+func: miffGetArrayCount
+******************************************************************************/
+MiffN4 miffGetArrayCount(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue1
+******************************************************************************/
+Miff1 miffGetValue1(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue2
+******************************************************************************/
+Miff2 miffGetValue2(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue3
+******************************************************************************/
+Miff3 miffGetValue3(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue4
+******************************************************************************/
+Miff4 miffGetValue4(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue8
+******************************************************************************/
+Miff8 miffGetValue8(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue16
+******************************************************************************/
+Miff16 miffGetValue16(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue32
+******************************************************************************/
+Miff32 miffGetValue32(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue64
+******************************************************************************/
+Miff64 miffGetValue64(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue128
+******************************************************************************/
+Miff128 miffGetValue128(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffGetValue256
+******************************************************************************/
+Miff256 miffGetValue256(Miff * const miff)
+{
+}
+
+/******************************************************************************
+func: miffSetKey
+******************************************************************************/
+MiffBool miffSetKey(Miff * const miff, MiffC const * const key, MiffValueType const type, 
+   MiffArrayFlag const arrayFlag, MiffCompressFlag const compressFlag, 
+   MiffN4 const chunkByteCount)
+{
+}
+
+/******************************************************************************
+func: miffSetValue1
+******************************************************************************/
+MiffBool miffSetValue1(Miff * const miff, Miff1 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue2
+******************************************************************************/
+MiffBool miffSetValue2(Miff * const miff, Miff2 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue3
+******************************************************************************/
+MiffBool miffSetValue3(Miff * const miff, Miff3 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue4
+******************************************************************************/
+MiffBool miffSetValue4(Miff * const miff, Miff4 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue8
+******************************************************************************/
+MiffBool miffSetValue8(Miff * const miff, Miff8 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue16
+******************************************************************************/
+MiffBool miffSetValue16(Miff * const miff, Miff16 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue32
+******************************************************************************/
+MiffBool miffSetValue32(Miff * const miff, Miff32 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue64
+******************************************************************************/
+MiffBool miffSetValue64(Miff * const miff, Miff64 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue128
+******************************************************************************/
+MiffBool miffSetValue128(Miff * const miff, Miff128 const value)
+{
+}
+
+/******************************************************************************
+func: miffSetValue256
+******************************************************************************/
+MiffBool miffSetValue256(Miff * const miff, Miff256 const value)
+{
+}
 
 /******************************************************************************
 func: miffStart
@@ -353,9 +583,46 @@ local:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _strClone
+func: _MemIsEqual
+
+Compare two binary buffers for equality.
 ******************************************************************************/
-static MiffC *_strClone(MiffN4 const count, MiffC const * const str)
+static MiffBool _MemIsEqual(MiffN4 const countA, MiddN1 const * const memA, MiffN4 const countB, 
+   MiffN1 const * const memB)
+{
+   returnFalseIf(countA != countB);
+   returnFalseIf(memcmp(strA, strB, countA) != 0);
+   returnTrue;
+}
+
+/******************************************************************************
+func: _ReadKey
+******************************************************************************/
+static MiffBool _ReadKey(Miff * const miff, MiffBool isRecordText)
+{
+   returnTrue;
+}
+
+/******************************************************************************
+func: _ReadValueHeader
+******************************************************************************/
+static MiffBool _ReadValueHeader(Miff * const miff, MiffBool isRecordText)
+{
+   returnTrue;
+}
+
+/******************************************************************************
+func: 
+******************************************************************************/
+static MiffBool _ReadValue8(Miff * const miff, MiffBool isRecordText)
+{
+   returnTrue;
+}
+
+/******************************************************************************
+func: _StrClone
+******************************************************************************/
+static MiffC *_StrClone(MiffN4 const count, MiffC const * const str)
 {
    MiffC *result;
 
@@ -368,9 +635,9 @@ static MiffC *_strClone(MiffN4 const count, MiffC const * const str)
 }
 
 /******************************************************************************
-func: _strFromUTF8
+func: _StrFromUTF8
 ******************************************************************************/
-static MiffC *_strFromUTF8(MiffN4 const count, MiffN1 const * const utf8)
+static MiffC *_StrFromUTF8(MiffN4 const count, MiffN1 const * const utf8)
 {
    MiffN4 index,
           rindex;

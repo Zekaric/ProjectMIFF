@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28307.1340
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mifflib", "mifflib\mifflib.vcxproj", "{C773B8B7-5C3B-44D4-8677-4BA59F03080C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7EF814F4-8EB2-413A-9282-F637ABDD588A} = {7EF814F4-8EB2-413A-9282-F637ABDD588A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GRL", "..\GRL\GRL\GRL.vcxproj", "{7EF814F4-8EB2-413A-9282-F637ABDD588A}"
 EndProject

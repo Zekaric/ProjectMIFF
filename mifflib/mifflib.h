@@ -87,7 +87,7 @@ typedef enum
    miffValueTypeN16,                      // 36
    miffValueTypeN32,                      // 37
    miffValueTypeN64,                      // 38
-   miffValueType128,                      // 39
+   miffValueTypeN128,                     // 39
    miffValueTypeN256,                     // 40
    miffValueTypeR2               = 52,    // 52
    miffValueTypeR4               = 54,    // 54
@@ -100,20 +100,20 @@ typedef enum
    
    miffValueTypeFIRST_USER_TYPE  = 64,
 
-   miffValueTypeLAST_USER_TYPE   = 4095
+   miffValueTypeLAST_USER_TYPE   = 0x0FFF
 } MiffValueType;
 
 typedef enum
 {
-   miffArrayFlagIS_SINGLE,
-   miffArrayFlagIS_ARRAY
+   miffArrayFlagIS_SINGLE = 0x0,
+   miffArrayFlagIS_ARRAY  = 0x1
 } MiffArrayFlag;
 
 typedef enum
 {
-   miffCompressionFlagIS_UNCOMPRESSED,
-   miffCompressionFlagIS_COMPRESSED,
-   miffCompressionFlagIS_CHUNKED_AND_COMPRESSED
+   miffCompressFlagIS_UNCOMPRESSED           = 0x0,
+   miffCompressFlagIS_COMPRESSED             = 0x1,
+   miffCompressFlagIS_CHUNKED_AND_COMPRESSED = 0x2
 } MiffCompressFlag;
 
 /******************************************************************************
@@ -201,26 +201,28 @@ typedef void     (*MiffMemDestroy)(    void * const mem);
 typedef MiffBool (*MiffMemCompress)(   MiffN4 const memByteCount,         void const * const mem,           MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem);
 typedef MiffBool (*MiffMemDecompress)( MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount,         void ** const mem);
 
-typedef MiffBool (*MiffGetBuffer1)(    void * const dataRepository, MiffN4 const byteCount, Miff1       * const buffer);
-typedef MiffBool (*MiffGetBuffer2)(    void * const dataRepository, MiffN4 const byteCount, Miff2       * const buffer);
-typedef MiffBool (*MiffGetBuffer4)(    void * const dataRepository, MiffN4 const byteCount, Miff4       * const buffer);
-typedef MiffBool (*MiffGetBuffer8)(    void * const dataRepository, MiffN4 const byteCount, Miff8       * const buffer);
+typedef MiffBool (*MiffGetBuffer1)(    void * const dataRepository, MiffN4 const data1Count, Miff1       * const data1);
+typedef MiffBool (*MiffGetBuffer2)(    void * const dataRepository, MiffN4 const data2Count, Miff2       * const data2);
+typedef MiffBool (*MiffGetBuffer4)(    void * const dataRepository, MiffN4 const data4Count, Miff4       * const data4);
+typedef MiffBool (*MiffGetBuffer8)(    void * const dataRepository, MiffN4 const data8Count, Miff8       * const data8);
 
-typedef MiffBool (*MiffSetBuffer1)(    void * const dataRepository, MiffN4 const byteCount, Miff1 const * const buffer);
-typedef MiffBool (*MiffSetBuffer2)(    void * const dataRepository, MiffN4 const byteCount, Miff2 const * const buffer);
-typedef MiffBool (*MiffSetBuffer4)(    void * const dataRepository, MiffN4 const byteCount, Miff4 const * const buffer);
-typedef MiffBool (*MiffSetBuffer8)(    void * const dataRepository, MiffN4 const byteCount, Miff8 const * const buffer);
+typedef MiffBool (*MiffSetBuffer1)(    void * const dataRepository, MiffN4 const data1Count, Miff1 const * const data1);
+typedef MiffBool (*MiffSetBuffer2)(    void * const dataRepository, MiffN4 const data2Count, Miff2 const * const data2);
+typedef MiffBool (*MiffSetBuffer4)(    void * const dataRepository, MiffN4 const data4Count, Miff4 const * const data4);
+typedef MiffBool (*MiffSetBuffer8)(    void * const dataRepository, MiffN4 const data8Count, Miff8 const * const data8);
 
 typedef struct
 {
+   void                       *dataRepository;
    MiffBool                    isBinary;
    MiffN8                      version;
-   MiffC                      *subFormatName;
+   MiffC                       subFormatName[256];
    MiffN8                      subFormatVersion;
    MiffMethod                  method;
    MiffBool                    isByteSwapping;
    MiffN1                      keyByteCount;
-   MiffKey                    *key;
+   MiffKey                     key[256];
+   MiffC                       keyC[256];
    MiffValueType               valueType;
    MiffArrayFlag               arrayFlag;
    MiffN4                      arrayCount;

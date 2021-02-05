@@ -216,12 +216,14 @@ typedef struct
    void                       *dataRepository;
    MiffBool                    isBinary;
    MiffN8                      version;
+   MiffN4                      subFormatNameCount;
    MiffC                       subFormatName[256];
    MiffN8                      subFormatVersion;
    MiffMethod                  method;
    MiffBool                    isByteSwapping;
    MiffN1                      keyByteCount;
    MiffKey                     key[256];
+   MiffN1                      keyCCount;
    MiffC                       keyC[256];
    MiffValueType               valueType;
    MiffArrayFlag               arrayFlag;

@@ -59,54 +59,55 @@ typedef enum
 {
    miffValueTypeNONE,
 
-   miffValueTypeKEY_VALUE_BLOCK,          // 1
-   miffValueTypeVALUE_STREAM_BLOCK,       // 2
-   miffValueTypeBINARY_DATA,              // 3
-   miffValueTypeEMBEDDED_FILE,            // 4
-   miffValueTypeTYPE,                     // 5
-   miffValueTypeSTRING,                   // 6
-   miffValueTypePATH,                     // 7
-   miffValueTypeKEY_ONLY_NO_VALUE,        // 8
-   miffValueTypeUSER_TYPE,                // 9
-   miffValueTypeBOOLEAN,                  // 10
-   miffValueTypeI1,                       // 11
-   miffValueTypeI2,                       // 12
-   miffValueTypeI3,                       // 13
-   miffValueTypeI4,                       // 14
-   miffValueTypeI8,                       // 15
-   miffValueTypeI16,                      // 16
-   miffValueTypeI32,                      // 17
-   miffValueTypeI64,                      // 18
-   miffValueTypeI128,                     // 19
-   miffValueTypeI256,                     // 20
-   miffValueTypeN1               = 31,    // 31
-   miffValueTypeN2,                       // 32
-   miffValueTypeN3,                       // 33
-   miffValueTypeN4,                       // 34
-   miffValueTypeN8,                       // 35
-   miffValueTypeN16,                      // 36
-   miffValueTypeN32,                      // 37
-   miffValueTypeN64,                      // 38
-   miffValueTypeN128,                     // 39
-   miffValueTypeN256,                     // 40
-   miffValueTypeR2               = 52,    // 52
-   miffValueTypeR4               = 54,    // 54
-   miffValueTypeR8,                       // 55
-   miffValueTypeR16,                      // 56
-   miffValueTypeR32,                      // 57
-   miffValueTypeR64,                      // 58
-   miffValueTypeR128,                     // 59
-   miffValueTypeR256,                     // 60
+   miffValueTypeKEY_VALUE_BLOCK,                      // 1
+   miffValueTypeVALUE_STREAM_BLOCK,                   // 2
+   miffValueTypeBINARY_DATA,                          // 3
+   miffValueTypeEMBEDDED_FILE,                        // 4
+   miffValueTypeTYPE,                                 // 5
+   miffValueTypeSTRING,                               // 6
+   miffValueTypePATH,                                 // 7
+   miffValueTypeKEY_ONLY_NO_VALUE,                    // 8
+   miffValueTypeUSER_TYPE,                            // 9
+   miffValueTypeBOOLEAN,                              // 10
+   miffValueTypeI1,                                   // 11
+   miffValueTypeI2,                                   // 12
+   miffValueTypeI3,                                   // 13
+   miffValueTypeI4,                                   // 14
+   miffValueTypeI8,                                   // 15
+   miffValueTypeI16,                                  // 16
+   miffValueTypeI32,                                  // 17
+   miffValueTypeI64,                                  // 18
+   miffValueTypeI128,                                 // 19
+   miffValueTypeI256,                                 // 20
+   miffValueTypeN1                           = 31,    // 31
+   miffValueTypeN2,                                   // 32
+   miffValueTypeN3,                                   // 33
+   miffValueTypeN4,                                   // 34
+   miffValueTypeN8,                                   // 35
+   miffValueTypeN16,                                  // 36
+   miffValueTypeN32,                                  // 37
+   miffValueTypeN64,                                  // 38
+   miffValueTypeN128,                                 // 39
+   miffValueTypeN256,                                 // 40
+   miffValueTypeR2                           = 52,    // 52
+   miffValueTypeR4                           = 54,    // 54
+   miffValueTypeR8,                                   // 55
+   miffValueTypeR16,                                  // 56
+   miffValueTypeR32,                                  // 57
+   miffValueTypeR64,                                  // 58
+   miffValueTypeR128,                                 // 59
+   miffValueTypeR256,                                 // 60
    
-   miffValueTypeFIRST_USER_TYPE  = 64,
+   miffValueTypeFIRST_USER_TYPE              = 64,
 
-   miffValueTypeLAST_USER_TYPE   = 0x0FFF
+   miffValueTypeLAST_USER_TYPE               = 0x0FFF
 } MiffValueType;
 
 typedef enum
 {
-   miffArrayFlagIS_SINGLE = 0x0,
-   miffArrayFlagIS_ARRAY  = 0x1
+   miffArrayFlagIS_SINGLE                    = 0x0,
+   miffArrayFlagIS_ARRAY                     = 0x1,
+   miffArrayFlagIS_ARRAY_USER_TYPE           = 0x2
 } MiffArrayFlag;
 
 typedef enum
@@ -216,7 +217,7 @@ typedef struct
    void                       *dataRepository;
    MiffBool                    isBinary;
    MiffN8                      version;
-   MiffN4                      subFormatNameCount;
+   MiffN1                      subFormatNameCount;
    MiffC                       subFormatName[256];
    MiffN8                      subFormatVersion;
    MiffMethod                  method;

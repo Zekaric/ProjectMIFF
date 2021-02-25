@@ -27,4 +27,7 @@
   <ItemGroup>
     <Text Include="Todo.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
 </Project>

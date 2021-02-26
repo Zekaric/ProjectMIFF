@@ -92,28 +92,30 @@ static void     _ByteSwap4(               Miff const * const miff, Miff4 * const
 static void     _ByteSwap8(               Miff const * const miff, Miff8 * const value);
 
 static MiffBool _MemIsEqual(              MiffN4 const countA, MiffN1 const * const strA, MiffN4 const countB, MiffN1 const * const strB);
+static MiffC   *_MiffCClone(              MiffN4 const strCount, MiffC const * const str);
+static MiffN4   _MiffCLetterToUTFLetter(  MiffC const letter, MiffN1 * const a, MiffN1 * const b, MiffN1 * const c, MiffN1 * const d);
+static MiffBool _MiffCToUTF(              MiffN4 const strCount, MiffC const * const str, MiffN4 * const utfByteCount, MiffN1 ** const utf);
+static MiffBool _MiffCToUTFKey(           MiffN4 const strCount, MiffC const * const str, MiffN1 * const utfByteCount, MiffN1 * const utf);
                                           
 static void     _ReadBase64Restart(       void);
 static MiffBool _ReadBase64Byte(          Miff * const miff, MiffN1 * const byte);
 static MiffN1   _ReadFirstLetter(         Miff * const miff);
-static MiffBool _ReadKey(                 Miff * const miff, MiffBool const isRecordText);
+static MiffBool _ReadKey(                 Miff * const miff, MiffMode const mode);
 static MiffBool _ReadPart(                Miff * const miff, MiffN4 * const partByteCount, MiffN1 *  const part);
 static MiffBool _ReadPartDynamic(         Miff * const miff, MiffN4 * const partByteCount, MiffN1 ** const part);
-static MiffBool _ReadValueHeader(         Miff * const miff, MiffBool const isRecordText);
-static MiffBool _ReadValue1(              Miff * const miff, MiffBool const isRecordText, Miff1 *value);
-static MiffBool _ReadValue2(              Miff * const miff, MiffBool const isRecordText, Miff2 *value);
-static MiffBool _ReadValue4(              Miff * const miff, MiffBool const isRecordText, Miff4 *value);
-static MiffBool _ReadValue8(              Miff * const miff, MiffBool const isRecordText, Miff8 *value);
+static MiffBool _ReadValueHeader(         Miff * const miff, MiffMode const mode);
+static MiffBool _ReadValue1(              Miff * const miff, MiffMode const mode, Miff1 *value);
+static MiffBool _ReadValue2(              Miff * const miff, MiffMode const mode, Miff2 *value);
+static MiffBool _ReadValue4(              Miff * const miff, MiffMode const mode, Miff4 *value);
+static MiffBool _ReadValue8(              Miff * const miff, MiffMode const mode, Miff8 *value);
                                           
-static MiffC   *_MiffCClone(              MiffN4 const strCount, MiffC const * const str);
 static MiffI8   _UTFDecimalToI(           MiffN4 const utfByteCount, MiffN1 const * const utf);
 static MiffN8   _UTFDecimalToN(           MiffN4 const utfByteCount, MiffN1 const * const utf);
 static void     _UTFToMiffC(              MiffN4 const utfByteCount, MiffN1 const * const utf, MiffN4 * const strCount, MiffC * const str);
 static void     _UTFToMiffCKey(           MiffN4 const utfByteCount, MiffN1 const * const utf, MiffN1 * const strCount, MiffC * const str);
                                           
-static MiffBool _MiffCToUTF(              MiffN4 const strCount, MiffC const * const str, MiffN4 * const utfByteCount, MiffN1 ** const utf);
-static MiffBool _MiffCToUTFKey(           MiffN4 const strCount, MiffC const * const str, MiffN1 * const utfByteCount, MiffN1 * const utf);
-static MiffN4   _MiffCLetterToUTFLetter(  MiffC const letter, MiffN1 * const a, MiffN1 * const b, MiffN1 * const c, MiffN1 * const d);
+static void     _WriteEndRecord(          Miff * const miff, MiffMode const mode);
+static void     _WriteKey(                Miff * const miff, MiffMode const mode);
 
 /******************************************************************************
 global:
@@ -173,7 +175,7 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    miff->getBuffer4     = getBuffer4Func;
    miff->getBuffer8     = getBuffer8Func;
 
-   returnFalseIf(!_ReadKey(miff, miffBoolFALSE));
+   returnFalseIf(!_ReadKey(miff, miffModeTEXT));
    if      (_MemIsEqual(miff->keyByteCount, miff->key, 8, (MiffN1 *) "MIFF_BIN"))
    {
       miff->isBinary = miffBoolTRUE;
@@ -188,22 +190,22 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
       returnFalse;
    }
 
-   returnFalseIf(!_ReadValueHeader(miff, miffBoolFALSE))
+   returnFalseIf(!_ReadValueHeader(miff, miffModeTEXT))
    returnFalseIf(!
       (miff->valueType    == miffValueTypeN8        &&
        miff->arrayFlag    == miffArrayFlagIS_SINGLE &&
        miff->compressFlag == miffCompressFlagIS_UNCOMPRESSED));
-   returnFalseIf(!_ReadValue8(miff, miffBoolFALSE, (Miff8 *) &miff->version));
+   returnFalseIf(!_ReadValue8(miff, miffModeTEXT, (Miff8 *) &miff->version));
    returnFalseIf(miff->version != 1);
 
-   returnFalseIf(!_ReadKey(miff, miffBoolFALSE));
+   returnFalseIf(!_ReadKey(miff, miffModeTEXT));
    _UTFToMiffCKey(miff->keyByteCount, miff->key, &miff->subFormatNameCount, miff->subFormatName);
-   returnFalseIf(!_ReadValueHeader(miff, miffBoolFALSE));
+   returnFalseIf(!_ReadValueHeader(miff, miffModeTEXT));
    returnFalseIf(!
       (miff->valueType    == miffValueTypeN8        &&
        miff->arrayFlag    == miffArrayFlagIS_SINGLE &&
        miff->compressFlag == miffCompressFlagIS_UNCOMPRESSED));
-   returnFalseIf(!_ReadValue8(miff, miffBoolFALSE, (Miff8 *) &miff->subFormatVersion));
+   returnFalseIf(!_ReadValue8(miff, miffModeTEXT, (Miff8 *) &miff->subFormatVersion));
 
    returnTrue;
 }
@@ -213,7 +215,7 @@ func: miffCreateWriter
 ******************************************************************************/
 Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, 
    MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, 
-   MiffBool const isBinary, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, 
+   MiffMode const mode, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, 
    MiffN8 const subFormatVersion)
 {
    Miff *miff;
@@ -232,7 +234,7 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Fu
          setBuffer2Func, 
          setBuffer4Func, 
          setBuffer8Func, 
-         isBinary, 
+         mode, 
          subFormatNameLen,
          subFormatName, 
          subFormatVersion))
@@ -250,7 +252,7 @@ func: miffCreateWriterContent
 ******************************************************************************/
 MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping, 
    MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, 
-   MiffSetBuffer8 setBuffer8Func, MiffBool const isBinary, MiffN1 const subFormatNameLen, 
+   MiffSetBuffer8 setBuffer8Func, MiffMode const mode, MiffN1 const subFormatNameLen, 
    MiffC const * const subFormatName, MiffN8 const subFormatVersion)
 {
    returnFalseIf(
@@ -265,7 +267,7 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
 
    memClearType(Miff, miff);
    miff->method             = miffMethodWRITING;
-   miff->isBinary           = isBinary;
+   miff->mode               = mode;
    miff->isByteSwapping     = isByteSwaping;
    miff->setBuffer1         = setBuffer1Func;
    miff->setBuffer2         = setBuffer2Func;
@@ -276,14 +278,15 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    memCopyTypeArray(subFormatNameLen, MiffC, miff->subFormatName, subFormatName);
 
    // Write the miff header.
-   returnFalseIf(!(
-      _writeKey(            miff, miffBoolFALSE, (isBinary) ? L"MIFF_BIN" : L"MIFF_TXT")                                      &&
-      _writeValueHeaderText(miff, miffBoolFALSE, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressFlagIS_UNCOMPRESSED, 0) &&
-      _writeValueN8(        miff, miffBoolFALSE, 1)                                                                           &&
-      
-      _writeKey(            miff, miffBoolFALSE, miff->subFormatName)                                                         &&
-      _writeValueHeaderText(miff, miffBoolFALSE, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressFlagIS_UNCOMPRESSED, 0) &&
-      _writeValueN8Text(    miff, miff->subFormatVersion)));
+   _WriteKey(            miff, miffModeTEXT, (mode == miffModeBINARY) ? L"MIFF_BIN" : L"MIFF_TXT");
+   _WriteValueHeaderText(miff, miffModeTEXT, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressFlagIS_UNCOMPRESSED, 0);
+   _WriteValueN8(        miff, miffModeTEXT, 1);
+   _WriteEndRecord(      miff, miffModeTEXT);
+   
+   _WriteKey(            miff, miffModeTEXT, miff->subFormatName);
+   _WriteValueHeaderText(miff, miffModeTEXT, miffValueTypeN8, miffArrayFlagIS_SINGLE, miffCompressFlagIS_UNCOMPRESSED, 0);
+   _WriteValueN8(        miff, miffModeTEXT, miff->subFormatVersion);
+   _WriteEndRecord(      miff, miffModeTEXT);
 
    return miff;
 }
@@ -615,86 +618,98 @@ Miff256 miffGetValue256(Miff * const miff)
 /******************************************************************************
 func: miffSetKey
 ******************************************************************************/
-MiffBool miffSetKey(Miff * const miff, MiffC const * const key, MiffValueType const type, 
-   MiffArrayFlag const arrayFlag, MiffCompressFlag const compressFlag, 
+void miffSetNextRecord(Miff * const miff, MiffC const * const key, MiffValueType const type,
+   MiffArrayFlag const arrayFlag, MiffN4 const arrayCount, MiffCompressFlag const compressFlag, 
    MiffN4 const chunkByteCount)
 {
+   memClearTypeArray(256, MiffC, miff->keyC);
+   memCopyTypeArray(255, MiffC, miff->keyC, key);
+   miff->keyCCount = wcsnlen_s(key, 255);
+
+   _MiffCToUTFKey(miff->keyCCount, miff->keyC, &miff->keyByteCount, miff->key);
+   miff->arrayFlag               = arrayFlag;
+   miff->arrayCount              = arrayCount;
+   miff->compressFlag            = compressFlag;
+   miff->compressChunkByteCount  = chunkByteCount;
+
+   _WriteKey(miff, miff->mode);
 }
 
 /******************************************************************************
 func: miffSetValue1
 ******************************************************************************/
-MiffBool miffSetValue1(Miff * const miff, Miff1 const value)
+void miffSetValue1(Miff * const miff, Miff1 const value)
 {
+
 }
 
 /******************************************************************************
 func: miffSetValue2
 ******************************************************************************/
-MiffBool miffSetValue2(Miff * const miff, Miff2 const value)
+void miffSetValue2(Miff * const miff, Miff2 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue3
 ******************************************************************************/
-MiffBool miffSetValue3(Miff * const miff, Miff3 const value)
+void miffSetValue3(Miff * const miff, Miff3 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue4
 ******************************************************************************/
-MiffBool miffSetValue4(Miff * const miff, Miff4 const value)
+void miffSetValue4(Miff * const miff, Miff4 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue8
 ******************************************************************************/
-MiffBool miffSetValue8(Miff * const miff, Miff8 const value)
+void miffSetValue8(Miff * const miff, Miff8 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue16
 ******************************************************************************/
-MiffBool miffSetValue16(Miff * const miff, Miff16 const value)
+void miffSetValue16(Miff * const miff, Miff16 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue32
 ******************************************************************************/
-MiffBool miffSetValue32(Miff * const miff, Miff32 const value)
+void miffSetValue32(Miff * const miff, Miff32 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue64
 ******************************************************************************/
-MiffBool miffSetValue64(Miff * const miff, Miff64 const value)
+void miffSetValue64(Miff * const miff, Miff64 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue128
 ******************************************************************************/
-MiffBool miffSetValue128(Miff * const miff, Miff128 const value)
+void miffSetValue128(Miff * const miff, Miff128 const value)
 {
 }
 
 /******************************************************************************
 func: miffSetValue256
 ******************************************************************************/
-MiffBool miffSetValue256(Miff * const miff, Miff256 const value)
+void miffSetValue256(Miff * const miff, Miff256 const value)
 {
 }
 
 /******************************************************************************
 func: miffStart
 ******************************************************************************/
-MiffBool miffStart(MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, 
+MiffBool miffStart(MiffMemCreate const memCreate, MiffMemDestroy const memDestroy,
    MiffMemCompress const compressBuffer, MiffMemDecompress const decompressBuffer);
 {
    MiffN1 index;
@@ -882,6 +897,159 @@ static MiffBool _MemIsEqual(MiffN4 const countA, MiffN1 const * const memA, Miff
 }
 
 /******************************************************************************
+func: _MiffCClone
+******************************************************************************/
+static MiffC *_MiffCClone(MiffN4 const strCount, MiffC const * const str)
+{
+   MiffC *result;
+
+   result = memCreateTypeArray(strCount, MiffC);
+   returnNullIf(!result);
+
+   memCopyTypeArray(strCount, MiffC, result, src);
+
+   return result;
+}
+
+/******************************************************************************
+func: _MiffCLetterToUTFLetter
+******************************************************************************/
+static MiffN4 _MiffCLetterToUTFLetter(MiffC const letter, MiffN1 * const a, MiffN1 * const b,
+   MiffN1 * const c, MiffN1 * const d)
+{
+   return0If(!a || !b || !c || !d);
+
+   if (letter < 0x0000007f)
+   {
+      *d = 0;
+      *c = 0;
+      *b = 0;
+      *a = (Gc1)letter;
+
+      return 1;
+   }
+
+   if (letter < 0x000007ff)
+   {
+      *d = 0;
+      *c = 0;
+      *b = (Gc1)(0x80 |  (letter       & 0x3f));
+      *a = (Gc1)(0xc0 | ((letter >> 6) & 0x1f));
+
+      return 2;
+   }
+
+   if (letter < 0x0000ffff)
+   {
+      *d = 0;
+      *c = (Gc1)(0x80 |  (letter        & 0x3f));
+      *b = (Gc1)(0x80 | ((letter >>  6) & 0x3f));
+      *a = (Gc1)(0xe0 | ((letter >> 12) & 0x0f));
+
+      return 3;
+   }
+
+   // letter < 0x001fffff
+   *d = (Gc1)(0x80 |  (letter        & 0x3f));
+   *c = (Gc1)(0x80 | ((letter >>  6) & 0x3f));
+   *b = (Gc1)(0x80 | ((letter >> 12) & 0x3f));
+   *c = (Gc1)(0xf0 | ((letter >> 18) & 0x07));
+
+   return 4;
+}
+
+/******************************************************************************
+func: _MiffCToUTF
+******************************************************************************/
+static MiffBool _MiffCToUTF(MiffN4 const count, MiffC const * const str, MiffN4 * const utfByteCount,
+   MiffN1 ** const utf)
+{
+   MiffN4 utfIndex,
+      strIndex,
+      utfByteCountMax,
+      letterCount;
+   MiffN1 a,
+      b,
+      c,
+      d,
+      *result;
+
+   utfByteCountMax = count * 4 + 1;
+   result          = memCreateTypeArray(utfByteCountMax, MiffN1);
+   returnNullIf(!result);
+
+   utfIndex = 0;
+   forCount(strIndex, count)
+   {
+      returnFalseIf(utfIndex == utfByteCountMax);
+
+      letterCount = _MiffCLetterToUTFLetter(str[strIndex], &a, &b, &c, &d);
+      returnFalseIf(!letterCount);
+
+      result[utfIndex++] = a;
+      continueIf(letterCount == 1);
+      returnFalseIf(utfIndex == utfByteCountMax);
+
+      result[utfIndex++] = b;
+      continueIf(letterCount == 2);
+      returnFalseIf(utfIndex == utfByteCountMax);
+
+      result[utfIndex++] = c;
+      continueIf(letterCount == 3);
+      returnFalseIf(utfIndex == utfByteCountMax);
+
+      key[keyIndex++] = d;
+   }
+
+   *utfByteCount = utfIndex;
+   *utf          = result;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _MiffCToUTFKey
+******************************************************************************/
+static MiffBool _MiffCToUTFKey(MiffN4 const count, MiffC const * const str,
+   MiffN1 * const utfByteCount, MiffN1 * const utf)
+{
+   MiffN4 utfIndex,
+      strIndex,
+      letterCount;
+   MiffN1 a,
+      b,
+      c,
+      d;
+
+   utfIndex = 0;
+   forCount(strIndex, count)
+   {
+      returnFalseIf(utfIndex == 256);
+
+      letterCount = _MiffCLetterToUTFLetter(str[strIndex], &a, &b, &c, &d);
+      returnFalseIf(!letterCount);
+
+      utf[utfIndex++] = a;
+      continueIf(letterCount == 1);
+      returnFalseIf(utfIndex == 256);
+
+      utf[utfIndex++] = b;
+      continueIf(letterCount == 2);
+      returnFalseIf(utfIndex == 256);
+
+      utf[utfIndex++] = c;
+      continueIf(letterCount == 3);
+      returnFalseIf(utfIndex == 256);
+
+      utf[utfIndex++] = d;
+   }
+
+   *utfByteCount = utfIndex;
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _ReadBase64Restart
 ******************************************************************************/
 static void _ReadBase64Restart(void)
@@ -979,14 +1147,14 @@ static MiffN1 _ReadFirstLetter(Miff * const miff)
 /******************************************************************************
 func: _ReadKey
 ******************************************************************************/
-static MiffBool _ReadKey(Miff * const miff, MiffBool const isRecordText)
+static MiffBool _ReadKey(Miff * const miff, MiffMode const mode)
 {
    miff->keyByteCount = 0;
    miff->keyCCount    = 0;
    miff->key[0]       = 0;
    miff->keyC[0]      = 0;
 
-   if (isRecordText)
+   if (mode == miffModeTEXT)
    {
       _ReadPart(miff, 255, miff->keyByteCount, miff->key);
    }
@@ -1127,9 +1295,9 @@ static MiffBool _ReadPartDynamic(Miff * const miff, MiffN4 * const partByteCount
 /******************************************************************************
 func: _ReadValueHeader
 ******************************************************************************/
-static MiffBool _ReadValueHeader(Miff * const miff, MiffBool const isRecordText)
+static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
 {
-   if (isRecordText)
+   if (mode == miffModeTEXT)
    {
       MiffN1 letter;
       MiffN4 typeByteCount;
@@ -1244,13 +1412,13 @@ static MiffBool _ReadValueHeader(Miff * const miff, MiffBool const isRecordText)
 /******************************************************************************
 func: _ReadValue1
 ******************************************************************************/
-static MiffBool _ReadValue1(Miff * const miff, MiffBool const isRecordText, 
+static MiffBool _ReadValue1(Miff * const miff, MiffMode const mode, 
    MiffValueType const type, Miff1 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
    
-   if (!isRecordText)
+   if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer1(miff->dataRepository, 1, value));
    }
@@ -1275,13 +1443,13 @@ static MiffBool _ReadValue1(Miff * const miff, MiffBool const isRecordText,
 /******************************************************************************
 func: _ReadValue2
 ******************************************************************************/
-static MiffBool _ReadValue2(Miff * const miff, MiffBool const isRecordText, 
+static MiffBool _ReadValue2(Miff * const miff, MiffMode const mode, 
    MiffValueType const type, Miff2 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
    
-   if (!isRecordText)
+   if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer2(miff->dataRepository, 1, value));
       _ByteSwap2(miff, value);
@@ -1325,14 +1493,14 @@ static MiffBool _ReadValue2(Miff * const miff, MiffBool const isRecordText,
 /******************************************************************************
 func: _ReadValue4
 ******************************************************************************/
-static MiffBool _ReadValue4(Miff * const miff, MiffBool const isRecordText, 
+static MiffBool _ReadValue4(Miff * const miff, MiffMode const mode, 
    MiffValueType const type, Miff4 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
    
    // Binary read value.
-   if (!isRecordText)
+   if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer4(miff->dataRepository, 1, value));
       _ByteSwap4(miff, value);
@@ -1387,13 +1555,13 @@ static MiffBool _ReadValue4(Miff * const miff, MiffBool const isRecordText,
 /******************************************************************************
 func: _ReadValue8
 ******************************************************************************/
-static MiffBool _ReadValue8(Miff * const miff, MiffBool const isRecordText, 
+static MiffBool _ReadValue8(Miff * const miff, MiffMode const mode, 
    MiffValueType const type, Miff8 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
    
-   if (!isRecordText)
+   if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer8(miff->dataRepository, 1, value));
       _ByteSwap8(miff, value);
@@ -1444,21 +1612,6 @@ static MiffBool _ReadValue8(Miff * const miff, MiffBool const isRecordText,
    memDestroy(part);
 
    returnTrue;
-}
-
-/******************************************************************************
-func: _MiffCClone
-******************************************************************************/
-static MiffC *_MiffCClone(MiffN4 const strCount, MiffC const * const str)
-{
-   MiffC *result;
-
-   result = memCreateTypeArray(strCount, MiffC);
-   returnNullIf(!result);
-
-   memCopyTypeArray(strCount, MiffC, result, src);
-
-   return result;
 }
 
 /******************************************************************************
@@ -1624,139 +1777,30 @@ static void _UTFToMiffCKey(MiffN4 const count, MiffN1 const * const utf8, MiffN1
 }
 
 /******************************************************************************
-func: _MiffCToUTF
+func: _WriteEndRecord
 ******************************************************************************/
-static MiffBool _MiffCToUTF(MiffN4 const count, MiffC const * const str, MiffN4 * const utfByteCount, 
-   MiffN1 ** const utf)
+static void _WriteEndRecord(Miff * const miff, MiffMode const mode)
 {
-   MiffN4 utfIndex,
-          strIndex,
-          utfByteCountMax,
-          letterCount;
-   MiffN1 a,
-          b,
-          c,
-          d,
-         *result;
-
-   utfByteCountMax = count * 4 + 1;
-   result          = memCreateTypeArray(utfByteCountMax, MiffN1);
-   returnNullIf(!result);
-
-   utfIndex = 0;
-   forCount(strIndex, count)
+   if (mode == miffModeTEXT)
    {
-      returnFalseIf(utfIndex == utfByteCountMax);
-
-      letterCount = _MiffCLetterToUTFLetter(str[strIndex], &a, &b, &c, &d);
-      returnFalseIf(!letterCount);
-
-      result[utfIndex++] = a;
-      continueIf(letterCount == 1);
-      returnFalseIf(utfIndex == utfByteCountMax);
-      
-      result[utfIndex++] = b;
-      continueIf(letterCount == 2);
-      returnFalseIf(utfIndex == utfByteCountMax);
-
-      result[utfIndex++] = c;
-      continueIf(letterCount == 3);
-      returnFalseIf(utfIndex == utfByteCountMax);
-      
-      key[keyIndex++] = d;
+      miff->setBuffer1(miff->dataRepository, 1, '\n');
    }
-
-   *utfByteCount = utfIndex;
-   *utf          = result;
-
-   returnTrue;
 }
 
 /******************************************************************************
-func: _MiffCToUTFKey
+func: _WriteKey
 ******************************************************************************/
-static MiffBool _MiffCToUTFKey(MiffN4 const count, MiffC const * const str, 
-   MiffN1 * const utfByteCount, MiffN1 * const utf)
+static void _WriteKey(Miff * const miff, MiffMode const mode)
 {
-   MiffN4 utfIndex,
-          strIndex,
-          letterCount;
-   MiffN1 a,
-          b,
-          c,
-          d;
-
-   utfIndex = 0;
-   forCount(strIndex, count)
+   if (mode == miffModeTEXT)
    {
-      returnFalseIf(utfIndex == 256);
-
-      letterCount = _MiffCLetterToUTFLetter(str[strIndex], &a, &b, &c, &d);
-      returnFalseIf(!letterCount);
-
-      utf[utfIndex++] = a;
-      continueIf(letterCount == 1);
-      returnFalseIf(utfIndex == 256);
-      
-      utf[utfIndex++] = b;
-      continueIf(letterCount == 2);
-      returnFalseIf(utfIndex == 256);
-
-      utf[utfIndex++] = c;
-      continueIf(letterCount == 3);
-      returnFalseIf(utfIndex == 256);
-      
-      utf[utfIndex++] = d;
+      miff->setBuffer1(miff->dataRepository, miff->keyByteCount, miff->key);
+      miff->setBuffer1(miff->dataRepository, 1, ' ');
    }
-
-   *utfByteCount = utfIndex;
-
-   returnTrue;
+   else
+   {
+      miff->setBuffer1(miff->dataRepository, 1,                  miff->keyByteCount);
+      miff->setBuffer1(miff->dataRepository, miff->keyByteCount, miff->key);
+   }
 }
 
-/******************************************************************************
-func: _MiffCLetterToUTFLetter
-******************************************************************************/
-static MiffN4 _MiffCLetterToUTFLetter(MiffC const letter, MiffN1 * const a, MiffN1 * const b, 
-   MiffN1 * const c, MiffN1 * const d)
-{
-   return0If(!a || !b || !c || !d);
-
-   if (letter < 0x0000007f)
-   {
-      *d = 0;
-      *c = 0;
-      *b = 0;
-      *a = (Gc1) letter;
-
-      return 1;
-   }
-   
-   if (letter < 0x000007ff)
-   {
-      *d = 0;
-      *c = 0;
-      *b = (Gc1) (0x80 |  (letter       & 0x3f));
-      *a = (Gc1) (0xc0 | ((letter >> 6) & 0x1f));
-
-      return 2;
-   }
-   
-   if (letter < 0x0000ffff)
-   {
-      *d = 0;
-      *c = (Gc1) (0x80 |  (letter        & 0x3f));
-      *b = (Gc1) (0x80 | ((letter >>  6) & 0x3f));
-      *a = (Gc1) (0xe0 | ((letter >> 12) & 0x0f));
-
-      return 3;
-   }
-
-   // letter < 0x001fffff
-   *d = (Gc1) (0x80 |  (letter        & 0x3f));
-   *c = (Gc1) (0x80 | ((letter >>  6) & 0x3f));
-   *b = (Gc1) (0x80 | ((letter >> 12) & 0x3f));
-   *c = (Gc1) (0xf0 | ((letter >> 18) & 0x07));
-
-   return 4;
-}

@@ -127,27 +127,27 @@ typedef enum
 type:
 ******************************************************************************/
 // Integer types
-#define MiffI1    char
-#define MiffI2    short
-#define MiffI4    int
-#define MiffI8    int64_t
+#define MiffI1       char
+#define MiffI2       short
+#define MiffI4       int
+#define MiffI8       int64_t
 // Natural types
-#define MiffN1    unsigned char
-#define MiffN2    unsigned short
-#define MiffN4    unsigned int
-#define MiffN8    uint64_t
+#define MiffN1       unsigned char
+#define MiffN2       unsigned short
+#define MiffN4       unsigned int
+#define MiffN8       uint64_t
 // Real types
-#define MiffR4    float
-#define MiffR8    double
+#define MiffR4       float
+#define MiffR8       double
 // String type
-#define MiffC     wchar_t
-#define MiffKey   MiffN1
+#define MiffC        wchar_t
+#define MiffKey      MiffN1
 
 typedef struct
 {
    MiffI1   i;
    MiffN1   n;
-   MiffN1   b;
+   MiffN1   byte[1];
 } Miff1;
 
 typedef struct
@@ -180,27 +180,27 @@ typedef struct
 
 typedef struct
 {
-   MiffN1   b[16];
+   MiffN1   byte[16];
 } Miff16;
 
 typedef struct
 {
-   MiffN1   b[32];
+   MiffN1   byte[32];
 } Miff32;
 
 typedef struct
 {
-   MiffN1   b[64];
+   MiffN1   byte[64];
 } Miff64;
 
 typedef struct
 {
-   MiffN1   b[128];
+   MiffN1   byte[128];
 } Miff128;
 
 typedef struct
 {
-   MiffN1   b[256];
+   MiffN1   byte[256];
 } Miff256;
 
 typedef void    *(*MiffMemCreate)(     MiffN4 const memByteCount);
@@ -218,15 +218,16 @@ typedef MiffBool (*MiffSetBuffer2)(    void * const dataRepository, MiffN4 const
 typedef MiffBool (*MiffSetBuffer4)(    void * const dataRepository, MiffN4 const data4Count, Miff4 const * const data4);
 typedef MiffBool (*MiffSetBuffer8)(    void * const dataRepository, MiffN4 const data8Count, Miff8 const * const data8);
 
-typedef struct
-{
+typedef struct MiffTypeRecord MiffTypeRecord;
+struct MiffTypeRecord {
    MiffN1                      nameByteCount;
    MiffKey                     name[256];
    MiffN1                      nameCCount;
    MiffC                       nameC[256];
    MiffValueType               type;
    MiffN4                      arrayCount;
-} MiffTypeRecord;
+   MiffTypeRecord             *next;
+};
 
 typedef struct
 {
@@ -235,12 +236,13 @@ typedef struct
    MiffN1                      nameCCount;
    MiffC                       nameC[256];
    MiffN4                      varCount;
-   MiffTypeRecord             *varList;
+   MiffTypeRecord             *varStart,
+                              *varEnd;
 } MiffUserType;
 
 typedef struct
 {
-   void                       *dataRepository;
+   // MIFF file information and configuration.
    MiffMode                    mode;
    MiffN8                      version;
    MiffN1                      subFormatNameCount;
@@ -248,23 +250,39 @@ typedef struct
    MiffN8                      subFormatVersion;
    MiffMethod                  method;
    MiffBool                    isByteSwapping;
+
+   // Current record key value.
    MiffN1                      keyByteCount;
    MiffKey                     key[256];
    MiffN1                      keyCCount;
    MiffC                       keyC[256];
+
+   // Current record value header information.
    MiffValueType               valueType;
    MiffArrayFlag               arrayFlag;
    MiffN4                      arrayCount;
    MiffCompressFlag            compressFlag;
+
+   // Temporary storage for uncompressed memory.
    MiffN4                      memByteCount;
    void                       *mem;
+
+   // Temporary storage for compressed memory.
    MiffN4                      compressChunkByteCount;
    MiffN4                      compressMemByteCount;
    MiffN1                     *compressMem;
+   
+   // The list of user types
+   MiffN2                      userTypeCurr;
    MiffN2                      userTypeCount;
    MiffUserType                userTypeList[4096];
+
+   // The list of vars for the current record per array element.
    MiffN4                      varCount;
    MiffTypeRecord             *varList;
+
+   // Data repo getters and setters.
+   void                       *dataRepository;
    MiffGetBuffer1              getBuffer1;
    MiffGetBuffer2              getBuffer2;
    MiffGetBuffer4              getBuffer4;
@@ -282,46 +300,49 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-Miff     *miffCreateReader(                               MiffBool const isByteSwaping, MiffGetBuffer1 getBuffer1Func, MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, MiffGetBuffer8 getBuffer8Func);
-MiffBool  miffCreateReaderContent(     Miff * const miff, MiffBool const isByteSwaping, MiffGetBuffer1 getBuffer1Func, MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, MiffGetBuffer8 getBuffer8Func);
-Miff     *miffCreateWriter(                               MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, MiffMode const mode, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, MiffN8 const subFormatVersion);
-MiffBool  miffCreateWriterContent(     Miff * const miff, MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, MiffMode const mode, MiffN4 const subFormatNameLen, MiffC const * const subFormatName, MiffN8 const subFormatVersion);
+Miff           *miffCreateReader(                               MiffBool const isByteSwaping, MiffGetBuffer1 getBuffer1Func, MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, MiffGetBuffer8 getBuffer8Func);
+MiffBool        miffCreateReaderContent(     Miff * const miff, MiffBool const isByteSwaping, MiffGetBuffer1 getBuffer1Func, MiffGetBuffer2 getBuffer2Func, MiffGetBuffer4 getBuffer4Func, MiffGetBuffer8 getBuffer8Func);
+Miff           *miffCreateWriter(                               MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, MiffMode const mode, MiffN1 const subFormatNameLen, MiffC const * const subFormatName, MiffN8 const subFormatVersion);
+MiffBool        miffCreateWriterContent(     Miff * const miff, MiffBool const isByteSwaping, MiffSetBuffer1 setBuffer1Func, MiffSetBuffer2 setBuffer2Func, MiffSetBuffer4 setBuffer4Func, MiffSetBuffer8 setBuffer8Func, MiffMode const mode, MiffN1 const subFormatNameLen, MiffC const * const subFormatName, MiffN8 const subFormatVersion);
 
-void      miffDestroy(                 Miff * const miff);
-void      miffDestroyContent(          Miff * const miff);
+void            miffDestroy(                 Miff * const miff);
+void            miffDestroyContent(          Miff * const miff);
 
-void      miffGetCurrentVar(           Miff * const miff, MiffC ** const name, MiffValueType * const type, MiffN4 * const arrayCount);
-MiffBool  miffGetFileFlagIsBinary(     Miff * const miff, MiffBool * const isBinary);
-MiffBool  miffGetFileVersion(          Miff * const miff, MiffN4 * const version);
-MiffBool  miffGetFileVersionSubFormat( Miff * const miff, MiffC ** const subFormatName, MiffN8 * const subFormatVersion);
-MiffBool  miffGetKey(                  Miff * const miff, MiffC ** const key);
-MiffBool  miffGetNextRecord(           Miff * const miff);
-MiffBool  miffGetValueHeader(          Miff * const miff, MiffValueType * const type, MiffArrayFlag * const arrayFlag, MiffCompressFlag * const compressFlag, MiffN4 * const arrayCount);
-Miff1     miffGetValue1(               Miff * const miff);
-Miff2     miffGetValue2(               Miff * const miff);
-Miff3     miffGetValue3(               Miff * const miff);
-Miff4     miffGetValue4(               Miff * const miff);
-Miff8     miffGetValue8(               Miff * const miff);
-Miff16    miffGetValue16(              Miff * const miff);
-Miff32    miffGetValue32(              Miff * const miff);
-Miff64    miffGetValue64(              Miff * const miff);
-Miff128   miffGetValue128(             Miff * const miff);
-Miff256   miffGetValue256(             Miff * const miff);
+void            miffGetCurrentVar(           Miff * const miff, MiffC ** const name, MiffValueType * const type, MiffN4 * const arrayCount);
+MiffBool        miffGetFileFlagIsBinary(     Miff * const miff, MiffBool * const isBinary);
+MiffBool        miffGetFileVersion(          Miff * const miff, MiffN8 * const version);
+MiffBool        miffGetFileVersionSubFormat( Miff * const miff, MiffC ** const subFormatName, MiffN8 * const subFormatVersion);
+MiffBool        miffGetKey(                  Miff * const miff, MiffC ** const key);
+MiffBool        miffGetNextRecord(           Miff * const miff);
+MiffBool        miffGetValueHeader(          Miff * const miff, MiffValueType * const type, MiffArrayFlag * const arrayFlag, MiffN4 * const arrayCount, MiffCompressFlag * const compressFlag, MiffN4 * const chunkByteCount);
+Miff1           miffGetValue1(               Miff * const miff);
+Miff2           miffGetValue2(               Miff * const miff);
+Miff3           miffGetValue3(               Miff * const miff);
+Miff4           miffGetValue4(               Miff * const miff);
+Miff8           miffGetValue8(               Miff * const miff);
+Miff16          miffGetValue16(              Miff * const miff);
+Miff32          miffGetValue32(              Miff * const miff);
+Miff64          miffGetValue64(              Miff * const miff);
+Miff128         miffGetValue128(             Miff * const miff);
+Miff256         miffGetValue256(             Miff * const miff);
 
-void      miffSetNextRecord(           Miff * const miff, MiffC const * const key, MiffValueType const type, MiffArrayFlag const arrayFlag, MiffN4 const arrayCount, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
-void      miffSetUserTypeVar(          Miff * const miff, MiffC const * const name, MiffValueType const type, MiffN4 const arrayCount);
-void      miffSetValue1(               Miff * const miff, Miff1   const value);
-void      miffSetValue2(               Miff * const miff, Miff2   const value);
-void      miffSetValue3(               Miff * const miff, Miff3   const value);
-void      miffSetValue4(               Miff * const miff, Miff4   const value);
-void      miffSetValue8(               Miff * const miff, Miff8   const value);
-void      miffSetValue16(              Miff * const miff, Miff16  const value);
-void      miffSetValue32(              Miff * const miff, Miff32  const value);
-void      miffSetValue64(              Miff * const miff, Miff64  const value);
-void      miffSetValue128(             Miff * const miff, Miff128 const value);
-void      miffSetValue256(             Miff * const miff, Miff256 const value);
+void            miffSetNextRecord(           Miff * const miff, MiffC const * const key, MiffValueType const type, MiffArrayFlag const arrayFlag, MiffN4 const arrayCount, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
+void            miffSetValue1(               Miff * const miff, Miff1   * const value);
+void            miffSetValue2(               Miff * const miff, Miff2   * const value);
+void            miffSetValue3(               Miff * const miff, Miff3   * const value);
+void            miffSetValue4(               Miff * const miff, Miff4   * const value);
+void            miffSetValue8(               Miff * const miff, Miff8   * const value);
+void            miffSetValue16(              Miff * const miff, Miff16  * const value);
+void            miffSetValue32(              Miff * const miff, Miff32  * const value);
+void            miffSetValue64(              Miff * const miff, Miff64  * const value);
+void            miffSetValue128(             Miff * const miff, Miff128 * const value);
+void            miffSetValue256(             Miff * const miff, Miff256 * const value);
 
-MiffBool  miffStart(                   MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompress const compressBuffer, MiffMemDecompress const decompressBuffer);
-void      miffStop(                    void);
+MiffBool        miffStart(                   MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
+void            miffStop(                    void);
+
+MiffBool        miffUserTypeAddVar(          Miff * const miff, MiffC const * const name, MiffValueType const type, MiffN4 const arrayCount);
+MiffValueType   miffUserTypeStart(           Miff * const miff, MiffC const * const name);
+void            miffUserTypeStop(            Miff * const miff);
 
 #endif

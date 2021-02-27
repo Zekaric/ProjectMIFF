@@ -1,3 +1,5 @@
 .vs
 Debug64
 Debug32
+Release32
+Release64

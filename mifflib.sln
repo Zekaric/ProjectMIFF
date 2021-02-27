@@ -5,6 +5,11 @@ VisualStudioVersion = 15.0.28307.1340
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mifflib", "mifflib\mifflib.vcxproj", "{C773B8B7-5C3B-44D4-8677-4BA59F03080C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mifflibTest", "mifflibTest\mifflibTest.vcxproj", "{7462140E-1E48-4583-AA97-201EF9D08FFF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C773B8B7-5C3B-44D4-8677-4BA59F03080C} = {C773B8B7-5C3B-44D4-8677-4BA59F03080C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +26,14 @@ Global
 		{C773B8B7-5C3B-44D4-8677-4BA59F03080C}.Release|x64.Build.0 = Release|x64
 		{C773B8B7-5C3B-44D4-8677-4BA59F03080C}.Release|x86.ActiveCfg = Release|Win32
 		{C773B8B7-5C3B-44D4-8677-4BA59F03080C}.Release|x86.Build.0 = Release|Win32
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Debug|x64.ActiveCfg = Debug|x64
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Debug|x64.Build.0 = Debug|x64
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Debug|x86.ActiveCfg = Debug|Win32
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Debug|x86.Build.0 = Debug|Win32
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Release|x64.ActiveCfg = Release|x64
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Release|x64.Build.0 = Release|x64
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Release|x86.ActiveCfg = Release|Win32
+		{7462140E-1E48-4583-AA97-201EF9D08FFF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

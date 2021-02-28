@@ -86,10 +86,15 @@ static MiffMemDecompress    _memDecompress            = NULL;
 static MiffN4               _base64State              = 0;
 static MiffN1               _base64Byte               = 0;
 static MiffN1               _base64LetterToValue[128];
+static MiffN1               _base64ValueToLetter[64];
 
 /******************************************************************************
 prototype:
 ******************************************************************************/
+static void     _Base64Restart(           void);
+static MiffBool _Base64Get(               Miff * const miff, Miff1 * const byte);
+static void     _Base64Set(               Miff * const miff, Miff1 * const byte);
+static void     _Base64SetEnd(            Miff * const miff);
 static void     _ByteSwap2(               Miff const * const miff, Miff2 * const value);
 static void     _ByteSwap4(               Miff const * const miff, Miff4 * const value);
 static void     _ByteSwap8(               Miff const * const miff, Miff8 * const value);
@@ -100,8 +105,6 @@ static MiffN4   _MiffCLetterToUTFLetter(  MiffN4 const letter, MiffN1 * const a,
 static MiffBool _MiffCToUTF(              MiffN4 const strCount, MiffC const * const str, MiffN4 * const utfByteCount, MiffN1 ** const utf);
 static MiffBool _MiffCToUTFKey(           MiffN4 const strCount, MiffC const * const str, MiffN1 * const utfByteCount, MiffN1 * const utf);
                                           
-static void     _ReadBase64Restart(       void);
-static MiffBool _ReadBase64Byte(          Miff * const miff, Miff1 * const byte);
 static MiffN1   _ReadFirstLetter(         Miff * const miff);
 static MiffBool _ReadKey(                 Miff * const miff, MiffMode const mode);
 static MiffBool _ReadPart(                Miff * const miff, MiffN4 const maxByteCount, MiffN4 * const partByteCount, MiffN1 *  const part);
@@ -641,7 +644,21 @@ Miff256 miffGetValue256(Miff * const miff)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetBoolean
+******************************************************************************/
+void miffSetBoolean(Miff * const miff, MiffC const * const key, MiffBool const value)
+{
+   Miff1 vtemp;
+
+   vtemp.n = (value ? 'T' : 'F');
+
+   miffSetNextRecord(miff, key, miffValueTypeBOOLEAN, miffArrayFlagIS_SINGLE, 1, miffCompressFlagIS_UNCOMPRESSED, 0);
+   miffSetValue1(miff, &vtemp);
+   _WriteEndRecord(miff, miff->mode);
+}
+
+/******************************************************************************
+func: miffSetI1
 ******************************************************************************/
 void miffSetI1(Miff * const miff, MiffC const * const key, MiffI1 const value)
 {
@@ -655,7 +672,7 @@ void miffSetI1(Miff * const miff, MiffC const * const key, MiffI1 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetI2
 ******************************************************************************/
 void miffSetI2(Miff * const miff, MiffC const * const key, MiffI2 const value)
 {
@@ -669,7 +686,7 @@ void miffSetI2(Miff * const miff, MiffC const * const key, MiffI2 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetI4
 ******************************************************************************/
 void miffSetI4(Miff * const miff, MiffC const * const key, MiffI4 const value)
 {
@@ -683,7 +700,7 @@ void miffSetI4(Miff * const miff, MiffC const * const key, MiffI4 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetI8
 ******************************************************************************/
 void miffSetI8(Miff * const miff, MiffC const * const key, MiffI8 const value)
 {
@@ -697,7 +714,7 @@ void miffSetI8(Miff * const miff, MiffC const * const key, MiffI8 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetN1
 ******************************************************************************/
 void miffSetN1(Miff * const miff, MiffC const * const key, MiffN1 const value)
 {
@@ -711,7 +728,7 @@ void miffSetN1(Miff * const miff, MiffC const * const key, MiffN1 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetN2
 ******************************************************************************/
 void miffSetN2(Miff * const miff, MiffC const * const key, MiffN2 const value)
 {
@@ -725,7 +742,7 @@ void miffSetN2(Miff * const miff, MiffC const * const key, MiffN2 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetN4
 ******************************************************************************/
 void miffSetN4(Miff * const miff, MiffC const * const key, MiffN4 const value)
 {
@@ -739,7 +756,7 @@ void miffSetN4(Miff * const miff, MiffC const * const key, MiffN4 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetN8
 ******************************************************************************/
 void miffSetN8(Miff * const miff, MiffC const * const key, MiffN8 const value)
 {
@@ -753,7 +770,7 @@ void miffSetN8(Miff * const miff, MiffC const * const key, MiffN8 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetR4
 ******************************************************************************/
 void miffSetR4(Miff * const miff, MiffC const * const key, MiffR4 const value)
 {
@@ -767,7 +784,7 @@ void miffSetR4(Miff * const miff, MiffC const * const key, MiffR4 const value)
 }
 
 /******************************************************************************
-func: miffSet
+func: miffSetR8
 ******************************************************************************/
 void miffSetR8(Miff * const miff, MiffC const * const key, MiffR8 const value)
 {
@@ -777,6 +794,74 @@ void miffSetR8(Miff * const miff, MiffC const * const key, MiffR8 const value)
 
    miffSetNextRecord(miff, key, miffValueTypeR8, miffArrayFlagIS_SINGLE, 1, miffCompressFlagIS_UNCOMPRESSED, 0);
    miffSetValue8(miff, &vtemp);
+   _WriteEndRecord(miff, miff->mode);
+}
+
+/******************************************************************************
+func: miffSetType
+******************************************************************************/
+void miffSetType(Miff * const miff, MiffC const * const key, MiffValueType const value)
+{
+   Miff2 vtemp;
+
+   miffSetNextRecord(miff, key, miffValueTypeTYPE, miffArrayFlagIS_SINGLE, 1, miffCompressFlagIS_UNCOMPRESSED, 0);
+
+   if (miff->mode == miffModeBINARY)
+   {
+      vtemp.n = value;
+      miffSetValue2(miff, &vtemp);
+   }
+   else
+   {
+      switch (value)
+      {
+      case miffValueTypeKEY_VALUE_BLOCK:     miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "[]");         break;
+      case miffValueTypeVALUE_STREAM_BLOCK:  miff->setBuffer1(miff->dataRepo, 5, (Miff1 *) "[...]");      break;
+      case miffValueTypeBINARY_DATA:         miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "...");        break;
+      case miffValueTypeEMBEDDED_FILE:       miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "file");       break;
+      case miffValueTypeTYPE:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "type");       break;
+      case miffValueTypeSTRING:              miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "\"\"");       break;
+      case miffValueTypePATH:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "path");       break;
+      case miffValueTypeKEY_ONLY_NO_VALUE:   miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) ".");          break;
+      case miffValueTypeUSER_TYPE:           miff->setBuffer1(miff->dataRepo, 8, (Miff1 *) "userType");   break;
+      case miffValueTypeBOOLEAN:             miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "bool");       break;
+      case miffValueTypeI1:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i1");         break;
+      case miffValueTypeI2:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i2");         break;
+      case miffValueTypeI3:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i3");         break;
+      case miffValueTypeI4:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i4");         break;
+      case miffValueTypeI8:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i8");         break;
+      case miffValueTypeI16:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "i16");        break;
+      case miffValueTypeI32:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "i32");        break;
+      case miffValueTypeI64:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "i64");        break;
+      case miffValueTypeI128:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "i128");       break;
+      case miffValueTypeI256:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "i256");       break;
+      case miffValueTypeN1:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "n1");         break;
+      case miffValueTypeN2:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "n2");         break;
+      case miffValueTypeN3:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "n3");         break;
+      case miffValueTypeN4:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "n4");         break;
+      case miffValueTypeN8:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "n8");         break;
+      case miffValueTypeN16:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "n16");        break;
+      case miffValueTypeN32:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "n32");        break;
+      case miffValueTypeN64:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "n64");        break;
+      case miffValueTypeN128:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "n128");       break;
+      case miffValueTypeN256:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "n256");       break;
+      case miffValueTypeR4:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "r4");         break;
+      case miffValueTypeR8:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "r8");         break;
+      case miffValueTypeR16:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "r16");        break;
+      case miffValueTypeR32:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "r32");        break;
+      case miffValueTypeR64:                 miff->setBuffer1(miff->dataRepo, 3, (Miff1 *) "r64");        break;
+      case miffValueTypeR128:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "r128");       break;
+      case miffValueTypeR256:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "r256");       break;
+      default:
+         // User Type.
+         miff->setBuffer1(
+            miff->dataRepo, 
+            miff->userTypeList[value].nameByteCount, 
+            (Miff1 *) miff->userTypeList[value].name);
+         break;
+      }
+   }
+
    _WriteEndRecord(miff, miff->mode);
 }
 
@@ -978,6 +1063,72 @@ MiffBool miffStart(MiffMemCreate const memCreate, MiffMemDestroy const memDestro
    _base64LetterToValue['+'] = index++;
    _base64LetterToValue['/'] = index++;
 
+   index = 0;
+   _base64ValueToLetter[index++] = 'A';
+   _base64ValueToLetter[index++] = 'B';
+   _base64ValueToLetter[index++] = 'C';
+   _base64ValueToLetter[index++] = 'D';
+   _base64ValueToLetter[index++] = 'E';
+   _base64ValueToLetter[index++] = 'F';
+   _base64ValueToLetter[index++] = 'G';
+   _base64ValueToLetter[index++] = 'H';
+   _base64ValueToLetter[index++] = 'I';
+   _base64ValueToLetter[index++] = 'J';
+   _base64ValueToLetter[index++] = 'K';
+   _base64ValueToLetter[index++] = 'L';
+   _base64ValueToLetter[index++] = 'M';
+   _base64ValueToLetter[index++] = 'N';
+   _base64ValueToLetter[index++] = 'O';
+   _base64ValueToLetter[index++] = 'P';
+   _base64ValueToLetter[index++] = 'Q';
+   _base64ValueToLetter[index++] = 'R';
+   _base64ValueToLetter[index++] = 'S';
+   _base64ValueToLetter[index++] = 'T';
+   _base64ValueToLetter[index++] = 'U';
+   _base64ValueToLetter[index++] = 'V';
+   _base64ValueToLetter[index++] = 'W';
+   _base64ValueToLetter[index++] = 'X';
+   _base64ValueToLetter[index++] = 'Y';
+   _base64ValueToLetter[index++] = 'Z';
+   _base64ValueToLetter[index++] = 'a';
+   _base64ValueToLetter[index++] = 'b';
+   _base64ValueToLetter[index++] = 'c';
+   _base64ValueToLetter[index++] = 'd';
+   _base64ValueToLetter[index++] = 'e';
+   _base64ValueToLetter[index++] = 'f';
+   _base64ValueToLetter[index++] = 'g';
+   _base64ValueToLetter[index++] = 'h';
+   _base64ValueToLetter[index++] = 'i';
+   _base64ValueToLetter[index++] = 'j';
+   _base64ValueToLetter[index++] = 'k';
+   _base64ValueToLetter[index++] = 'l';
+   _base64ValueToLetter[index++] = 'm';
+   _base64ValueToLetter[index++] = 'n';
+   _base64ValueToLetter[index++] = 'o';
+   _base64ValueToLetter[index++] = 'p';
+   _base64ValueToLetter[index++] = 'q';
+   _base64ValueToLetter[index++] = 'r';
+   _base64ValueToLetter[index++] = 's';
+   _base64ValueToLetter[index++] = 't';
+   _base64ValueToLetter[index++] = 'u';
+   _base64ValueToLetter[index++] = 'v';
+   _base64ValueToLetter[index++] = 'w';
+   _base64ValueToLetter[index++] = 'x';
+   _base64ValueToLetter[index++] = 'y';
+   _base64ValueToLetter[index++] = 'z';
+   _base64ValueToLetter[index++] = '0';
+   _base64ValueToLetter[index++] = '1';
+   _base64ValueToLetter[index++] = '2';
+   _base64ValueToLetter[index++] = '3';
+   _base64ValueToLetter[index++] = '4';
+   _base64ValueToLetter[index++] = '5';
+   _base64ValueToLetter[index++] = '6';
+   _base64ValueToLetter[index++] = '7';
+   _base64ValueToLetter[index++] = '8';
+   _base64ValueToLetter[index++] = '9';
+   _base64ValueToLetter[index++] = '+';
+   _base64ValueToLetter[index++] = '/';
+
    returnTrue;
 }
 
@@ -1105,19 +1256,176 @@ local:
 function:
 ******************************************************************************/
 /******************************************************************************
+func: _Base64Restart
+******************************************************************************/
+static void _Base64Restart(void)
+{
+   _base64State = 0;
+   _base64Byte  = 0;
+}
+
+/******************************************************************************
+func: _Base64Get
+******************************************************************************/
+static MiffBool _Base64Get(Miff * const miff, Miff1 * const byte)
+{
+   byte->n = 0;
+   
+   switch (_base64State)
+   {
+   case 0:
+      // byte to fill      Incoming base64 byte
+      // [........]        [......]
+
+      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
+
+      // [111111..]        [111111]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 2);
+
+      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
+
+      // [11111122]        [22....]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 4);
+
+      // Remainder [..2222]
+      _base64State = 1;
+      break;
+
+   case 1:
+      // byte to fill      Incoming base64 byte
+      // [........]        [..xxxx]
+
+      // [xxxx....]        [..xxxx]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 4);
+
+      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
+
+      // [xxxx1111]        [1111..]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 2);
+
+      // Remainder [....22]
+      _base64State = 2;
+      break;
+
+   case 2:
+      // byte to fill      Incoming base64 byte
+      // [........]        [....xx]
+
+      // [xx......]        [....xx]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 6);
+
+      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
+
+      // [xx111111]        [111111]
+      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte]);
+
+      // Remainder [......]
+      _base64State = 0;
+      break;
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _Base64Set
+******************************************************************************/
+static void _Base64Set(Miff * const miff, Miff1 * const byte)
+{
+   MiffN1 sixbit;
+
+   switch (_base64State)
+   {
+   case 0:
+      // Remainder byte
+      // [........]
+      
+      sixbit = byte->n >> 2;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+
+      // Remainder [......xx]
+      _base64Byte  = byte->n;
+      _base64State = 1;
+      break;
+
+   case 1:
+      // Remainder byte
+      // [......xx]
+
+      sixbit = (_base64Byte & 0x3) | byte->n >> 4;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+
+      // Remainder [....xxxx]
+      _base64Byte  = byte->n;
+      _base64State = 2;
+      break;
+
+   case 2:
+      // Remainder byte
+      // [....xxxx]
+
+      sixbit = (_base64Byte & 0xf) | byte->n >> 6;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+
+      sixbit = byte->n & 0x3f;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+
+      // Remainder [........]
+      _base64Byte  = 0;
+      _base64State = 0;
+      break;
+   }
+}
+
+/******************************************************************************
+func: _Base64SetEnd
+
+Send out the remainder bits.
+******************************************************************************/
+static void _Base64SetEnd(Miff * const miff)
+{
+   MiffN1 sixbit;
+
+   switch (_base64State)
+   {
+   case 0:
+      // Remainder byte
+      // [........]
+
+      // Nothing to do.
+      break;
+
+   case 1:
+      // Remainder byte
+      // [......xx]
+
+      sixbit = _base64Byte & 0x3;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+      break;
+
+   case 2:
+      // Remainder byte
+      // [....xxxx]
+
+      sixbit = _base64Byte & 0xf;
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64ValueToLetter[sixbit]);
+      break;
+   }
+
+   _base64Byte  = 0;
+   _base64State = 0;
+}
+
+/******************************************************************************
 func: _ByteSwap2
 ******************************************************************************/
 static void _ByteSwap2(Miff const * const miff, Miff2 * const value)
 {
    if (miff->isByteSwapping)
    {
-      value->byte[0] ^= value->byte[3];
-      value->byte[3] ^= value->byte[0];
-      value->byte[0] ^= value->byte[3];
-
-      value->byte[1] ^= value->byte[2];
-      value->byte[2] ^= value->byte[1];
-      value->byte[1] ^= value->byte[2];
+      value->byte[0] ^= value->byte[1];
+      value->byte[1] ^= value->byte[0];
+      value->byte[0] ^= value->byte[1];
    }
 }
 
@@ -1325,79 +1633,6 @@ static MiffBool _MiffCToUTFKey(MiffN4 const count, MiffC const * const str,
    }
 
    *utfByteCount = (MiffN1) utfIndex;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadBase64Restart
-******************************************************************************/
-static void _ReadBase64Restart(void)
-{
-   _base64State = 0;
-   _base64Byte  = 0;
-}
-
-/******************************************************************************
-func: _ReadBase64Byte
-******************************************************************************/
-static MiffBool _ReadBase64Byte(Miff * const miff, Miff1 * const byte)
-{
-   byte->n = 0;
-
-
-   switch (_base64State)
-   {
-   case 0:
-      // byte to fill      Incoming base64 byte
-      // [........]        [......]
-
-      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
-
-      // [111111..]        [111111]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 2);
-
-      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
-
-      // [11111122]        [22....]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 4);
-
-      // Remainder [..2222]
-      _base64State = 1;
-      break;
-
-   case 1:
-      // byte to fill      Incoming base64 byte
-      // [........]        [..xxxx]
-
-      // [xxxx....]        [..xxxx]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 4);
-
-      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
-
-      // [xxxx1111]        [1111..]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 2);
-
-      // Remainder [....22]
-      _base64State = 2;
-      break;
-
-   case 2:
-      // byte to fill      Incoming base64 byte
-      // [........]        [....xx]
-
-      // [xx......]        [....xx]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte] << 6);
-
-      returnFalseIf(!miff->getBuffer1(miff->dataRepo, 1, (Miff1 *) &_base64Byte));
-
-      // [xx111111]        [111111]
-      byte->n |= (MiffN1) (_base64LetterToValue[_base64Byte]);
-
-      // Remainder [......]
-      _base64State = 0;
-      break;
-   }
 
    returnTrue;
 }
@@ -1631,7 +1866,9 @@ static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "type"))       miff->valueType = miffValueTypeTYPE;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "\"\""))       miff->valueType = miffValueTypeSTRING;
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "path"))       miff->valueType = miffValueTypePATH;
+      else if (_MemIsEqual(typeByteCount, type, 1, (MiffN1 *) "."))          miff->valueType = miffValueTypeKEY_ONLY_NO_VALUE;
       else if (_MemIsEqual(typeByteCount, type, 8, (MiffN1 *) "userType"))   miff->valueType = miffValueTypeUSER_TYPE;
+      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "bool"))       miff->valueType = miffValueTypeBOOLEAN;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i1"))         miff->valueType = miffValueTypeI1;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i2"))         miff->valueType = miffValueTypeI2;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i3"))         miff->valueType = miffValueTypeI3;
@@ -1741,14 +1978,14 @@ static MiffBool _ReadValue2(Miff * const miff, MiffMode const mode,
       if (miff->isByteSwapping)
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
       }
       else
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]));
       }
 
       returnTrue;
@@ -1797,18 +2034,18 @@ static MiffBool _ReadValue4(Miff * const miff, MiffMode const mode,
       if (miff->isByteSwapping)
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[3]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[2]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
       }
       else
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[2]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[3]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[3]));
       }
 
       returnTrue;
@@ -1853,26 +2090,26 @@ static MiffBool _ReadValue8(Miff * const miff, MiffMode const mode,
       if (miff->isByteSwapping)
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[7]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[6]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[5]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[4]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[3]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[2]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[7]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[6]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[5]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[4]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
       }
       else
       {
          returnFalseIf(
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[0]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[1]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[2]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[3]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[4]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[5]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[6]) ||
-            !_ReadBase64Byte(miff, (Miff1 *) &value->byte[7]));
+            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[4]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[5]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[6]) ||
+            !_Base64Get(miff, (Miff1 *) &value->byte[7]));
       }
 
       returnTrue;
@@ -2104,6 +2341,7 @@ static void _WriteValueHeader(Miff * const miff, MiffMode const mode, MiffValueT
       case miffValueTypeSTRING:              miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "\"\"");       break;
       case miffValueTypePATH:                miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "path");       break;
       case miffValueTypeUSER_TYPE:           miff->setBuffer1(miff->dataRepo, 8, (Miff1 *) "userType");   break;
+      case miffValueTypeBOOLEAN:             miff->setBuffer1(miff->dataRepo, 4, (Miff1 *) "bool");       break;
       case miffValueTypeI1:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i1");         break;
       case miffValueTypeI2:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i2");         break;
       case miffValueTypeI3:                  miff->setBuffer1(miff->dataRepo, 2, (Miff1 *) "i3");         break;
@@ -2231,6 +2469,12 @@ static void _WriteValue1(Miff * const miff, MiffMode const mode, MiffValueType c
       return;
    }
 
+   if (type == miffValueTypeBOOLEAN)
+   {
+      miff->setBuffer1(miff->dataRepo, 1, (Miff1 *) &value->n);
+      return;
+   }
+
    if (type == miffValueTypeI1)
    {
       if (value->i < 0)
@@ -2292,7 +2536,14 @@ static void _WriteValue4(Miff * const miff, MiffMode const mode, MiffValueType c
 
    if (type == miffValueTypeR4)
    {
-      //TODO
+      _ByteSwap4(miff, value);
+
+      _Base64Set(   miff, (Miff1 *) &value->byte[0]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[1]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[2]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[3]);
+      _Base64SetEnd(miff);
+      return;
    }
 
    if (type == miffValueTypeI4)
@@ -2324,7 +2575,18 @@ static void _WriteValue8(Miff * const miff, MiffMode const mode, MiffValueType c
 
    if (type == miffValueTypeR8)
    {
-      //TODO
+      _ByteSwap8(miff, value);
+
+      _Base64Set(   miff, (Miff1 *) &value->byte[0]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[1]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[2]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[3]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[4]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[5]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[6]);
+      _Base64Set(   miff, (Miff1 *) &value->byte[7]);
+      _Base64SetEnd(miff);
+      return;
    }
 
    if (type == miffValueTypeI8)

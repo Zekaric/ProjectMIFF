@@ -168,7 +168,7 @@ tc	A specific string value that represents a relative path (relative to the MIFF
 
 t-
 tcx	8
-tcx	
+tcx	.
 tc	No value, just a key whose presence or absense is enough information.
 
 t-

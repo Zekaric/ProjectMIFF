@@ -326,6 +326,7 @@ Miff64          miffGetValue64(              Miff * const miff);
 Miff128         miffGetValue128(             Miff * const miff);
 Miff256         miffGetValue256(             Miff * const miff);
 
+void            miffSetBoolean(              Miff * const miff, MiffC const * const key, MiffBool const value);
 void            miffSetI1(                   Miff * const miff, MiffC const * const key, MiffI1 const value);
 void            miffSetI2(                   Miff * const miff, MiffC const * const key, MiffI2 const value);
 void            miffSetI4(                   Miff * const miff, MiffC const * const key, MiffI4 const value);
@@ -334,9 +335,10 @@ void            miffSetN1(                   Miff * const miff, MiffC const * co
 void            miffSetN2(                   Miff * const miff, MiffC const * const key, MiffN2 const value);
 void            miffSetN4(                   Miff * const miff, MiffC const * const key, MiffN4 const value);
 void            miffSetN8(                   Miff * const miff, MiffC const * const key, MiffN8 const value);
+void            miffSetNextRecord(           Miff * const miff, MiffC const * const key, MiffValueType const type, MiffArrayFlag const arrayFlag, MiffN4 const arrayCount, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
 void            miffSetR4(                   Miff * const miff, MiffC const * const key, MiffR4 const value);
 void            miffSetR8(                   Miff * const miff, MiffC const * const key, MiffR8 const value);
-void            miffSetNextRecord(           Miff * const miff, MiffC const * const key, MiffValueType const type, MiffArrayFlag const arrayFlag, MiffN4 const arrayCount, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
+void            miffSetType(                 Miff * const miff, MiffC const * const key, MiffValueType const value);
 void            miffSetValue1(               Miff * const miff, Miff1   * const value);
 void            miffSetValue2(               Miff * const miff, Miff2   * const value);
 void            miffSetValue3(               Miff * const miff, Miff3   * const value);

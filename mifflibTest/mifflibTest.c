@@ -292,6 +292,8 @@ static MiffBool _TestWrite(MiffC * const fileName, MiffMode const mode)
       miffSetType(miff, L"TypeBool", miffValueTypeBOOLEAN);
       miffSetType(miff, L"TypeKey",  miffValueTypeKEY_ONLY_NO_VALUE);
 
+      miffSetString(miff, L"String", L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
       break;
    }
 

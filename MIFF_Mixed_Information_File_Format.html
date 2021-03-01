@@ -198,8 +198,7 @@ $cost
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>8</td>
-<td class="zword"><nobr>	
-</td>
+<td class="zword"><nobr>.</td>
 <td class="zword">No value, just a key whose presence or absense is enough information.</td>
 </tr>
 <tr class="zword">
@@ -823,18 +822,18 @@ Binary                                                     Text
 Binary                                                     Text
 
 
-[n1     :5]                                                type1 type- mat3r4\n
+[n1     :5]                                                type1 type- bool\n
 [n1 * 5 :type1]
 [n2     :00|00|5]
-[n2     :130]
+[n2     :10]
 
 
-[n1     :5]                                                type2 type= 2 mat3r8 v3r8\n
+[n1     :5]                                                type2 type= 2 bool .\n
 [n1 * 5 :type2]
 [n2     :00|01|5]
 [n4     :2]
-[n2     :131]
-[n2     :201]
+[n2     :10]
+[n2     :8]
 
 
 [n1     :5]                                                type3 typeZ 100 31 ...
@@ -955,11 +954,11 @@ Binary                                                     Text
 </pre>
 <p class="zword">The text case is a little more involved.</p>
 <pre class="zword">
-[key] ""- [escape character][string data]\n
+[key] ""- "[string data]\n
 
 
 [key] ""= [array count]\n
-[excape character][string data]\n
+"[string data]\n
 ...
 
 
@@ -988,23 +987,31 @@ Binary                                                     Text
 [compressed byte count] [Base64 compressed data]\n
 ...
 </pre>
-<p class="zword">If no compression is used then before the string starts you need to define the escape character.  This is needed to encode control characters like tabs, new lines, cursor return etc.  All the usual control characters will escaped using the control character provided.  If your string already has a escape charater combination inside and it should not be treated as a control character, then you need to pick a different escape character.  Control characters need not be 'printable' but it would help if it was.</p>
-<p class="zword">Multi-line strings are placed on one line.  With the escapement of these control characters (\n, \r etc.) this can be done.</p>
-<p class="zword">There cannot be any separators between the escape character and the start of the string.  If separators exist between this escape character and the start of the string, then those separators are part of the string.</p>
+<p class="zword">If no compression is used then the string starts right after the " character till the end of the line but not including the new line character at the end of the line.</p>
+<p class="zword">Multi-line strings are placed on one line.  This is done by escaping new line and cursor return characters as well as some other characters.  See below.</p>
 <pre class="zword">
-string1 ""- \<-escape character being used.  No separators after this character.  Otherwise those separators are part of the string.  This is a single string value.\nBut multiline.\n
-
-
-string2 ""- ~Example of changing the escape character.~nThis is a new line\n
+\a - bell           - 0x07
+\b - backspace      - 0x08
+\t - tab            - 0x09
+\n - new line       - 0x0a
+\v - vertical tab   - 0x0b
+\f - form feed      - 0x0c
+\r - cursor return  - 0x0d
+\e - escape         - 0x1b
+\\ - \
+</pre>
+<p class="zword">Examples:</p>
+<pre class="zword">
+string1 ""- "No separators after this character.  Otherwise those separators are part of the string.  This is a single string value.\nBut multiline.\n
 
 
 string3 ""z 1024 754 ...\n
 
 
 stringList1 ""= 3\n
-^This is string 1, line 1.^r^nThis is string1, line 2.^r^n\n
-/This is string 2.\n
-@This is string 3.  Escape characters can change\n
+"This is string 1, line 1.\r\nThis is string1, line 2.\r\n\n
+"This is string 2.\n
+"This is string 3.\n
 
 
 stringList2 ""Z 3\n
@@ -1012,14 +1019,14 @@ stringList2 ""Z 3\n
 42 15 ...\n
 75 34 ...\n
 </pre>
-<p class="zword">If the array flag is used, the individual strings will reside on their own line.  Meaning, as soon as the [array count] is written a \n should be present.  Each string is on it's own line following the key line.</p>
-<p class="zword">For an array of strings, Again, the first character of the string will be the escape character and then immediately followed by the string.</p>
+<p class="zword">If the array flag is used, the individual strings will reside on their own line.  Meaning, as soon as the [array count] is written a \n should be present.  Each string is on it's own line.</p>
+<p class="zword">For an array of strings, Again, the first character of the string will be the " character and then immediately followed by the string.  Any space preceeding the " is ignored.</p>
 <p class="zword">For a compressed single string, the string is compressed first before converting to Base64.  No escape character or string modification is needed since it is treated like binary data.  A byte count of the string and a compressed byte count is required to follow.</p>
 <p class="zword">For a compressed array of strings, each string is concatenated together to form one long buffer.  Then compressed.  After the [array count] there will be a string count for each string in the array followed by the compressed byte count of this concatenated buffer.</p>
 
 <h2 class="zword"><a name="3.7">3.7 - Path Values</a></h2>
-<p class="zword">A string defining a relative path (relative to the MIFF file location.)  Folders are separated by a "/" only.  No "." or ".." are allowed as part of the path.  I am still investigating if there is a universal way to define paths.  UNC may be it but I haven't convinced myself yet.</p>
-<p class="zword">See strings (section 3.6) for storage rules.</p>
+<p class="zword">A string defining a relative path (relative to the MIFF file location.)  Folders are separated by a "/" only.  No "." or ".." are allowed as part of the path.</p>
+<p class="zword">See String Values above for storage rules.  They are the same.</p>
 
 <h2 class="zword"><a name="3.8">3.8 - Boolean values</a></h2>
 <pre class="zword">
@@ -1029,7 +1036,7 @@ Binary                                                     Text
 [n1                        :key byte count]                [key] bool- [boolean value]\n
 [n1 * key byte count       :key]
 [n2                        :value header  - 00|00|10]
-[n1                        :boolean value - 't'|'f']
+[n1                        :boolean value - 'T'|'F']
 
 
 [n1                        :key byte count]                [key] bool= [array count] [boolean value] * (array count)\n
@@ -1058,8 +1065,8 @@ Binary                                                     Text
 [n1 * compressed byte count:compressed data]
 ...
 </pre>
-<p class="zword">By default, the value will be 't' for true, or 'f' for false.</p>
-<p class="zword">For array values in text files, the value will be a string of 't' or 'f' letters with no separator in between to save some space.</p>
+<p class="zword">By default, the value will be 'T' for true, or 'F' for false.</p>
+<p class="zword">For array values in text files, the value will be a string of 'T' or 'F' letters with no separator in between to save some space.</p>
 <p class="zword">For array values in binary , the value will be made into a bitmap first.  See diagram below for bit assignment.</p>
 <p class="zword">For compressed array value, a bitmap is made and then compress.  See diagram below for bit assignment.</p>
 <pre class="zword">
@@ -1075,13 +1082,13 @@ Byte 0                            Byte 1
 Binary                                                     Text
 
 
-[n1                        :5]                             Bool1 bool- t\n
+[n1                        :5]                             Bool1 bool- T\n
 [n1 * 5                    :Bool1]
 [n2                        :00|00|10]
-[n1                        :t]
+[n1                        :T]
                        
 
-[n1                        :5]                             Bool2 bool= 10 tttttfffff\n
+[n1                        :5]                             Bool2 bool= 10 TTTTTFFFFF\n
 [n1 * 5                    :Bool2]
 [n2                        :00|01|10]
 [n4                        :array count]

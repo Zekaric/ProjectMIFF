@@ -22,13 +22,15 @@
 **2 - Format: Base**<br />
     2.1 - File Header<br />
     2.2 - Content<br />
-        2.2.1 - Numbers<br />
-        2.2.2 - Key Value Composition<br />
-            2.2.2.1 - Key<br />
-            2.2.2.2 - Value Header<br />
-                2.2.2.2.1 - Type Code<br />
-                2.2.2.2.2 - array and compression flag<br />
-            2.2.2.3 - Value<br />
+        2.2.1 - Binary Syte Sequences<br />
+        2.2.2 - Numbers<br />
+        2.2.3 - Key Value Composition<br />
+            2.2.3.1 - Key<br />
+            2.2.3.2 - Value Header<br />
+                2.2.3.2.1 - Type Code<br />
+                2.2.3.2.2 - Array Count Flag<br />
+                2.2.3.2.3 - Compression Flag<br />
+            2.2.3.3 - Value<br />
     2.3 - Text Format<br />
         2.3.1 - Whitespace Characters<br />
         2.3.2 - Separator Characters<br />
@@ -44,8 +46,8 @@
             2.4.1.2 - Value Header<br />
             2.4.1.3 - Value<br />
 **3 - Fromat: Value Specifics**<br />
-    3.1 - Key-Value Block<br />
-    3.2 - Value Stream<br />
+    3.1 - Key only<br />
+    3.2 - Key-Value Block Begin and End.<br />
     3.3 - Binary values<br />
     3.4 - Embedded files<br />
     3.5 - Type value<br />
@@ -82,18 +84,18 @@ What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file fo
 
 **Why not XML or JSON?**
 
-I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I won't claim MIFF is better, it is just different.
+I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.
 
 **Why Big Endian for multibyte data types?**
 
-In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a Little Endian machine which Windows has always been.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format isn't meant to be good in performance; its main goal is to be good in getting data moved from one place to another.
+In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different Endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another.
 
 ## 1.4 - Disclosure
 
 
 I, Robbert de Groot, have been a professional Software Developer since 1995.
 
-This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing options which I find lacking or distasteful in some fashion.
+This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing or developing options which I find lacking or distasteful in some fashion.
 
 I can be reached at the following email address.
 
@@ -102,13 +104,13 @@ zekaric@gmail.com
 # 2 - Format: Base
 
 
-There are two representations of the format.  A Text file and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
+There are two representations of the format.  A Text file representation and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
 
 A MIFF format is essentially a collection of key value pairs.  Values are typed.  Nesting and user types are allowed.
 
 The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file format to move data from one program to another.
 
-Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 but without any line feeds, cursor returns to break up the buffer.
+Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.
 
 ## 2.1 - File Header
 
@@ -116,39 +118,55 @@ Common to both Text and Binary formats, any Byte data that is encode or stored a
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
 ```
-MIFF_TXT n8- 1\n
-[Sub-Format Name] n8- [Sub-Format Version]\n
+"MIFF" \t "." \n
+"1" \t "." \n
+"TXT" \t "." \n
+[Sub-Format Name string] \t "." \n
+[Sub-Format Version string] \t "." \n
 ```
 
 or
 
 ```
-MIFF_BIN n8- 1\n
-[Sub-Format Name] n8- [Sub-Format Version]\n
+"MIFF"\n
+"1"\n
+"BIN"\n
+[Sub-Format Name string]\n
+[Sub-Format Version string]\n
 ```
 
-These lines may look a little odd if you do not know anything about the MIFF format.  In short the first two lines are MIFF Key Value pairs in Text format.
+These lines may look a little odd if you do not know anything about the MIFF format.  Anything in quotes (the quotes will not be written out) is what is seen in the file.
 
-First line is the MIFF format and style for the file and the version number of the MIFF format.
+\n means a new line character.
 
-Second line is the sub format of the MIFF file and the version of the sub format.
 
-"MIFF_TXT" on the first line indicates that after the second line we will see key value pairs in text MIFF representation.  "MIFF_BIN" means that after the \n of the second line we will see the key value pairs in the binary MIFF representation.
+* **Line 1** - Format of the file.  MIFF.
 
-"n8-" indicates that the version number is a single natural number using 8 Bytes.  Natural number being unsigned integer if programmers are wondering.
+* **Line 2** - Version of the file.  Version 1.
 
-Currently MIFF is at version 1.  This will only use whole numbers instead of the usual XX.XX.XX.XX versioning of software.  This is written as a readable decimal number.
+* **Line 3** - Representation of the file.  TXT for text, or BIN for binary.
 
-[Sub-Format Name] will be a UTF8 string and defines the format of what is being stored in the file.  Do not include spaces in this name.
+* **Line 4** - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.
 
-Like the first line we have a single natural number for version of this sub-format.
+* **Line 5** - Sub-Format version identifier.
+
+If the representation is Binary then right after the \n of the fifth line, the binary format will begin.
+
+If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain tabs (\t) or new lines (\n).  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte size.
 
 ## 2.2 - Content
 
 
 Before going into the specifics of the format we will cover some things at a high level.
 
-### 2.2.1 - Numbers
+### 2.2.1 - Binary Syte Sequences
+
+
+Everything within "[]" is a byte sequence of a known size.  Each byte seqence is separated but in reality it is immediately following the previous byte sequence.  Nothing extra is added between sequences.
+
+A byte sequence is "[" [Byte count] ":" [Name of this Byte sequence] "]", where Byte count is a number indicating the number of bytes this sequence uses.
+
+### 2.2.2 - Numbers
 
 
 **Natural numbers** (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
@@ -157,23 +175,25 @@ Before going into the specifics of the format we will cover some things at a hig
 
 **Real numbers   ** (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
 
-### 2.2.2 - Key Value Composition
+### 2.2.3 - Key Value Composition
 
 
 ```
-[key] [value header] [value]\n
+[key] [value header] [value]
 ```
 
-**[key]         ** will be a string that will somewhat uniquely identify the value.  A key can not be longer than 255 Bytes in UTF8 format.  Longer keys will be truncated.
+**[key]         ** will be a string that will somewhat uniquely identify the value.
 
-**[value header]** will be an code (binary) or sequence of characters (text) that will dictate what the value will look like.
+**[value header]** will be a code (binary) or sequence of characters (text) that will dictate what the value will look like.
 
 **[value]       ** will depend on the **[value header]** on what is contained here.
 
-#### 2.2.2.1 - Key
+The fields are separated by a single \t character.
+
+#### 2.2.3.1 - Key
 
 
-Keys are always a single string of characters and are limited to printable UNICODE code points.  Meaning no whitespace of any kind inside a key.  They are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up being more than 1 byte in size.
+Keys are always a single string of any character in UTF8 encoding as long as none are \t and \n.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just " " and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
 
 ```
 12345
@@ -181,54 +201,74 @@ Keys are always a single string of characters and are limited to printable UNICO
 a_b_c
 $cost
 été
+This is also a valid key with internal spaces
 ```
 
-The key can be anything and in any language.  As long it does not include any whitespace.  It should use printable characters only.
-
-#### 2.2.2.2 - Value Header
+#### 2.2.3.2 - Value Header
 
 
-A value header is comprised of a type code and an array and compression flag.
+A value header is comprised of a type code, an array count, and a compression flag.
 
-##### 2.2.2.2.1 - Type Code
+```
+Text
+[type code] \t [array count] \t [compression flag] \n
+
+
+Binary (2 byte sequence plus a variable number of bytes for array count)
+[2B:(cc)(aaa)(ttt tttttttt)][0/1/2/3/4/8/16B: Array Count]
+
+
+(cc)           -  2 bits, compression flag.
+(aaa)          -  3 bits, array flag.
+(ttt tttttttt) - 11 bits, type code.
+```
+
+##### 2.2.3.2.1 - Type Code
 
 
 | Binary Type Code | Text Type Code | Description |
 | --- | --- | --- |
+| 0 | "." | No value, presence or absence of a key is enough information. |
 | <br />**Block Types**<br /> |
-| 1 | [] | Key-Value block. |
-| 2 | [...] | Value stream block.  The contents deviates from the rest of the format.  Representations will explained where they are used. |
-| <br />**Embedded Types**<br /> |
-| 3 | ... | Binary data. |
-| 4 | file | And embedded file. |
+| 1 | "{" | Key-Value block begins. |
+| 2 | "}" | Key-Value block ends. |
 | <br />**Basic Types**<br /> |
-| 5 | type | Type value.  One of these type codes or user type code. |
-| 6 | "" | String (UTF8) data, can be of any length. |
-| 7 | path | A specific string value that represents a relative path (relative to the MIFF file location.) |
-| 8 | . | No value, just a key whose presence or absense is enough information. |
-| 9 | userType | A series of key-type pairs.  You can define up to 4031 new types maximum. |
-| 10 | bool | Boolean value. |
-| 11, 12, 13, 14, 15, 16,  17,  18,  19,   20 | i1, i2, i3, i4, i8, i16, i32, i64, i128, i256 | An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
-| 31, 32, 33, 34, 35, 36,  37,  38,  39,   40 | n1, n2, n3, n4, n8, n16, n32, n64, n128, n256 | A natural number using 1 to 16 Bytes.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like i3, but I include these byte counts because they may be useful in certain cases. |
-| 51, 52, 53,  54,  55,  56,   57 | r4, r8, r16, r32, r64, r128, r256 | A real value using 4 (float), 8 (double).  I do realize there are no standards for r16, r32, r64, or r128 but these are just placeholders for the future if they ever become standard. |
+| 3 | "type" | Type value.  One of these type codes or a user type code. |
+| 4 | "define" | A series of key-type pairs.  You can define up to 4031 new types maximum. |
+| 5 | """ (Sorry, just a " ) | String (UTF8) data, can be of any length. |
+| 6 | "-&#62;" | A specific string value that represents a relative path (relative to the MIFF file location and no backsies "..", local directory or deeper directory.) |
+| 7 | "b" | Boolean value. |
+| 10   11   12   13   14   15    16    17    18     19 | "i1" "i2" "i3" "i4" "i8" "i16" "i32" "i64" "i128" "i256" | An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
+| 20   21   22   23   24   25    26    27    28     29 | "n1" "n2" "n3" "n4" "n8" "n16" "n32" "n64" "n128" "n256" | A natural number.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases. |
+| 31   33   34   35    36    37    38     39 | "r2" "r4" "r8" "r16" "r32" "r64" "r128" "r256" | A real value.  I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard. |
+| <br />**Embedded Types**<br /> |
+| 40  41   42    43 | "&#42;" "&#42;&#42;" "&#42;&#42;&#42;" "&#42;&#42;&#42;&#42; | Binary data of n4, n8, n16, n32 byte counts in size. |
+| 50    51     52      53 | "[&#42;]" "[&#42;&#42;]" "[&#42;&#42;&#42;]" "[&#42;&#42;&#42;&#42;}" | An embedded file of n4, n8, n16, n32 byte counts in size. |
+| <br />**User Tyes**<br /> |
 | 64 and higher | [user type name] | Depends on what the user type defines. |
 
 
-##### 2.2.2.2.2 - array and compression flag
+##### 2.2.3.2.2 - Array Count Flag
 
 
-| Encoding Code (Binary) | Encoding Code (Text) | Description |
+| Encoding Code (Binary (aaa)) | Encoding Code (Text) | Description |
 | --- | --- | --- |
-| ??00 | - | A single value follows. |
-| ??01 | = | An array of values follows. |
-| ??10 | &#42; | An array of values.  This is only ever used when defining a user type.  See User types. |
-| 0100 | z | A single value compressed with zlib follows. |
-| 0101 | Z | An array of values compressed with zlib follows. |
-| 1000 | c | A single value broken down into uniform chunks and each chunk compressed with zlib.  Final chunk need not be the same size as the other chunks. |
-| 1001 | C | An array of values broken down into uniform chunks and each chunk compressed with zlib.  Final chunk need not be the same size as the other chunks. |
+| 000 | 1 | A single value follows.  In binary, no array count byte sequence follows. |
+| 001, 010, 011, 100, 101, 110 | [number of items] | An array of values follows.  In binary, 001 means a 1 byte natural follows; 010 means a 2 bytes natural follows; 011 means a 3 byte natural follows; 100 means a 4 byte natural follows; 101 means an 8 byte natural follows; 110 means a 16 byte natural follows. |
+| 111 | &#42; | An array of values.  This is only ever used when defining a user type.  See User types. |
 
 
-#### 2.2.2.3 - Value
+##### 2.2.3.2.3 - Compression Flag
+
+
+| Encoding Code (Binary (cc)) | Encoding Code (Text) | Description |
+| --- | --- | --- |
+| 00 | - | Values are inlined raw with no compression. |
+| 01 | . | Values are compressed with zlib as one big chunk. |
+| 01 | : | Values are broken down into smaller chunks and then each chunk compressed with zlib. |
+
+
+#### 2.2.3.3 - Value
 
 
 The value header generally indicates what will be stored in the value of the key value pair.  It then becomes an issue on how it is represented in the two types of files.  See their respective sections for the details.
@@ -238,7 +278,7 @@ The value header generally indicates what will be stored in the value of the key
 
 The text format is a UTF8 text file.
 
-The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if the text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.
+The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.
 
 The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.
 
@@ -252,14 +292,7 @@ A whitespace character is any character that does not make a blemish on a piece 
 ### 2.3.2 - Separator Characters
 
 
-MIFF limits what white space characters can be used as separators.
-
-```
-' ' (Space)
-'\t' (Tab)
-```
-
-If you see any other whitespace characters used as a separator in the MIFF file then the file is not MIFF.
+MIFF only uses tab (\t) as a separater character.  And only one \t between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
 
 ### 2.3.3 - Printable Characters
 
@@ -269,7 +302,7 @@ Just to be clear what a printable character is.  If you had a blank piece of pap
 ### 2.3.4 - Base64
 
 
-A few items are stored in Base64.  This is to add a little compression to the items in question or to ensure exactness of the data when reading the values back in.  Unlike normal Base64 which will break the buffer into lines of a certain length, Base64 values in a MIFF are one long continuous stream of characters.  No \n or line breaks of any kind will be present.
+A few items are stored in Base64.  This is to add a little compression to the items in question but mainly it is to ensure binary exactness of the data when writing the values out and reading the values back in.  Unlike normal Base64 which will break the buffer into lines of a certain length, Base64 values in a MIFF are one long continuous stream of characters.  No \n or line breaks of any kind will be present.
 
 ### 2.3.5 - Real Number Representation
 
@@ -280,32 +313,24 @@ All real numbers are stored as a Base64 string.  No exceptions.  This is to ensu
 
 
 ```
-[key] [value header] [value]\n
+[key] \t [value header] \t [value] \n
 ```
 
-There can be leading separators before the [key] but these will be ignored/trimmed off.
+Any space found in the key that is not a \t will be part of the key.  They will be significant.  Do not strip or reduce them.
 
-There has to be at least one separator between [key] and [value header].
+There has to be one \t separator between [key] and [value header].
 
-There has to be at least one separator between [value header] and the [value].
-
-Any extra separators in the line will be ignored/trimmed off.
+There has to be one \t separator between [value header] and [value].
 
 To terminate the key value pair use a single '\n' character.
 
 To be clear...
 
-**Valid:** spaces and tabs can be used to indent and separate the parts although rather wasteful of space.
+**Invalid:** Absolutely no "\n" anywhere before or within the key value line&#42;.  Absolutely no blank lines.  Absolutely no extra \t anywhere in the format.
 
 ```
-\t\t[key]\t[value header]\t\t\t[value]\n
-```
-
-**Invalid:** Absolutely no "\n" anywhere before or within the key value line&#42;.  Absolutely no blank lines as they have specific meaning in the format.
-
-```
-\n\n\n[key]\n[value header]\n[value]\n
- \n[key] [value header] [value]\n
+\t[key]\n[value header]\t[value]\n
+[key] [value header] [value]\n
 ```
 
 &#42; There are cases where the [value] will be broken up by '\n' characters but this will be indicated where that will happen.  In general most key value lines live on a single line.
@@ -316,14 +341,16 @@ To be clear...
 Value header will typically look like this.
 
 ```
-[type code][array and compression flag] [[array count]]
+[type code] \t [array count] \t [compression flag]
 ```
 
 However it can vary slightly depending on the Type Code being used.  See section 3 for accurate representation.
 
-**[type flag]** and **[array and compression flag]** is a string.  No space between the two.
+**[type flag]** is a short string as listed in the type code table earlier on in this document.
 
-[array count] will be a natural number (n4) value in readable UTF8 indicating how many values in the array.  Only present when =, Z, or C are used.
+**[array count]** is a natural value indicating how many values of this given type is present.
+
+**[compression flag]** is a string as listed in the compression flag table earlier in this document.
 
 #### 2.3.6.2 - Value
 
@@ -335,26 +362,22 @@ Values will be discussed lower in section 3.
 
 The Binary file will to match the Text file 1-1.
 
-Everything within '[]' is a byte sequence of a known size.  Each byte seqence is separated  but is immediately following after previous byte sequence.  Nothing extra is added between sequences.
-
-A byte sequence is [[Byte count]:[Name of this Byte sequence]], where Byte count is a number indicating the number of bytes this sequence uses.
-
 ### 2.4.1 - Key Value Format
 
 
 ```
-[n1                 :key byte count]
-[n1 * key byte count:key]
-[*                  :value header]
-[*                  :value]
+[n1           :key size]
+[n1 * key size:key]
+[*            :value header]
+[*            :value]
 ```
 
 #### 2.4.1.1 - Key
 
 
-[key byte count] defines how long the key is in bytes.  Keys are 1 to 255 Bytes and the Bytes define a UTF8 string.
+[key size] defines how long the key is in bytes.  Keys are 1 to 255 Bytes and the Bytes define a UTF8 string.
 
-[key] defines the key of the key value pair.  The length of which was defined by [key byte count] above.  No null terminator is included in the key.
+[key] defines the key of the key value pair.  The length of which was defined by [key size] above.  No null terminator is included in the key.
 
 #### 2.4.1.2 - Value Header
 
@@ -362,11 +385,11 @@ A byte sequence is [[Byte count]:[Name of this Byte sequence]], where Byte count
 Value header will typically look like this.
 
 ```
-[n2:2 bit - compression flag, 2 bit - array flag, 12 bit - type code]
-[n4:array count]
+[n2:2 bit - compression flag, 3 bit - array flag, 11 bit - type code]
+[0,n1,n2,n3,n4,n8,n16:array count]
 ```
 
-The first 2 bytes holds the type code and array and compression flags.  The 4 high bits of this value are holding the array and compression flags.  The remaining 12 bits are for the type code.  See section 2.2.2.2 above for what the flags and type code should equal to.
+The first 2 bytes holds the type code and array and compression flags.  The 5 high bits of this value are holding the array and compression flags.  The remaining 11 bits are for the type code.  See section on Type Codes, Array Count Flag and Compression Flag earlier in this document for what the type code and flags should equal to.
 
 [array count] byte sequence is only present when storing an array of values.
 
@@ -378,36 +401,53 @@ The first 2 bytes holds the type code and array and compression flags.  The 4 hi
 # 3 - Fromat: Value Specifics
 
 
-## 3.1 - Key-Value Block
+## 3.1 - Key only
+
+
+Just a key and no value.  Just like the header lines of the file.
+
+```
+Binary                                                     Text
+
+
+[n1           :key size]                                   [key]\n
+[n1 * key size:key]                                        [key]\t.\n
+[n2           :value header - 00|000|0]
+```
+
+In text, either line will do.  The first line saves 2 bytes.
+
+## 3.2 - Key-Value Block Begin and End.
 
 
 Key-Value blocks are special.  They are needed to allow nesting of key values.
 
 In a text file, the last line of a Key-Value Block needs to be a comletely empty line with nothing on it but a \n to indicate that the block is terminated.
 
-In a binary file you will have a key byte count of 0 to indicate the end of a Key-Value block.
+In a binary file you will have a key size of 0 to indicate the end of a Key-Value block.
 
 ```
 Binary                                                     Text
 
 
-[n1                 :key byte count]                       [key] []-\n
-[n1 * key byte count:key]                                   ...
-[n2                 :value header   - 00|00|1]             \n
+[n1           :key size]                                   [key]\t{\n
+[n1 * key size:key]                                        ...
+[n2           :value header   - 00|000|1]                  \t}\n
 ...
-[n1                 :key byte count - 0]
+[n1           :0]
+[n2           :value header   - 00|000|2]
 
 
-[n1                 :key byte count]                       [key] []= [array count]\n
-[n1 * key byte count:key]                                   ...
-[n2                 :value header   - 00|01|1]
-[n4                 :array count]
+[n1           :key size]                                   [key]\t{\t[array count]\n
+[n1 * key size:key]                                        ...
+[n2           :value header   - 00|???|1]
+[???          :array count]
 ...
 ```
 
-Key value bocks can have an Array flag set.  This is useful for an array of a complex type.
+Key value bocks can have an Array count.  What that will mean is that there are [array count] key value pairs following.  The next key value pair will not belong to this block.
 
-In this case there is no blank line (text) or 0 key count (binary) terminator since the key value count is known.
+A block is terminated when a value type of "}" is reached.  The key, if present on this line will be ignored.  Begin and end need to match.  Miss one or the other and the file is corrupt.
 
 Compression flags are never used with this value type.
 
@@ -417,65 +457,67 @@ To be clear on how it works.  In the text file leading separators before the key
 Binary                                                     Text
 
 
-[n1     :7]                                                docInfo []-\n
-[n1 * 7 :docInfo]                                           ...
-[n2     :00|00|1]                                          \n
+[n1     :7]                                                docInfo\t{\n
+[n1 * 7 :docInfo]                                          ...
+[n2     :00|000|1]                                         \t}\n
 ...
 [n1     :0]
+[n2     :00|000|2]
 
 
-[n1     :6]                                                level1 []-\n
-[n1 * 6 :level1]                                            level2 []-\n
-[n2     :00|00|1]                                            level3 []-\n
-[n1     :6]                                                   ...
-[n1 * 6 :level2]                                             \n
-[n2     :00|00|1]                                            anotherLevel3 []-\n
-[n1     :6]                                                   ...
-[n1 * 6 :level3]                                             \n
-[n2     :00|00|1]                                           \n
-...                                                         anotherLevel2 []-\n
-[n1     :0]                                                  ...
-[n1     :13]                                                \n
-[n1 * 13:anotherlevel3]                                    \n
-[n2     :00|00|1]                                          anotherLevel1 []-\n
-...                                                         ...
-[n1     :0]                                                \n
+[n1     :6]                                                level1\t{\n
+[n1 * 6 :level1]                                           level2\t{\n
+[n2     :00|000|1]                                          level3\t{\n
+[n1     :6]                                                ...
+[n1 * 6 :level2]                                           \t}\n
+[n2     :00|000|1]                                          anotherLevel3\t{\n
+[n1     :6]                                                ...
+[n1 * 6 :level3]                                           \t}\n
+[n2     :00|000|1]                                          \t}\n
+...                                                        anotherLevel2\t{\n
+[n1     :0]                                                ...
+[n2     :00|000|2]                                         \t}\n
+[n1     :13]                                               \t}\n
+[n1 * 13:anotherlevel3]                                     anotherLevel1\t{\n
+[n2     :00|000|1]                                         ...
+...                                                        \t}\n
 [n1     :0]
+[n2     :00|000|2]
+[n1     :0]
+[n2     :00|000|2]
 [n1     :6]
 [n1 * 6 :anotherlevel2]
-[n2     :00|00|1]
+[n2     :00|000|1]
 ...
 [n1     :0]
+[n2     :00|000|2]
 [n1     :0]
+[n2     :00|000|2]
 [n1     :6]
 [n1 * 6 :anotherlevel1]
-[n2     :00|00|1]
+[n2     :00|000|1]
 ...
 [n1     :0]
+[n2     :00|000|2]
 
 
-[n1     :8]                                                itemList []= 2\n
-[n1 * 8 :itemList]                                          item []-\n
-[n2     :00|01|1]                                            ...
-[n4     :2]                                                 \n
-[n1     :4]                                                 item []-\n
-[n1 * 4 :item]                                               ...
-[n2     :00|00|1]                                           \n
+[n1     :8]                                                itemList\t{\t2\n
+[n1 * 8 :itemList]                                         item\t{\n
+[n2     :00|001|1]                                         ...
+[n1     :2]                                                \t}\n
+[n1     :4]                                                item\t{\n
+[n1 * 4 :item]                                             ...
+[n2     :00|000|1]                                         \t}\n
 ...
 [n1     :0]
+[n2     :00|000|2]
 [n1     :4]
 [n1 * 4 :item]
-[n2     :00|00|1]
+[n2     :00|000|1]
 ...
 [n1     :0]
+[n2     :00|000|2]
 ```
-
-## 3.2 - Value Stream
-
-
-A Value Stream is a departure of the base format.  It is meant to be used to compress the data storage more with a simpler key value structure which will be dictated by the format that uses MIFF as a base format.
-
-Keys will typically be 1 byte.  Values will be a known sized based on the key or other information of the format.
 
 ## 3.3 - Binary values
 
@@ -484,72 +526,73 @@ Keys will typically be 1 byte.  Values will be a known sized based on the key or
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key ...- [binary byte count] [Base64 binary data]\n
-[n1 * key byte count       :key]
-[n2                        :value header - 00|00|3]
-[n4                        :binary byte count]
-[n1 * binary byte count    :binary data]
+[n1                  :key size]                            [key] \t "*" \t "1" \t "-" \t[binary size] \t [Base64 binary data]\n
+[n1 * key size       :key]
+[n2                  :value header - 00|000|3]
+[n4                  :binary size]
+[n1 * binary size    :binary data]
 
 
-[n1                        :key byte count]                [key] ...= [array count]\n
-[n1 * key byte count       :key]                           [binary byte count] [Base64 binary data]\n
-[n2                        :value header - 00|01|3]        [binary byte count] [Base64 binary data]\n
-[n4                        :array count]
-[n4                        :binary byte count]
-[n1 * binary byte count    :binary data]
-[n4                        :binary byte count]
-[n1 * binary byte count    :binary data]
+[n1                  :key size]                            [key] \t "*" \t [array count] \t "-"\n
+[n1 * key size       :key]                                 [binary size] \t [Base64 binary data] \n
+[n2                  :value header - 00|???|3]             [binary size] \t [Base64 binary data] \n
+[n4                  :array count]                         ...
+[n4                  :binary size]
+[n1 * binary size    :binary data]
+[n4                  :binary size]
+[n1 * binary size    :binary data]
 ...
 
 
-[n1                        :key byte count]                [key] ...z [binary byte count] [compressed byte count] [Base64 compressed data]\n
-[n1 * key byte count       :key]
-[n2                        :value header - 01|00|3]
-[n4                        :binary byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n1                  :key size]                            [key] \t "*" \t "1" \t "." \t [binary size] \t [compressed size] \t [Base64 compressed data]\n
+[n1 * key size       :key]
+[n2                  :value header - 01|00|3]
+[n4                  :binary size]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] ...Z [array count]\n
-[n1 * key byte count       :key]                           [binary byte count] [compressed byte count] [Base64 compressed data]\n
-[n2                        :value header - 01|01|3]        [binary byte count] [compressed byte count] [Base64 compressed data]\n
-[n4                        :array count]
-[n4                        :binary byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :binary byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n1                  :key size]                            [key] \t "*" \t [array count] \t "." \n
+[n1 * key size       :key]                                 [binary size] \t [compressed size] \t [Base64 compressed data] \n
+[n2                  :value header - 01|???|3]             [binary size] \t [compressed size] \t [Base64 compressed data] \n
+[???                 :array count]
+[n4                  :binary size]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
+[n4                  :binary size]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
 ...
 
 
-[n1                        :key byte count]                [key] ...c [binary byte count] [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [Base64 compressed data]\n
-[n2                        :value header - 10|00|3]        [compressed byte count] [Base64 compressed data]\n
-[n4                        :binary byte count]             ...
-[n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n1                  :key size]                            [key] \t "*" \t "1" \t ":" \t [binary size] \t [chunk byte count] \n
+[n1 * key size       :key]                                 [compressed size] \t [Base64 compressed data] \n
+[n2                  :value header - 10|000|3]             [compressed size] \t [Base64 compressed data]\n
+[n4                  :binary size]                         ...
+[n4                  :chunk byte count]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
 ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
+...
 
 
-[n1                        :key byte count]                [key] ...C [array count]\n
-[n1 * key byte count       :key]                           [binary byte count] [chunk byte count]\n
-[n2                        :value header - 10|01|3]        [compressed byte count] [Base64 compressed data]\n
-[n4                        :array count]                   [compressed byte count] [Base64 compressed data]\n
-[n4                        :binary byte count]             ...
-[n4                        :chunk byte count]              [binary byte count] [chunk byte count]\n
-[n4                        :compressed byte count]         [compressed byte count] [Base64 compressed data]\n
-[n1 * compressed byte count:compressed data]               ...
+[n1                  :key size]                            [key] \t "*" \t [array count] \t ":" \n
+[n1 * key size       :key]                                 [binary size] \t [chunk byte count]\n
+[n2                  :value header - 10|???|3]             [compressed size] \t [Base64 compressed data] \n
+[???                 :array count]                         [compressed size] \t [Base64 compressed data]\n
+[n4                  :binary size]                         ...
+[n4                  :chunk byte count]                    [binary size] \t [chunk byte count]\n
+[n4                  :compressed size]                     [compressed size] \t [Base64 compressed data]\n
+[n1 * compressed size:compressed data]                     ...
 ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :binary byte count]
-[n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
+[n4                  :binary size]
+[n4                  :chunk byte count]
+[n4                  :compressed size]
+[n1 * compressed size:compressed data]
 ...
 ```
 
@@ -635,8 +678,8 @@ However this is here as a catchall just in case.
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key] file- [file type] [byte count] [Base64 file data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] file- [file type] [byte count] [Base64 file data]\n
+[n1 * key size       :key]
 [n2                        :00|00|4]
 [n1                        :file type byte count]
 [n1 * file type byte count :file type]
@@ -644,8 +687,8 @@ Binary                                                     Text
 [n1 * byte count           :file data]
 
 
-[n1                        :key byte count]                [key] file= [array count]\n
-[n1 * key byte count       :key]                           [three letter file type] [byte count] [Base64 file data]\n
+[n1                        :key size]                [key] file= [array count]\n
+[n1 * key size       :key]                           [three letter file type] [byte count] [Base64 file data]\n
 [n2                        :00|01|4]                       [file type] [byte count] [Base64 file data]\n
 [n4                        :array count]                   ...
 [n1                        :file type byte count]
@@ -658,64 +701,64 @@ Binary                                                     Text
 ...
 
 
-[n1                        :key byte count]                [key] filez [file type] [byte count] [compressed byte count] [Base64 compressed data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] filez [file type] [byte count] [compressed size] [Base64 compressed data]\n
+[n1 * key size       :key]
 [n2                        :01|00|4]
 [n1                        :file type byte count]
 [n1 * file type byte count :file type]
 [n4                        :byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] fileZ [array count]\n
-[n1 * key byte count       :key]                           [file type] [byte count] [compressed byte count] [Base64 compressed data]\n
-[n2                        :01|01|4]                       [file type] [byte count] [compressed byte count] [Base64 compressed data]\n
+[n1                        :key size]                [key] fileZ [array count]\n
+[n1 * key size       :key]                           [file type] [byte count] [compressed size] [Base64 compressed data]\n
+[n2                        :01|01|4]                       [file type] [byte count] [compressed size] [Base64 compressed data]\n
 [n4                        :array count]                   ...
 [n1                        :file type byte count]
 [n1 * file type byte count :file type]
 [n4                        :byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 [n3                        :three letter file type]
 [n4                        :byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 
 
-[n1                        :key byte count]                [key] filec [file type] [byte count] [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [Base64 compressed data]\n
-[n2                        :10|00|4]                       [compressed byte count] [Base64 compressed data]\n
+[n1                        :key size]                [key] filec [file type] [byte count] [chunk byte count]\n
+[n1 * key size       :key]                           [compressed size] [Base64 compressed data]\n
+[n2                        :10|00|4]                       [compressed size] [Base64 compressed data]\n
 [n1                        :file type byte count]          ...
 [n1 * file type byte count :file type]
 [n4                        :byte count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] fileC [array count]\n
-[n1 * key byte count       :key]                           [file type] [byte count] [chunk byte count]\n
-[n2                        :10|01|4]                       [compressed byte count] [Base64 compressed data]\n
-[n4                        :array count]                   [compressed byte count] [Base64 compressed data]\n
+[n1                        :key size]                [key] fileC [array count]\n
+[n1 * key size       :key]                           [file type] [byte count] [chunk byte count]\n
+[n2                        :10|01|4]                       [compressed size] [Base64 compressed data]\n
+[n4                        :array count]                   [compressed size] [Base64 compressed data]\n
 [n1                        :file type byte count]          ...
 [n1 * file type byte count :file type]                     [file type] [byte count] [chunk byte count]\n
-[n4                        :byte count]                    [compressed byte count] [Base64 compressed data]\n
+[n4                        :byte count]                    [compressed size] [Base64 compressed data]\n
 [n4                        :chunk byte count]              ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 [n3                        :three letter file type]
 [n4                        :byte count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 ```
 
@@ -819,34 +862,34 @@ type stores type format string.
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key] type- [text type code]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] type- [text type code]\n
+[n1 * key size       :key]
 [n2                        :value header - 00|00|5]
 [n2                        :binary type code]
 
 
-[n1                        :key byte count]                [key] type= [array count] [text type code]*\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] type= [array count] [text type code]*\n
+[n1 * key size       :key]
 [n2                        :value header - 00|01|5]
 [n4                        :array count]
 [n2                        :binary type code]*
 
 
-[n1                        :key byte count]                type3 typeZ [array count] [compressed byte count] [Base64 compressed binary type codes]
-[n1 * key byte count       :key]
+[n1                        :key size]                type3 typeZ [array count] [compressed size] [Base64 compressed binary type codes]
+[n1 * key size       :key]
 [n2                        :value header - 01|01|5]
 [n4                        :array count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed binary type code]
+[n4                        :compressed size]
+[n1 * compressed size:compressed binary type code]
 
 
-[n1                        :key byte count]                type3 typeC [array count] [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [Base64 compressed binary type codes]\n
+[n1                        :key size]                type3 typeC [array count] [chunk byte count]\n
+[n1 * key size       :key]                           [compressed size] [Base64 compressed binary type codes]\n
 [n2                        :value header - 01|01|5]        ...
 [n4                        :array count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed binary type code]
+[n4                        :compressed size]
+[n1 * compressed size:compressed binary type code]
 ...
 ```
 
@@ -886,15 +929,15 @@ Binary                                                     Text
 Binary case is simpler so we'll talk about that first.
 
 ```
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 00|00|6]
 [n4                        :string byte count]
 [n1 * string byte count    :string data]
 
 
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 00|01|6]
 [n4                        :array count]
 [n4                        :string byte count]
@@ -904,52 +947,52 @@ Binary case is simpler so we'll talk about that first.
 ...
 
 
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 01|00|6]
 [n4                        :string byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 01|01|6]
 [n4                        :array count]
 [n4 * array count          :string byte count list]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 10|00|6]
 [n4                        :string byte count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 
 
-[n1                        :key byte count]
-[n1 * key byte count       :key]
+[n1                        :key size]
+[n1 * key size       :key]
 [n2                        :value header - 10|01|6]
 [n4                        :array count]
 [n4 * array count          :string byte count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 [n4 * array count          :string byte count]
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 ```
 
@@ -957,7 +1000,7 @@ The case of a single value just requires a byte count before the actual string d
 
 The case of an array value just requires a repeat of the byte count string data for as may in the array.
 
-The case of a compressed single value adds a compressed byte count after the string byte count.  And a compressed byte array of the string follows.
+The case of a compressed single value adds a compressed size after the string byte count.  And a compressed byte array of the string follows.
 
 The case of an array of compressed strings is similar to regular array but each string is individually compressed.
 
@@ -1009,29 +1052,29 @@ The text case is a little more involved.
 ...
 
 
-[key] ""z [string byte count] [compressed byte count] [Base64 compressed data]\n
+[key] ""z [string byte count] [compressed size] [Base64 compressed data]\n
 
 
 [key] ""Z [array count]\n
-[string byte count] [compressed byte count] [Base64 compressed data]\n
-[string byte count] [compressed byte count] [Base64 compressed data]\n
+[string byte count] [compressed size] [Base64 compressed data]\n
+[string byte count] [compressed size] [Base64 compressed data]\n
 ...
 
 
 [key] ""c [string byte count] [chunk byte count]\n
-[compressed byte count] [Base64 compressed data]\n
-[compressed byte count] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
 ...
 
 
 [key] ""C [array count]\n1
 [string byte count] [chunk byte count]\n
-[compressed byte count] [Base64 compressed data]\n
-[compressed byte count] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
 ...
 [string byte count] [chunk byte count]\n
-[compressed byte count] [Base64 compressed data]\n
-[compressed byte count] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
+[compressed size] [Base64 compressed data]\n
 ...
 ```
 
@@ -1076,9 +1119,9 @@ If the array flag is used, the individual strings will reside on their own line.
 
 For an array of strings, Again, the first character of the string will be the " character and then immediately followed by the string.  Any space preceeding the " is ignored.
 
-For a compressed single string, the string is compressed first before converting to Base64.  No escape character or string modification is needed since it is treated like binary data.  A byte count of the string and a compressed byte count is required to follow.
+For a compressed single string, the string is compressed first before converting to Base64.  No escape character or string modification is needed since it is treated like binary data.  A byte count of the string and a compressed size is required to follow.
 
-For a compressed array of strings, each string is concatenated together to form one long buffer.  Then compressed.  After the [array count] there will be a string count for each string in the array followed by the compressed byte count of this concatenated buffer.
+For a compressed array of strings, each string is concatenated together to form one long buffer.  Then compressed.  After the [array count] there will be a string count for each string in the array followed by the compressed size of this concatenated buffer.
 
 ## 3.7 - Path Values
 
@@ -1094,36 +1137,36 @@ See String Values above for storage rules.  They are the same.
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key] bool- [boolean value]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] bool- [boolean value]\n
+[n1 * key size       :key]
 [n2                        :value header  - 00|00|10]
 [n1                        :boolean value - 'T'|'F']
 
 
-[n1                        :key byte count]                [key] bool= [array count] [boolean value] * (array count)\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] bool= [array count] [boolean value] * (array count)\n
+[n1 * key size       :key]
 [n2                        :value header  - 00|01|10]
 [n4                        :array count]
 [n1 * (array count / 8)    :boolean value]
 
 
-[n1                        :key byte count]                [key] boolZ [array count] [compressed byte count] [Base64 compressed data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] boolZ [array count] [compressed size] [Base64 compressed data]\n
+[n1 * key size       :key]
 [n2                        :value header  - 01|01|10]
 [n4                        :array count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] boolC [array count] [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [Base64 compressed data]\n
-[n2                        :value header  - 10|01|10]       [compressed byte count] [Base64 compressed data]\n
+[n1                        :key size]                [key] boolC [array count] [chunk byte count]\n
+[n1 * key size       :key]                           [compressed size] [Base64 compressed data]\n
+[n2                        :value header  - 10|01|10]       [compressed size] [Base64 compressed data]\n
 [n4                        :array count]                   ...
 [n4                        :chunk byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ...
 ```
 
@@ -1168,8 +1211,8 @@ Binary                                                     Text
 [n1 * 5                    :Bool3]
 [n2                        :01|01|10]
 [n4                        :array count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ```
 
 ## 3.9 - Simple values
@@ -1181,50 +1224,50 @@ Simple value encoding.  Based on what is being stored the byte streams only look
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key] [text type code]- [type value]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [text type code]- [type value]\n
+[n1 * key size       :key]
 [n2                        :value header - 00|00|[type code]]
 [[byte count]              :type value]
 
 
-[n1                        :key byte count]                [key] [text type code]= [array count] [type value] * (array count)\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [text type code]= [array count] [type value] * (array count)\n
+[n1 * key size       :key]
 [n2                        :value header - 00|01|[type code]]
 [n4                        :array count]
 [[byte count] * array count:type values]
 
 
-[n1                        :key byte count]                [key] [text type code]z [compressed byte count] [compressed data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [text type code]z [compressed size] [compressed data]\n
+[n1 * key size       :key]
 [n2                        :value header - 01|00|[type code]]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] [text type code]Z [array count] [compressed byte count] [compressed data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [text type code]Z [array count] [compressed size] [compressed data]\n
+[n1 * key size       :key]
 [n2                        :value header - 01|01|[type code]]
 [n4                        :array count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] [text type code]c [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [compressed data]\n
-[n2                        :value header - 10|00|[type code]][compressed byte count] [compressed data]\n
-[n4                        :compressed byte count]         ...
-[n1 * compressed byte count:compressed data]
+[n1                        :key size]                [key] [text type code]c [chunk byte count]\n
+[n1 * key size       :key]                           [compressed size] [compressed data]\n
+[n2                        :value header - 10|00|[type code]][compressed size] [compressed data]\n
+[n4                        :compressed size]         ...
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] [text type code]C [array count] [chunk byte count]\n
-[n1 * key byte count       :key]                           [compressed byte count] [compressed data]\n
-[n2                        :value header - 10|01|[type code]][compressed byte count] [compressed data]\n
+[n1                        :key size]                [key] [text type code]C [array count] [chunk byte count]\n
+[n1 * key size       :key]                           [compressed size] [compressed data]\n
+[n2                        :value header - 10|01|[type code]][compressed size] [compressed data]\n
 [n4                        :array count]                   ...
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ```
 
-Binary Byte counts for the simple types will be one of...
+binary sizes for the simple types will be one of...
 
 | Type | Byte Count |
 | --- | --- |
@@ -1301,8 +1344,8 @@ A simple key only record.  No value.  If the key exists or doesn't exist, that c
 Binary                                                     Text
 
 
-[n1                     :key byte count]                   [key] -\n
-[n1 * key byte count    :key]
+[n1                     :key size]                   [key] -\n
+[n1 * key size    :key]
 [n2                     :value header - 00|00|8]
 ```
 
@@ -1317,43 +1360,43 @@ A definition of a user type.
 Binary                                                     Text
 
 
-[n1                     :key byte count]                   [key] usertype- [comment]\n
-[n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
+[n1                     :key size]                   [key] usertype- [comment]\n
+[n1 * key size    :key]                              [key] [value header] [array count] [comment]\n
 [n2                     :value header - 00|00|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n1                     :comment byte count]               \n
 [n1 * comment byte count:comment]
-[n1                     :key byte count]
-[n1 * key byte count    :key]
+[n1                     :key size]
+[n1 * key size    :key]
 [n2                     :value header]
 [n4                     :array count]*
 [n1                     :comment byte count]
 [n1 * comment byte count:comment]
-[n1                     :key byte count]
-[n1 * key byte count    :key]
+[n1                     :key size]
+[n1 * key size    :key]
 [n2                     :value header]
 [n4                     :array count]*
 [n1                     :comment byte count]
 [n1 * comment byte count:comment]
 ...
-[n1                     :key byte count - 0]
+[n1                     :key size - 0]
 
 
-[n1                     :key byte count]                   [key] usertype= [array count] [comment]\n
-[n1 * key byte count    :key]                              [key] [value header] [array count] [comment]\n
+[n1                     :key size]                   [key] usertype= [array count] [comment]\n
+[n1 * key size    :key]                              [key] [value header] [array count] [comment]\n
 [n2                     :value header - 00|01|9]           [key] [value header] [array count] [comment]\n
 [n2                     :user type code]                   ...
 [n4                     :array count]
 [n1                     :comment byte count]
 [n1 * comment byte count:comment]
-[n1                     :key byte count]
-[n1 * key byte count    :key]
+[n1                     :key size]
+[n1 * key size    :key]
 [n2                     :value header]
 [n4                     :array count]*
 [n1                     :comment byte count]
 [n1 * comment byte count:comment]
-[n1                     :key byte count]
-[n1 * key byte count    :key]
+[n1                     :key size]
+[n1 * key size    :key]
 [n2                     :value header]
 [n4                     :array count]*
 [n1                     :comment byte count]
@@ -1363,7 +1406,7 @@ Binary                                                     Text
 
 In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.  In the text file, the key for the user type is the user type code.
 
-The difference between the single value and array value is the inclusion of a count.  They both will permit the definition of multiple items.  In the binary case, if not using the array case we need a 0 key byte count terminator.
+The difference between the single value and array value is the inclusion of a count.  They both will permit the definition of multiple items.  In the binary case, if not using the array case we need a 0 key size terminator.
 
 [array count] after the [value header] of a type item is optional and only required if the value header defines an array.
 
@@ -1494,16 +1537,16 @@ point userType- This point replaces the above point\n
 Binary                                                     Text
 
 
-[n1                        :key byte count]                [key] [user type]= [user type data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [user type]= [user type data]\n
+[n1 * key size       :key]
 [n2                        :00|00|user type code]
 [n1                        :user type byte count]
 [n1 * user type byte count :user type]
 [*                         :user type data]
 
 
-[n1                        :key byte count]                [key] [user type]= [array count]\n
-[n1 * key byte count       :key]                           [user type data]\n
+[n1                        :key size]                [key] [user type]= [array count]\n
+[n1 * key size       :key]                           [user type data]\n
 [n2                        :00|01|user type code]          ...
 [n1                        :user type byte count]
 [n1 * user type byte count :user type]
@@ -1512,25 +1555,25 @@ Binary                                                     Text
 ...
 
 
-[n1                        :key byte count]                [key] [user type]z [byte count] [compressed byte count] [user type data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [user type]z [byte count] [compressed size] [user type data]\n
+[n1 * key size       :key]
 [n2                        :01|00|user type code]
 [n1                        :user type byte count]
 [n1 * user type byte count :user type]
 [n4                        :byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 
 
-[n1                        :key byte count]                [key] [user type]Z [array count] [compressed byte count] [Base64 compressed data]\n
-[n1 * key byte count       :key]
+[n1                        :key size]                [key] [user type]Z [array count] [compressed size] [Base64 compressed data]\n
+[n1 * key size       :key]
 [n2                        :01|01|user type code]
 [n1                        :user type byte count]
 [n1 * user type byte count :user type]
 [n4                        :array count]
 [n4                        :byte count]
-[n4                        :compressed byte count]
-[n1 * compressed byte count:compressed data]
+[n4                        :compressed size]
+[n1 * compressed size:compressed data]
 ```
 
 The value of a user type.  A usertype needs to be defined first.  The values that follow are in the order that the usertype defined them.  If an array of usertypes then each item is on their own line.

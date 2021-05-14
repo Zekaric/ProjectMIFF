@@ -39,12 +39,9 @@ static void     _MemDestroy(     void * const mem);
 static MiffBool _MemCompress(    MiffN4 const memByteCount, void const * const mem, MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem);
 static MiffBool _MemDecompress(  MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount, void ** const mem);
 
-static MiffBool _SetBuffer1(     void * const dataRepo, MiffN4 const data1Count, Miff1 const * const data1);
-static MiffBool _SetBuffer2(     void * const dataRepo, MiffN4 const data2Count, Miff2 const * const data2);
-static MiffBool _SetBuffer4(     void * const dataRepo, MiffN4 const data4Count, Miff4 const * const data4);
-static MiffBool _SetBuffer8(     void * const dataRepo, MiffN4 const data8Count, Miff8 const * const data8);
+static MiffBool _SetBuffer(      void * const dataRepo, MiffN4 const byteCount, Miff1 const * const byteData);
 
-static MiffBool _TestWrite(      MiffC * const fileName, MiffMode const mode);
+static MiffBool _TestWrite(      MiffC2 * const fileName, MiffMode const mode);
 
 /******************************************************************************
 global:
@@ -75,11 +72,11 @@ int main(int acount, char **alist)
       goto DONE;
    }
 
-   if (!_TestWrite(L"MiffFileTestBin.miff", miffModeBINARY))
-   {
-      result = 3;
-      goto DONE;
-   }
+//   if (!_TestWrite(L"MiffFileTestBin.miff", miffModeBINARY))
+//   {
+//      result = 3;
+//      goto DONE;
+//   }
 
 DONE:
    // Stop miff library.
@@ -179,41 +176,17 @@ MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const 
 }
 
 /******************************************************************************
-func: miffSetBuffer1
+func: miffSetBuffer
 ******************************************************************************/
-static MiffBool _SetBuffer1(void * const dataRepo, MiffN4 const data1Count, Miff1 const * const data1)
+static MiffBool _SetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
 {
-   return (_fwrite_nolock(data1, 1, data1Count, (FILE *) dataRepo) == data1Count);
-}
-
-/******************************************************************************
-func: miffSetBuffer2
-******************************************************************************/
-static MiffBool _SetBuffer2(void * const dataRepo, MiffN4 const data2Count, Miff2 const * const data2)
-{
-   return (_fwrite_nolock(data2, 2, data2Count, (FILE *) dataRepo) == data2Count);
-}
-
-/******************************************************************************
-func: miffSetBuffer4
-******************************************************************************/
-static MiffBool _SetBuffer4(void * const dataRepo, MiffN4 const data4Count, Miff4 const * const data4)
-{
-   return (_fwrite_nolock(data4, 4, data4Count, (FILE *) dataRepo) == data4Count);
-}
-
-/******************************************************************************
-func: miffSetBuffer8
-******************************************************************************/
-static MiffBool _SetBuffer8(void * const dataRepo, MiffN4 const data8Count, Miff8 const * const data8)
-{
-   return (_fwrite_nolock(data8, 8, data8Count, (FILE *) dataRepo) == data8Count);
+   return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
 /******************************************************************************
 func: _TestWrite
 ******************************************************************************/
-static MiffBool _TestWrite(MiffC * const fileName, MiffMode const mode)
+static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 {
    FILE *file;
    Miff *miff;
@@ -231,10 +204,7 @@ static MiffBool _TestWrite(MiffC * const fileName, MiffMode const mode)
       // Create a miff file.
       miff = miffCreateWriter(
          miffBoolTRUE,
-         _SetBuffer1,
-         _SetBuffer2,
-         _SetBuffer4,
-         _SetBuffer8,
+         _SetBuffer,
          mode,
          (MiffN1) wcslen(L"MiffTestFile"),
          L"MiffTestFile",

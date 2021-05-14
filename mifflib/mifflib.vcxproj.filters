@@ -18,14 +18,17 @@
     <ClCompile Include="mifflib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="write.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mifflib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Todo.txt" />
+    <ClInclude Include="local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

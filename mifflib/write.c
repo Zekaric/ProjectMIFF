@@ -41,11 +41,68 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _WriteTxtRecordDivider
+func: _WriteTxtC1
 ******************************************************************************/
-MiffBool _WriteTxtRecordDivider(Miff const * const miff)
+MiffBool _WriteTxtC1(Miff const * const miff, MiffC1 const * const value)
 {
-   return miff->setBuffer(miff->dataRepo, 1, "\t");
+   return miff->setBuffer(miff->dataRepo, _C1GetCount(value), value);
+}
+
+/******************************************************************************
+func: _WriteTxtC2
+******************************************************************************/
+MiffBool _WriteTxtC2(Miff const * const miff, MiffC2 const * const c2)
+{
+   MiffN4  c1Count;
+   MiffC1 *c1;
+
+   if (!_C2ToC1(_C2GetCount(c2) + 1, c2, &c1Count, &c1))
+   {
+      returnFalse;
+   }
+
+   _WriteTxtC1(miff, c1);
+
+   memDestroy(c1);
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _WriteTxtRecordArrayCount
+******************************************************************************/
+MiffBool _WriteTxtRecordArrayCount(Miff const * const miff, MiffN4 const count)
+{
+   return _WriteTxtValue4(miff, miffValueTypeN4, (Miff4 *) &count);
+}
+
+/******************************************************************************
+func: _WriteTxtRecordCompressChunkSize
+******************************************************************************/
+MiffBool _WriteTxtRecordCompressChunkSize(Miff const * const miff, MiffN4 const chunkSize)
+{
+   return _WriteTxtValue4(miff, miffValueTypeN4, (Miff4 *) &chunkSize);
+}
+
+/******************************************************************************
+func: _WriteTxtRecordCompressFlag
+******************************************************************************/
+MiffBool _WriteTxtRecordCompressFlag(Miff const * const miff, MiffCompressFlag const compressFlag)
+{
+   if      (compressFlag == miffCompressFlagIS_UNCOMPRESSED)
+   {
+      return _WriteTxtC1(miff->dataRepo, "-");
+   }
+   else if (compressFlag == miffCompressFlagIS_COMPRESSED)
+   {
+      return _WriteTxtC1(miff->dataRepo, ".");
+   }
+   else if (compressFlag == miffCompressFlagIS_CHUNKED_AND_COMPRESSED)
+   {
+      return _WriteTxtC1(miff->dataRepo, ":");
+   }
+
+   returnFalse;
 }
 
 /******************************************************************************
@@ -57,50 +114,76 @@ MiffBool _WriteTxtRecordEnder(Miff const * const miff)
 }
 
 /******************************************************************************
-func: _WriteTxtStringC1
+func: _WriteTxtRecordSeparator
 ******************************************************************************/
-MiffBool _WriteTxtStringC1(Miff const * const miff, MiffC1 const * const value)
+MiffBool _WriteTxtRecordSeparator(Miff const * const miff)
 {
-   return miff->setBuffer(miff->dataRepo, miffC1GetLength(value), value);
+   return miff->setBuffer(miff->dataRepo, 1, "\t");
 }
 
 /******************************************************************************
-func: _WriteTxtStringC2
+func: _WriteTxtRecordType
 ******************************************************************************/
-MiffBool _WriteTxtStringC2(Miff const * const miff, MiffC2 const * const value)
+MiffBool _WriteTxtRecordType(Miff const * const miff, MiffValueType const type)
 {
-   int index,
-       count;
-
-   count = miffC2GetLength(value);
-   for (index = 0; index < count; index++)
+   switch (type)
    {
-      index += _WriteTxtStringC2Letter(miff, &value[index]);
+   case miffValueTypeKEY_VALUE_BLOCK_START:  return _WriteTxtC1(miff->dataRepo, "{"     ));
+   case miffValueTypeKEY_VALUE_BLOCK_STOP:   return _WriteTxtC1(miff->dataRepo, "}"     ));
+   case miffValueTypeBINARY_DATA_1:          return _WriteTxtC1(miff->dataRepo, "*"     ));
+   case miffValueTypeBINARY_DATA_2:          return _WriteTxtC1(miff->dataRepo, "**"    ));
+   case miffValueTypeBINARY_DATA_3:          return _WriteTxtC1(miff->dataRepo, "***"   ));
+   case miffValueTypeBINARY_DATA_4:          return _WriteTxtC1(miff->dataRepo, "****"  ));
+   case miffValueTypeEMBEDDED_FILE_1:        return _WriteTxtC1(miff->dataRepo, "[*]"   ));
+   case miffValueTypeEMBEDDED_FILE_2:        return _WriteTxtC1(miff->dataRepo, "[**]"  ));
+   case miffValueTypeEMBEDDED_FILE_3:        return _WriteTxtC1(miff->dataRepo, "[***]" ));
+   case miffValueTypeEMBEDDED_FILE_4:        return _WriteTxtC1(miff->dataRepo, "[****]"));
+   case miffValueTypeTYPE:                   return _WriteTxtC1(miff->dataRepo, "type"  ));
+   case miffValueTypeSTRING:                 return _WriteTxtC1(miff->dataRepo, "\""    ));
+   case miffValueTypePATH:                   return _WriteTxtC1(miff->dataRepo, "->"    ));
+   case miffValueTypeUSER_TYPE:              return _WriteTxtC1(miff->dataRepo, "define"));
+   case miffValueTypeBOOLEAN:                return _WriteTxtC1(miff->dataRepo, "b"     ));
+   case miffValueTypeI1:                     return _WriteTxtC1(miff->dataRepo, "i1"    ));
+   case miffValueTypeI2:                     return _WriteTxtC1(miff->dataRepo, "i2"    ));
+   case miffValueTypeI3:                     return _WriteTxtC1(miff->dataRepo, "i3"    ));
+   case miffValueTypeI4:                     return _WriteTxtC1(miff->dataRepo, "i4"    ));
+   case miffValueTypeI8:                     return _WriteTxtC1(miff->dataRepo, "i8"    ));
+   case miffValueTypeI16:                    return _WriteTxtC1(miff->dataRepo, "i16"   ));
+   case miffValueTypeI32:                    return _WriteTxtC1(miff->dataRepo, "i32"   ));
+   case miffValueTypeI64:                    return _WriteTxtC1(miff->dataRepo, "i64"   ));
+   case miffValueTypeI128:                   return _WriteTxtC1(miff->dataRepo, "i128"  ));
+   case miffValueTypeI256:                   return _WriteTxtC1(miff->dataRepo, "i256"  ));
+   case miffValueTypeN1:                     return _WriteTxtC1(miff->dataRepo, "n1"    ));
+   case miffValueTypeN2:                     return _WriteTxtC1(miff->dataRepo, "n2"    ));
+   case miffValueTypeN3:                     return _WriteTxtC1(miff->dataRepo, "n3"    ));
+   case miffValueTypeN4:                     return _WriteTxtC1(miff->dataRepo, "n4"    ));
+   case miffValueTypeN8:                     return _WriteTxtC1(miff->dataRepo, "n8"    ));
+   case miffValueTypeN16:                    return _WriteTxtC1(miff->dataRepo, "n16"   ));
+   case miffValueTypeN32:                    return _WriteTxtC1(miff->dataRepo, "n32"   ));
+   case miffValueTypeN64:                    return _WriteTxtC1(miff->dataRepo, "n64"   ));
+   case miffValueTypeN128:                   return _WriteTxtC1(miff->dataRepo, "n128"  ));
+   case miffValueTypeN256:                   return _WriteTxtC1(miff->dataRepo, "n256"  ));
+   case miffValueTypeR2:                     return _WriteTxtC1(miff->dataRepo, "r2"    ));
+   case miffValueTypeR4:                     return _WriteTxtC1(miff->dataRepo, "r4"    ));
+   case miffValueTypeR8:                     return _WriteTxtC1(miff->dataRepo, "r8"    ));
+   //case miffValueTypeR16:                    return _WriteTxtC1(miff->dataRepo, "r16"   ));
+   //case miffValueTypeR32:                    return _WriteTxtC1(miff->dataRepo, "r32"   ));
+   //case miffValueTypeR64:                    return _WriteTxtC1(miff->dataRepo, "r64"   ));
+   //case miffValueTypeR128:                   return _WriteTxtC1(miff->dataRepo, "r128"  ));
+   //case miffValueTypeR256:                   return _WriteTxtC1(miff->dataRepo, "r256"  ));
 
-      returnFalseIf(index < 0);
+   default:
+      // user type.
+      return _WriteTxtC1(miff->dataRepo, miff->userTypeList[type - miffValueTypeFIRST_USER_TYPE].nameC1);
    }
 
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteTxtStringC2Letter
-
-This will first determine if the current letter is a pair or a single.
-Then convert the pair/single to UTF8.
-Then write the UTF8 to the buffer.
-******************************************************************************/
-int _WriteTxtStringC2Letter(Miff const * const miff, MiffC2 const * const value)
-{
-   MiffN4 fullLetter;
-
-
+   returnFalse;
 }
 
 /******************************************************************************
 func: _WriteTxtValue1
 ******************************************************************************/
-MiffBool _WriteTxtValue1(Miff const * const miff, MiffValueType const type, Miff1 const * const value)
+MiffBool _WriteTxtValue1(Miff const * const miff, MiffValueType const type, Miff1 const value)
 {
    if (type == miffValueTypeBOOLEAN)
    {
@@ -114,118 +197,123 @@ MiffBool _WriteTxtValue1(Miff const * const miff, MiffValueType const type, Miff
 
    if (type == miffValueTypeI1)
    {
-      return _WriteTxtValueI(miff, value);
+      return _WriteTxtValueI(miff, (MiffI8) value.i);
    }
 
-   return _WriteTxtValueN(miff, value);
+   return _WriteTxtValueN(miff, (MiffN8) value.n);
 }
 
 /******************************************************************************
 func: _WriteTxtValue2
 ******************************************************************************/
-MiffBool _WriteTxtValue2(Miff const * const miff, MiffValueType const type, Miff2 const * const value)
+MiffBool _WriteTxtValue2(Miff const * const miff, MiffValueType const type, Miff2 const value)
 {
    if (type == miffValueTypeR2)
    {
-      Miff8 vtemp;
+      Miff2 vtemp;
 
       vtemp = value;
-      _ByteSwap2(miff, vtemp);
+      _ByteSwap2(miff, &vtemp);
 
-      returnFalseIf(!_Base64Set(miff, value->byte[0]));
-      returnFalseIf(!_Base64Set(miff, value->byte[1]));
+      returnFalseIf(!_Base64Set(miff, value.byte[0]));
+      returnFalseIf(!_Base64Set(miff, value.byte[1]));
 
       return _Base64SetEnd(miff);
    }
 
    if (type == miffValueTypeI2)
    {
-      return _WriteTxtValueI(miff, value);
+      return _WriteTxtValueI(miff, (MiffI8) value.i);
    }
 
-   return _WriteTxtValueN(miff, value);
+   return _WriteTxtValueN(miff, (MiffN8) value.n);
 }
 
 /******************************************************************************
 func: _WriteTxtValue4
 ******************************************************************************/
-MiffBool _WriteTxtValue4(Miff const * const miff, MiffValueType const type, Miff4 const * const value)
+MiffBool _WriteTxtValue4(Miff const * const miff, MiffValueType const type, Miff4 const value)
 {
    if (type == miffValueTypeR4)
    {
-      Miff8 vtemp;
+      Miff4 vtemp;
 
       vtemp = value;
-      _ByteSwap4(miff, vtemp);
+      _ByteSwap4(miff, &vtemp);
 
-      returnFalseIf(!_Base64Set(miff, value->byte[0]));
-      returnFalseIf(!_Base64Set(miff, value->byte[1]));
-      returnFalseIf(!_Base64Set(miff, value->byte[2]));
-      returnFalseIf(!_Base64Set(miff, value->byte[3]));
+      returnFalseIf(!_Base64Set(miff, value.byte[0]));
+      returnFalseIf(!_Base64Set(miff, value.byte[1]));
+      returnFalseIf(!_Base64Set(miff, value.byte[2]));
+      returnFalseIf(!_Base64Set(miff, value.byte[3]));
 
       return _Base64SetEnd(miff);
    }
 
    if (type == miffValueTypeI4)
    {
-      return _WriteTxtValueI(miff, value);
+      return _WriteTxtValueI(miff, (MiffI8) value.i);
    }
 
-   return _WriteTxtValueN(miff, value);
+   return _WriteTxtValueN(miff, (MiffN8) value.n);
 }
 
 /******************************************************************************
 func: _WriteTxtValue8
 ******************************************************************************/
-MiffBool _WriteTxtValue8(Miff const * const miff, MiffValueType const type, Miff8 const * const value)
+MiffBool _WriteTxtValue8(Miff const * const miff, MiffValueType const type, Miff8 const value)
 {
    if (type == miffValueTypeR8)
    {
       Miff8 vtemp;
 
       vtemp = value;
-      _ByteSwap8(miff, vtemp);
+      _ByteSwap8(miff, &vtemp);
 
-      returnFalseIf(!_Base64Set(miff, value->byte[0]));
-      returnFalseIf(!_Base64Set(miff, value->byte[1]));
-      returnFalseIf(!_Base64Set(miff, value->byte[2]));
-      returnFalseIf(!_Base64Set(miff, value->byte[3]));
-      returnFalseIf(!_Base64Set(miff, value->byte[4]));
-      returnFalseIf(!_Base64Set(miff, value->byte[5]));
-      returnFalseIf(!_Base64Set(miff, value->byte[6]));
-      returnFalseIf(!_Base64Set(miff, value->byte[7]));
+      returnFalseIf(!_Base64Set(miff, value.byte[0]));
+      returnFalseIf(!_Base64Set(miff, value.byte[1]));
+      returnFalseIf(!_Base64Set(miff, value.byte[2]));
+      returnFalseIf(!_Base64Set(miff, value.byte[3]));
+      returnFalseIf(!_Base64Set(miff, value.byte[4]));
+      returnFalseIf(!_Base64Set(miff, value.byte[5]));
+      returnFalseIf(!_Base64Set(miff, value.byte[6]));
+      returnFalseIf(!_Base64Set(miff, value.byte[7]));
 
       return _Base64SetEnd(miff);
    }
 
    if (type == miffValueTypeI8)
    {
-      return _WriteTxtValueI(miff, value);
+      return _WriteTxtValueI(miff, value.i);
    }
 
-   return _WriteTxtValueN(miff, value);
+   return _WriteTxtValueN(miff, value.n);
 }
 
 /******************************************************************************
 func: _WriteTxtValueI
 ******************************************************************************/
-MiffBool _WriteTxtValueI(Miff const * const miff, Miff8 const * const value)
+MiffBool _WriteTxtValueI(Miff const * const miff, MiffI8 const value)
 {
-   Miff8 vtemp;
+   MiffN8 ntemp;
 
-   vtemp = value;
-   if (vtemp->i < 0)
+   ntemp = 0;
+   if (value < 0)
    {
       miff->setBuffer(miff->dataRepo, 1, "-");
-      vtemp->n = -vtemp->i;
+      ntemp = -value;
    }
-   return _WriteTxtValueN(miff, &vtemp);
+   else 
+   {
+      ntemp =  value;
+   }
+
+   return _WriteTxtValueN(miff, ntemp);
 }
 
 /******************************************************************************
 func: _WriteTxtValueN
 ******************************************************************************/
-MiffBool _WriteTxtValueN(Miff const * const miff, Miff8 const * const value)
+MiffBool _WriteTxtValueN(Miff const * const miff, MiffN8 const value)
 {
    int    index,
           count,

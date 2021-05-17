@@ -167,7 +167,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="base64.c" />
+    <ClCompile Include="byteSwap.c" />
     <ClCompile Include="mifflib.c" />
+    <ClCompile Include="string.c" />
+    <ClCompile Include="util.c" />
     <ClCompile Include="write.c" />
   </ItemGroup>
   <ItemGroup>

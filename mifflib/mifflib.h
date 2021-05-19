@@ -313,7 +313,7 @@ MiffBool        miffSetRecordValueN8(        Miff       * const miff, MiffN8    
 MiffBool        miffSetRecordValueR4(        Miff       * const miff, MiffR4        const value);
 MiffBool        miffSetRecordValueR8(        Miff       * const miff, MiffR8        const value);
 MiffBool        miffSetRecordValueType(      Miff       * const miff, MiffValueType const value);
-MiffBool        miffSetRecordValueString(    Miff       * const miff, MiffC2        const * const string);
+MiffBool        miffSetRecordValueC2(        Miff       * const miff, MiffC2        const * const string);
 
 MiffBool        miffStart(                   MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
 void            miffStop(                    void);

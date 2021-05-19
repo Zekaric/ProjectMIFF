@@ -225,3 +225,150 @@ MiffBool _Base64SetEnd(Miff * const miff)
 
    returnTrue;
 }
+
+/******************************************************************************
+func: _Base64Start
+******************************************************************************/
+void _Base64Start(void)
+{
+   MiffN1 index;
+
+   _MemClearTypeArray(128, MiffN1, _base64LetterToValue);
+   index = 0;
+   _base64LetterToValue['A'] = index++;
+   _base64LetterToValue['B'] = index++;
+   _base64LetterToValue['C'] = index++;
+   _base64LetterToValue['D'] = index++;
+   _base64LetterToValue['E'] = index++;
+   _base64LetterToValue['F'] = index++;
+   _base64LetterToValue['G'] = index++;
+   _base64LetterToValue['H'] = index++;
+   _base64LetterToValue['I'] = index++;
+   _base64LetterToValue['J'] = index++;
+   //10
+   _base64LetterToValue['K'] = index++;
+   _base64LetterToValue['L'] = index++;
+   _base64LetterToValue['M'] = index++;
+   _base64LetterToValue['N'] = index++;
+   _base64LetterToValue['O'] = index++;
+   _base64LetterToValue['P'] = index++;
+   _base64LetterToValue['Q'] = index++;
+   _base64LetterToValue['R'] = index++;
+   _base64LetterToValue['S'] = index++;
+   _base64LetterToValue['T'] = index++;
+   //20
+   _base64LetterToValue['U'] = index++;
+   _base64LetterToValue['V'] = index++;
+   _base64LetterToValue['W'] = index++;
+   _base64LetterToValue['X'] = index++;
+   _base64LetterToValue['Y'] = index++;
+   _base64LetterToValue['Z'] = index++;
+   _base64LetterToValue['a'] = index++;
+   _base64LetterToValue['b'] = index++;
+   _base64LetterToValue['c'] = index++;
+   _base64LetterToValue['d'] = index++;
+   //30
+   _base64LetterToValue['e'] = index++;
+   _base64LetterToValue['f'] = index++;
+   _base64LetterToValue['g'] = index++;
+   _base64LetterToValue['h'] = index++;
+   _base64LetterToValue['i'] = index++;
+   _base64LetterToValue['j'] = index++;
+   _base64LetterToValue['k'] = index++;
+   _base64LetterToValue['l'] = index++;
+   _base64LetterToValue['m'] = index++;
+   _base64LetterToValue['n'] = index++;
+   //40
+   _base64LetterToValue['o'] = index++;
+   _base64LetterToValue['p'] = index++;
+   _base64LetterToValue['q'] = index++;
+   _base64LetterToValue['r'] = index++;
+   _base64LetterToValue['s'] = index++;
+   _base64LetterToValue['t'] = index++;
+   _base64LetterToValue['u'] = index++;
+   _base64LetterToValue['v'] = index++;
+   _base64LetterToValue['w'] = index++;
+   _base64LetterToValue['x'] = index++;
+   //50
+   _base64LetterToValue['y'] = index++;
+   _base64LetterToValue['z'] = index++;
+   _base64LetterToValue['0'] = index++;
+   _base64LetterToValue['1'] = index++;
+   _base64LetterToValue['2'] = index++;
+   _base64LetterToValue['3'] = index++;
+   _base64LetterToValue['4'] = index++;
+   _base64LetterToValue['5'] = index++;
+   _base64LetterToValue['6'] = index++;
+   _base64LetterToValue['7'] = index++;
+   //60
+   _base64LetterToValue['8'] = index++;
+   _base64LetterToValue['9'] = index++;
+   _base64LetterToValue['+'] = index++;
+   _base64LetterToValue['/'] = index++;
+
+   index = 0;
+   _base64ValueToLetter[index++] = 'A';
+   _base64ValueToLetter[index++] = 'B';
+   _base64ValueToLetter[index++] = 'C';
+   _base64ValueToLetter[index++] = 'D';
+   _base64ValueToLetter[index++] = 'E';
+   _base64ValueToLetter[index++] = 'F';
+   _base64ValueToLetter[index++] = 'G';
+   _base64ValueToLetter[index++] = 'H';
+   _base64ValueToLetter[index++] = 'I';
+   _base64ValueToLetter[index++] = 'J';
+   _base64ValueToLetter[index++] = 'K';
+   _base64ValueToLetter[index++] = 'L';
+   _base64ValueToLetter[index++] = 'M';
+   _base64ValueToLetter[index++] = 'N';
+   _base64ValueToLetter[index++] = 'O';
+   _base64ValueToLetter[index++] = 'P';
+   _base64ValueToLetter[index++] = 'Q';
+   _base64ValueToLetter[index++] = 'R';
+   _base64ValueToLetter[index++] = 'S';
+   _base64ValueToLetter[index++] = 'T';
+   _base64ValueToLetter[index++] = 'U';
+   _base64ValueToLetter[index++] = 'V';
+   _base64ValueToLetter[index++] = 'W';
+   _base64ValueToLetter[index++] = 'X';
+   _base64ValueToLetter[index++] = 'Y';
+   _base64ValueToLetter[index++] = 'Z';
+   _base64ValueToLetter[index++] = 'a';
+   _base64ValueToLetter[index++] = 'b';
+   _base64ValueToLetter[index++] = 'c';
+   _base64ValueToLetter[index++] = 'd';
+   _base64ValueToLetter[index++] = 'e';
+   _base64ValueToLetter[index++] = 'f';
+   _base64ValueToLetter[index++] = 'g';
+   _base64ValueToLetter[index++] = 'h';
+   _base64ValueToLetter[index++] = 'i';
+   _base64ValueToLetter[index++] = 'j';
+   _base64ValueToLetter[index++] = 'k';
+   _base64ValueToLetter[index++] = 'l';
+   _base64ValueToLetter[index++] = 'm';
+   _base64ValueToLetter[index++] = 'n';
+   _base64ValueToLetter[index++] = 'o';
+   _base64ValueToLetter[index++] = 'p';
+   _base64ValueToLetter[index++] = 'q';
+   _base64ValueToLetter[index++] = 'r';
+   _base64ValueToLetter[index++] = 's';
+   _base64ValueToLetter[index++] = 't';
+   _base64ValueToLetter[index++] = 'u';
+   _base64ValueToLetter[index++] = 'v';
+   _base64ValueToLetter[index++] = 'w';
+   _base64ValueToLetter[index++] = 'x';
+   _base64ValueToLetter[index++] = 'y';
+   _base64ValueToLetter[index++] = 'z';
+   _base64ValueToLetter[index++] = '0';
+   _base64ValueToLetter[index++] = '1';
+   _base64ValueToLetter[index++] = '2';
+   _base64ValueToLetter[index++] = '3';
+   _base64ValueToLetter[index++] = '4';
+   _base64ValueToLetter[index++] = '5';
+   _base64ValueToLetter[index++] = '6';
+   _base64ValueToLetter[index++] = '7';
+   _base64ValueToLetter[index++] = '8';
+   _base64ValueToLetter[index++] = '9';
+   _base64ValueToLetter[index++] = '+';
+   _base64ValueToLetter[index++] = '/';
+}

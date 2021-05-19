@@ -206,7 +206,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          miffBoolTRUE,
          _SetBuffer,
          mode,
-         (MiffN1) wcslen(L"MiffTestFile"),
+         (MiffN1) _C2GetCount(L"MiffTestFile"),
          L"MiffTestFile",
          1,
          (void *) file);

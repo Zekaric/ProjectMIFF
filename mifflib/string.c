@@ -49,7 +49,7 @@ Escape certain characters
 \v - vertical tab
 \\ - \
 ******************************************************************************/
-MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 * const c1, 
+MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1, 
    MiffN4 * const c1eCount, MiffC1 ** const c1e)
 {
    MiffN4    index,
@@ -80,7 +80,7 @@ MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 * const c1,
    }
 
    eCount = c1Count + charCount;
-   etemp  = memCreateTypeArray(eCount, MiffC1);
+   etemp  = _MemCreateTypeArray(eCount, MiffC1);
    returnFalseIf(!etemp);
 
    eindex = c1Count + charCount - 1;
@@ -216,10 +216,10 @@ MiffC2 *_C2Clone(MiffN4 const c2Count, MiffC2 const * const c2)
 {
    MiffC2 *result;
 
-   result = memCreateTypeArray(c2Count, MiffC2);
+   result = _MemCreateTypeArray(c2Count, MiffC2);
    returnNullIf(!result);
 
-   memCopyTypeArray(c2Count, MiffC2, result, c2);
+   _MemCopyTypeArray(c2Count, MiffC2, result, c2);
 
    return result;
 }
@@ -242,7 +242,7 @@ MiffBool _C2ToC1(MiffN4 const c2Count, MiffC2 const * const c2, MiffN4 * const c
    *c1      = NULL;
 
    c1CountMax = c2Count * 2 + 1;
-   c1Result   = memCreateTypeArray(c2CountMax, MiffC1);
+   c1Result   = _MemCreateTypeArray(c1CountMax, MiffC1);
    returnFalseIf(!c1Result);
 
    c1Index = 0;
@@ -316,7 +316,7 @@ MiffBool _C2ToC1Key(MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * cons
       c1Index += c1Required;
    }
 
-   *c1Count = c1Index;
+   *c1Count = (MiffN1) c1Index;
 
    returnTrue;
 }
@@ -324,7 +324,7 @@ MiffBool _C2ToC1Key(MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * cons
 /******************************************************************************
 func: _C1LetterToC4Letter
 ******************************************************************************/
-MiffN4 _C1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4);
+MiffN4 _C1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4)
 {
    returnIf(!c1, 0);
 
@@ -369,13 +369,9 @@ MiffN4 _C1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4);
 /******************************************************************************
 func: _C2LetterToC4Letter
 ******************************************************************************/
-MiffN4 _C2LetterToC4Letter(MiffC2 * const c2, MiffC4 * const c4)
+MiffN4 _C2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4)
 {
-   MiffC4 letter;
-
-   genter;
-
-   greturn0If(!c2);
+   return0If(!c2);
 
    // 2 utf16 to form the code point.
    if ((c2[0] & 0xFC00) == 0xD800 &&

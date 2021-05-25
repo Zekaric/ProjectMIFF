@@ -80,9 +80,9 @@ variable:
 prototype:
 ******************************************************************************/
 void      _Base64Restart(              void);
-MiffBool  _Base64Get(                  Miff * const miff, Miff1 * const byte);
-MiffBool  _Base64Set(                  Miff * const miff, Miff1 * const byte);
-MiffBool  _Base64SetEnd(               Miff * const miff);
+MiffBool  _Base64Get(                  Miff       * const miff, MiffN1 * const byte);
+MiffBool  _Base64Set(                  Miff const * const miff, MiffN1   const byte);
+MiffBool  _Base64SetEnd(               Miff const * const miff);
 void      _Base64Start(                void);
 
 void      _ByteSwap2(                  Miff const * const miff, Miff2 * const value);

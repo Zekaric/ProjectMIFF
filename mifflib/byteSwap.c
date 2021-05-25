@@ -57,4 +57,57 @@ prototype:
 global:
 function:
 ******************************************************************************/
+/******************************************************************************
+func: _ByteSwap2
+******************************************************************************/
+void _ByteSwap2(Miff const * const miff, Miff2 * const value)
+{
+   if (miff->isByteSwapping)
+   {
+      value->byte[0] ^= value->byte[1];
+      value->byte[1] ^= value->byte[0];
+      value->byte[0] ^= value->byte[1];
+   }
+}
 
+/******************************************************************************
+func: _ByteSwap4
+******************************************************************************/
+void _ByteSwap4(Miff const * const miff, Miff4 * const value)
+{
+   if (miff->isByteSwapping)
+   {
+      value->byte[0] ^= value->byte[3];
+      value->byte[3] ^= value->byte[0];
+      value->byte[0] ^= value->byte[3];
+
+      value->byte[1] ^= value->byte[2];
+      value->byte[2] ^= value->byte[1];
+      value->byte[1] ^= value->byte[2];
+   }
+}
+
+/******************************************************************************
+func: _ByteSwap8
+******************************************************************************/
+void _ByteSwap8(Miff const * const miff, Miff8 * const value)
+{
+   if (miff->isByteSwapping)
+   {
+      value->byte[0] ^= value->byte[7];
+      value->byte[7] ^= value->byte[0];
+      value->byte[0] ^= value->byte[7];
+
+      value->byte[1] ^= value->byte[6];
+      value->byte[6] ^= value->byte[1];
+      value->byte[1] ^= value->byte[6];
+
+      value->byte[2] ^= value->byte[5];
+      value->byte[5] ^= value->byte[2];
+      value->byte[2] ^= value->byte[5];
+
+      value->byte[3] ^= value->byte[4];
+      value->byte[4] ^= value->byte[3];
+      value->byte[3] ^= value->byte[4];
+   }
+}

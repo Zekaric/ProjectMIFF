@@ -100,7 +100,7 @@ typedef enum
    miffValueTypeN64,                              
    miffValueTypeN128,                             
    miffValueTypeN256,                             
-   miffValueTypeR2                           = 52,
+   //miffValueTypeR2                           = 52,
    miffValueTypeR4                           = 54,
    miffValueTypeR8,                               
    // miffValueTypeR16,                              
@@ -300,20 +300,21 @@ void            miffDestroyContent(          Miff       * const miff);
 // Miff128         miffGetValue128(             Miff const * const miff);
 // Miff256         miffGetValue256(             Miff const * const miff);
 
-MiffBool        miffSetRecordData(           Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
-MiffBool        miffSetRecordValueBoolean(   Miff       * const miff, MiffBool      const value);
-MiffBool        miffSetRecordValueI1(        Miff       * const miff, MiffI1        const value);
-MiffBool        miffSetRecordValueI2(        Miff       * const miff, MiffI2        const value);
-MiffBool        miffSetRecordValueI4(        Miff       * const miff, MiffI4        const value);
-MiffBool        miffSetRecordValueI8(        Miff       * const miff, MiffI8        const value);
-MiffBool        miffSetRecordValueN1(        Miff       * const miff, MiffN1        const value);
-MiffBool        miffSetRecordValueN2(        Miff       * const miff, MiffN2        const value);
-MiffBool        miffSetRecordValueN4(        Miff       * const miff, MiffN4        const value);
-MiffBool        miffSetRecordValueN8(        Miff       * const miff, MiffN8        const value);
-MiffBool        miffSetRecordValueR4(        Miff       * const miff, MiffR4        const value);
-MiffBool        miffSetRecordValueR8(        Miff       * const miff, MiffR8        const value);
-MiffBool        miffSetRecordValueType(      Miff       * const miff, MiffValueType const value);
-MiffBool        miffSetRecordValueC2(        Miff       * const miff, MiffC2        const * const string);
+MiffBool        miffSetRecordData(              Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
+MiffBool        miffSetRecordValueBinaryData1(  Miff       * const miff, MiffN4 const byteCount, MiffN1 const * const value);
+MiffBool        miffSetRecordValueBoolean(      Miff       * const miff, MiffBool              const value);
+MiffBool        miffSetRecordValueI1(           Miff       * const miff, MiffI1                const value);
+MiffBool        miffSetRecordValueI2(           Miff       * const miff, MiffI2                const value);
+MiffBool        miffSetRecordValueI4(           Miff       * const miff, MiffI4                const value);
+MiffBool        miffSetRecordValueI8(           Miff       * const miff, MiffI8                const value);
+MiffBool        miffSetRecordValueN1(           Miff       * const miff, MiffN1                const value);
+MiffBool        miffSetRecordValueN2(           Miff       * const miff, MiffN2                const value);
+MiffBool        miffSetRecordValueN4(           Miff       * const miff, MiffN4                const value);
+MiffBool        miffSetRecordValueN8(           Miff       * const miff, MiffN8                const value);
+MiffBool        miffSetRecordValueR4(           Miff       * const miff, MiffR4                const value);
+MiffBool        miffSetRecordValueR8(           Miff       * const miff, MiffR8                const value);
+MiffBool        miffSetRecordValueType(         Miff       * const miff, MiffValueType         const value);
+MiffBool        miffSetRecordValueC2(           Miff       * const miff, MiffC2        const * const value);
 
 MiffBool        miffStart(                   MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
 void            miffStop(                    void);

@@ -249,6 +249,47 @@ MiffBool miffSetRecordData(Miff * const miff, MiffValueType const type, MiffC2 c
 }
 
 /******************************************************************************
+func: miffSetRecordValueBinaryData1
+******************************************************************************/
+MiffBool miffSetRecordValueBinaryData1(Miff * const miff, MiffN4 const byteCount, MiffN1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffValueTypeBINARY_DATA_1 ||
+        miff->currentRecord.type == miffValueTypeBINARY_DATA_2 ||
+        miff->currentRecord.type == miffValueTypeBINARY_DATA_3 ||
+        miff->currentRecord.type == miffValueTypeBINARY_DATA_4));
+
+   switch (miff->currentRecord.type)
+   {
+   case miffValueTypeBINARY_DATA_1:
+      returnFalseIf(!_WriteTxtValueN(miff, (MiffN8) byteCount));
+      break;
+
+   case miffValueTypeBINARY_DATA_2:
+   case miffValueTypeBINARY_DATA_3:
+   case miffValueTypeBINARY_DATA_4:
+      returnFalse;
+   }
+
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+
+   _Base64Restart();
+   forCount(index, byteCount)
+   {
+      returnFalseIf(!_Base64Set(miff, value[index]));
+   }
+   returnFalseIf(!_Base64SetEnd(miff));
+
+   returnFalseIf(!_CurrentIndexInc(miff));
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffSetRecordValueBoolean
 ******************************************************************************/
 MiffBool miffSetRecordValueBoolean(Miff * const miff, MiffBool const value)

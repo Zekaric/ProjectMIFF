@@ -79,7 +79,7 @@ MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1,
       }
    }
 
-   eCount = c1Count + charCount;
+   eCount = c1Count + charCount + 1;
    etemp  = _MemCreateTypeArray(eCount, MiffC1);
    returnFalseIf(!etemp);
 

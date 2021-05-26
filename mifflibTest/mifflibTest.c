@@ -473,94 +473,119 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          break;
       }
 
-      miffSetRecordData(miff, miffValueTypeBOOLEAN, L"True", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueBoolean(miff, miffBoolTRUE);
+      miffSetOneBoolean(      miff, L"True",     miffBoolTRUE);
+      miffSetOneBoolean(      miff, L"False",    miffBoolFALSE);
+                              
+      miffSetOneI1(           miff, L"I1_0",     0);
+      miffSetOneI1(           miff, L"I1_1",     1);
+      miffSetOneI1(           miff, L"I1_-1",    -1);
+      miffSetOneI1(           miff, L"I1_127",   127);
+      miffSetOneI1(           miff, L"I1_-128",  -128);
+                              
+      miffSetOneN1(           miff, L"N1_0",     0);
+      miffSetOneN1(           miff, L"N1_1",     1);
+      miffSetOneN1(           miff, L"N1_255",   255);
+                                                 
+      miffSetOneI2(           miff, L"I2_0",     0);
+      miffSetOneI2(           miff, L"I2_1",     1);
+      miffSetOneI2(           miff, L"I2_-1",    -1);
+                                                 
+      miffSetOneN2(           miff, L"N2_0",     0);
+      miffSetOneN2(           miff, L"N2_1",     1);
+                              
+      miffSetOneI4(           miff, L"I4_0",     0);
+      miffSetOneI4(           miff, L"I4_1",     1);
+      miffSetOneI4(           miff, L"I4_-1",    -1);
+                                                 
+      miffSetOneN4(           miff, L"N4_0",     0);
+      miffSetOneN4(           miff, L"N4_1",     1);
+                              
+      miffSetOneR4(           miff, L"R4_0",     0.0);
+      miffSetOneR4(           miff, L"R4_1",     1.0);
+      miffSetOneR4(           miff, L"R4_-1",    -1.0);
+      miffSetOneR4(           miff, L"R4_PI",    3.14159f);
+                                                 
+      miffSetOneI8(           miff, L"I8_0",     0);
+      miffSetOneI8(           miff, L"I8_1",     1);
+      miffSetOneI8(           miff, L"I8_-1",    -1);
+                                                 
+      miffSetOneN8(           miff, L"N8_0",     0);
+      miffSetOneN8(           miff, L"N8_1",     1);
+                              
+      miffSetOneR8(           miff, L"R8_0",     0.0);
+      miffSetOneR8(           miff, L"R8_1",     1.0);
+      miffSetOneR8(           miff, L"R8_-1",    -1.0);
+      miffSetOneR8(           miff, L"R8_PI",    3.14159);
+                              
+      miffSetOneType(         miff, L"TypeBool", miffValueTypeBOOLEAN);
+      miffSetOneType(         miff, L"TypeKey",  miffValueTypeTYPE);
+                              
+      miffSetOneStringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                                                 
+      miffSetOnePathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
+                                                 
+      miffSetOneBinaryData1(  miff, L"Binary",           256 * 3, binary);
+                                               
+      miffSetOneEmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
 
-      miffSetRecordData(miff, miffValueTypeBOOLEAN, L"False", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueBoolean(miff, miffBoolFALSE);
-
-      miffSetRecordData(miff, miffValueTypeI1, L"I1_0",    1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI1(miff, 0);
-      miffSetRecordData(miff, miffValueTypeI1, L"I1_1",    1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI1(miff, 1);
-      miffSetRecordData(miff, miffValueTypeI1, L"I1_-1",   1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI1(miff, -1);
-      miffSetRecordData(miff, miffValueTypeI1, L"I1_127",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI1(miff, 127);
-      miffSetRecordData(miff, miffValueTypeI1, L"I1_-128", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI1(miff, -128);
-
-      miffSetRecordData(miff, miffValueTypeN1, L"N1_0",   1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN1(miff, 0);
-      miffSetRecordData(miff, miffValueTypeN1, L"N1_1",   1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN1(miff, 1);
-      miffSetRecordData(miff, miffValueTypeN1, L"N1_255", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN1(miff, 255);
-
-      miffSetRecordData(miff, miffValueTypeI2, L"I2_0",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI2(miff,  0);
-      miffSetRecordData(miff, miffValueTypeI2, L"I2_1",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI2(miff,  1);
-      miffSetRecordData(miff, miffValueTypeI2, L"I2_-1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI2(miff, -1);
-
-      miffSetRecordData(miff, miffValueTypeN2, L"N2_0", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN2(miff, 0);
-      miffSetRecordData(miff, miffValueTypeN2, L"N2_1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN2(miff, 1);
-
-      miffSetRecordData(miff, miffValueTypeI4, L"I4_0",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI4(miff,  0);
-      miffSetRecordData(miff, miffValueTypeI4, L"I4_1",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI4(miff,  1);
-      miffSetRecordData(miff, miffValueTypeI4, L"I4_-1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI4(miff, -1);
-
-      miffSetRecordData(miff, miffValueTypeN4, L"N4_0", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN4(miff, 0);
-      miffSetRecordData(miff, miffValueTypeN4, L"N4_1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN4(miff, 1);
-
-      miffSetRecordData(miff, miffValueTypeR4, L"R4_0",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR4(miff,  0.0);
-      miffSetRecordData(miff, miffValueTypeR4, L"R4_1",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR4(miff,  1.0);
-      miffSetRecordData(miff, miffValueTypeR4, L"R4_-1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR4(miff, -1.0);
-      miffSetRecordData(miff, miffValueTypeR4, L"R4_PI", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR4(miff,  3.14159f);
-
-      miffSetRecordData(miff, miffValueTypeI8, L"I8_0",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI8(miff,  0);
-      miffSetRecordData(miff, miffValueTypeI8, L"I8_1",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI8(miff,  1);
-      miffSetRecordData(miff, miffValueTypeI8, L"I8_-1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueI8(miff, -1);
-
-      miffSetRecordData(miff, miffValueTypeN8, L"N8_0", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN8(miff, 0);
-      miffSetRecordData(miff, miffValueTypeN8, L"N8_1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueN8(miff, 1);
-
-      miffSetRecordData(miff, miffValueTypeR8, L"R8_0",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR8(miff,  0.0);
-      miffSetRecordData(miff, miffValueTypeR8, L"R8_1",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR8(miff,  1.0);
-      miffSetRecordData(miff, miffValueTypeR8, L"R8_-1", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR8(miff, -1.0);
-      miffSetRecordData(miff, miffValueTypeR8, L"R8_PI", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueR8(miff,  3.14159);
-
-      miffSetRecordData(miff, miffValueTypeTYPE, L"TypeBool", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueType(miff, miffValueTypeBOOLEAN);
-      miffSetRecordData(miff, miffValueTypeTYPE, L"TypeKey",  1, miffCompressFlagNONE, 0);
-      miffSetRecordValueType(miff, miffValueTypeTYPE);
-
-      miffSetRecordData(miff, miffValueTypeSTRING, L"String", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueC2(miff, L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-      miffSetRecordData(miff, miffValueTypeBINARY_DATA_1, L"Binary", 1, miffCompressFlagNONE, 0);
-      miffSetRecordValueBinaryData1(miff, 256 * 3, binary);
+      miffSetBlockStart(miff, L"KeyValueBlock");
+      {
+         miffSetOneBoolean(      miff, L"True",     miffBoolTRUE);
+         miffSetOneBoolean(      miff, L"False",    miffBoolFALSE);
+                            
+         miffSetOneI1(           miff, L"I1_0",     0);
+         miffSetOneI1(           miff, L"I1_1",     1);
+         miffSetOneI1(           miff, L"I1_-1",    -1);
+         miffSetOneI1(           miff, L"I1_127",   127);
+         miffSetOneI1(           miff, L"I1_-128",  -128);
+                            
+         miffSetOneN1(           miff, L"N1_0",     0);
+         miffSetOneN1(           miff, L"N1_1",     1);
+         miffSetOneN1(           miff, L"N1_255",   255);
+                                                 
+         miffSetOneI2(           miff, L"I2_0",     0);
+         miffSetOneI2(           miff, L"I2_1",     1);
+         miffSetOneI2(           miff, L"I2_-1",    -1);
+                                                 
+         miffSetOneN2(           miff, L"N2_0",     0);
+         miffSetOneN2(           miff, L"N2_1",     1);
+                            
+         miffSetOneI4(           miff, L"I4_0",     0);
+         miffSetOneI4(           miff, L"I4_1",     1);
+         miffSetOneI4(           miff, L"I4_-1",    -1);
+                                                 
+         miffSetOneN4(           miff, L"N4_0",     0);
+         miffSetOneN4(           miff, L"N4_1",     1);
+                            
+         miffSetOneR4(           miff, L"R4_0",     0.0);
+         miffSetOneR4(           miff, L"R4_1",     1.0);
+         miffSetOneR4(           miff, L"R4_-1",    -1.0);
+         miffSetOneR4(           miff, L"R4_PI",    3.14159f);
+                                                 
+         miffSetOneI8(           miff, L"I8_0",     0);
+         miffSetOneI8(           miff, L"I8_1",     1);
+         miffSetOneI8(           miff, L"I8_-1",    -1);
+                                                 
+         miffSetOneN8(           miff, L"N8_0",     0);
+         miffSetOneN8(           miff, L"N8_1",     1);
+                            
+         miffSetOneR8(           miff, L"R8_0",     0.0);
+         miffSetOneR8(           miff, L"R8_1",     1.0);
+         miffSetOneR8(           miff, L"R8_-1",    -1.0);
+         miffSetOneR8(           miff, L"R8_PI",    3.14159);
+                            
+         miffSetOneType(         miff, L"TypeBool", miffValueTypeBOOLEAN);
+         miffSetOneType(         miff, L"TypeKey",  miffValueTypeTYPE);
+                            
+         miffSetOneStringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                                                 
+         miffSetOnePathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
+                                                 
+         miffSetOneBinaryData1(  miff, L"Binary",           256 * 3, binary);
+                                                 
+         miffSetOneEmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
+      }
+      miffSetBlockStop(miff);
 
       break;
    }

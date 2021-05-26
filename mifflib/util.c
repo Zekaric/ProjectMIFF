@@ -40,7 +40,9 @@ func: _CurrentIndexInc
 MiffBool _CurrentIndexInc(Miff * const miff)
 {
    miff->currentIndex++;
-   if (miff->currentIndex == miff->currentRecord.arrayCount)
+   if (miff->currentRecord.type == miffValueTypeKEY_VALUE_BLOCK_START ||
+       miff->currentRecord.type == miffValueTypeKEY_VALUE_BLOCK_STOP  ||
+       miff->currentIndex       == miff->currentRecord.arrayCount)
    {
       miff->currentRecord.type = miffValueTypeNONE;
       returnFalseIf(!_WriteTxtRecordEnder(miff));

@@ -14,6 +14,8 @@ include:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
+#include <float.h>
 
 #include "zlib.h"
 #include "mifflib.h"
@@ -118,7 +120,7 @@ MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem, MiffN4 
    {
       return miffBoolFALSE;
    }
-   
+
    result                 = (MiffN4) ~Z_OK;
    minSize                = (uLongf) *compressMemByteCount;
    *compressMemByteCount  = 0;
@@ -188,8 +190,9 @@ func: _TestWrite
 ******************************************************************************/
 static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 {
-   FILE *file;
-   Miff *miff;
+   FILE  *file;
+   Miff  *miff;
+   MiffI4 index;
    MiffN1 binary[] =
    {
         0,   0,   0,
@@ -449,11 +452,90 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       254, 254, 254,
       255, 255, 255
    };
+   MiffR4 reals[300] = 
+   { 
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+      0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+   };
+   MiffC2 *strings[10] =
+   {
+      L"the quick brown fox jumped over the lazy dog.",
+      L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
+      L"I fart in your general direction.",
+      L"No one expects the Spanish Inquisition!",
+      L"And now for something completely different.",
+      L"the quick brown fox jumped over the lazy dog.\tTHE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
+      L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.\nthe quick brown fox jumped over the lazy dog.",
+      L"I fart in your general direction.",
+      L"No one expects the Spanish Inquisition!",
+      L"And now for something completely different."
+   };
+   MiffBool bools[100] =
+   {
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+   };
 
    file = NULL;
    miff = NULL;
 
-   for (;;)
+   for(;;)
    {
       if (_wfopen_s(&file, fileName, L"wb") != 0)
       {
@@ -473,117 +555,133 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          break;
       }
 
-      miffSetOneBoolean(      miff, L"True",     miffBoolTRUE);
-      miffSetOneBoolean(      miff, L"False",    miffBoolFALSE);
-                              
-      miffSetOneI1(           miff, L"I1_0",     0);
-      miffSetOneI1(           miff, L"I1_1",     1);
-      miffSetOneI1(           miff, L"I1_-1",    -1);
-      miffSetOneI1(           miff, L"I1_127",   127);
-      miffSetOneI1(           miff, L"I1_-128",  -128);
-                              
-      miffSetOneN1(           miff, L"N1_0",     0);
-      miffSetOneN1(           miff, L"N1_1",     1);
-      miffSetOneN1(           miff, L"N1_255",   255);
-                                                 
-      miffSetOneI2(           miff, L"I2_0",     0);
-      miffSetOneI2(           miff, L"I2_1",     1);
-      miffSetOneI2(           miff, L"I2_-1",    -1);
-                                                 
-      miffSetOneN2(           miff, L"N2_0",     0);
-      miffSetOneN2(           miff, L"N2_1",     1);
-                              
-      miffSetOneI4(           miff, L"I4_0",     0);
-      miffSetOneI4(           miff, L"I4_1",     1);
-      miffSetOneI4(           miff, L"I4_-1",    -1);
-                                                 
-      miffSetOneN4(           miff, L"N4_0",     0);
-      miffSetOneN4(           miff, L"N4_1",     1);
-                              
-      miffSetOneR4(           miff, L"R4_0",     0.0);
-      miffSetOneR4(           miff, L"R4_1",     1.0);
-      miffSetOneR4(           miff, L"R4_-1",    -1.0);
-      miffSetOneR4(           miff, L"R4_PI",    3.14159f);
-                                                 
-      miffSetOneI8(           miff, L"I8_0",     0);
-      miffSetOneI8(           miff, L"I8_1",     1);
-      miffSetOneI8(           miff, L"I8_-1",    -1);
-                                                 
-      miffSetOneN8(           miff, L"N8_0",     0);
-      miffSetOneN8(           miff, L"N8_1",     1);
-                              
-      miffSetOneR8(           miff, L"R8_0",     0.0);
-      miffSetOneR8(           miff, L"R8_1",     1.0);
-      miffSetOneR8(           miff, L"R8_-1",    -1.0);
-      miffSetOneR8(           miff, L"R8_PI",    3.14159);
-                              
-      miffSetOneType(         miff, L"TypeBool", miffValueTypeBOOLEAN);
-      miffSetOneType(         miff, L"TypeKey",  miffValueTypeTYPE);
-                              
-      miffSetOneStringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-                                                 
-      miffSetOnePathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
-                                                 
-      miffSetOneBinaryData1(  miff, L"Binary",           256 * 3, binary);
-                                               
-      miffSetOneEmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
+      miffSet1Boolean(      miff, L"True",     miffBoolTRUE);
+      miffSet1Boolean(      miff, L"False",    miffBoolFALSE);
+
+      miffSet1I1(           miff, L"I1_0",     0);
+      miffSet1I1(           miff, L"I1_1",     1);
+      miffSet1I1(           miff, L"I1_-1",    -1);
+      miffSet1I1(           miff, L"I1_127",   127);
+      miffSet1I1(           miff, L"I1_-128",  -128);
+
+      miffSet1N1(           miff, L"N1_0",     0);
+      miffSet1N1(           miff, L"N1_1",     1);
+      miffSet1N1(           miff, L"N1_255",   255);
+
+      miffSet1I2(           miff, L"I2_0",     0);
+      miffSet1I2(           miff, L"I2_1",     1);
+      miffSet1I2(           miff, L"I2_-1",    -1);
+
+      miffSet1N2(           miff, L"N2_0",     0);
+      miffSet1N2(           miff, L"N2_1",     1);
+
+      miffSet1I4(           miff, L"I4_0",     0);
+      miffSet1I4(           miff, L"I4_1",     1);
+      miffSet1I4(           miff, L"I4_-1",    -1);
+
+      miffSet1N4(           miff, L"N4_0",     0);
+      miffSet1N4(           miff, L"N4_1",     1);
+
+      miffSet1R4(           miff, L"R4_0",     0.0);
+      miffSet1R4(           miff, L"R4_1",     1.0);
+      miffSet1R4(           miff, L"R4_-1",    -1.0);
+      miffSet1R4(           miff, L"R4_PI",    3.14159f);
+
+      miffSet1I8(           miff, L"I8_0",     0);
+      miffSet1I8(           miff, L"I8_1",     1);
+      miffSet1I8(           miff, L"I8_-1",    -1);
+
+      miffSet1N8(           miff, L"N8_0",     0);
+      miffSet1N8(           miff, L"N8_1",     1);
+
+      miffSet1R8(           miff, L"R8_0",     0.0);
+      miffSet1R8(           miff, L"R8_1",     1.0);
+      miffSet1R8(           miff, L"R8_-1",    -1.0);
+      miffSet1R8(           miff, L"R8_PI",    3.14159);
+
+      miffSet1Type(         miff, L"TypeBool", miffValueTypeBOOLEAN);
+      miffSet1Type(         miff, L"TypeKey",  miffValueTypeTYPE);
+
+      miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+      miffSet1PathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
+
+      miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
+
+      miffSet1EmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
+
+      miffSetNN1(           miff, L"N1_Array",     256 * 3, binary);
+
+      miffSetNR4(           miff, L"R4_Array",     300,     reals);
+
+      miffSetNStringC2(     miff, L"String_Array", 10,      strings);
+
+      miffSetNBoolean(      miff, L"Bool_Array",   100,     bools);
 
       miffSetBlockStart(miff, L"KeyValueBlock");
       {
-         miffSetOneBoolean(      miff, L"True",     miffBoolTRUE);
-         miffSetOneBoolean(      miff, L"False",    miffBoolFALSE);
-                            
-         miffSetOneI1(           miff, L"I1_0",     0);
-         miffSetOneI1(           miff, L"I1_1",     1);
-         miffSetOneI1(           miff, L"I1_-1",    -1);
-         miffSetOneI1(           miff, L"I1_127",   127);
-         miffSetOneI1(           miff, L"I1_-128",  -128);
-                            
-         miffSetOneN1(           miff, L"N1_0",     0);
-         miffSetOneN1(           miff, L"N1_1",     1);
-         miffSetOneN1(           miff, L"N1_255",   255);
-                                                 
-         miffSetOneI2(           miff, L"I2_0",     0);
-         miffSetOneI2(           miff, L"I2_1",     1);
-         miffSetOneI2(           miff, L"I2_-1",    -1);
-                                                 
-         miffSetOneN2(           miff, L"N2_0",     0);
-         miffSetOneN2(           miff, L"N2_1",     1);
-                            
-         miffSetOneI4(           miff, L"I4_0",     0);
-         miffSetOneI4(           miff, L"I4_1",     1);
-         miffSetOneI4(           miff, L"I4_-1",    -1);
-                                                 
-         miffSetOneN4(           miff, L"N4_0",     0);
-         miffSetOneN4(           miff, L"N4_1",     1);
-                            
-         miffSetOneR4(           miff, L"R4_0",     0.0);
-         miffSetOneR4(           miff, L"R4_1",     1.0);
-         miffSetOneR4(           miff, L"R4_-1",    -1.0);
-         miffSetOneR4(           miff, L"R4_PI",    3.14159f);
-                                                 
-         miffSetOneI8(           miff, L"I8_0",     0);
-         miffSetOneI8(           miff, L"I8_1",     1);
-         miffSetOneI8(           miff, L"I8_-1",    -1);
-                                                 
-         miffSetOneN8(           miff, L"N8_0",     0);
-         miffSetOneN8(           miff, L"N8_1",     1);
-                            
-         miffSetOneR8(           miff, L"R8_0",     0.0);
-         miffSetOneR8(           miff, L"R8_1",     1.0);
-         miffSetOneR8(           miff, L"R8_-1",    -1.0);
-         miffSetOneR8(           miff, L"R8_PI",    3.14159);
-                            
-         miffSetOneType(         miff, L"TypeBool", miffValueTypeBOOLEAN);
-         miffSetOneType(         miff, L"TypeKey",  miffValueTypeTYPE);
-                            
-         miffSetOneStringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-                                                 
-         miffSetOnePathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
-                                                 
-         miffSetOneBinaryData1(  miff, L"Binary",           256 * 3, binary);
-                                                 
-         miffSetOneEmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
+         miffSet1Boolean(      miff, L"True",     miffBoolTRUE);
+         miffSet1Boolean(      miff, L"False",    miffBoolFALSE);
+
+         miffSet1I1(           miff, L"I1_0",     0);
+         miffSet1I1(           miff, L"I1_1",     1);
+         miffSet1I1(           miff, L"I1_-1",    -1);
+         miffSet1I1(           miff, L"I1_127",   127);
+         miffSet1I1(           miff, L"I1_-128",  -128);
+
+         miffSet1N1(           miff, L"N1_0",     0);
+         miffSet1N1(           miff, L"N1_1",     1);
+         miffSet1N1(           miff, L"N1_255",   255);
+
+         miffSet1I2(           miff, L"I2_0",     0);
+         miffSet1I2(           miff, L"I2_1",     1);
+         miffSet1I2(           miff, L"I2_-1",    -1);
+
+         miffSet1N2(           miff, L"N2_0",     0);
+         miffSet1N2(           miff, L"N2_1",     1);
+
+         miffSet1I4(           miff, L"I4_0",     0);
+         miffSet1I4(           miff, L"I4_1",     1);
+         miffSet1I4(           miff, L"I4_-1",    -1);
+
+         miffSet1N4(           miff, L"N4_0",     0);
+         miffSet1N4(           miff, L"N4_1",     1);
+
+         miffSet1R4(           miff, L"R4_0",     0.0);
+         miffSet1R4(           miff, L"R4_1",     1.0);
+         miffSet1R4(           miff, L"R4_-1",    -1.0);
+         miffSet1R4(           miff, L"R4_PI",    3.14159f);
+
+         miffSet1I8(           miff, L"I8_0",     0);
+         miffSet1I8(           miff, L"I8_1",     1);
+         miffSet1I8(           miff, L"I8_-1",    -1);
+
+         miffSet1N8(           miff, L"N8_0",     0);
+         miffSet1N8(           miff, L"N8_1",     1);
+
+         miffSet1R8(           miff, L"R8_0",     0.0);
+         miffSet1R8(           miff, L"R8_1",     1.0);
+         miffSet1R8(           miff, L"R8_-1",    -1.0);
+         miffSet1R8(           miff, L"R8_PI",    3.14159);
+
+         miffSet1Type(         miff, L"TypeBool", miffValueTypeBOOLEAN);
+         miffSet1Type(         miff, L"TypeKey",  miffValueTypeTYPE);
+
+         miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+         miffSet1PathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
+
+         miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
+
+         miffSet1EmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
+
+         miffSetNN1(           miff, L"N1_Array",     256 * 3, binary);
+
+         miffSetNR4(           miff, L"R4_Array",     300,     reals);
+
+         miffSetNStringC2(     miff, L"String_Array", 10,      strings);
+
+         miffSetNBoolean(      miff, L"Bool_Array",   100,     bools);
       }
       miffSetBlockStop(miff);
 

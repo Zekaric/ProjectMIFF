@@ -289,9 +289,9 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
 }
 
 /******************************************************************************
-func: miffSetOneBinaryData1
+func: miffSet1BinaryData1
 ******************************************************************************/
-MiffBool miffSetOneBinaryData1(Miff * const miff, MiffC2 const * const key, MiffN4 const byteCount, 
+MiffBool miffSet1BinaryData1(Miff * const miff, MiffC2 const * const key, MiffN4 const byteCount, 
    MiffN1 const * const value)
 {
    returnFalseIf(!miffSetHeader(          miff, miffValueTypeBINARY_DATA_1, key, 1, miffCompressFlagNONE, 0));
@@ -300,9 +300,9 @@ MiffBool miffSetOneBinaryData1(Miff * const miff, MiffC2 const * const key, Miff
 }
 
 /******************************************************************************
-func: miffSetOneBoolean
+func: miffSet1Boolean
 ******************************************************************************/
-MiffBool miffSetOneBoolean(Miff * const miff, MiffC2 const * const key, MiffBool const value)
+MiffBool miffSet1Boolean(Miff * const miff, MiffC2 const * const key, MiffBool const value)
 {
    returnFalseIf(!miffSetHeader(      miff, miffValueTypeBOOLEAN, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueBoolean(miff, value));
@@ -310,9 +310,9 @@ MiffBool miffSetOneBoolean(Miff * const miff, MiffC2 const * const key, MiffBool
 }
 
 /******************************************************************************
-func: miffSetOneEmbeddedFile1
+func: miffSet1EmbeddedFile1
 ******************************************************************************/
-MiffBool miffSetOneEmbeddedFile1(Miff * const miff, MiffC2 const * const key, 
+MiffBool miffSet1EmbeddedFile1(Miff * const miff, MiffC2 const * const key, 
    MiffC2 const * const fileType, MiffN4 const byteCount, MiffN1 const * const value)
 {
    returnFalseIf(!miffSetHeader(            miff, miffValueTypeEMBEDDED_FILE_1, key, 1, miffCompressFlagNONE, 0));
@@ -321,9 +321,9 @@ MiffBool miffSetOneEmbeddedFile1(Miff * const miff, MiffC2 const * const key,
 }
 
 /******************************************************************************
-func: miffSetOneI1
+func: miffSet1I1
 ******************************************************************************/
-MiffBool miffSetOneI1(Miff * const miff, MiffC2 const * const key, MiffI1 const value)
+MiffBool miffSet1I1(Miff * const miff, MiffC2 const * const key, MiffI1 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeI1, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueI1(miff, value));
@@ -331,9 +331,9 @@ MiffBool miffSetOneI1(Miff * const miff, MiffC2 const * const key, MiffI1 const 
 }
 
 /******************************************************************************
-func: miffSetOneI2
+func: miffSet1I2
 ******************************************************************************/
-MiffBool miffSetOneI2(Miff * const miff, MiffC2 const * const key, MiffI2 const value)
+MiffBool miffSet1I2(Miff * const miff, MiffC2 const * const key, MiffI2 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeI2, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueI2(miff, value));
@@ -341,9 +341,9 @@ MiffBool miffSetOneI2(Miff * const miff, MiffC2 const * const key, MiffI2 const 
 }
 
 /******************************************************************************
-func: miffSetOneI4
+func: miffSet1I4
 ******************************************************************************/
-MiffBool miffSetOneI4(Miff * const miff, MiffC2 const * const key, MiffI4 const value)
+MiffBool miffSet1I4(Miff * const miff, MiffC2 const * const key, MiffI4 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeI4, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueI4(miff, value));
@@ -351,9 +351,9 @@ MiffBool miffSetOneI4(Miff * const miff, MiffC2 const * const key, MiffI4 const 
 }
 
 /******************************************************************************
-func: miffSetOneI8
+func: miffSet1I8
 ******************************************************************************/
-MiffBool miffSetOneI8(Miff * const miff, MiffC2 const * const key, MiffI8 const value)
+MiffBool miffSet1I8(Miff * const miff, MiffC2 const * const key, MiffI8 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeI8, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueI8(miff, value));
@@ -361,9 +361,9 @@ MiffBool miffSetOneI8(Miff * const miff, MiffC2 const * const key, MiffI8 const 
 }
 
 /******************************************************************************
-func: miffSetOneN1
+func: miffSet1N1
 ******************************************************************************/
-MiffBool miffSetOneN1(Miff * const miff, MiffC2 const * const key, MiffN1 const value)
+MiffBool miffSet1N1(Miff * const miff, MiffC2 const * const key, MiffN1 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeN1, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueN1(miff, value));
@@ -371,9 +371,9 @@ MiffBool miffSetOneN1(Miff * const miff, MiffC2 const * const key, MiffN1 const 
 }
 
 /******************************************************************************
-func: miffSetOneN2
+func: miffSet1N2
 ******************************************************************************/
-MiffBool miffSetOneN2(Miff * const miff, MiffC2 const * const key, MiffN2 const value)
+MiffBool miffSet1N2(Miff * const miff, MiffC2 const * const key, MiffN2 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeN2, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueN2(miff, value));
@@ -381,9 +381,9 @@ MiffBool miffSetOneN2(Miff * const miff, MiffC2 const * const key, MiffN2 const 
 }
 
 /******************************************************************************
-func: miffSetOneN4
+func: miffSet1N4
 ******************************************************************************/
-MiffBool miffSetOneN4(Miff * const miff, MiffC2 const * const key, MiffN4 const value)
+MiffBool miffSet1N4(Miff * const miff, MiffC2 const * const key, MiffN4 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeN4, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueN4(miff, value));
@@ -391,9 +391,9 @@ MiffBool miffSetOneN4(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 }
 
 /******************************************************************************
-func: miffSetOneN8
+func: miffSet1N8
 ******************************************************************************/
-MiffBool miffSetOneN8(Miff * const miff, MiffC2 const * const key, MiffN8 const value)
+MiffBool miffSet1N8(Miff * const miff, MiffC2 const * const key, MiffN8 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeN8, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueN8(miff, value));
@@ -401,9 +401,9 @@ MiffBool miffSetOneN8(Miff * const miff, MiffC2 const * const key, MiffN8 const 
 }
 
 /******************************************************************************
-func: miffSetOnePathC2
+func: miffSet1PathC2
 ******************************************************************************/
-MiffBool miffSetOnePathC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
+MiffBool miffSet1PathC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
 {
    returnFalseIf(!miffSetHeader(    miff, miffValueTypePATH, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValuePathC2(miff, value));
@@ -411,9 +411,9 @@ MiffBool miffSetOnePathC2(Miff * const miff, MiffC2 const * const key, MiffC2 co
 }
 
 /******************************************************************************
-func: miffSetOneR4
+func: miffSet1R4
 ******************************************************************************/
-MiffBool miffSetOneR4(Miff * const miff, MiffC2 const * const key, MiffR4 const value)
+MiffBool miffSet1R4(Miff * const miff, MiffC2 const * const key, MiffR4 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeR4, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueR4(miff, value));
@@ -421,9 +421,9 @@ MiffBool miffSetOneR4(Miff * const miff, MiffC2 const * const key, MiffR4 const 
 }
 
 /******************************************************************************
-func: miffSetOneR8
+func: miffSet1R8
 ******************************************************************************/
-MiffBool miffSetOneR8(Miff * const miff, MiffC2 const * const key, MiffR8 const value)
+MiffBool miffSet1R8(Miff * const miff, MiffC2 const * const key, MiffR8 const value)
 {
    returnFalseIf(!miffSetHeader( miff, miffValueTypeR8, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueR8(miff, value));
@@ -431,9 +431,9 @@ MiffBool miffSetOneR8(Miff * const miff, MiffC2 const * const key, MiffR8 const 
 }
 
 /******************************************************************************
-func: miffSetOneType
+func: miffSet1Type
 ******************************************************************************/
-MiffBool miffSetOneType(Miff * const miff, MiffC2 const * const key, MiffValueType const value)
+MiffBool miffSet1Type(Miff * const miff, MiffC2 const * const key, MiffValueType const value)
 {
    returnFalseIf(!miffSetHeader(   miff, miffValueTypeTYPE, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueType(miff, value));
@@ -441,14 +441,237 @@ MiffBool miffSetOneType(Miff * const miff, MiffC2 const * const key, MiffValueTy
 }
 
 /******************************************************************************
-func: miffSetOneStringC2
+func: miffSet1StringC2
 ******************************************************************************/
-MiffBool miffSetOneStringC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
+MiffBool miffSet1StringC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
 {
    returnFalseIf(!miffSetHeader(       miff, miffValueTypeSTRING, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueStringC2(miff, value));
    returnTrue;
 }
+
+/******************************************************************************
+func: miffSetNBoolean
+******************************************************************************/
+MiffBool miffSetNBoolean(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffBool const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeBOOLEAN, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueBoolean(miff, value[index]));
+   }
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNI1
+******************************************************************************/
+MiffBool miffSetNI1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffI1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeI1, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueI1(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNI2
+******************************************************************************/
+MiffBool miffSetNI2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffI2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeI2, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueI2(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNI4
+******************************************************************************/
+MiffBool miffSetNI4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffI4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeI4, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueI4(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNI8
+******************************************************************************/
+MiffBool miffSetNI8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffI8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeI8, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueI8(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNN1
+******************************************************************************/
+MiffBool miffSetNN1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffN1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeN1, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueN1(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNN2
+******************************************************************************/
+MiffBool miffSetNN2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffN2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeN2, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueN2(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNN4
+******************************************************************************/
+MiffBool miffSetNN4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffN4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeN4, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueN4(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNN8
+******************************************************************************/
+MiffBool miffSetNN8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffN8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeN8, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueN8(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNPathC2
+******************************************************************************/
+MiffBool miffSetNPathC2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffC2 const * const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypePATH, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValuePathC2(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNR4
+******************************************************************************/
+MiffBool miffSetNR4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffR4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeR4, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueR4(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNR8
+******************************************************************************/
+MiffBool miffSetNR8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffR8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeR8, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueR8(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNType
+******************************************************************************/
+MiffBool miffSetNType(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffValueType const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeTYPE, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueType(miff, value[index]));
+   }
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffSetNStringC2
+******************************************************************************/
+MiffBool miffSetNStringC2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffC2 const * const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeSTRING, key, count, miffCompressFlagNONE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueStringC2(miff, value[index]));
+   }
+   returnTrue;
+}
+
 
 /******************************************************************************
 func: miffSetValueBinaryData1

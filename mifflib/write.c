@@ -213,7 +213,7 @@ MiffBool _WriteTxtValue1(Miff const * const miff, MiffValueType const type, Miff
       {
          return _WriteTxtC1(miff, (MiffC1 *) "T");
       }
-      
+
       return _WriteTxtC1(miff, (MiffC1 *) "F");
    }
 
@@ -388,7 +388,7 @@ MiffBool _WriteTxtValueC2(Miff const * const miff, MiffC2 const * const value)
    once
    {
       breakIf(!_C2ToC1(_C2GetCount(value), value, &c1Count, &c1));
-      
+
       breakIf(!_C1ToC1Encoded(_C1GetCount(c1), c1, &c1eCount, &c1e));
 
       breakIf(!_WriteTxtC1(miff, c1e));

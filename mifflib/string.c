@@ -400,9 +400,6 @@ MiffN4 _C4LetterToC1Letter(MiffN4 const c4, MiffN1 * const a, MiffN1 * const b,
 
    if (c4 < 0x0000007f)
    {
-      *d = 0;
-      *c = 0;
-      *b = 0;
       *a = (MiffN1) c4;
 
       return 1;
@@ -410,8 +407,6 @@ MiffN4 _C4LetterToC1Letter(MiffN4 const c4, MiffN1 * const a, MiffN1 * const b,
 
    if (c4 < 0x000007ff)
    {
-      *d = 0;
-      *c = 0;
       *b = (MiffN1) (0x80 |  (c4       & 0x3f));
       *a = (MiffN1) (0xc0 | ((c4 >> 6) & 0x1f));
 
@@ -420,7 +415,6 @@ MiffN4 _C4LetterToC1Letter(MiffN4 const c4, MiffN1 * const a, MiffN1 * const b,
 
    if (c4 < 0x0000ffff)
    {
-      *d = 0;
       *c = (MiffN1) (0x80 |  (c4        & 0x3f));
       *b = (MiffN1) (0x80 | ((c4 >>  6) & 0x3f));
       *a = (MiffN1) (0xe0 | ((c4 >> 12) & 0x0f));

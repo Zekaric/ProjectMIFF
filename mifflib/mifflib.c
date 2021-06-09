@@ -173,7 +173,8 @@ void miffDestroyContent(Miff * const miff)
 func: miffStart
 ******************************************************************************/
 MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc,
-   MiffMemCompress const memCompressFunc, MiffMemDecompress const memDecompressFunc)
+   MiffMemCompressBound const memCompressBoundFunc, MiffMemCompress const memCompressFunc,
+   MiffMemDecompress const memDecompressFunc)
 {
    returnTrueIf(_isStarted);
 
@@ -183,7 +184,7 @@ MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDe
       !memCreateFunc ||
       !memDestroyFunc)
 
-   _MemStart(memCreateFunc, memDestroyFunc, memCompressFunc, memDecompressFunc);
+   _MemStart(memCreateFunc, memDestroyFunc, memCompressBoundFunc, memCompressFunc, memDecompressFunc);
 
    _isStarted     = miffBoolTRUE;
 
@@ -226,6 +227,8 @@ func: miffSetHeader
 MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const * const key, 
    MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
 {
+   MiffN4 memSize;
+
    returnFalseIf(
       !_isStarted ||
       !miff);
@@ -233,7 +236,8 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
    if (type == miffValueTypeKEY_VALUE_BLOCK_STOP)
    {
       returnFalseIf(!_WriteTxtRecordType( miff, type));
-      return         _WriteTxtRecordEnder(miff);
+      returnFalseIf(!_WriteTxtRecordEnder(miff));
+      returnTrue;
    }
    
    returnFalseIf(!key);
@@ -284,6 +288,33 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
       returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
       returnFalseIf(!_WriteTxtRecordSeparator(miff));
    }
+
+   // If compression is used, prep the internal buffer
+   memSize = 0;
+   if      (compressFlag == miffCompressFlagCOMPRESS)
+   {
+      memSize = count * _TypeGetSize(miff, type);
+   }
+   else if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   {
+      memSize = chunkByteCount;
+   }
+
+   if (miff->compressMemByteCount < memSize)
+   {
+      _MemDestroy(miff->compressMemByteData);
+   
+      // Allocate the buffer.
+      miff->compressMemByteData = _MemCreateTypeArray(count * _TypeGetSize(miff, type), MiffN1);
+      if (!miff->compressMemByteData)
+      {
+         miff->currentRecord.type = miffValueTypeNONE;
+         returnFalse;
+      }
+   }
+   miff->compressMemByteCount = memSize;
+   miff->compressMemByteIndex = 0;
+   _MemClearTypeArray(memSize, MiffN1, miff->compressMemByteData);
 
    returnTrue;
 }
@@ -704,12 +735,20 @@ MiffBool miffSetValueBinaryData1(Miff * const miff, MiffN4 const byteCount, Miff
 
    returnFalseIf(!_WriteTxtRecordSeparator(miff));
 
-   _Base64Restart();
-   forCount(index, byteCount)
+   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
    {
-      returnFalseIf(!_Base64Set(miff, value[index]));
+      _Base64Restart();
+
+      forCount(index, byteCount)
+      {
+         returnFalseIf(!_Base64Set(miff, value[index]));
+      }
+      returnFalseIf(!_Base64SetEnd(miff));
    }
-   returnFalseIf(!_Base64SetEnd(miff));
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   {
+      _CompressAndWrite(miff, byteCount, value);
+   }
 
    returnFalseIf(!_CurrentIndexInc(miff));
 
@@ -793,16 +832,11 @@ MiffBool miffSetValueI1(Miff * const miff, MiffI1 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeI1);
+      !miff)
 
    vtemp.i = value;
 
-   returnFalseIf(!_WriteTxtValue1(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue1(miff, miffValueTypeI1, vtemp);
 }
 
 /******************************************************************************
@@ -814,16 +848,11 @@ MiffBool miffSetValueI2(Miff * const miff, MiffI2 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeI2);
+      !miff)
 
    vtemp.i = value;
 
-   returnFalseIf(!_WriteTxtValue2(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue2(miff, miffValueTypeI2, vtemp);
 }
 
 /******************************************************************************
@@ -835,16 +864,11 @@ MiffBool miffSetValueI4(Miff * const miff, MiffI4 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeI4);
+      !miff)
 
    vtemp.i = value;
 
-   returnFalseIf(!_WriteTxtValue4(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue4(miff, miffValueTypeI4, vtemp);
 }
 
 /******************************************************************************
@@ -856,16 +880,11 @@ MiffBool miffSetValueI8(Miff * const miff, MiffI8 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeI8);
+      !miff)
 
    vtemp.i = value;
 
-   returnFalseIf(!_WriteTxtValue8(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue8(miff, miffValueTypeI8, vtemp);
 }
 
 /******************************************************************************
@@ -877,16 +896,11 @@ MiffBool miffSetValueN1(Miff * const miff, MiffN1 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeN1);
+      !miff)
 
    vtemp.n = value;
 
-   returnFalseIf(!_WriteTxtValue1(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue1(miff, miffValueTypeN1, vtemp);
 }
 
 /******************************************************************************
@@ -898,16 +912,11 @@ MiffBool miffSetValueN2(Miff * const miff, MiffN2 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeN2);
+      !miff)
 
    vtemp.n = value;
 
-   returnFalseIf(!_WriteTxtValue2(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue2(miff, miffValueTypeN2, vtemp);
 }
 
 /******************************************************************************
@@ -919,16 +928,11 @@ MiffBool miffSetValueN4(Miff * const miff, MiffN4 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeN4);
+      !miff)
 
    vtemp.n = value;
 
-   returnFalseIf(!_WriteTxtValue4(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue4(miff, miffValueTypeN4, vtemp);
 }
 
 /******************************************************************************
@@ -940,16 +944,11 @@ MiffBool miffSetValueN8(Miff * const miff, MiffN8 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeN8);
+      !miff)
 
    vtemp.n = value;
 
-   returnFalseIf(!_WriteTxtValue8(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue8(miff, miffValueTypeN8, vtemp);
 }
 
 /******************************************************************************
@@ -979,16 +978,11 @@ MiffBool miffSetValueR4(Miff * const miff, MiffR4 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeR4);
+      !miff)
 
    vtemp.r = value;
 
-   returnFalseIf(!_WriteTxtValue4(miff, miff->currentRecord.type, vtemp));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
+   return _WriteValue4(miff, miffValueTypeR4, vtemp);
 }
 
 /******************************************************************************
@@ -1000,12 +994,25 @@ MiffBool miffSetValueR8(Miff * const miff, MiffR8 const value)
 
    returnFalseIf(
       !_isStarted ||
-      !miff       ||
-      miff->currentRecord.type != miffValueTypeR8);
+      !miff)
 
    vtemp.r = value;
 
-   returnFalseIf(!_WriteTxtValue8(miff, miff->currentRecord.type, vtemp));
+   return _WriteValue8(miff, miffValueTypeR8, vtemp);
+}
+
+/******************************************************************************
+func: miffSetValueStringC2
+******************************************************************************/
+MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !value      ||
+      miff->currentRecord.type != miffValueTypeSTRING);
+
+   returnFalseIf(!_WriteTxtValueC2(miff, value));
 
    returnFalseIf(!_CurrentIndexInc(miff));
 
@@ -1030,24 +1037,34 @@ MiffBool miffSetValueType(Miff * const miff, MiffValueType const value)
 }
 
 /******************************************************************************
-func: miffSetValueStringC2
+func: miffSetValueUserType
 ******************************************************************************/
-MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
+MiffBool miffSetValueUserType(Miff * const miff, MiffValueType const type, MiffC2 const * const name,
+   MiffN4 const count)
 {
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !value      ||
-      miff->currentRecord.type != miffValueTypeSTRING);
+      !name       ||
+      miff->currentRecord.type != miffValueTypeUSER_TYPE);
 
-   returnFalseIf(!_WriteTxtValueC2(miff, value));
+   returnFalseIf(!_WriteTxtValueType(      miff, type));
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   returnFalseIf(!_WriteTxtValueC2(        miff, name));
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   if (count == miffArrayCountUNKNOWN)
+   {
+      returnFalseIf(!_WriteTxtValueC2(     miff, miffArrayCountUNKNOWN_C2));
+   }
+   else
+   {
+      returnFalseIf(!_WriteTxtValueN(      miff, count));
+   }
 
    returnFalseIf(!_CurrentIndexInc(miff));
 
    returnTrue;
 }
-
-
 
 
 

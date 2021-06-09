@@ -172,6 +172,7 @@
     <ClCompile Include="mem.c" />
     <ClCompile Include="mifflib.c" />
     <ClCompile Include="string.c" />
+    <ClCompile Include="type.c" />
     <ClCompile Include="util.c" />
     <ClCompile Include="write.c" />
   </ItemGroup>

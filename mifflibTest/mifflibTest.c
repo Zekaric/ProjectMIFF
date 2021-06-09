@@ -36,14 +36,15 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static void    *_MemCreate(      MiffN4 const memByteCount);
-static void     _MemDestroy(     void * const mem);
-static MiffBool _MemCompress(    MiffN4 const memByteCount, void const * const mem, MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem);
-static MiffBool _MemDecompress(  MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount, void ** const mem);
+static void    *_MemCreate(         MiffN4 const memByteCount);
+static void     _MemDestroy(        void * const mem);
+static MiffBool _MemCompress(       MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
+static MiffN4   _MemCompressBound(  MiffN4 const memByteCount);
+static MiffBool _MemDecompress(     MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
 
-static MiffBool _SetBuffer(      void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
+static MiffBool _SetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
 
-static MiffBool _TestWrite(      MiffC2 * const fileName, MiffMode const mode);
+static MiffBool _TestWrite(         MiffC2 * const fileName, MiffMode const mode);
 
 /******************************************************************************
 global:
@@ -61,7 +62,7 @@ int main(int acount, char **alist)
    result = 0;
 
    // Start miff library.
-   if (!miffStart(_MemCreate, _MemDestroy, _MemCompress, _MemDecompress))
+   if (!miffStart(_MemCreate, _MemDestroy, _MemCompressBound, _MemCompress, _MemDecompress))
    {
       result = 1;
       goto DONE;
@@ -108,15 +109,24 @@ void _MemDestroy(void * const mem)
 }
 
 /******************************************************************************
+func: _MemCompressBound
+******************************************************************************/
+MiffN4 _MemCompressBound(MiffN4 const memByteCount)
+{
+   return compressBound((uLong) memByteCount);
+}
+
+/******************************************************************************
 func: _MemCompress
 ******************************************************************************/
-MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem, MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem)
+MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
+   MiffN4 * const compressMemByteCount, void * const compressMem)
 {
    uLongf minSize;
    MiffN4 result;
 
    if (!memByteCount         || !mem ||
-       !compressMemByteCount || compressMem)
+       !compressMemByteCount || !compressMem)
    {
       return miffBoolFALSE;
    }
@@ -127,8 +137,8 @@ MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem, MiffN4 
 
    // Compress the buffer.
    result = compress2(
-      (Bytef *) compressMem, 
-      &minSize, 
+      (Bytef *) compressMem,
+      &minSize,
       (Bytef const *) mem,
       (uLong) memByteCount,
       Z_DEFAULT_COMPRESSION);
@@ -146,7 +156,8 @@ MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem, MiffN4 
 /******************************************************************************
 func: _MemDecompress
 ******************************************************************************/
-MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount, void ** const mem)
+MiffBool _MemDecompress(MiffN4 const compressMemByteCount, void const * const compressMem,
+   MiffN4 * const memByteCount, void * const mem)
 {
    MiffN4 result;
    uLongf size;
@@ -162,9 +173,9 @@ MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const 
 
    // Uncompress the buffer.
    result = uncompress(
-      (Bytef *) mem, 
+      (Bytef *) mem,
       &size,
-      (Bytef const *) compressMem, 
+      (Bytef const *) compressMem,
       (uLong) compressMemByteCount);
 
    if (result != Z_OK)
@@ -452,8 +463,148 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       254, 254, 254,
       255, 255, 255
    };
-   MiffR4 reals[300] = 
-   { 
+   MiffN1 n1array[] =
+   {
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
+   };
+   MiffN2 n2array[] =
+   {
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
+   };
+   MiffN4 n4array[] =
+   {
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
+   };
+   MiffN8 n8array[] =
+   {
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
+
+      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
+      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
+      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
+      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
+      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
+      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
+      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
+      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
+      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
+      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
+   };
+   MiffR4 reals4[300] =
+   {
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
@@ -504,6 +655,59 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
+   };
+   MiffR8 reals8[300] =
+   {
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
+      0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
    };
    MiffC2 *strings[10] =
    {
@@ -520,16 +724,16 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
    };
    MiffBool bools[100] =
    {
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE, 
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
    };
 
    file = NULL;
@@ -606,17 +810,65 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSet1PathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
 
-      miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
-
       miffSet1EmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
 
-      miffSetNN1(           miff, L"N1_Array",     256 * 3, binary);
+      miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
 
-      miffSetNR4(           miff, L"R4_Array",     300,     reals);
+      miffSetHeader(          miff, miffValueTypeBINARY_DATA_1, L"Binary Compressed", 1, miffCompressFlagCOMPRESS, 0);
+      miffSetValueBinaryData1(miff, 256 * 3, n1array);
+
+      miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) n1array);
+      miffSetNN1(           miff, L"N1_Array",     256,     n1array);
+      miffSetHeader(        miff, miffValueTypeI1, L"I1 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueI1(miff, ((MiffI1 *) n1array)[index]);
+      }
+
+      miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) n2array);
+      miffSetNN2(           miff, L"N2_Array",     256,     n2array);
+      miffSetHeader(        miff, miffValueTypeI2, L"I2 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueI2(miff, ((MiffI2 *) n2array)[index]);
+      }
+
+      miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) n4array);
+      miffSetNN4(           miff, L"N4_Array",     256,     n4array);
+      miffSetHeader(        miff, miffValueTypeI4, L"I4 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueI4(miff, ((MiffI4 *) n4array)[index]);
+      }
+
+      miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) n8array);
+      miffSetNN8(           miff, L"N8_Array",     256,     n8array);
+      miffSetHeader(        miff, miffValueTypeI8, L"I8 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueI8(miff, ((MiffI8 *) n8array)[index]);
+      }
+
+      miffSetNR4(           miff, L"R4_Array",     300,     reals4);
+      miffSetNR8(           miff, L"R8_Array",     300,     reals8);
+      miffSetHeader(        miff, miffValueTypeR8, L"R8 Array Compressed", 300, miffCompressFlagCOMPRESS, 0);
+      for (index = 0; index < 300; index++)
+      {
+         miffSetValueR8(miff, reals8[index]);
+      }
 
       miffSetNStringC2(     miff, L"String_Array", 10,      strings);
 
       miffSetNBoolean(      miff, L"Bool_Array",   100,     bools);
+
+      miffSetHeader(        miff, miffValueTypeUSER_TYPE, L"Matrix",  1, miffCompressFlagNONE, 0);
+      miffSetValueUserType( miff, miffValueTypeR4,        L"Cell",   16);
+
+      miffSetHeader(        miff, miffValueTypeUSER_TYPE, L"Point",   4, miffCompressFlagNONE, 0);
+      miffSetValueUserType( miff, miffValueTypeSTRING,    L"String",  1);
+      miffSetValueUserType( miff, miffValueTypeR4,        L"E",       1);
+      miffSetValueUserType( miff, miffValueTypeR4,        L"N",       1);
+      miffSetValueUserType( miff, miffValueTypeR4,        L"Z",       1);
 
       miffSetBlockStart(miff, L"KeyValueBlock");
       {
@@ -665,23 +917,11 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          miffSet1R8(           miff, L"R8_PI",    3.14159);
 
          miffSet1Type(         miff, L"TypeBool", miffValueTypeBOOLEAN);
-         miffSet1Type(         miff, L"TypeKey",  miffValueTypeTYPE);
+         miffSet1Type(         miff, L"TypeType", miffValueTypeTYPE);
 
          miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-         miffSet1PathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
-
-         miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
-
-         miffSet1EmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
-
-         miffSetNN1(           miff, L"N1_Array",     256 * 3, binary);
-
-         miffSetNR4(           miff, L"R4_Array",     300,     reals);
-
          miffSetNStringC2(     miff, L"String_Array", 10,      strings);
-
-         miffSetNBoolean(      miff, L"Bool_Array",   100,     bools);
       }
       miffSetBlockStop(miff);
 

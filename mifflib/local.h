@@ -101,6 +101,7 @@ MiffN4    _C1LetterToC4Letter(         MiffC1 const * const c1, MiffC4 * const c
 MiffN4    _C2LetterToC4Letter(         MiffC2 const * const c2, MiffC4 * const c4);
 MiffN4    _C4LetterToC1Letter(         MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
 MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
+MiffBool  _CompressAndWrite(           Miff * const miff, MiffN4 const byteCount, void const * const byteData);
 MiffBool  _CurrentIndexInc(            Miff       * const miff);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
@@ -108,10 +109,11 @@ MiffBool  _CurrentIndexInc(            Miff       * const miff);
 
 void     *_MemCreate(                  MiffN4 const memByteCount);
 void      _MemDestroy(                 void * const mem);
-MiffBool  _MemCompress(                MiffN4 const memByteCount, void const * const mem, MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem);
-MiffBool  _MemDecompress(              MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount, void ** const mem);
+MiffN4    _MemCompressBound(           MiffN4 const memByteCount);
+MiffBool  _MemCompress(                MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
+MiffBool  _MemDecompress(              MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
 MiffBool  _MemIsEqual(                 MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB, MiffN1 const * const memB);
-void      _MemStart(                   MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc, MiffMemCompress const memCompressFunc, MiffMemDecompress const memDecompressFunc);
+void      _MemStart(                   MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc, MiffMemCompressBound const memCompressBoundFunc, MiffMemCompress const memCompressFunc, MiffMemDecompress const memDecompressFunc);
 void      _MemStop(                    void);
 
 #define   _MemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
@@ -119,6 +121,8 @@ void      _MemStop(                    void);
 #define   _MemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
 #define   _MemCreateType(            TYPE)           (TYPE *) _MemCreate(                    sizeof(TYPE))
 #define   _MemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MemCreate(          (COUNT) * sizeof(TYPE))
+
+MiffN4    _TypeGetSize(                Miff const * const miff, MiffValueType const type);
 
 MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * const value);
 MiffBool  _WriteTxtC2(                 Miff const * const miff, MiffC2 const * const value);
@@ -138,5 +142,9 @@ MiffBool  _WriteTxtValueI(             Miff const * const miff,                 
 MiffBool  _WriteTxtValueN(             Miff const * const miff,                           MiffN8 const value);
 MiffBool  _WriteTxtValueType(          Miff const * const miff,                           MiffValueType const value);
 MiffBool  _WriteTxtValueC2(            Miff const * const miff,                           MiffC2 const * const value);
+MiffBool  _WriteValue1(                Miff       * const miff, MiffValueType const type, Miff1 value);
+MiffBool  _WriteValue2(                Miff       * const miff, MiffValueType const type, Miff2 value);
+MiffBool  _WriteValue4(                Miff       * const miff, MiffValueType const type, Miff4 value);
+MiffBool  _WriteValue8(                Miff       * const miff, MiffValueType const type, Miff8 value);
 
 #endif

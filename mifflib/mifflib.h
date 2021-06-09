@@ -115,6 +115,7 @@ typedef enum
 } MiffValueType;
 
 #define miffArrayCountUNKNOWN                ((MiffN4) 0xFFFFFFFF)
+#define miffArrayCountUNKNOWN_C2             L"*"
 
 typedef enum
 {
@@ -207,14 +208,15 @@ typedef struct
    MiffN1   byte[256];
 } Miff256;
 
-typedef void    *(*MiffMemCreate)(     MiffN4 const memByteCount);
-typedef void     (*MiffMemDestroy)(    void * const mem);
-typedef MiffBool (*MiffMemCompress)(   MiffN4 const memByteCount,         void const * const mem,           MiffN4 * const compressMemByteCount, MiffN1 ** const compressMem);
-typedef MiffBool (*MiffMemDecompress)( MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, MiffN4 * const memByteCount,         void ** const mem);
+typedef void    *(*MiffMemCreate)(        MiffN4 const memByteCount);
+typedef void     (*MiffMemDestroy)(       void * const mem);
+typedef MiffN4   (*MiffMemCompressBound)( MiffN4 const memByteCount);
+typedef MiffBool (*MiffMemCompress)(      MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
+typedef MiffBool (*MiffMemDecompress)(    MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
 
-typedef MiffBool (*MiffGetBuffer)(     void * const dataRepo, MiffN4 const byteCount, MiffN1       * const data);
+typedef MiffBool (*MiffGetBuffer)(        void * const dataRepo, MiffN4 const byteCount, MiffN1       * const data);
 
-typedef MiffBool (*MiffSetBuffer)(     void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const data);
+typedef MiffBool (*MiffSetBuffer)(        void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const data);
 
 typedef struct 
 {
@@ -264,6 +266,7 @@ typedef struct
    // Temporary storage for compressed memory.
    MiffN4                      compressChunkByteCount;
    MiffN4                      compressMemByteCount;
+   MiffN4                      compressMemByteIndex;
    MiffN1                     *compressMemByteData;
 } Miff;
 
@@ -347,10 +350,11 @@ MiffBool        miffSetValueN8(              Miff       * const miff, MiffN8    
 MiffBool        miffSetValuePathC2(          Miff       * const miff, MiffC2        const * const value);
 MiffBool        miffSetValueR4(              Miff       * const miff, MiffR4                const value);
 MiffBool        miffSetValueR8(              Miff       * const miff, MiffR8                const value);
-MiffBool        miffSetValueType(            Miff       * const miff, MiffValueType         const value);
 MiffBool        miffSetValueStringC2(        Miff       * const miff, MiffC2        const * const value);
+MiffBool        miffSetValueType(            Miff       * const miff, MiffValueType         const value);
+MiffBool        miffSetValueUserType(        Miff       * const miff, MiffValueType         const type, MiffC2 const * const name, MiffN4 const count);
 
-MiffBool        miffStart(                         MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
+MiffBool        miffStart(                         MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompressBound const memCompressBound, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
 void            miffStop(                          void);
 
 // MiffBool        miffUserTypeAddVar(                Miff       * const miff, MiffC2 const * const name, MiffValueType const type, MiffN4 const arrayCount);

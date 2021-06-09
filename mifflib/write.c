@@ -324,7 +324,7 @@ MiffBool _WriteTxtValueI(Miff const * const miff, MiffI8 const value)
       miff->setBuffer(miff->dataRepo, 1, (MiffN1 *) "-");
       ntemp = -value;
    }
-   else 
+   else
    {
       ntemp =  value;
    }
@@ -398,6 +398,119 @@ MiffBool _WriteTxtValueC2(Miff const * const miff, MiffC2 const * const value)
 
    _MemDestroy(c1e);
    _MemDestroy(c1);
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _WriteValue1
+******************************************************************************/
+MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
+{
+   returnFalseIf(miff->currentRecord.type != type);
+
+   if (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   {
+      // Write out the value.
+      returnFalseIf(!_WriteTxtValue1(miff, type, value));
+   }
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   {
+      // Populate the internal buffer before compression.
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
+   }
+
+   // Write out the separator, ender, compressed data.
+   returnFalseIf(!_CurrentIndexInc(miff));
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _WriteValue2
+******************************************************************************/
+MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
+{
+   returnFalseIf(miff->currentRecord.type != type);
+
+   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   {
+      // Write out the value
+      returnFalseIf(!_WriteTxtValue2(miff, type, value));
+   }
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   {
+      // Ensure proper byte order.
+      _ByteSwap2(miff, &value);
+
+      // Populate the internal buffer before compression.
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
+   }
+
+   returnFalseIf(!_CurrentIndexInc(miff));
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _WriteValue4
+******************************************************************************/
+MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
+{
+   returnFalseIf(miff->currentRecord.type != type);
+
+   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   {
+      // Write out the value
+      returnFalseIf(!_WriteTxtValue4(miff, type, value));
+   }
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   {
+      // Ensure proper byte order.
+      _ByteSwap4(miff, &value);
+
+      // Populate the internal buffer before compression.
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[2];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[3];
+   }
+
+   returnFalseIf(!_CurrentIndexInc(miff));
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _WriteValue8
+******************************************************************************/
+MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
+{
+   returnFalseIf(miff->currentRecord.type != type);
+
+   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   {
+      // Write out the value
+      returnFalseIf(!_WriteTxtValue8(miff, type, value));
+   }
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   {
+      // Ensure proper byte order.
+      _ByteSwap8(miff, &value);
+
+      // Populate the internal buffer before compression.
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[2];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[3];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[4];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[5];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[6];
+      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[7];
+   }
+
+   returnFalseIf(!_CurrentIndexInc(miff));
 
    returnTrue;
 }

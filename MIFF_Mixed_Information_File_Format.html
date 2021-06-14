@@ -27,13 +27,14 @@
 <p class="zword_toc1"><a href="#2">2 - Format: Base</a></p>
 <p class="zword_toc2"><a href="#2.1">2.1 - File Header</a></p>
 <p class="zword_toc2"><a href="#2.2">2.2 - Content</a></p>
-<p class="zword_toc3"><a href="#2.2.1">2.2.1 - Numbers</a></p>
-<p class="zword_toc3"><a href="#2.2.2">2.2.2 - Record Composition</a></p>
-<p class="zword_toc4"><a href="#2.2.2.1">2.2.2.1 - Key</a></p>
-<p class="zword_toc4"><a href="#2.2.2.2">2.2.2.2 - Type Code</a></p>
-<p class="zword_toc4"><a href="#2.2.2.3">2.2.2.3 - Array Size</a></p>
-<p class="zword_toc4"><a href="#2.2.2.4">2.2.2.4 - Compression Flag</a></p>
-<p class="zword_toc4"><a href="#2.2.2.5">2.2.2.5 - Value</a></p>
+<p class="zword_toc3"><a href="#2.2.1">2.2.1 - Binary Syte Sequences</a></p>
+<p class="zword_toc3"><a href="#2.2.2">2.2.2 - Numbers</a></p>
+<p class="zword_toc3"><a href="#2.2.3">2.2.3 - Record Composition</a></p>
+<p class="zword_toc4"><a href="#2.2.3.1">2.2.3.1 - Key</a></p>
+<p class="zword_toc4"><a href="#2.2.3.2">2.2.3.2 - Type Code</a></p>
+<p class="zword_toc4"><a href="#2.2.3.3">2.2.3.3 - Array Count</a></p>
+<p class="zword_toc4"><a href="#2.2.3.4">2.2.3.4 - Compression Flag</a></p>
+<p class="zword_toc4"><a href="#2.2.3.5">2.2.3.5 - Value</a></p>
 <p class="zword_toc2"><a href="#2.3">2.3 - Text Format</a></p>
 <p class="zword_toc3"><a href="#2.3.1">2.3.1 - Whitespace Characters</a></p>
 <p class="zword_toc3"><a href="#2.3.2">2.3.2 - Separator Characters</a></p>
@@ -41,14 +42,20 @@
 <p class="zword_toc3"><a href="#2.3.4">2.3.4 - Base64</a></p>
 <p class="zword_toc3"><a href="#2.3.5">2.3.5 - Real Number Representation</a></p>
 <p class="zword_toc3"><a href="#2.3.6">2.3.6 - Record Composition</a></p>
+<p class="zword_toc2"><a href="#2.4">2.4 - Binary</a></p>
+<p class="zword_toc3"><a href="#2.4.1">2.4.1 - Key Value Format</a></p>
+<p class="zword_toc4"><a href="#2.4.1.1">2.4.1.1 - Key</a></p>
+<p class="zword_toc4"><a href="#2.4.1.2">2.4.1.2 - Value Header</a></p>
+<p class="zword_toc4"><a href="#2.4.1.3">2.4.1.3 - Array Count</a></p>
+<p class="zword_toc4"><a href="#2.4.1.4">2.4.1.4 - Chunk Byte Count</a></p>
+<p class="zword_toc4"><a href="#2.4.1.5">2.4.1.5 - Value</a></p>
+<p class="zword_toc4"><a href="#2.4.1.6">2.4.1.6 - Special Case</a></p>
 <p class="zword_toc1"><a href="#3">3 - Fromat: Value Specifics</a></p>
 <p class="zword_toc2"><a href="#3.1">3.1 - Key-Value Block Begin and End.</a></p>
-<p class="zword_toc2"><a href="#3.2">3.2 - Type value</a></p>
+<p class="zword_toc2"><a href="#3.2">3.2 - Basic Values</a></p>
 <p class="zword_toc2"><a href="#3.3">3.3 - String values</a></p>
-<p class="zword_toc2"><a href="#3.4">3.4 - Boolean values</a></p>
-<p class="zword_toc2"><a href="#3.5">3.5 - Simple values</a></p>
-<p class="zword_toc2"><a href="#3.6">3.6 - User Type</a></p>
-<p class="zword_toc2"><a href="#3.7">3.7 - User Data</a></p>
+<p class="zword_toc2"><a href="#3.4">3.4 - Define User Type</a></p>
+<p class="zword_toc2"><a href="#3.5">3.5 - User Data</a></p>
 
 
 <h1 class="zword"><a name="1">1 - M.I.F.F.</a></h1>
@@ -58,8 +65,8 @@
 
 <h2 class="zword"><a name="1.2">1.2 - Goals</a></h2>
 <ul class="zword">
-<li class="zword"><strong>Simple  </strong>  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.</li>
-<li class="zword"><strong>Brief   </strong>  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.</li>
+<li class="zword"><strong>Simple</strong>    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.</li>
+<li class="zword"><strong>Brief</strong>     The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.</li>
 <li class="zword"><strong>Flexible</strong>  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.</li>
 <li class="zword"><strong>Accurate</strong>  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.</li>
 </ul>
@@ -81,15 +88,13 @@
 <p class="zword">There are two representations of the format.  A Text file representation and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.</p>
 <p class="zword">A MIFF format is essentially a collection of key value pairs.  Values are typed.  Nesting and user types are allowed.</p>
 <p class="zword">The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file format to move data from one program to another.</p>
-<p class="zword">Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.</p>
+<p class="zword">Common to both Text and Binary formats, any byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.</p>
 
 <h2 class="zword"><a name="2.1">2.1 - File Header</a></h2>
 <p class="zword">There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.</p>
-<p class="zword"><img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />TXT<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" /></p>
-<!--or-->
-<!--	
--->
-<!--<img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />BIN<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" />-->
+<p class="zword"><code><img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />TXT<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
+<p class="zword">or</p>
+<p class="zword"><code><img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />BIN<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
 <p class="zword"><img src="tab.png" /> means a tab character.  <img src="nl.png" /> means a new line character.</p>
 <ul class="zword">
 <li class="zword"><strong>Line 1</strong> - Format of the file.  MIFF.</li>
@@ -98,33 +103,31 @@
 <li class="zword"><strong>Line 4</strong> - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.</li>
 <li class="zword"><strong>Line 5</strong> - Sub-Format version identifier.</li>
 </ul>
-<p class="zword">If the representation is Binary then right after the \n of the fifth line, the binary format will begin.</p>
-<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain tabs (\t, <img src="tab.png" />) or new lines (\n, <img src="nl.png" />).  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte size.</p>
-<p class="zword">Binary files will be explored at a later date.</p>
+<p class="zword">If the representation is Binary then right after the <img src="nl.png" /> of the fifth line, the binary format will begin.</p>
+<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain <img src="tab.png" />s or <img src="nl.png" />s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.</p>
 
 <h2 class="zword"><a name="2.2">2.2 - Content</a></h2>
 <p class="zword">Before going into the specifics of the format we will cover some things at a high level.</p>
-<!--hhh	2.2 - Binary Syte Sequences-->
-<!--	
--->
-<!--Everything within "[]" is a byte sequence of a known size.  Each byte seqence is separated but in reality it is immediately following the previous byte sequence.  Nothing extra is added between sequences.-->
-<!--A byte sequence is "[" [Byte count] ":" [Name of this Byte sequence] "]", where Byte count is a number indicating the number of bytes this sequence uses.-->
 
-<h3 class="zword"><a name="2.2.1">2.2.1 - Numbers</a></h3>
+<h3 class="zword"><a name="2.2.1">2.2.1 - Binary Syte Sequences</a></h3>
+<p class="zword">Everything within &ldquo;&lt;&rdquo; and &ldquo;&gt;&rdquo; is a byte sequence of a known byte count.  Each byte seqence is immediately followed by the next byte sequence.  Nothing extra is added between sequences.</p>
+<p class="zword">A byte sequence is represented by &ldquo;&lt;&rdquo; [byte count] &ldquo;:&rdquo; [name of this byte sequence] &ldquo;&gt;&rdquo;, where byte count is a number indicating the number of bytes this sequence uses.  This byte count can be represented by a value defined in an earlier byte sequence.</p>
+
+<h3 class="zword"><a name="2.2.2">2.2.2 - Numbers</a></h3>
 <p class="zword"><strong>Natural numbers</strong> (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.</p>
 <p class="zword"><strong>Integer numbers</strong> are numbers are positive and negative whole numbers.</p>
-<p class="zword"><strong>Real numbers   </strong> (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.</p>
+<p class="zword"><strong>Real numbers</strong>    (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.</p>
 
-<h3 class="zword"><a name="2.2.2">2.2.2 - Record Composition</a></h3>
+<h3 class="zword"><a name="2.2.3">2.2.3 - Record Composition</a></h3>
 <p class="zword">A record basically defines a key - value pair.  However the composition of that record is composed of a few parts.</p>
-<p class="zword"><strong>[key]             </strong> will be a string that will somewhat uniquely identify the value.</p>
-<p class="zword"><strong>[type code]       </strong> will be a code (BIN) or sequence of characters (TXT) that will dictate what the value will look like as well as a compression setting and array size setting.</p>
-<p class="zword"><strong>[array size]      </strong> will be a number or special character to indicate the number of values of a particular type is associated with the key.</p>
+<p class="zword"><strong>[key]</strong>              will be a string that will somewhat uniquely identify the value.</p>
+<p class="zword"><strong>[type code]</strong>        will be a code (BIN) or sequence of characters (TXT) that will dictate what the value will look like as well as a compression setting and array count setting.</p>
+<p class="zword"><strong>[array count]</strong>      will be a number or special character to indicate the number of values of a particular type is associated with the key.</p>
 <p class="zword"><strong>[compression flag]</strong> will be a setting on how the value is compressed, if at all.</p>
-<p class="zword"><strong>[value]           </strong> will depend on the the other parts so it can vary in appearance.</p>
+<p class="zword"><strong>[value]</strong>            will depend on the the other parts so it can vary in appearance.</p>
 
-<h4 class="zword"><a name="2.2.2.1">2.2.2.1 - Key</a></h4>
-<p class="zword">Keys are always a single string of any character in UTF8 encoding as long as none are \t and \n.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just " " and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.</p>
+<h4 class="zword"><a name="2.2.3.1">2.2.3.1 - Key</a></h4>
+<p class="zword">Keys are always a single string of any character in UTF8 encoding as long as none are <img src="tab.png" /> and <img src="nl.png" />.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.</p>
 <pre class="zword">
 12345
 ;':][.,<>]'
@@ -134,10 +137,10 @@ $cost
 This is also a valid key with internal spaces
 </pre>
 
-<h4 class="zword"><a name="2.2.2.2">2.2.2.2 - Type Code</a></h4>
+<h4 class="zword"><a name="2.2.3.2">2.2.3.2 - Type Code</a></h4>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
-<!--thx	Binary Type Code-->
+<th class="zword"><nobr>Binary Type Code</th>
 <th class="zword"><nobr>Text Type Code</th>
 <th class="zword_fill">Description</th>
 </tr>
@@ -145,52 +148,51 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr><br /><strong>Block Types</strong><br /></td>
 </tr>
 <tr class="zword">
-<!--tcx	1-->
-<td class="zword"><nobr>{</td>
+<td class="zword"><nobr><code>1</code></td>
+<td class="zword"><nobr><code>{</code></td>
 <td class="zword">Key-Value block begins.</td>
 </tr>
 <tr class="zword">
-<!--tcx	2-->
-<td class="zword"><nobr>}</td>
+<td class="zword"><nobr><code>0</code></td>
+<td class="zword"><nobr><code>}</code></td>
 <td class="zword">Key-Value block ends.</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr><br /><strong>Basic Types</strong><br /></td>
 </tr>
 <tr class="zword">
-<!--tcx	3-->
-<td class="zword"><nobr>type</td>
+<td class="zword"><nobr><code>2</code></td>
+<td class="zword"><nobr><code>type</code></td>
 <td class="zword">Type value.  One of these type codes or a user type code.</td>
 </tr>
 <tr class="zword">
-<!--tcx	4-->
-<td class="zword"><nobr>define</td>
+<td class="zword"><nobr><code>3</code></td>
+<td class="zword"><nobr><code>define</code></td>
 <td class="zword">A series of key-type pairs.  You can define up to 4031 new types maximum.</td>
 </tr>
 <tr class="zword">
-<!--tcx	5-->
-<td class="zword"><nobr>"</td>
+<td class="zword"><nobr><code>5</code></td>
+<td class="zword"><nobr><code>"</code></td>
 <td class="zword">String (UTF8) data, can be of any length.</td>
 </tr>
 <tr class="zword">
-<!--tcx	7-->
-<td class="zword"><nobr>b</td>
+<td class="zword"><nobr><code>8</code></td>
+<td class="zword"><nobr><code>b</code></td>
 <td class="zword">Boolean value.</td>
 </tr>
 <tr class="zword">
-<!--tcx	10   11   12   13   14   15    16    17    18     19-->
-<td class="zword"><nobr>i1 i2 i3 i4 i8 i16 i32 i64 i128 i256</td>
-<td class="zword">An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.</td>
+<td class="zword"><nobr><code>10 11 12 13 14 15 16 17 18 19</code></td>
+<td class="zword"><nobr><code>i1 i2 i3 i4 i8 i16 i32 i64 i128 i256</code></td>
+<td class="zword">An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.</td>
 </tr>
 <tr class="zword">
-<!--tcx	20   21   22   23   24   25    26    27    28     29-->
-<td class="zword"><nobr>n1 n2 n3 n4 n8 n16 n32 n64 n128 n256</td>
-<td class="zword">A natural number.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.</td>
+<td class="zword"><nobr><code>20 21 22 23 24 25 26 27 28 29</code></td>
+<td class="zword"><nobr><code>n1 n2 n3 n4 n8 n16 n32 n64 n128 n256</code></td>
+<td class="zword">A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.</td>
 </tr>
 <tr class="zword">
-<!--tcx	31   33   34   35    36    37    38     39-->
-<td class="zword"><nobr>r2 r4 r8</td>
-<!--r16 r32 r64 r128 r256-->
+<td class="zword"><nobr><code>33 34</code></td>
+<td class="zword"><nobr><code>r4 r8</code></td>
 <td class="zword">A real value.</td>
 <!--I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard.-->
 </tr>
@@ -198,74 +200,69 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr><br /><strong>User Tyes</strong><br /></td>
 </tr>
 <tr class="zword">
-<!--tcx	64 and higher-->
-<td class="zword"><nobr>[user type name]</td>
+<td class="zword"><nobr><code>64 and higher</code></td>
+<td class="zword"><nobr><code>[user type name]</code></td>
 <td class="zword">Depends on what the user type defines.  A define must exist first.</td>
 </tr>
 </tbody></table>
 
-<h4 class="zword"><a name="2.2.2.3">2.2.2.3 - Array Size</a></h4>
+<h4 class="zword"><a name="2.2.3.3">2.2.3.3 - Array Count</a></h4>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
-<!--thx	Encoding Code (Binary (aaa))-->
+<th class="zword"><nobr>Encoding Code (Binary bits(aaa))</th>
 <th class="zword"><nobr>Encoding Code (Text)</th>
 <th class="zword_fill">Description</th>
 </tr>
 <tr class="zword">
-<!--tc	000-->
-<td class="zword">1</td>
-<td class="zword">A single value follows.  In binary, no array size byte sequence follows.</td>
+<td class="zword"><code>000</code></td>
+<td class="zword"><code>1</code></td>
+<td class="zword">A single value follows.  In binary, no array count present.</td>
 </tr>
 <tr class="zword">
-<!--tc	001, 010, 011, 100, 101, 110-->
-<td class="zword">[number of items]</td>
-<td class="zword">An array of values follows.  In binary, 001 means a 1 byte natural follows; 010 means a 2 bytes natural follows; 011 means a 3 byte natural follows; 100 means a 4 byte natural follows; 101 means an 8 byte natural follows; 110 means a 16 byte natural follows.</td>
+<td class="zword"><code>001 010 011 100 101 110</code></td>
+<td class="zword"><code>[number of items]</code></td>
+<td class="zword">An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.</td>
 </tr>
 <tr class="zword">
-<!--tc	111-->
-<td class="zword">*</td>
-<td class="zword">An unknown array of values follows or used when defining a user type.  See User types.</td>
+<td class="zword"><code>111</code></td>
+<td class="zword"><code>*</code></td>
+<td class="zword">An unknown count array of values follows or used when defining a user type.  See User types.</td>
 </tr>
 </tbody></table>
 
-<h4 class="zword"><a name="2.2.2.4">2.2.2.4 - Compression Flag</a></h4>
+<h4 class="zword"><a name="2.2.3.4">2.2.3.4 - Compression Flag</a></h4>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
-<!--thx	Encoding Code (Binary (cc))-->
+<th class="zword"><nobr>Encoding Code (Binary bit(c))</th>
 <th class="zword"><nobr>Encoding Code (Text)</th>
 <th class="zword_fill">Description</th>
 </tr>
 <tr class="zword">
-<!--tc	00-->
-<td class="zword">-</td>
+<td class="zword"><code>0</code></td>
+<td class="zword"><code>-</code></td>
 <td class="zword">Values are inlined raw with no compression.</td>
 </tr>
 <tr class="zword">
-<!--tc	01-->
-<td class="zword">.</td>
-<td class="zword">Values are compressed with zlib as one big chunk.</td>
-</tr>
-<tr class="zword">
-<!--tc	10-->
-<td class="zword">:</td>
+<td class="zword"><code>1</code></td>
+<td class="zword"><code>:</code></td>
 <td class="zword">Values are broken down into smaller chunks and then each chunk compressed with zlib.</td>
 </tr>
 </tbody></table>
 
-<h4 class="zword"><a name="2.2.2.5">2.2.2.5 - Value</a></h4>
+<h4 class="zword"><a name="2.2.3.5">2.2.3.5 - Value</a></h4>
 <p class="zword">See the types respective sections for details.</p>
 
 <h2 class="zword"><a name="2.3">2.3 - Text Format</a></h2>
 <p class="zword">The text format is a UTF8 text file.</p>
 <p class="zword">The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.</p>
 <p class="zword">The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.</p>
-<p class="zword">All lines are terminated with a single '\n'.  NOT an MSDOS/Windows \r\n or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.  No exceptions.</p>
+<p class="zword">All lines are terminated with a single <img src="nl.png" /> (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.</p>
 
 <h3 class="zword"><a name="2.3.1">2.3.1 - Whitespace Characters</a></h3>
 <p class="zword">A whitespace character is any character that does not make a blemish on a piece of paper if printed out; this includes control characters like bell, NULL, form feed, etc.</p>
 
 <h3 class="zword"><a name="2.3.2">2.3.2 - Separator Characters</a></h3>
-<p class="zword">MIFF only uses tab (\t, <img src="tab.png" />) as a separater character.  And only one <img src="tab.png" /> between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.</p>
+<p class="zword">MIFF only uses <img src="tab.png" /> as a separater character.  And only one <img src="tab.png" /> between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.</p>
 
 <h3 class="zword"><a name="2.3.3">2.3.3 - Printable Characters</a></h3>
 <p class="zword">Just to be clear what a printable character is.  If you had a blank piece of paper with just one character on it, if the character causes ink to be placed on the paper, it is printable.  If it does not make a mark, it is not printable (like spaces, control characters, etc.)</p>
@@ -277,61 +274,42 @@ This is also a valid key with internal spaces
 <p class="zword">All real numbers are stored as a Base64 string.  No exceptions.  This is to ensure that when read back into memory from file, the number is exactly as it was when it was stored in the file.  The real value in the MIFF file will be in Big Endian order.</p>
 
 <h3 class="zword"><a name="2.3.6">2.3.6 - Record Composition</a></h3>
-<p class="zword"><img src="indent.png" />[type code]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />[compression flag]<img src="tab.png" />[value]<img src="nl.png" /></p>
+<p class="zword"><code><img src="indent.png" />[type code]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />[compression flag]<img src="tab.png" />[value]<img src="nl.png" /></code></p>
 <p class="zword">Any space found in the key that is not a <img src="tab.png" /> will be part of the key.  They will be significant.  Do not strip or reduce them.</p>
 <p class="zword">There has to be one <img src="tab.png" /> separator between each part.</p>
 <p class="zword">How the value appears will depend on the definition here.</p>
 <p class="zword">To be clear...</p>
 <p class="zword"><strong>Invalid:</strong> Absolutely no <img src="nl.png" /> anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra <img src="tab.png" /> anywhere in the format.</p>
-<p class="zword"><img src="indent.png" />[type code]<img src="tab.png" /><img src="tab.png" />[key]<img src="nl.png" />[array size] [compression flag]<img src="tab.png" />[value]<img src="nl.png" /></p>
-<p class="zword">* There are cases where the [value] will be broken up by '\n' characters but this will be indicated where that will happen.  In general most key value lines live on a single line.</p>
-<p class="zword">Values will be discussed lower in section 3.</p>
-<!--hh	2.3.6 - Binary-->
-<!--	
--->
-<!--The Binary file will to match the Text file 1-1.-->
-<!--		
--->
-<!--hhh	2.3.6 - Key Value Format-->
-<!--	
--->
-<!--.[-->
-<!--[n1           :key size]-->
-<!--[n1 * key size:key]-->
-<!--[*            :value header]-->
-<!--[*            :value]-->
-<!--]-->
-<!--	
--->
-<!--hhhh	2.3.6 - Key-->
-<!--	
--->
-<!--[key size] defines how long the key is in bytes.  Keys are 1 to 255 Bytes and the Bytes define a UTF8 string.-->
-<!--[key] defines the key of the key value pair.  The length of which was defined by [key size] above.  No null terminator is included in the key.-->
-<!--	
--->
-<!--	
--->
-<!--hhhh	2.3.6 - Value Header-->
-<!--	
--->
-<!--Value header will typically look like this.-->
-<!--	
--->
-<!--.[-->
-<!--[n2:2 bit - compression flag, 3 bit - array flag, 11 bit - type code]-->
-<!--[0,n1,n2,n3,n4,n8,n16:array size]-->
-<!--]-->
-<!--The first 2 bytes holds the type code and array and compression flags.  The 5 high bits of this value are holding the array and compression flags.  The remaining 11 bits are for the type code.  See section on Type Codes, array size Flag and Compression Flag earlier in this document for what the type code and flags should equal to.-->
-<!--[array size] byte sequence is only present when storing an array of values.-->
-<!--	
--->
-<!--	
--->
-<!--hhhh	2.3.6 - Value-->
-<!--	
--->
-<!--[*:value] field will vary wildly depending on the [value header].  But it will be a known size given all that information.-->
+<p class="zword"><code><img src="indent.png" />[type code]<img src="tab.png" /><img src="tab.png" />[key]<img src="nl.png" />[array count] [compression flag]<img src="tab.png" />[value]<img src="nl.png" /></code></p>
+<p class="zword">What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.</p>
+
+<h2 class="zword"><a name="2.4">2.4 - Binary</a></h2>
+<p class="zword">The Binary file byte sequence is not too different than the text file organization.  The infromation stored will not be much different.</p>
+
+<h3 class="zword"><a name="2.4.1">2.4.1 - Key Value Format</a></h3>
+<p class="zword"><code><img src="indent.png" />&lt;n2                 :value header(aaa c tttt tttt tttt)&gt;<br /><img src="indent.png" />&lt;n1                 :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count + 1 :key&gt;<br /><img src="indent.png" />&lt;n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)&gt;<br /><img src="indent.png" />&lt;n4                 :chunk byte count (if c above is 1)&gt;<br /><img src="indent.png" />&lt;*                  :value&gt;</code></p>
+
+<h4 class="zword"><a name="2.4.1.1">2.4.1.1 - Key</a></h4>
+<p class="zword"><code>&lt;n1:key byte count&gt;</code> defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.</p>
+<p class="zword"><code>&lt;key byte count + 1:key&gt;</code> defines the key of the key value pair.  The length of which was defined by <code>&lt;key byte count&gt;</code> above.  No null terminator is included in the key.</p>
+
+<h4 class="zword"><a name="2.4.1.2">2.4.1.2 - Value Header</a></h4>
+<p class="zword"><code>&lt;n2:value header&gt;</code> Value header is a 2 byte value.</p>
+<p class="zword">The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.</p>
+<p class="zword">The 4th high bit (c) defines is chunked compression is being used.  See section 2.2.3.4.</p>
+<p class="zword">The remaining bits define the type of the key value.  0-63 type values are reserved, see section 2.2.3.2.  User types are values 64 - 4095.</p>
+
+<h4 class="zword"><a name="2.4.1.3">2.4.1.3 - Array Count</a></h4>
+<p class="zword"><code>&lt;n1/n2/n4/n8/n16/n32:array count&gt;</code> byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).</p>
+
+<h4 class="zword"><a name="2.4.1.4">2.4.1.4 - Chunk Byte Count</a></h4>
+<p class="zword"><code>&lt;n4:chunk byte count&gt;</code> Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.</p>
+
+<h4 class="zword"><a name="2.4.1.5">2.4.1.5 - Value</a></h4>
+<p class="zword"><code>&lt;*:value&gt;</code> field will vary wildly depending on the <code>&lt;value header&gt;</code>.  See section 3 for how the values are represented.</p>
+
+<h4 class="zword"><a name="2.4.1.6">2.4.1.6 - Special Case</a></h4>
+<p class="zword">Key Value Block End will just have the value header and nothing else follows.  (aaa) will be 000, (c) will be 0, and (tttttttttttt) will be 0.</p>
 
 
 <h1 class="zword"><a name="3">3 - Fromat: Value Specifics</a></h1>
@@ -339,421 +317,46 @@ This is also a valid key with internal spaces
 <h2 class="zword"><a name="3.1">3.1 - Key-Value Block Begin and End.</a></h2>
 <p class="zword">Key-Value blocks are special.  They are needed to allow nesting of key values.</p>
 <p class="zword">In a text file, the last line of a Key-Value Block needs to be a comletely empty line with nothing on it but a \n to indicate that the block is terminated.</p>
-<p class="zword">In a binary file you will have a key size of 0 to indicate the end of a Key-Value block.</p>
-<p class="zword"><img src="indent.png" />{<img src="tab.png" />[key]<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1           :key size]                                   [key]\t{\n-->
-<!--[n1 * key size:key]                                        ...-->
-<!--[n2           :value header   - 00|000|1]                  \t}\n-->
-<!--...-->
-<!--[n1           :0]-->
-<!--[n2           :               - 00|000|2]-->
-<!--]-->
-<!--	
--->
-<p class="zword">Key value bocks can have an array size.  What that will mean is that there are [array size] key value pairs following.  The next key value pair after the last key value will not belong to this block.</p>
-<p class="zword">A block is terminated when a value type of "}" is reached or array size key values have been read.  The key for this line, if present, will be ignored.  So it should really be empty to save space.  Every begin requires an end, there must not be extras of each in the file.</p>
-<p class="zword">Compression flags are never used with this value type.</p>
-<p class="zword"><img src="indent.png" />{<img src="tab.png" />docInfo<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />{<img src="tab.png" />level1<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />level2<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />level3<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel3<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel2<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel1<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1     :7]                                                docInfo\t{\n-->
-<!--[n1 * 7 :docInfo]                                          ...-->
-<!--[n2     :00|000|1]                                         \t}\n-->
-<!--...-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--	
--->
-<!--[n1     :6]                                                level1\t{\n-->
-<!--[n1 * 6 :level1]                                           level2\t{\n-->
-<!--[n2     :00|000|1]                                          level3\t{\n-->
-<!--[n1     :6]                                                ...-->
-<!--[n1 * 6 :level2]                                           \t}\n-->
-<!--[n2     :00|000|1]                                          anotherLevel3\t{\n-->
-<!--[n1     :6]                                                ...-->
-<!--[n1 * 6 :level3]                                           \t}\n-->
-<!--[n2     :00|000|1]                                          \t}\n-->
-<!--...                                                        anotherLevel2\t{\n-->
-<!--[n1     :0]                                                ...-->
-<!--[n2     :00|000|2]                                         \t}\n-->
-<!--[n1     :13]                                               \t}\n-->
-<!--[n1 * 13:anotherlevel3]                                     anotherLevel1\t{\n-->
-<!--[n2     :00|000|1]                                         ...-->
-<!--...                                                        \t}\n-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--[n1     :6]-->
-<!--[n1 * 6 :anotherlevel2]-->
-<!--[n2     :00|000|1]-->
-<!--...-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--[n1     :6]-->
-<!--[n1 * 6 :anotherlevel1]-->
-<!--[n2     :00|000|1]-->
-<!--...-->
-<!--[n1     :0]-->
-<!--[n2     :00|000|2]-->
-<!--]-->
+<p class="zword">In a binary file you will have a key byte count of 0 to indicate the end of a Key-Value block.</p>
+<p class="zword"><strong>Text</strong></p>
+<p class="zword"><code><img src="indent.png" />{<img src="tab.png" />[key]<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2            :value header (000 0 1)&gt;<br /><img src="indent.png" />&lt;n1            :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count:key&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2            :value header (000 0 0)&gt;</code></p>
+<p class="zword">A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.</p>
+<p class="zword">Array Count and Compression flags are never used with this value type.</p>
+<p class="zword"><strong>Example 1:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />{<img src="tab.png" />docInfo<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :7&gt;&lt;7 :docInfo&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /></code></p>
+<p class="zword"><strong>Example 2:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />{<img src="tab.png" />level1<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />level2<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />level3<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel3<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel2<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />}<img src="nl.png" /><br /><img src="indent.png" />{<img src="tab.png" />anotherLevel1<img src="nl.png" /><br /><img src="indent.png" />...<br /><img src="indent.png" />}<img src="nl.png" /><br /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level1&gt;<br /><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level2&gt;<br /><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level3&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel3&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel2&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;<br /><img src="indent.png" />&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel1&gt;<br /><img src="indent.png" />...<br /><img src="indent.png" />&lt;n2 :000 0 0&gt;</code></p>
 
-<h2 class="zword"><a name="3.2">3.2 - Type value</a></h2>
-<p class="zword">type stores type format string.</p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[text type code]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />-(<img src="tab.png" />[text type code])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />.<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                        :key size]                [key] type- [text type code]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|00|5]-->
-<!--[n2                        :binary type code]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] type= [array size] [text type code]*\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|01|5]-->
-<!--[n4                        :array size]-->
-<!--[n2                        :binary type code]*-->
-<!--	
--->
-<!--[n1                        :key size]                type3 typeZ [array size] [compressed size] [Base64 compressed binary type codes]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 01|01|5]-->
-<!--[n4                        :array size]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed binary type code]-->
-<!--	
--->
-<!--[n1                        :key size]                type3 typeC [array size] [chunk byte count]\n-->
-<!--[n1 * key size       :key]                           [compressed size] [Base64 stream]\n-->
-<!--[n2                        :value header - 01|01|5]        ...-->
-<!--[n4                        :array size]-->
-<!--[n4                        :chunk byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed binary type code]-->
-<!--...-->
-<!--]-->
-<p class="zword">There is no chunked or compressed single value case.</p>
-<p class="zword">The text chunked and compressed type array is using the binary type codes and not the text type codes.</p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />type1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />b<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />type2<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" />b<img src="tab.png" />n4<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />type3<img src="tab.png" />100<img src="tab.png" />.<img src="tab.png" />31<img src="tab.png" />...<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />type<img src="tab.png" />type4<img src="tab.png" />100000<img src="tab.png" />:<img src="tab.png" />1000<img src="tab.png" />2342<img src="tab.png" />...<img src="tab.png" />4546<img src="tab.png" />...<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1     :5]                                                type1 type- bool\n-->
-<!--[n1 * 5 :type1]-->
-<!--[n2     :00|00|5]-->
-<!--[n2     :10]-->
-<!--	
--->
-<!--[n1     :5]                                                type2 type= 2 bool .\n-->
-<!--[n1 * 5 :type2]-->
-<!--[n2     :00|01|5]-->
-<!--[n4     :2]-->
-<!--[n2     :10]-->
-<!--[n2     :8]-->
-<!--	
--->
-<!--[n1     :5]                                                type3 typeZ 100 31 ...-->
-<!--[n1 * 5 :type3]-->
-<!--[n2     :01|01|5]-->
-<!--[n4     :100]-->
-<!--[n4     :31]-->
-<!--[n1 * 31:...]-->
-<!--]-->
-
-<h2 class="zword"><a name="3.3">3.3 - String values</a></h2>
-<!--Binary case is simpler so we'll talk about that first.-->
-<!--	
--->
-<!--.[-->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|00|6]-->
-<!--[n4                        :string byte count]-->
-<!--[n1 * string byte count    :string data]-->
-<!--	
--->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|01|6]-->
-<!--[n4                        :array size]-->
-<!--[n4                        :string byte count]-->
-<!--[n1 * string byte count    :string data]-->
-<!--[n4                        :string byte count]-->
-<!--[n1 * string byte count    :string data]-->
-<!--...-->
-<!--	
--->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 01|00|6]-->
-<!--[n4                        :string byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 01|01|6]-->
-<!--[n4                        :array size]-->
-<!--[n4 * array size          :string byte count list]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 10|00|6]-->
-<!--[n4                        :string byte count]-->
-<!--[n4                        :chunk byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--...-->
-<!--	
--->
-<!--[n1                        :key size]-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 10|01|6]-->
-<!--[n4                        :array size]-->
-<!--[n4 * array size          :string byte count]-->
-<!--[n4                        :chunk byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--...-->
-<!--[n4 * array size          :string byte count]-->
-<!--[n4                        :chunk byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--...-->
-<!--]-->
-<!--	
--->
-<!--The case of a single value just requires a byte count before the actual string data.  The string data will be exactly the byte count size.  Since this is binary, string data is not modified in any way.-->
-<!--The case of an array value just requires a repeat of the byte count string data for as may in the array.-->
-<!--The case of a compressed single value adds a compressed size after the string byte count.  And a compressed byte array of the string follows.-->
-<!--The case of an array of compressed strings is similar to regular array but each string is individually compressed.-->
-<!--Chunking just breaks up the long strings into chunks before compression.-->
-<!--	
--->
-<!--.[-->
-<!--[n1     :7]-->
-<!--[n1 * 7 :string1]-->
-<!--[n2     :00|00|6]-->
-<!--[n4     :55]-->
-<!--[n1 * 55:...]-->
-<!--	
--->
-<!--[n1     :7]-->
-<!--[n1 * 7 :string2]-->
-<!--[n2     :00|01|6]-->
-<!--[n4     :2]-->
-<!--[n4     :55]-->
-<!--[n1 * 55:...]-->
-<!--[n4     :55]-->
-<!--[n1 * 55:...]-->
-<!--	
--->
-<!--[n1     :7]-->
-<!--[n1 * 7 :string3]-->
-<!--[n2     :01|00|6]-->
-<!--[n4     :555]-->
-<!--[n4     :67]-->
-<!--[n1 * 67:...]-->
-<!--	
--->
-<!--[n1     :7]-->
-<!--[n1 * 7 :string4]-->
-<!--[n2     :01|01|6]-->
-<!--[n4     :2]-->
-<!--[n4 * 2 :75 65]-->
-<!--[n4     :85]-->
-<!--[n1 * 85:...]-->
-<!--]-->
-<!--	
--->
-<!--The text case is a little more involved.-->
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[string value]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />-|img (<img src="tab.png" />[string value])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<p class="zword">If no compression is used then the string starts right after the <img src="tab.png" /> character till the end of the line but not including the new line character at the end of the line.</p>
-<p class="zword">Multi-line strings are placed on one line.  This is done by escaping new line characters, tab characters and the escape character when the string is written out without any compression.</p>
-<p class="zword">If compression is used then we will still escape these characters.  Note however there is no "." compression option when dealing with a string or an array of strings.  This is because a string length is never consistent so chunked compression is only available.  Strings are stored in the compressed buffer in the same way as it is stored in the uncompressed string.</p>
-<pre class="zword">
-\t - tab            - 0x09
-\n - new line       - 0x0a
-\\ - \
-</pre>
-<p class="zword">Examples:</p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />string1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />This is line1.\nThis is line 2.<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />string3<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />1000000<img src="tab.png" />1000<img src="tab.png" />23424<img src="tab.png" />[Base64 stream]\n<img src="tab.png" />458947<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />stringList1<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />This is string 1, line 1.\r\nThis is string1, line 2.\r\n<img src="tab.png" />This is string 2.<img src="tab.png" />This is string 3.<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />"<img src="tab.png" />stringList3<img src="tab.png" />3<img src="tab.png" />:<img src="tab.png" />1000<img src="tab.png" />252<img src="tab.png" />[Base64 stream]<img src="tab.png" />543<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-
-<h2 class="zword"><a name="3.4">3.4 - Boolean values</a></h2>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[boolean value]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />-(<img src="tab.png" />[boolean value])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                        :key size]                [key] bool- [boolean value]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header  - 00|00|10]-->
-<!--[n1                        :boolean value - 'T'|'F']-->
-<!--	
--->
-<!--[n1                        :key size]                [key] bool= [array size] [boolean value] * (array size)\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header  - 00|01|10]-->
-<!--[n4                        :array size]-->
-<!--[n1 * (array size / 8)    :boolean value]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] boolZ [array size] [compressed size] [Base64 compressed data]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header  - 01|01|10]-->
-<!--[n4                        :array size]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] boolC [array size] [chunk byte count]\n-->
-<!--[n1 * key size       :key]                           [compressed size] [Base64 compressed data]\n-->
-<!--[n2                        :value header  - 10|01|10]       [compressed size] [Base64 compressed data]\n-->
-<!--[n4                        :array size]                   ...-->
-<!--[n4                        :chunk byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--...-->
-<!--]-->
-<p class="zword">By default, the value will be 'T' for true, or 'F' for false.</p>
-<p class="zword">For array values in text files, the value will be a string of 'T' or 'F' letters with a separator in between.</p>
-<p class="zword">For array values in binary , the same string will compressed.</p>
-<p class="zword">'z' encoding flag is never used with this type.</p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />Bool1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />T<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />Bool2<img src="tab.png" />10<img src="tab.png" />-<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />Bool3<img src="tab.png" />1024<img src="tab.png" />.<img src="tab.png" />25<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />b<img src="tab.png" />Bool4<img src="tab.png" />100000<img src="tab.png" />:<img src="tab.png" />1000<img src="tab.png" />234<img src="tab.png" />[Base64 stream]<img src="tab.png" />2934<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                        :5]                             Bool1 bool- T\n-->
-<!--[n1 * 5                    :Bool1]-->
-<!--[n2                        :00|00|10]-->
-<!--[n1                        :T]-->
-<!--	                       
--->
-<!--[n1                        :5]                             Bool2 bool= 10 TTTTTFFFFF\n-->
-<!--[n1 * 5                    :Bool2]-->
-<!--[n2                        :00|01|10]-->
-<!--[n4                        :array size]-->
-<!--[n1 * (array size / 8)    :boolean value]-->
-<!--	
--->
-<!--[n1                        :5]                             Bool3 boolZ 1024 25 ...\n-->
-<!--[n1 * 5                    :Bool3]-->
-<!--[n2                        :01|01|10]-->
-<!--[n4                        :array size]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--]-->
-
-<h2 class="zword"><a name="3.5">3.5 - Simple values</a></h2>
-<p class="zword">Simple value encoding.  Based on what is being stored the byte streams only look slighly different.</p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[type value]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />.<img src="tab.png" />[compressed size]<img src="tab.png" />[compressed data]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />-(<img src="tab.png" />[type value])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />.<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]- [type value]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|00|[type code]]-->
-<!--[[byte count]              :type value]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]= [array size] [type value] * (array size)\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 00|01|[type code]]-->
-<!--[n4                        :array size]-->
-<!--[[byte count] * array size:type values]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]z [compressed size] [compressed data]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 01|00|[type code]]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]Z [array size] [compressed size] [compressed data]\n-->
-<!--[n1 * key size       :key]-->
-<!--[n2                        :value header - 01|01|[type code]]-->
-<!--[n4                        :array size]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]c [chunk byte count]\n-->
-<!--[n1 * key size       :key]                           [compressed size] [compressed data]\n-->
-<!--[n2                        :value header - 10|00|[type code]][compressed size] [compressed data]\n-->
-<!--[n4                        :compressed size]         ...-->
-<!--[n1 * compressed size:compressed data]-->
-<!--	
--->
-<!--[n1                        :key size]                [key] [text type code]C [array size] [chunk byte count]\n-->
-<!--[n1 * key size       :key]                           [compressed size] [compressed data]\n-->
-<!--[n2                        :value header - 10|01|[type code]][compressed size] [compressed data]\n-->
-<!--[n4                        :array size]                   ...-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
-<!--]-->
-<p class="zword">binary sizes for the simple types will be one of...</p>
+<h2 class="zword"><a name="3.2">3.2 - Basic Values</a></h2>
+<p class="zword">Basic value encoding.  Based on what is being stored the byte streams only look slighly different.</p>
+<p class="zword"><strong>Text</strong></p>
+<p class="zword"><code><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[type value]<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />-(<img src="tab.png" />[type value])*<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />[text type code]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2               :value header (000 0 [type code])&gt;<br /><img src="indent.png" />&lt;n1               :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count   :key&gt;<br /><img src="indent.png" />&lt;[type byte count]:[type data]&gt;</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2               :value header (000 1 [type code])&gt;<br /><img src="indent.png" />&lt;n1               :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count   :key&gt;<br /><img src="indent.png" />&lt;n4               :chunk byte count&gt;<br /><img src="indent.png" />(&lt;n4                   :compressed byte count&gt;<br /><img src="indent.png" /> &lt;compressed byte count:binary compressed data&gt;)*</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2               :value header (aaa 0 [type code])&gt;<br /><img src="indent.png" />&lt;n1               :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count   :key&gt;<br /><img src="indent.png" />&lt;n??              :array count&gt;<br /><img src="indent.png" />&lt;[type byte count] * array count:[type data]&gt;</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2               :value header (aaa 1 [type code])&gt;<br /><img src="indent.png" />&lt;n1               :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count   :key&gt;<br /><img src="indent.png" />&lt;n??              :array count&gt;<br /><img src="indent.png" />&lt;n4               :chunk byte count&gt;<br /><img src="indent.png" />(&lt;n4                   :compressed byte count&gt;<br /><img src="indent.png" /> &lt;compressed byte count:binary compressed data&gt;)*</code></p>
+<p class="zword">type byte counts for the simple types will be one of...</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Type</th>
-<th class="zword_fill">Byte Count</th>
+<th class="zword_fill">byte Count</th>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i1, n1</td>
+<td class="zword"><nobr>b, i1, n1</td>
 <td class="zword">1</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i2, n2</td>
+<td class="zword"><nobr>type, i2, n2</td>
 <td class="zword">2</td>
 </tr>
 <tr class="zword">
@@ -769,318 +372,205 @@ This is also a valid key with internal spaces
 <td class="zword">8</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i16, n16, r16</td>
+<td class="zword"><nobr>i16, n16</td>
 <td class="zword">16</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i32, n32, r32</td>
+<td class="zword"><nobr>i32, n32</td>
 <td class="zword">32</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i64, n64, r64</td>
+<td class="zword"><nobr>i64, n64</td>
 <td class="zword">64</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i128, n128, r128</td>
+<td class="zword"><nobr>i128, n128</td>
 <td class="zword">128</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>i256, n256, r256</td>
+<td class="zword"><nobr>i256, n256</td>
 <td class="zword">256</td>
 </tr>
 </tbody></table>
-<!--The values are simply encoded as...-->
-<!--	
--->
-<!--.	[byte count:value]-->
-<!--	
--->
-<!--Again, multi-byte values are store in big endian.-->
-<!--Arrays of these values are simply repeating the above as many times necessary for the array.-->
-<!--Chunk and Compression flags on a single value are not usually used unless they have a large byte count.-->
 <p class="zword">Text representation for a value will be...</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Type Code</th>
-<th class="zword_fill">Representation</th>
+<th class="zword"><nobr>Text Representation</th>
+<th class="zword_fill">Binary Representation</th>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>type</td>
+<td class="zword"><nobr>text string for the type.</td>
+<td class="zword">2 byte binary value.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>b</td>
+<td class="zword"><nobr>'T' or 'F'.</td>
+<td class="zword">1 byte per value. 1 or 0</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>i*, n*</td>
-<td class="zword">1 value in regular digits.</td>
+<td class="zword"><nobr>1 value in regular digits.</td>
+<td class="zword">Byte count of type.  Big endian order.</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>r*</td>
-<td class="zword">1 Base64 stream of the 1 value.</td>
+<td class="zword"><nobr>1 Base64 stream of the 1 value.  Big endian order.</td>
+<td class="zword"><nobr>Byte count of type.  Big endian order.</td>
 </tr>
 </tbody></table>
-<p class="zword">If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one \t.</p>
-<p class="zword"><img src="indent.png" />i4<img src="tab.png" />1Int<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />1024<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />n4<img src="tab.png" />*Nat<img src="tab.png" />8<img src="tab.png" />-<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />4<img src="tab.png" />8<img src="tab.png" />16<img src="tab.png" />32<img src="tab.png" />64<img src="tab.png" />128<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />r4<img src="tab.png" />1Real<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[Base64 encoded value]<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1      :4]                                               1Int i4- 1024\n-->
-<!--[n1 * 4  :1Int]-->
-<!--[n2      :00|00|14]-->
-<!--[i4      :1024]-->
-<!--	
--->
-<!--[n1      :4]                                               *Nat n4= 8 1 2 4 8 16 32 64 128\n-->
-<!--[n1 * 4  :*Nat]-->
-<!--[n2      :00|01|34]-->
-<!--[n4      :8]-->
-<!--[n4      :1]-->
-<!--[n4      :2]-->
-<!--[n4      :4]-->
-<!--[n4      :8]-->
-<!--[n4      :16]-->
-<!--[n4      :32]-->
-<!--[n4      :64]-->
-<!--[n4      :128]-->
-<!--	
--->
-<!--[n1      :5]                                               1Real r4- [Base64 encoded value]\n-->
-<!--[n1 * 5  :1Real]-->
-<!--[n1      :00|00|51]-->
-<!--[r4      :3.14159]-->
-<!--]-->
-<!--	
--->
-<!--hh	3.5 - Key Type-->
-<!--	
--->
-<!--A simple key only record.  No value.  If the key exists or doesn't exist, that can be enough information for the format.-->
-<!--	
--->
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                     :key size]                   [key] -\n-->
-<!--[n1 * key size    :key]-->
-<!--[n2                     :value header - 00|00|8]-->
-<!--]-->
-<!--	
--->
-<!--Only - is ever used with this type.-->
+<p class="zword">If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one <img src="tab.png" /> in text mode.</p>
+<p class="zword"><strong>Example 1:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />type<img src="tab.png" />type1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />b<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 2&gt;&lt;n1 :5&gt;&lt;5 :type1&gt;&lt;n2 :8&gt;</code></p>
+<p class="zword"><strong>Example 2:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />type<img src="tab.png" />type2<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" />b<img src="tab.png" />n4<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0 5&gt;&lt;n1 :5&gt;&lt;5 :type2&gt;&lt;n1 :2&gt;&lt;n2 * 2 :8 23&gt;</code></p>
+<p class="zword"><strong>Example 3:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />type<img src="tab.png" />type3<img src="tab.png" />100000<img src="tab.png" />:<img src="tab.png" />10000<img src="tab.png" /><br /><img src="indent.png" />2342<img src="tab.png" />[Base64 stream]<img src="tab.png" /><br /><img src="indent.png" />4546<img src="tab.png" />[Base64 stream]<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :011 1 5&gt;&lt;n1 :5&gt;&lt;5 :type3&gt;&lt;n4 :100000&gt;&lt;n4 :10000&gt;<br /><img src="indent.png" />&lt;n4 :2342&gt;&lt;2342 :binary compressed data&gt;<br /><img src="indent.png" />&lt;n4 :4546&gt;&lt;4546 :binary compressed data&gt;</code></p>
+<p class="zword"><strong>Example 4:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />b<img src="tab.png" />Bool1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />T<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 8&gt;&lt;n1 :5&gt;&lt;5 :Bool1&gt;&lt;n1 :1&gt;</code></p>
+<p class="zword"><strong>Example 5:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />b<img src="tab.png" />Bool2<img src="tab.png" />10<img src="tab.png" />-<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0 8&gt;&lt;n1 :5&gt;&lt;5 :Bool5&gt;&lt;n1 :10&gt;&lt;n1 * 10 :1 1 1 1 1 0 0 0 0 0&gt;</code></p>
+<p class="zword"><strong>Example 6:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />i4<img src="tab.png" />1Int<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />1024<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 13&gt;&lt;n1 :4&gt;&lt;4 :1Int&gt;&lt;n4 :1024&gt;</code></p>
+<p class="zword"><strong>Example 7:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />n4<img src="tab.png" />*Nat<img src="tab.png" />8<img src="tab.png" />-<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />4<img src="tab.png" />8<img src="tab.png" />16<img src="tab.png" />32<img src="tab.png" />64<img src="tab.png" />128<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0 23&gt;&lt;n1 :4&gt;&lt;4 :*Nat&gt;&lt;n1 :8&gt;&lt;n4 * 8 :1 2 4 8 16 32 64 128&gt;</code></p>
+<p class="zword"><strong>Example 8:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />r4<img src="tab.png" />1Real<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[Base64 encoded value]<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 33&gt;&lt;n1 :5&gt;&lt;5 :1Real&gt;&lt;r4 :[binary r4 value]&gt;</code></p>
+<p class="zword"><strong>Example 9:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />r8<img src="tab.png" />*Real<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />[Base64 encoded value]<img src="tab.png" />[Base64 encoded value]<img src="tab.png" />[Base64 encoded value]<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0 34&gt;&lt;n1 :5&gt;&lt;5 :*Real&gt;&lt;n1 :3&gt;&lt;n8 * 3 :[binary r8 value] * 3&gt;</code></p>
 
-<h2 class="zword"><a name="3.6">3.6 - User Type</a></h2>
-<p class="zword">A definition of a user type.</p>
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />[key]<img src="tab.png" />[member count]<img src="tab.png" />-(<img src="tab.png" />[type code]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />[compression type])*<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                     :key size]                   [key] usertype- [comment]\n-->
-<!--[n1 * key size    :key]                              [key] [value header] [array size] [comment]\n-->
-<!--[n2                     :value header - 00|00|9]           [key] [value header] [array size] [comment]\n-->
-<!--[n2                     :user type code]                   ...-->
-<!--[n1                     :comment byte count]               \n-->
-<!--[n1 * comment byte count:comment]-->
-<!--[n1                     :key size]-->
-<!--[n1 * key size    :key]-->
-<!--[n2                     :value header]-->
-<!--[n4                     :array size]*-->
-<!--[n1                     :comment byte count]-->
-<!--[n1 * comment byte count:comment]-->
-<!--[n1                     :key size]-->
-<!--[n1 * key size    :key]-->
-<!--[n2                     :value header]-->
-<!--[n4                     :array size]*-->
-<!--[n1                     :comment byte count]-->
-<!--[n1 * comment byte count:comment]-->
-<!--...-->
-<!--[n1                     :key size - 0]-->
-<!--	
--->
-<!--[n1                     :key size]                   [key] usertype= [array size] [comment]\n-->
-<!--[n1 * key size    :key]                              [key] [value header] [array size] [comment]\n-->
-<!--[n2                     :value header - 00|01|9]           [key] [value header] [array size] [comment]\n-->
-<!--[n2                     :user type code]                   ...-->
-<!--[n4                     :array size]-->
-<!--[n1                     :comment byte count]-->
-<!--[n1 * comment byte count:comment]-->
-<!--[n1                     :key size]-->
-<!--[n1 * key size    :key]-->
-<!--[n2                     :value header]-->
-<!--[n4                     :array size]*-->
-<!--[n1                     :comment byte count]-->
-<!--[n1 * comment byte count:comment]-->
-<!--[n1                     :key size]-->
-<!--[n1 * key size    :key]-->
-<!--[n2                     :value header]-->
-<!--[n4                     :array size]*-->
-<!--[n1                     :comment byte count]-->
-<!--[n1 * comment byte count:comment]-->
-<!--...-->
-<!--]-->
-<!--	
--->
-<!--In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.  In the text file, the key for the user type is the user type code.-->
+<h2 class="zword"><a name="3.3">3.3 - String values</a></h2>
+<p class="zword"><strong>Text</strong></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[string value]<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />-(<img src="tab.png" />[string value])*<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2             :value header (000 0 5)&gt;<br /><img src="indent.png" />&lt;n1             :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count :key&gt;<br /><img src="indent.png" />&lt;(n1)*          :[string value]<img src="nl.png" />&gt;</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2             :value header (000 1 5)&gt;<br /><img src="indent.png" />&lt;n1             :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count :key&gt;<br /><img src="indent.png" />&lt;n4             :chunk byte count&gt;<br /><img src="indent.png" />(&lt;n4                   :compressed byte count&gt;<br /><img src="indent.png" /> &lt;compressed byte count:binary compressed data&gt;)*</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2             :value header (aaa 0 5)&gt;<br /><img src="indent.png" />&lt;n1             :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count :key&gt;<br /><img src="indent.png" />&lt;n??            :array count&gt;<br /><img src="indent.png" />&lt;(n1)*          :[string value](<img src="tab.png" />[string value])*<img src="nl.png" />&gt;</code></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2             :value header (aaa 1 5)&gt;<br /><img src="indent.png" />&lt;n1             :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count :key&gt;<br /><img src="indent.png" />&lt;n??            :array count&gt;<br /><img src="indent.png" />&lt;n4             :chunk byte count&gt;<br /><img src="indent.png" />(&lt;n4                   :compressed byte count&gt;<br /><img src="indent.png" /> &lt;compressed byte count:binary compressed data&gt;)*</code></p>
+<p class="zword">In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.</p>
+<p class="zword">In a compressed byte array, the tabs in the stream will separate the strings like they do in the uncompressed text record.  The new line character will indicate the end of the string.</p>
+<pre class="zword">
+\t - tab            - 0x09
+\n - new line       - 0x0a
+\\ - \
+</pre>
+<p class="zword"><strong>Example 1:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />string1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />This is line1.\nThis is line 2.<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :000 0 5&gt;&lt;n1 :7&gt;&lt;7 :string1&gt;&lt;(n1)* :This is line1.\nThis is line 2.<img src="nl.png" />&gt;</code></p>
+<p class="zword"><strong>Example 2:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />string2<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />1000000<img src="tab.png" />23424<img src="tab.png" />[Base64 stream]\n<img src="tab.png" />45894<img src="tab.png" />[Base64 stream]<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 1 5&gt;&lt;n1 :7&gt;&lt;7 :string2&gt;&lt;n4 :1000000&gt;<br /><img src="indent.png" />&lt;n4 :23424&gt;&lt;23424 :binary compressed data&gt;<br /><img src="indent.png" />&lt;n4 :45894&gt;&lt;45894 :binary compressed data&gt;</code></p>
+<p class="zword"><strong>Example 3:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />stringList1<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />This is string 1, line 1.\nThis is string1, line 2.\n<img src="tab.png" />This is string 2.<img src="tab.png" />This is string 3.<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0 5&gt;&lt;n1 :11&gt;&lt;11 :stringList1&gt;&lt;n1 :3&gt;<br /><img src="indent.png" />&lt;(n1)* :This is string 1, line 1.\nThis is string1, line 2.\n<img src="tab.png" />This is string 2.<img src="tab.png" />This is string 3.<img src="nl.png" />&gt;</code></p>
+<p class="zword"><strong>Example 4:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />"<img src="tab.png" />stringList2<img src="tab.png" />3<img src="tab.png" />:<img src="tab.png" />1000<img src="tab.png" />252<img src="tab.png" />[Base64 stream]<img src="tab.png" />543<img src="tab.png" />[Base64 stream]<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 1 5&gt;&lt;n1 :11&gt;&lt;11 :stringList2&gt;&lt;n1 :3&gt;&lt;n4 :1000&gt;<br /><img src="indent.png" />&lt;n4 :252&gt;&lt;252 :binary compressed data&gt;<br /><img src="indent.png" />&lt;n4 :543&gt;&lt;543 :binary compressed data&gt;</code></p>
+
+<h2 class="zword"><a name="3.4">3.4 - Define User Type</a></h2>
+<p class="zword"><strong>Text</strong></p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />[key]<img src="tab.png" />[member count]<img src="tab.png" />-(<img src="tab.png" />[type code]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />[compression type])*<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2             :value header (aaa 0 3)&gt;<br /><img src="indent.png" />&lt;n1             :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count :key&gt;<br /><img src="indent.png" />&lt;n??            :array count&gt;<br /><img src="indent.png" />&lt;n2             :user type code&gt;<br /><img src="indent.png" />(&lt;n2                            :member variable value header (aaa c [type code])&gt;<br /><img src="indent.png" /> &lt;n1                            :member variable key byte count&gt;<br /><img src="indent.png" /> &lt;member variable key byte count:member variable key&gt;<br /><img src="indent.png" /> &lt;n??                           :array count if (aaa) not 000 or 111&gt;<br /><img src="indent.png" /> &lt;n4                            :chunk byte count if (c) is 1&gt;)*</code></p>
+<p class="zword">In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.</p>
 <p class="zword">Compression is never used with this type code.</p>
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />TypeContact<img src="tab.png" />6<img src="tab.png" />-<img src="tab.png" />"<img src="tab.png" />NameGiven<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />"<img src="tab.png" />NameFamily<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />n1<img src="tab.png" />Age<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />"<img src="tab.png" />EMail<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />n1<img src="tab.png" />DataFlags<img src="tab.png" />5<img src="tab.png" />-<img src="tab.png" />i4<img src="tab.png" />Streamed data<img src="tab.png" />*<img src="tab.png" />:<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />Image<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />n4<img src="tab.png" />Width<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />n4<img src="tab.png" />Height<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />n1<img src="tab.png" />Pixels<img src="tab.png" />*<img src="tab.png" />:<img src="tab.png" />1000000<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />Binary Blob<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" />n4<img src="tab.png" />Byte Count<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />n1<img src="tab.png" />Byte Data<img src="tab.png" />*<img src="tab.png" />:<img src="tab.png" />1000000<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1     :11]                                               TypeContact usertype-\n-->
-<!--[n1 * 11:TypeContact]                                      NameGiven ""-\n-->
-<!--[n2     :00|00|9]                                          NameFamily ""-\n-->
-<!--[n2     :64]                                               Age n1-\n-->
-<!--[n1     :0]                                                EMail ""-\n-->
-<!---no comment-                                               DataFlags n1= 5\n-->
-<!--[n1     :9]                                                \n-->
-<!--[n1 * 9 :NameGiven]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :10]-->
-<!--[n1 * 10:NameFamily]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :3]-->
-<!--[n1 * 3 :Age]-->
-<!--[n2     :00|00|31]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :5]-->
-<!--[n1 * 5 :EMail]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :9]-->
-<!--[n1 * 9 :DataFlags]-->
-<!--[n2     :00|01|31]-->
-<!--[n4     :5]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :0]-->
-<!--	
--->
-<!--[n1     :11]                                               TypeContact usertype= 5-->
-<!--[n1 * 11:TypeContact]                                      NameGiven ""-\n-->
-<!--[n2     :00|01|9]                                          NameFamily ""-\n-->
-<!--[n2     :64]                                               Age n1-\n-->
-<!--[n4     :5]                                                EMail ""-\n-->
-<!--[n1     :0]                                                DataFlags n1= 5\n-->
-<!---no comment--->
-<!--[n1     :9]-->
-<!--[n1 * 9 :NameGiven]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :10]-->
-<!--[n1 * 10:NameFamily]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :3]-->
-<!--[n1 * 3 :Age]-->
-<!--[n2     :00|00|31]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :5]-->
-<!--[n1 * 5 :EMail]-->
-<!--[n2     :00|00|6]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--[n1     :9]-->
-<!--[n1 * 9 :DataFlags]-->
-<!--[n2     :00|01|31]-->
-<!--[n4     :5]-->
-<!--[n1     :0]-->
-<!---no comment--->
-<!--]-->
-<p class="zword">As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its size when we defined the type.  The size will be provided when the data for the type is provided.</p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1     :5]                                                Image usertype-\n-->
-<!--[n1 * 5 :Image]                                            Width  n4- Width in pixels for the image.\n-->
-<!--[n2     :00|00|9]                                          Height n4- Height in pixels for the image.\n-->
-<!--[n2     :65]                                               Pixels n1* Width * Height * n1 * 3 pixel values in RGB order.\n-->
-<!--[n1     :5]                                                \n-->
-<!--[n1 * 5 :Width]-->
-<!--[n2     :00|00|34]-->
-<!--[n1     :30]-->
-<!--[n1 * 30:Width in pixels for the image.]-->
-<!--[n1     :6]-->
-<!--[n1 * 6 :Height]-->
-<!--[n2     :00|00|34]-->
-<!--[n1     :31]-->
-<!--[n1 * 31:Height in pixels for the image.]-->
-<!--[n1     :6]-->
-<!--[n1 * 3 :Pixels]-->
-<!--[n2     :00|10|31]-->
-<!--[n1     :50]-->
-<!--[n1 * 50:Width * Height * n1 * 3 pixel values in RGB order.]-->
-<!--[n1     :0]-->
-<!--]-->
-<!--	
--->
-<!--In this situation Pixels is a byte array but the size of it is not known at definition.  Rules on its size may be dictated by who ever set the type.  Comments should be used to make it clear.-->
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r4<img src="tab.png" />value<img src="tab.png" />3<img src="tab.png" />-<img src="nl.png" /></p>
-<p class="zword">...</p>
-<p class="zword"><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />east<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />north<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />elevation<img src="tab.png" />1<img src="tab.png" />-<img src="nl.png" /></p>
-<p class="zword">If you redefine a userType then the previous userType will be replaced with the new one.</p>
+<p class="zword"><strong>Example 1:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />TypeContact<img src="tab.png" />5<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />"<img src="tab.png" />NameGiven<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />"<img src="tab.png" />NameFamily<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n1<img src="tab.png" />Age<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />"<img src="tab.png" />EMail<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n1<img src="tab.png" />DataFlags<img src="tab.png" />5<img src="tab.png" />-<img src="nl.png" /></code></p>
+<p class="zword">Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.</p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :TypeContact&gt;&lt;n1 :6&gt;&lt;n2 :64&gt;<br /><img src="indent.png" />&lt;n2 :000 0  5&gt;&lt;n1 : 9&gt;&lt; 9 :NameGiven&gt;<br /><img src="indent.png" />&lt;n2 :000 0  5&gt;&lt;n1 :10&gt;&lt;10 :NameFamily&gt;<br /><img src="indent.png" />&lt;n2 :000 0 20&gt;&lt;n1 : 3&gt;&lt; 3 :Age&gt;<br /><img src="indent.png" />&lt;n2 :000 0  5&gt;&lt;n1 : 5&gt;&lt; 5 :Email&gt;<br /><img src="indent.png" />&lt;n2 :001 0 20&gt;&lt;n1 : 9&gt;&lt; 9 :DataFlags&gt;&lt;n1 :5&gt;</code></p>
+<p class="zword"><strong>Example 2:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />Image<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n4<img src="tab.png" />Width<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n4<img src="tab.png" />Height<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n1<img src="tab.png" />Pixels<img src="tab.png" />*<img src="tab.png" />:<img src="tab.png" />1000000<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0  3&gt;&lt;n1 :5&gt;&lt;5 :Image&gt;&lt;n1 :3&gt;&lt;n2 :65&gt;<br /><img src="indent.png" />&lt;n2 :000 0 23&gt;&lt;n1 :5&gt;&lt;5 :Width&gt;<br /><img src="indent.png" />&lt;n2 :000 0 23&gt;&lt;n1 :6&gt;&lt;6 :Height&gt;<br /><img src="indent.png" />&lt;n2 :111 1 20&gt;&lt;n1 :6&gt;&lt;6 :Pixels&gt;&lt;n4 :1000000&gt;</code></p>
+<p class="zword"><strong>Example 3:<br />Text</strong></p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />Binary Blob<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n4<img src="tab.png" />Byte Count<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" /><br /><img src="indent.png" /><img src="indent.png" />n1<img src="tab.png" />Byte Data<img src="tab.png" />*<img src="tab.png" />:<img src="tab.png" />1000000<img src="nl.png" /></code></p>
+<p class="zword"><strong>Binary</strong></p>
+<p class="zword"><code><img src="indent.png" />&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :Binary Blob&gt;&lt;n1 :2&gt;&lt;n2 :66&gt;<br /><img src="indent.png" />&lt;n2 :000 0 23&gt;&lt;n1 :10&gt;&lt;10 :Byte Count&gt;<br /><img src="indent.png" />&lt;n2 :111 1 20&gt;&lt;n1 : 9&gt;&lt; 9 :Byte Data&gt;&lt;n4 :1000000&gt;</code></p>
+<p class="zword">As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its byte count when we defined the type.  The byte count will be provided when the data for the type is provided.</p>
+<p class="zword">What would happen if a type is redefined in a MIFF file like...</p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r4<img src="tab.png" />value<img src="tab.png" />3<img src="tab.png" />-<img src="nl.png" /></code></p>
+<p class="zword"><img src="indent.png" />...</p>
+<p class="zword"><code><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />east<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />north<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />elevation<img src="tab.png" />1<img src="tab.png" />-<img src="nl.png" /></code></p>
+<p class="zword">In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.</p>
 
-<h2 class="zword"><a name="3.7">3.7 - User Data</a></h2>
+<h2 class="zword"><a name="3.5">3.5 - User Data</a></h2>
 <p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array size]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed size]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
+<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
+<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
 <!--.[-->
 <!--Binary                                                     Text-->
 <!--	
 -->
-<!--[n1                        :key size]                [key] [user type]= [user type data]\n-->
-<!--[n1 * key size       :key]-->
+<!--[n1                        :key byte count]                [key] [user type]= [user type data]\n-->
+<!--[n1 * key byte count       :key]-->
 <!--[n2                        :00|00|user type code]-->
 <!--[n1                        :user type byte count]-->
 <!--[n1 * user type byte count :user type]-->
 <!--[*                         :user type data]-->
 <!--	
 -->
-<!--[n1                        :key size]                [key] [user type]= [array size]\n-->
-<!--[n1 * key size       :key]                           [user type data]\n-->
+<!--[n1                        :key byte count]                [key] [user type]= [array count]\n-->
+<!--[n1 * key byte count       :key]                           [user type data]\n-->
 <!--[n2                        :00|01|user type code]          ...-->
 <!--[n1                        :user type byte count]-->
 <!--[n1 * user type byte count :user type]-->
-<!--[n4                        :array size]-->
+<!--[n4                        :array count]-->
 <!--[*                         :user type data]-->
 <!--...-->
 <!--	
 -->
-<!--[n1                        :key size]                [key] [user type]z [byte count] [compressed size] [user type data]\n-->
-<!--[n1 * key size       :key]-->
+<!--[n1                        :key byte count]                [key] [user type]z [byte count] [compressed byte count] [user type data]\n-->
+<!--[n1 * key byte count       :key]-->
 <!--[n2                        :01|00|user type code]-->
 <!--[n1                        :user type byte count]-->
 <!--[n1 * user type byte count :user type]-->
 <!--[n4                        :byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
+<!--[n4                        :compressed byte count]-->
+<!--[n1 * compressed byte count:compressed data]-->
 <!--	
 -->
-<!--[n1                        :key size]                [key] [user type]Z [array size] [compressed size] [Base64 compressed data]\n-->
-<!--[n1 * key size       :key]-->
+<!--[n1                        :key byte count]                [key] [user type]Z [array count] [compressed byte count] [Base64 compressed data]\n-->
+<!--[n1 * key byte count       :key]-->
 <!--[n2                        :01|01|user type code]-->
 <!--[n1                        :user type byte count]-->
 <!--[n1 * user type byte count :user type]-->
-<!--[n4                        :array size]-->
+<!--[n4                        :array count]-->
 <!--[n4                        :byte count]-->
-<!--[n4                        :compressed size]-->
-<!--[n1 * compressed size:compressed data]-->
+<!--[n4                        :compressed byte count]-->
+<!--[n1 * compressed byte count:compressed data]-->
 <!--]-->
 <!--	
 -->
 <p class="zword">The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.</p>
-<p class="zword">If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer size was.</p>
+<p class="zword">If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer byte count was.</p>
 <p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />Contact1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />Robbert<img src="tab.png" />de Groot<img src="tab.png" />100<img src="tab.png" />zekaric@gmail.com<img src="tab.png" />1<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />3<img src="tab.png" />5<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />Contact2<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />10000<img src="tab.png" />521<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />ContactList1<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" />Robbert<img src="tab.png" />de Groot<img src="tab.png" />100<img src="tab.png" />zekaric@gmail.com<img src="tab.png" />1<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />3<img src="tab.png" />5<img src="tab.png" />Sherlock<img src="tab.png" />Holms<img src="tab.png" />32<img src="tab.png" />221b@bakerst.uk<img src="tab.png" />10<img src="tab.png" />20<img src="tab.png" />30<img src="tab.png" />40<img src="tab.png" />50<img src="nl.png" /></p>

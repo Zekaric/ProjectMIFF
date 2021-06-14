@@ -22,8 +22,8 @@ hh	|chapter| - Discussion
 hh	|chapter| - Goals
 
 :[
--	|b |Simple  | b|  The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
--	|b |Brief   | b|  The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+-	|b |Simple| b|    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
+-	|b |Brief| b|     The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
 -	|b |Flexible| b|  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
 -	|b |Accurate| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 ]
@@ -49,18 +49,18 @@ h	|chapter| - Format: Base
 	There are two representations of the format.  A Text file representation and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
 	A MIFF format is essentially a collection of key value pairs.  Values are typed.  Nesting and user types are allowed.
 	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file format to move data from one program to another.
-	Common to both Text and Binary formats, any Byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.
+	Common to both Text and Binary formats, any byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.
 
 
 hh	|chapter| - File Header
 
 	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
-	|img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|TXT|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|
+	|. ||img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|TXT|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|| .|
 
-//		or
-//	
-//	|img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|BIN|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|
+		or
+	
+	|. ||img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|BIN|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|| .|
 
 	|img |tab.png| img| means a tab character.  |img |nl.png| img| means a new line character.
 
@@ -72,39 +72,38 @@ hh	|chapter| - File Header
 -	|b |Line 5| b| - Sub-Format version identifier.
 ]
 
-	If the representation is Binary then right after the \n of the fifth line, the binary format will begin.
-	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain tabs (\t, |img |tab.png| img|) or new lines (\n, |img |nl.png| img|).  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte size.
-	Binary files will be explored at a later date.
+	If the representation is Binary then right after the |img |nl.png| img| of the fifth line, the binary format will begin.
+	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain |img |tab.png| img|s or |img |nl.png| img|s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
 
 
 hh	|chapter| - Content
 
 	Before going into the specifics of the format we will cover some things at a high level.
 
-//	hhh	|chapter| - Binary Syte Sequences
-//	
-//		Everything within "[]" is a byte sequence of a known size.  Each byte seqence is separated but in reality it is immediately following the previous byte sequence.  Nothing extra is added between sequences.
-//		A byte sequence is "[" [Byte count] ":" [Name of this Byte sequence] "]", where Byte count is a number indicating the number of bytes this sequence uses.
+hhh	|chapter| - Binary Syte Sequences
+	
+		Everything within |" ||<|| "| and |" ||>|| "| is a byte sequence of a known byte count.  Each byte seqence is immediately followed by the next byte sequence.  Nothing extra is added between sequences.
+		A byte sequence is represented by |" ||<|| "| [byte count] |" |:| "| [name of this byte sequence] |" ||>|| "|, where byte count is a number indicating the number of bytes this sequence uses.  This byte count can be represented by a value defined in an earlier byte sequence.
 
 hhh	|chapter| - Numbers
 
 	|b |Natural numbers| b| (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
 	|b |Integer numbers| b| are numbers are positive and negative whole numbers.
-	|b |Real numbers   | b| (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
+	|b |Real numbers| b|    (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
 
 hhh	|chapter| - Record Composition
 
 	A record basically defines a key - value pair.  However the composition of that record is composed of a few parts.
 	
-	|b |[key]             | b| will be a string that will somewhat uniquely identify the value.  
-	|b |[type code]       | b| will be a code (BIN) or sequence of characters (TXT) that will dictate what the value will look like as well as a compression setting and array size setting.
-	|b |[array size]      | b| will be a number or special character to indicate the number of values of a particular type is associated with the key.
+	|b |[key]| b|              will be a string that will somewhat uniquely identify the value.  
+	|b |[type code]| b|        will be a code (BIN) or sequence of characters (TXT) that will dictate what the value will look like as well as a compression setting and array count setting.
+	|b |[array count]| b|      will be a number or special character to indicate the number of values of a particular type is associated with the key.
 	|b |[compression flag]| b| will be a setting on how the value is compressed, if at all.
-	|b |[value]           | b| will depend on the the other parts so it can vary in appearance.
+	|b |[value]| b|            will depend on the the other parts so it can vary in appearance.
 
 hhhh	|chapter| - Key
 
-	Keys are always a single string of any character in UTF8 encoding as long as none are \t and \n.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just " " and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
+	Keys are always a single string of any character in UTF8 encoding as long as none are |img |tab.png| img| and |img |nl.png| img|.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
 
 .[
 12345
@@ -119,7 +118,7 @@ This is also a valid key with internal spaces
 hhhh	|chapter| - Type Code
 
 t[
-//	thx	Binary Type Code
+thx	Binary Type Code
 thx	Text Type Code
 th*	Description
 
@@ -127,52 +126,51 @@ t-
 tcx	|line||b |Block Types| b||line|
 
 t-
-//	tcx	1
-tcx	{
+tcx	|. |1| .|
+tcx	|. |{| .|
 tc	Key-Value block begins.
 
 t-
-//	tcx	2
-tcx	}
+tcx	|. |0| .|
+tcx	|. |}| .|
 tc	Key-Value block ends.
 
 t-
 tcx	|line||b |Basic Types| b||line|
 
 t-
-//	tcx	3
-tcx	type
+tcx	|. |2| .|
+tcx	|. |type| .|
 tc	Type value.  One of these type codes or a user type code.
 
 t-
-//	tcx	4
-tcx	define
+tcx	|. |3| .|
+tcx	|. |define| .|
 tc	A series of key-type pairs.  You can define up to 4031 new types maximum.
 
 t-
-//	tcx	5
-tcx	"
+tcx	|. |5| .|
+tcx	|. |"| .|
 tc	String (UTF8) data, can be of any length.
 
 t-
-//	tcx	7
-tcx	b
+tcx	|. |8| .|
+tcx	|. |b| .|
 tc	Boolean value.
 
 t-
-//	tcx	10   11   12   13   14   15    16    17    18     19   
-tcx	i1 i2 i3 i4 i8 i16 i32 i64 i128 i256
-tc	An integer number.  Min and Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.
+tcx	|. |10 11 12 13 14 15 16 17 18 19| .| 
+tcx	|. |i1 i2 i3 i4 i8 i16 i32 i64 i128 i256| .|
+tc	An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-//	tcx	20   21   22   23   24   25    26    27    28     29
-tcx	n1 n2 n3 n4 n8 n16 n32 n64 n128 n256
-tc	A natural number.  Ranges from 0 to max value.  Max value will depend on how much the Bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.
+tcx	|. |20 21 22 23 24 25 26 27 28 29| .|
+tcx	|. |n1 n2 n3 n4 n8 n16 n32 n64 n128 n256| .|
+tc	A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-//	tcx	31   33   34   35    36    37    38     39
-tcx	r2 r4 r8 
-//	r16 r32 r64 r128 r256
+tcx	|. |33 34| .|
+tcx	|. |r4 r8| .|
 tc	A real value.  
 //	I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard.
 
@@ -180,57 +178,52 @@ t-
 tcx	|line||b |User Tyes| b||line|
 
 t-
-//	tcx	64 and higher
-tcx	[user type name]
+tcx	|. |64 and higher| .|
+tcx	|. |[user type name]| .|
 tc	Depends on what the user type defines.  A define must exist first.
 
 ]
 
 
-hhhh	|chapter| - Array Size
+hhhh	|chapter| - Array Count
 
 t[
-//	thx	Encoding Code (Binary (aaa))
+thx	Encoding Code (Binary bits(aaa))
 thx	Encoding Code (Text)
 th*	Description
 
 t-
-//	tc	000
-tc	1
-tc	A single value follows.  In binary, no array size byte sequence follows.
+tc	|. |000| .|
+tc	|. |1| .|
+tc	A single value follows.  In binary, no array count present.
 
 t-
-//	tc	001, 010, 011, 100, 101, 110
-tc	[number of items]
-tc	An array of values follows.  In binary, 001 means a 1 byte natural follows; 010 means a 2 bytes natural follows; 011 means a 3 byte natural follows; 100 means a 4 byte natural follows; 101 means an 8 byte natural follows; 110 means a 16 byte natural follows.
+tc	|. |001 010 011 100 101 110| .|
+tc	|. |[number of items]| .|
+tc	An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.
 
 t-
-//	tc	111
-tc	*
-tc	An unknown array of values follows or used when defining a user type.  See User types.
+tc	|. |111| .|
+tc	|. |*| .|
+tc	An unknown count array of values follows or used when defining a user type.  See User types.
 ]
 
 
 hhhh	|chapter| - Compression Flag
 
 t[
-//	thx	Encoding Code (Binary (cc))
+thx	Encoding Code (Binary bit(c))
 thx	Encoding Code (Text)
 th*	Description
 
 t-
-//	tc	00
-tc	-
+tc	|. |0| .|
+tc	|. |-| .|
 tc	Values are inlined raw with no compression.
 
 t-
-//	tc	01
-tc	.
-tc	Values are compressed with zlib as one big chunk.
-
-t-
-//	tc	10
-tc	:
+tc	|. |1| .|
+tc	|. |:| .|
 tc	Values are broken down into smaller chunks and then each chunk compressed with zlib.
 
 ]
@@ -246,7 +239,7 @@ hh	|chapter| - Text Format
 	The text format is a UTF8 text file.
 	The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.
 	The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.
-	All lines are terminated with a single \n (|img |nl.png| img|).  NOT an MSDOS/Windows \r\n or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.  No exceptions.
+	All lines are terminated with a single |img |nl.png| img| (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.
 
 
 hhh	|chapter| - Whitespace Characters
@@ -256,7 +249,7 @@ hhh	|chapter| - Whitespace Characters
 
 hhh	|chapter| - Separator Characters
 
-	MIFF only uses tab (\t, |img |tab.png| img|) as a separater character.  And only one |img |tab.png| img| between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
+	MIFF only uses |img |tab.png| img| as a separater character.  And only one |img |tab.png| img| between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
 
 
 hhh	|chapter| - Printable Characters
@@ -273,7 +266,7 @@ hhh	|chapter| - Real Number Representation
 
 hhh	|chapter| - Record Composition
 
-	|img |indent.png| img|[type code]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|[compression flag]|img |tab.png| img|[value]|img |nl.png| img|
+	|. ||img |indent.png| img|[type code]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|[compression flag]|img |tab.png| img|[value]|img |nl.png| img|| .|
 
 	Any space found in the key that is not a |img |tab.png| img| will be part of the key.  They will be significant.  Do not strip or reduce them.
 	There has to be one |img |tab.png| img| separator between each part.
@@ -283,47 +276,52 @@ hhh	|chapter| - Record Composition
 	
 	|b |Invalid:| b| Absolutely no |img |nl.png| img| anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra |img |tab.png| img| anywhere in the format.
 
-	|img |indent.png| img|[type code]|img |tab.png| img||img |tab.png| img|[key]|img |nl.png| img|[array size] [compression flag]|img |tab.png| img|[value]|img |nl.png| img|
+	|. ||img |indent.png| img|[type code]|img |tab.png| img||img |tab.png| img|[key]|img |nl.png| img|[array count] [compression flag]|img |tab.png| img|[value]|img |nl.png| img|| .|
 
 	What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
 
 
-//	hh	|chapter| - Binary
-//	
-//		The Binary file will to match the Text file 1-1.  
-//		
-//	hhh	|chapter| - Key Value Format
-//	
-//	.[
-//	[n1           :key size]
-//	[n1 * key size:key]
-//	[*            :value header]
-//	[*            :value]
-//	]
-//	
-//	hhhh	|chapter| - Key
-//	
-//		[key size] defines how long the key is in bytes.  Keys are 1 to 255 Bytes and the Bytes define a UTF8 string.
-//		[key] defines the key of the key value pair.  The length of which was defined by [key size] above.  No null terminator is included in the key.
-//	
-//	
-//	hhhh	|chapter| - Value Header
-//	
-//		Value header will typically look like this.
-//	
-//	.[
-//	[n2:2 bit - compression flag, 3 bit - array flag, 11 bit - type code]
-//	[0,n1,n2,n3,n4,n8,n16:array size]
-//	]
-//		The first 2 bytes holds the type code and array and compression flags.  The 5 high bits of this value are holding the array and compression flags.  The remaining 11 bits are for the type code.  See section on Type Codes, array size Flag and Compression Flag earlier in this document for what the type code and flags should equal to.
-//		[array size] byte sequence is only present when storing an array of values.
-//	
-//	
-//	hhhh	|chapter| - Value
-//	
-//		[*:value] field will vary wildly depending on the [value header].  But it will be a known size given all that information.
+hh	|chapter| - Binary
+
+	The Binary file byte sequence is not too different than the text file organization.  The infromation stored will not be much different.
+	
+hhh	|chapter| - Key Value Format
+
+	|. ||img |indent.png| img||<|n2                 :value header(aaa c tttt tttt tttt)|>||line||img |indent.png| img||<|n1                 :key byte count|>||line||img |indent.png| img||<|key byte count + 1 :key|>||line||img |indent.png| img||<|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|>||line||img |indent.png| img||<|n4                 :chunk byte count (if c above is 1)|>||line||img |indent.png| img||<|*                  :value|>|| .|
 
 
+hhhh	|chapter| - Key
+
+	|. ||<|n1:key byte count|>|| .| defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
+	|. ||<|key byte count + 1:key|>|| .| defines the key of the key value pair.  The length of which was defined by |. ||<|key byte count|>|| .| above.  No null terminator is included in the key.
+
+
+hhhh	|chapter| - Value Header
+
+	|. ||<|n2:value header|>|| .| Value header is a 2 byte value.  
+	The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.
+	The 4th high bit (c) defines is chunked compression is being used.  See section 2.2.3.4.
+	The remaining bits define the type of the key value.  0-63 type values are reserved, see section 2.2.3.2.  User types are values 64 - 4095.
+
+
+hhhh	|chapter| - Array Count
+
+	|. ||<|n1/n2/n4/n8/n16/n32:array count|>|| .| byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
+
+
+hhhh	|chapter| - Chunk Byte Count
+
+	|. ||<|n4:chunk byte count|>|| .| Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
+
+
+hhhh	|chapter| - Value
+	
+	|. ||<|*:value|>|| .| field will vary wildly depending on the |. ||<|value header|>|| .|.  See section 3 for how the values are represented.
+
+
+hhhh	|chapter| - Special Case
+
+	Key Value Block End will just have the value header and nothing else follows.  (aaa) will be 000, (c) will be 0, and (tttttttttttt) will be 0.
 
 
 h	|chapter| - Fromat: Value Specifics
@@ -333,423 +331,69 @@ hh	|chapter| - Key-Value Block Begin and End.
 
 	Key-Value blocks are special.  They are needed to allow nesting of key values.  
 	In a text file, the last line of a Key-Value Block needs to be a comletely empty line with nothing on it but a \n to indicate that the block is terminated.
-	In a binary file you will have a key size of 0 to indicate the end of a Key-Value block.
+	In a binary file you will have a key byte count of 0 to indicate the end of a Key-Value block.
 
-	|img |indent.png| img|{|img |tab.png| img|[key]|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img|
+	|b |Text| b|
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1           :key size]                                   [key]\t{\n
-//	[n1 * key size:key]                                        ...
-//	[n2           :value header   - 00|000|1]                  \t}\n
-//	...                                                        
-//	[n1           :0]                   
-//	[n2           :               - 00|000|2]
-//	]
-//	
-	Key value bocks can have an array size.  What that will mean is that there are [array size] key value pairs following.  The next key value pair after the last key value will not belong to this block.
-	A block is terminated when a value type of "}" is reached or array size key values have been read.  The key for this line, if present, will be ignored.  So it should really be empty to save space.  Every begin requires an end, there must not be extras of each in the file.
-	Compression flags are never used with this value type.
+	|. ||img |indent.png| img|{|img |tab.png| img|[key]|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img|| .|
 
-	|img |indent.png| img|{|img |tab.png| img|docInfo|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img|
-	|img |indent.png| img|{|img |tab.png| img|level1|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|level2|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|level3|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel3|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel2|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel1|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line|
+	|b |Binary| b|
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1     :7]                                                docInfo\t{\n
-//	[n1 * 7 :docInfo]                                          ...
-//	[n2     :00|000|1]                                         \t}\n
-//	...                                                        
-//	[n1     :0]                   
-//	[n2     :00|000|2]
-//	
-//	[n1     :6]                                                level1\t{\n
-//	[n1 * 6 :level1]                                           level2\t{\n
-//	[n2     :00|000|1]                                          level3\t{\n
-//	[n1     :6]                                                ...
-//	[n1 * 6 :level2]                                           \t}\n
-//	[n2     :00|000|1]                                          anotherLevel3\t{\n
-//	[n1     :6]                                                ...
-//	[n1 * 6 :level3]                                           \t}\n
-//	[n2     :00|000|1]                                          \t}\n
-//	...                                                        anotherLevel2\t{\n
-//	[n1     :0]                                                ...
-//	[n2     :00|000|2]                                         \t}\n
-//	[n1     :13]                                               \t}\n
-//	[n1 * 13:anotherlevel3]                                     anotherLevel1\t{\n
-//	[n2     :00|000|1]                                         ...
-//	...                                                        \t}\n
-//	[n1     :0]                                                
-//	[n2     :00|000|2]
-//	[n1     :0]                                                
-//	[n2     :00|000|2]
-//	[n1     :6]                                                
-//	[n1 * 6 :anotherlevel2]                                    
-//	[n2     :00|000|1]                                            
-//	...                                                        
-//	[n1     :0]                                                
-//	[n2     :00|000|2]
-//	[n1     :0]                                                
-//	[n2     :00|000|2]
-//	[n1     :6]                                                
-//	[n1 * 6 :anotherlevel1]                                    
-//	[n2     :00|000|1]                                            
-//	...                                                        
-//	[n1     :0]                                                
-//	[n2     :00|000|2]
-//	]
+	|. ||img |indent.png| img||<|n2            :value header (000 0 1)|>||line||img |indent.png| img||<|n1            :key byte count|>||line||img |indent.png| img||<|key byte count:key|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2            :value header (000 0 0)|>|| .|
+
+	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.
+	Array Count and Compression flags are never used with this value type.
+
+	|b |Example 1:|line|Text| b|
+
+	|. ||img |indent.png| img|{|img |tab.png| img|docInfo|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img|| .|
+
+	|b |Binary| b|
+
+	|. ||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :7|>||<|7 :docInfo|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2 :000 0 0|>||line|| .|
+	
+	|b |Example 2:|line|Text| b|
+
+	|. ||img |indent.png| img|{|img |tab.png| img|level1|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|level2|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|level3|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel3|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel2|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|}|img |nl.png| img||line||img |indent.png| img|{|img |tab.png| img|anotherLevel1|img |nl.png| img||line||img |indent.png| img|...|line||img |indent.png| img|}|img |nl.png| img||line|| .|
+
+	|b |Binary| b|
+
+	|. ||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level1|>||line||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level2|>||line||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level3|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2 :000 0 0|>||line||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel3|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2 :000 0 0|>||line||img |indent.png| img||<|n2 :000 0 0|>||line||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel2|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2 :000 0 0|>||line||img |indent.png| img||<|n2 :000 0 0|>||line||img |indent.png| img||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel1|>||line||img |indent.png| img|...|line||img |indent.png| img||<|n2 :000 0 0|>|| .|
 
 
-hh	|chapter| - Type value
+hh	|chapter| - Basic Values
 
-	type stores type format string.
+	Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
 
-	|img |indent.png| img|type|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[text type code]|img |nl.png| img|
+	|b |Text| b|
 
-	|img |indent.png| img|type|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|-(|img |tab.png| img|[text type code])*|img |nl.png| img|
+	|. ||img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[type value]|img |nl.png| img|| .|
+	|. ||img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|| .|
+	|. ||img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|-(|img |tab.png| img|[type value])*|img |nl.png| img|| .|
+	|. ||img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|| .|
 
-	|img |indent.png| img|type|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|.|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream]|img |nl.png| img|
+	|b |Binary| b|
 
-	|img |indent.png| img|type|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
+	|. ||img |indent.png| img||<|n2               :value header (000 0 [type code])|>||line||img |indent.png| img||<|n1               :key byte count|>||line||img |indent.png| img||<|key byte count   :key|>||line||img |indent.png| img||<|[type byte count]:[type data]|>|| .|
 
+	|. ||img |indent.png| img||<|n2               :value header (000 1 [type code])|>||line||img |indent.png| img||<|n1               :key byte count|>||line||img |indent.png| img||<|key byte count   :key|>||line||img |indent.png| img||<|n4               :chunk byte count|>||line||img |indent.png| img|(|<|n4                   :compressed byte count|>||line||img |indent.png| img| |<|compressed byte count:binary compressed data|>|)*| .|
 
-//	.[
-//	Binary                                                     Text 
-//	
-//	[n1                        :key size]                [key] type- [text type code]\n
-//	[n1 * key size       :key]                 
-//	[n2                        :value header - 00|00|5]          
-//	[n2                        :binary type code]              
-//	
-//	[n1                        :key size]                [key] type= [array size] [text type code]*\n
-//	[n1 * key size       :key]                 
-//	[n2                        :value header - 00|01|5]          
-//	[n4                        :array size]                   
-//	[n2                        :binary type code]*
-//	
-//	[n1                        :key size]                type3 typeZ [array size] [compressed size] [Base64 compressed binary type codes]
-//	[n1 * key size       :key]                 
-//	[n2                        :value header - 01|01|5]          
-//	[n4                        :array size]                   
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed binary type code]
-//	
-//	[n1                        :key size]                type3 typeC [array size] [chunk byte count]\n
-//	[n1 * key size       :key]                           [compressed size] [Base64 stream]\n
-//	[n2                        :value header - 01|01|5]        ...
-//	[n4                        :array size]                   
-//	[n4                        :chunk byte count]                   
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed binary type code]
-//	...
-//	]
+	|. ||img |indent.png| img||<|n2               :value header (aaa 0 [type code])|>||line||img |indent.png| img||<|n1               :key byte count|>||line||img |indent.png| img||<|key byte count   :key|>||line||img |indent.png| img||<|n??              :array count|>||line||img |indent.png| img||<|[type byte count] * array count:[type data]|>|| .|
 
-	There is no chunked or compressed single value case.
-	The text chunked and compressed type array is using the binary type codes and not the text type codes.
+	|. ||img |indent.png| img||<|n2               :value header (aaa 1 [type code])|>||line||img |indent.png| img||<|n1               :key byte count|>||line||img |indent.png| img||<|key byte count   :key|>||line||img |indent.png| img||<|n??              :array count|>||line||img |indent.png| img||<|n4               :chunk byte count|>||line||img |indent.png| img|(|<|n4                   :compressed byte count|>||line||img |indent.png| img| |<|compressed byte count:binary compressed data|>|)*| .|
 
-	|img |indent.png| img|type|img |tab.png| img|type1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|b|img |nl.png| img|
-	|img |indent.png| img|type|img |tab.png| img|type2|img |tab.png| img|2|img |tab.png| img|-|img |tab.png| img|b|img |tab.png| img|n4|img |nl.png| img|
-	|img |indent.png| img|type|img |tab.png| img|type3|img |tab.png| img|100|img |tab.png| img|.|img |tab.png| img|31|img |tab.png| img|...|img |nl.png| img|
-	|img |indent.png| img|type|img |tab.png| img|type4|img |tab.png| img|100000|img |tab.png| img|:|img |tab.png| img|1000|img |tab.png| img|2342|img |tab.png| img|...|img |tab.png| img|4546|img |tab.png| img|...|img |nl.png| img|
-
-//	.[
-//	Binary                                                     Text 
-//	
-//	[n1     :5]                                                type1 type- bool\n
-//	[n1 * 5 :type1]                 
-//	[n2     :00|00|5]                 
-//	[n2     :10]                   
-//	
-//	[n1     :5]                                                type2 type= 2 bool .\n
-//	[n1 * 5 :type2]                 
-//	[n2     :00|01|5]                 
-//	[n4     :2]                     
-//	[n2     :10]                   
-//	[n2     :8]                   
-//	
-//	[n1     :5]                                                type3 typeZ 100 31 ...
-//	[n1 * 5 :type3]                 
-//	[n2     :01|01|5]                 
-//	[n4     :100]                   
-//	[n4     :31]            
-//	[n1 * 31:...]           
-//	]
-
-
-
-hh	|chapter| - String values
-
-//		Binary case is simpler so we'll talk about that first.
-//	
-//	.[
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 00|00|6]
-//	[n4                        :string byte count]
-//	[n1 * string byte count    :string data]
-//	
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 00|01|6]
-//	[n4                        :array size]
-//	[n4                        :string byte count]
-//	[n1 * string byte count    :string data]
-//	[n4                        :string byte count]
-//	[n1 * string byte count    :string data]
-//	...                        
-//	
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 01|00|6]
-//	[n4                        :string byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 01|01|6]
-//	[n4                        :array size]
-//	[n4 * array size          :string byte count list]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 10|00|6]
-//	[n4                        :string byte count]
-//	[n4                        :chunk byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	...
-//	
-//	[n1                        :key size]
-//	[n1 * key size       :key]
-//	[n2                        :value header - 10|01|6]
-//	[n4                        :array size]
-//	[n4 * array size          :string byte count]
-//	[n4                        :chunk byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	...
-//	[n4 * array size          :string byte count]
-//	[n4                        :chunk byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	...
-//	]
-//	
-//		The case of a single value just requires a byte count before the actual string data.  The string data will be exactly the byte count size.  Since this is binary, string data is not modified in any way.
-//		The case of an array value just requires a repeat of the byte count string data for as may in the array.
-//		The case of a compressed single value adds a compressed size after the string byte count.  And a compressed byte array of the string follows.
-//		The case of an array of compressed strings is similar to regular array but each string is individually compressed.  
-//		Chunking just breaks up the long strings into chunks before compression.
-//	
-//	.[
-//	[n1     :7]
-//	[n1 * 7 :string1]
-//	[n2     :00|00|6]
-//	[n4     :55]
-//	[n1 * 55:...]
-//	
-//	[n1     :7]
-//	[n1 * 7 :string2]
-//	[n2     :00|01|6]
-//	[n4     :2]
-//	[n4     :55]
-//	[n1 * 55:...]
-//	[n4     :55]
-//	[n1 * 55:...]
-//	
-//	[n1     :7]
-//	[n1 * 7 :string3]
-//	[n2     :01|00|6]
-//	[n4     :555]
-//	[n4     :67]
-//	[n1 * 67:...]
-//	
-//	[n1     :7]
-//	[n1 * 7 :string4]
-//	[n2     :01|01|6]
-//	[n4     :2]
-//	[n4 * 2 :75 65]
-//	[n4     :85]
-//	[n1 * 85:...]
-//	]
-//	
-//		The text case is a little more involved.
-
-	|img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[string value]|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|-|img (|img |tab.png| img|[string value])*|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-
-	If no compression is used then the string starts right after the |img |tab.png| img| character till the end of the line but not including the new line character at the end of the line.
-	Multi-line strings are placed on one line.  This is done by escaping new line characters, tab characters and the escape character when the string is written out without any compression.
-	If compression is used then we will still escape these characters.  Note however there is no "." compression option when dealing with a string or an array of strings.  This is because a string length is never consistent so chunked compression is only available.  Strings are stored in the compressed buffer in the same way as it is stored in the uncompressed string.
-
-.[
-\t - tab            - 0x09
-\n - new line       - 0x0a
-\\ - \
-]
-
-	Examples:
-
-	|img |indent.png| img|"|img |tab.png| img|string1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|This is line1.\nThis is line 2.|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|string3|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|1000000|img |tab.png| img|23424|img |tab.png| img|[Base64 stream]\n|img |tab.png| img|458947|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|stringList1|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|This is string 1, line 1.\nThis is string1, line 2.\n|img |tab.png| img|This is string 2.|img |tab.png| img|This is string 3.|img |nl.png| img|
-	|img |indent.png| img|"|img |tab.png| img|stringList3|img |tab.png| img|3|img |tab.png| img|:|img |tab.png| img|1000|img |tab.png| img|252|img |tab.png| img|[Base64 stream]|img |tab.png| img|543|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-
-
-hh	|chapter| - Boolean values
-
-	|img |indent.png| img|b|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[boolean value]|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|-(|img |tab.png| img|[boolean value])*|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                        :key size]                [key] bool- [boolean value]\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header  - 00|00|10]         
-//	[n1                        :boolean value - 'T'|'F']       
-//	
-//	[n1                        :key size]                [key] bool= [array size] [boolean value] * (array size)\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header  - 00|01|10]          
-//	[n4                        :array size]                   
-//	[n1 * (array size / 8)    :boolean value]                 
-//	
-//	[n1                        :key size]                [key] boolZ [array size] [compressed size] [Base64 compressed data]\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header  - 01|01|10]          
-//	[n4                        :array size]                   
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	
-//	[n1                        :key size]                [key] boolC [array size] [chunk byte count]\n
-//	[n1 * key size       :key]                           [compressed size] [Base64 compressed data]\n
-//	[n2                        :value header  - 10|01|10]       [compressed size] [Base64 compressed data]\n
-//	[n4                        :array size]                   ...
-//	[n4                        :chunk byte count]
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	...
-//	]
-
-
-	By default, the value will be 'T' for true, or 'F' for false.
-	For array values in text files, the value will be a string of 'T' or 'F' letters with a separator in between.
-	For array values in binary , the same string will compressed.
-	'z' encoding flag is never used with this type.
-
-	|img |indent.png| img|b|img |tab.png| img|Bool1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|T|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|Bool2|img |tab.png| img|10|img |tab.png| img|-|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|Bool3|img |tab.png| img|1024|img |tab.png| img|.|img |tab.png| img|25|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-	|img |indent.png| img|b|img |tab.png| img|Bool4|img |tab.png| img|100000|img |tab.png| img|:|img |tab.png| img|1000|img |tab.png| img|234|img |tab.png| img|[Base64 stream]|img |tab.png| img|2934|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                        :5]                             Bool1 bool- T\n
-//	[n1 * 5                    :Bool1]
-//	[n2                        :00|00|10]
-//	[n1                        :T]
-//	                       
-//	[n1                        :5]                             Bool2 bool= 10 TTTTTFFFFF\n
-//	[n1 * 5                    :Bool2]
-//	[n2                        :00|01|10]
-//	[n4                        :array size]
-//	[n1 * (array size / 8)    :boolean value]
-//	
-//	[n1                        :5]                             Bool3 boolZ 1024 25 ...\n
-//	[n1 * 5                    :Bool3]
-//	[n2                        :01|01|10]
-//	[n4                        :array size]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
-//	]
-
-
-hh	|chapter| - Simple values
-
-	Simple value encoding.  Based on what is being stored the byte streams only look slighly different.
-
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[type value]|img |nl.png| img|
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|.|img |tab.png| img|[compressed size]|img |tab.png| img|[compressed data]|img |nl.png| img|
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|-(|img |tab.png| img|[type value])*|img |nl.png| img|
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|.|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream]|img |nl.png| img|
-	|img |indent.png| img|[text type code]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-...
-
-
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                        :key size]                [key] [text type code]- [type value]\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header - 00|00|[type code]]
-//	[[byte count]              :type value]                    
-//	
-//	[n1                        :key size]                [key] [text type code]= [array size] [type value] * (array size)\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header - 00|01|[type code]]
-//	[n4                        :array size]                   
-//	[[byte count] * array size:type values]         
-//	
-//	[n1                        :key size]                [key] [text type code]z [compressed size] [compressed data]\n
-//	[n1 * key size       :key]                           
-//	[n2                        :value header - 01|00|[type code]]
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	
-//	[n1                        :key size]                [key] [text type code]Z [array size] [compressed size] [compressed data]\n
-//	[n1 * key size       :key]
-//	[n2                        :value header - 01|01|[type code]]
-//	[n4                        :array size]                   
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	
-//	[n1                        :key size]                [key] [text type code]c [chunk byte count]\n
-//	[n1 * key size       :key]                           [compressed size] [compressed data]\n
-//	[n2                        :value header - 10|00|[type code]][compressed size] [compressed data]\n
-//	[n4                        :compressed size]         ...
-//	[n1 * compressed size:compressed data]               
-//	
-//	[n1                        :key size]                [key] [text type code]C [array size] [chunk byte count]\n
-//	[n1 * key size       :key]                           [compressed size] [compressed data]\n
-//	[n2                        :value header - 10|01|[type code]][compressed size] [compressed data]\n
-//	[n4                        :array size]                   ...
-//	[n4                        :compressed size]         
-//	[n1 * compressed size:compressed data]               
-//	]
-
-
-	binary sizes for the simple types will be one of...
+	type byte counts for the simple types will be one of...
 
 t[
 thx	Type
-th*	Byte Count
+th*	byte Count
 
 t-
-tcx	i1, n1
+tcx	b, i1, n1
 tc	1
 
 t-
-tcx	i2, n2
+tcx	type, i2, n2
 tc	2
 
 t-
@@ -765,317 +409,242 @@ tcx	i8, n8, r8
 tc	8
 
 t-
-tcx	i16, n16, r16
+tcx	i16, n16
 tc	16
 
 t-
-tcx	i32, n32, r32
+tcx	i32, n32
 tc	32
 
 t-
-tcx	i64, n64, r64
+tcx	i64, n64
 tc	64
 
 t-
-tcx	i128, n128, r128
+tcx	i128, n128
 tc	128
 
 t-
-tcx	i256, n256, r256
+tcx	i256, n256
 tc	256
 ]
 
-//		The values are simply encoded as...
-//	
-//	.	[byte count:value]
-//	
-//		Again, multi-byte values are store in big endian.
-//		Arrays of these values are simply repeating the above as many times necessary for the array.
-//		Chunk and Compression flags on a single value are not usually used unless they have a large byte count.
-	
+
 	Text representation for a value will be...
 
 t[
 thx	Type Code
-th*	Representation
+thx	Text Representation
+th*	Binary Representation
+
+t-
+tcx	type
+tcx	text string for the type.
+tc  	2 byte binary value.
+
+t-
+tcx	b
+tcx	'T' or 'F'.
+tc 	1 byte per value. 1 or 0
 
 t-
 tcx	i*, n*
-tc	1 value in regular digits.
+tcx	1 value in regular digits.
+tc	Byte count of type.  Big endian order.
 
 t-
 tcx	r*
-tc	1 Base64 stream of the 1 value.
+tcx	1 Base64 stream of the 1 value.  Big endian order.
+tcx	Byte count of type.  Big endian order.
 ]
 
-	If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one \t.
+	If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one |img |tab.png| img| in text mode.
 
-	|img |indent.png| img|i4|img |tab.png| img|1Int|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|1024|img |nl.png| img|
-	|img |indent.png| img|n4|img |tab.png| img|*Nat|img |tab.png| img|8|img |tab.png| img|-|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|4|img |tab.png| img|8|img |tab.png| img|16|img |tab.png| img|32|img |tab.png| img|64|img |tab.png| img|128|img |nl.png| img|
-	|img |indent.png| img|r4|img |tab.png| img|1Real|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[Base64 encoded value]|img |nl.png| img|
+	|b |Example 1:|line|Text| b|
+	|. ||img |indent.png| img|type|img |tab.png| img|type1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|b|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :000 0 2|>||<|n1 :5|>||<|5 :type1|>||<|n2 :8|>|| .|
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1      :4]                                               1Int i4- 1024\n
-//	[n1 * 4  :1Int]
-//	[n2      :00|00|14]
-//	[i4      :1024]
-//	
-//	[n1      :4]                                               *Nat n4= 8 1 2 4 8 16 32 64 128\n
-//	[n1 * 4  :*Nat]
-//	[n2      :00|01|34]
-//	[n4      :8]
-//	[n4      :1]
-//	[n4      :2]
-//	[n4      :4]
-//	[n4      :8]
-//	[n4      :16]
-//	[n4      :32]
-//	[n4      :64]
-//	[n4      :128]
-//	
-//	[n1      :5]                                               1Real r4- [Base64 encoded value]\n
-//	[n1 * 5  :1Real]
-//	[n1      :00|00|51]
-//	[r4      :3.14159]
-//	]
-//	
+	|b |Example 2:|line|Text| b|
+	|. ||img |indent.png| img|type|img |tab.png| img|type2|img |tab.png| img|2|img |tab.png| img|-|img |tab.png| img|b|img |tab.png| img|n4|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0 5|>||<|n1 :5|>||<|5 :type2|>||<|n1 :2|>||<|n2 * 2 :8 23|>|| .|
 
-//	hh	|chapter| - Key Type
-//	
-//		A simple key only record.  No value.  If the key exists or doesn't exist, that can be enough information for the format.
-//	
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                     :key size]                   [key] -\n
-//	[n1 * key size    :key]                              
-//	[n2                     :value header - 00|00|8]           
-//	]
-//	
-//		Only - is ever used with this type.  
+	|b |Example 3:|line|Text| b|
+	|. ||img |indent.png| img|type|img |tab.png| img|type3|img |tab.png| img|100000|img |tab.png| img|:|img |tab.png| img|10000|img |tab.png| img||line||img |indent.png| img|2342|img |tab.png| img|[Base64 stream]|img |tab.png| img||line||img |indent.png| img|4546|img |tab.png| img|[Base64 stream]|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :011 1 5|>||<|n1 :5|>||<|5 :type3|>||<|n4 :100000|>||<|n4 :10000|>||line||img |indent.png| img||<|n4 :2342|>||<|2342 :binary compressed data|>||line||img |indent.png| img||<|n4 :4546|>||<|4546 :binary compressed data|>|| .|
+
+	|b |Example 4:|line|Text| b|
+	|. ||img |indent.png| img|b|img |tab.png| img|Bool1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|T|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :000 0 8|>||<|n1 :5|>||<|5 :Bool1|>||<|n1 :1|>|| .|
+
+	|b |Example 5:|line|Text| b|
+	|. ||img |indent.png| img|b|img |tab.png| img|Bool2|img |tab.png| img|10|img |tab.png| img|-|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|T|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |tab.png| img|F|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0 8|>||<|n1 :5|>||<|5 :Bool5|>||<|n1 :10|>||<|n1 * 10 :1 1 1 1 1 0 0 0 0 0|>|| .|
+
+	|b |Example 6:|line|Text| b|
+	|. ||img |indent.png| img|i4|img |tab.png| img|1Int|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|1024|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :000 0 13|>||<|n1 :4|>||<|4 :1Int|>||<|n4 :1024|>|| .|
+
+	|b |Example 7:|line|Text| b|
+	|. ||img |indent.png| img|n4|img |tab.png| img|*Nat|img |tab.png| img|8|img |tab.png| img|-|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|4|img |tab.png| img|8|img |tab.png| img|16|img |tab.png| img|32|img |tab.png| img|64|img |tab.png| img|128|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0 23|>||<|n1 :4|>||<|4 :*Nat|>||<|n1 :8|>||<|n4 * 8 :1 2 4 8 16 32 64 128|>|| .|
+
+	|b |Example 8:|line|Text| b|
+	|. ||img |indent.png| img|r4|img |tab.png| img|1Real|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[Base64 encoded value]|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :000 0 33|>||<|n1 :5|>||<|5 :1Real|>||<|r4 :[binary r4 value]|>|| .|
+
+	|b |Example 9:|line|Text| b|
+	|. ||img |indent.png| img|r8|img |tab.png| img|*Real|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|[Base64 encoded value]|img |tab.png| img|[Base64 encoded value]|img |tab.png| img|[Base64 encoded value]|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0 34|>||<|n1 :5|>||<|5 :*Real|>||<|n1 :3|>||<|n8 * 3 :[binary r8 value] * 3|>|| .|
+
+hh	|chapter| - String values
+
+	|b |Text| b|
+
+	|. ||img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[string value]|img |nl.png| img|| .|
+	|. ||img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|| .|
+	|. ||img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|-(|img |tab.png| img|[string value])*|img |nl.png| img|| .|
+	|. ||img |indent.png| img|"|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|| .|
+
+	|b |Binary| b|
+	
+	|. ||img |indent.png| img||<|n2             :value header (000 0 5)|>||line||img |indent.png| img||<|n1             :key byte count|>||line||img |indent.png| img||<|key byte count :key|>||line||img |indent.png| img||<|(n1)*          :[string value]|img |nl.png| img||>|| .|
+
+	|. ||img |indent.png| img||<|n2             :value header (000 1 5)|>||line||img |indent.png| img||<|n1             :key byte count|>||line||img |indent.png| img||<|key byte count :key|>||line||img |indent.png| img||<|n4             :chunk byte count|>||line||img |indent.png| img|(|<|n4                   :compressed byte count|>||line||img |indent.png| img| |<|compressed byte count:binary compressed data|>|)*| .|
+
+	|. ||img |indent.png| img||<|n2             :value header (aaa 0 5)|>||line||img |indent.png| img||<|n1             :key byte count|>||line||img |indent.png| img||<|key byte count :key|>||line||img |indent.png| img||<|n??            :array count|>||line||img |indent.png| img||<|(n1)*          :[string value](|img |tab.png| img|[string value])*|img |nl.png| img||>|| .|
+
+	|. ||img |indent.png| img||<|n2             :value header (aaa 1 5)|>||line||img |indent.png| img||<|n1             :key byte count|>||line||img |indent.png| img||<|key byte count :key|>||line||img |indent.png| img||<|n??            :array count|>||line||img |indent.png| img||<|n4             :chunk byte count|>||line||img |indent.png| img|(|<|n4                   :compressed byte count|>||line||img |indent.png| img| |<|compressed byte count:binary compressed data|>|)*| .|
+
+	In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.
+	In a compressed byte array, the tabs in the stream will separate the strings like they do in the uncompressed text record.  The new line character will indicate the end of the string.
+
+.[
+\t - tab            - 0x09
+\n - new line       - 0x0a
+\\ - \
+]
+
+	|b |Example 1:|line|Text| b|
+	|. ||img |indent.png| img|"|img |tab.png| img|string1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|This is line1.\nThis is line 2.|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :000 0 5|>||<|n1 :7|>||<|7 :string1|>||<|(n1)* :This is line1.\nThis is line 2.|img |nl.png| img||>|| .|
+
+	|b |Example 2:|line|Text| b|
+	|. ||img |indent.png| img|"|img |tab.png| img|string2|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|1000000|img |tab.png| img|23424|img |tab.png| img|[Base64 stream]\n|img |tab.png| img|45894|img |tab.png| img|[Base64 stream]|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 1 5|>||<|n1 :7|>||<|7 :string2|>||<|n4 :1000000|>||line||img |indent.png| img||<|n4 :23424|>||<|23424 :binary compressed data|>||line||img |indent.png| img||<|n4 :45894|>||<|45894 :binary compressed data|>|| .|
+
+	|b |Example 3:|line|Text| b|
+	|. ||img |indent.png| img|"|img |tab.png| img|stringList1|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|This is string 1, line 1.\nThis is string1, line 2.\n|img |tab.png| img|This is string 2.|img |tab.png| img|This is string 3.|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0 5|>||<|n1 :11|>||<|11 :stringList1|>||<|n1 :3|>||line||img |indent.png| img||<|(n1)* :This is string 1, line 1.\nThis is string1, line 2.\n|img |tab.png| img|This is string 2.|img |tab.png| img|This is string 3.|img |nl.png| img||>|| .|
+
+	|b |Example 4:|line|Text| b|
+	|. ||img |indent.png| img|"|img |tab.png| img|stringList2|img |tab.png| img|3|img |tab.png| img|:|img |tab.png| img|1000|img |tab.png| img|252|img |tab.png| img|[Base64 stream]|img |tab.png| img|543|img |tab.png| img|[Base64 stream]|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 1 5|>||<|n1 :11|>||<|11 :stringList2|>||<|n1 :3|>||<|n4 :1000|>||line||img |indent.png| img||<|n4 :252|>||<|252 :binary compressed data|>||line||img |indent.png| img||<|n4 :543|>||<|543 :binary compressed data|>|| .|
 
 
-hh	|chapter| - User Type
+hh	|chapter| - Define User Type
 
-	A definition of a user type.  
+	|b |Text| b|
 
-	|img |indent.png| img|define|img |tab.png| img|[key]|img |tab.png| img|[member count]|img |tab.png| img|-(|img |tab.png| img|[type code]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|[compression type])*|img |nl.png| img|
+	|. ||img |indent.png| img|define|img |tab.png| img|[key]|img |tab.png| img|[member count]|img |tab.png| img|-(|img |tab.png| img|[type code]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|[compression type])*|img |nl.png| img|| .|
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                     :key size]                   [key] usertype- [comment]\n
-//	[n1 * key size    :key]                              [key] [value header] [array size] [comment]\n
-//	[n2                     :value header - 00|00|9]           [key] [value header] [array size] [comment]\n
-//	[n2                     :user type code]                   ...
-//	[n1                     :comment byte count]               \n
-//	[n1 * comment byte count:comment]                          
-//	[n1                     :key size]                       
-//	[n1 * key size    :key]                                  
-//	[n2                     :value header]
-//	[n4                     :array size]*
-//	[n1                     :comment byte count]               
-//	[n1 * comment byte count:comment]                          
-//	[n1                     :key size]
-//	[n1 * key size    :key]
-//	[n2                     :value header]
-//	[n4                     :array size]*
-//	[n1                     :comment byte count]               
-//	[n1 * comment byte count:comment]                          
-//	...                     
-//	[n1                     :key size - 0]
-//	
-//	[n1                     :key size]                   [key] usertype= [array size] [comment]\n
-//	[n1 * key size    :key]                              [key] [value header] [array size] [comment]\n
-//	[n2                     :value header - 00|01|9]           [key] [value header] [array size] [comment]\n
-//	[n2                     :user type code]                   ...
-//	[n4                     :array size]                      
-//	[n1                     :comment byte count]               
-//	[n1 * comment byte count:comment]                          
-//	[n1                     :key size]
-//	[n1 * key size    :key]
-//	[n2                     :value header]
-//	[n4                     :array size]*
-//	[n1                     :comment byte count]               
-//	[n1 * comment byte count:comment]                          
-//	[n1                     :key size]
-//	[n1 * key size    :key]
-//	[n2                     :value header]
-//	[n4                     :array size]*
-//	[n1                     :comment byte count]               
-//	[n1 * comment byte count:comment]                          
-//	...
-//	]
-//	
+	|b |Binary| b|
 
-//	In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.  In the text file, the key for the user type is the user type code.
+	|. ||img |indent.png| img||<|n2             :value header (aaa 0 3)|>||line||img |indent.png| img||<|n1             :key byte count|>||line||img |indent.png| img||<|key byte count :key|>||line||img |indent.png| img||<|n??            :array count|>||line||img |indent.png| img||<|n2             :user type code|>||line||img |indent.png| img|(|<|n2                            :member variable value header (aaa c [type code])|>||line||img |indent.png| img| |<|n1                            :member variable key byte count|>||line||img |indent.png| img| |<|member variable key byte count:member variable key|>||line||img |indent.png| img| |<|n??                           :array count if (aaa) not 000 or 111|>||line||img |indent.png| img| |<|n4                            :chunk byte count if (c) is 1|>|)*| .|
+
+	In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.
 	Compression is never used with this type code.
 
-	|img |indent.png| img|define|img |tab.png| img|TypeContact|img |tab.png| img|6|img |tab.png| img|-|img |tab.png| img|"|img |tab.png| img|NameGiven|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|"|img |tab.png| img|NameFamily|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|n1|img |tab.png| img|Age|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|"|img |tab.png| img|EMail|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|n1|img |tab.png| img|DataFlags|img |tab.png| img|5|img |tab.png| img|-|img |tab.png| img|i4|img |tab.png| img|Streamed data|img |tab.png| img|*|img |tab.png| img|:|img |nl.png| img|
-	|img |indent.png| img|define|img |tab.png| img|Image|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|n4|img |tab.png| img|Width|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|n4|img |tab.png| img|Height|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|n1|img |tab.png| img|Pixels|img |tab.png| img|*|img |tab.png| img|:|img |tab.png| img|1000000|img |nl.png| img|
-	|img |indent.png| img|define|img |tab.png| img|Binary Blob|img |tab.png| img|2|img |tab.png| img|-|img |tab.png| img|n4|img |tab.png| img|Byte Count|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|n1|img |tab.png| img|Byte Data|img |tab.png| img|*|img |tab.png| img|:|img |tab.png| img|1000000|img |nl.png| img|
+	|b |Example 1:|line|Text| b|
+	|. ||img |indent.png| img|define|img |tab.png| img|TypeContact|img |tab.png| img|5|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|"|img |tab.png| img|NameGiven|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|"|img |tab.png| img|NameFamily|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n1|img |tab.png| img|Age|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|"|img |tab.png| img|EMail|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n1|img |tab.png| img|DataFlags|img |tab.png| img|5|img |tab.png| img|-|img |nl.png| img|| .|
+	Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :TypeContact|>||<|n1 :6|>||<|n2 :64|>||line||img |indent.png| img||<|n2 :000 0  5|>||<|n1 : 9|>||<| 9 :NameGiven|>||line||img |indent.png| img||<|n2 :000 0  5|>||<|n1 :10|>||<|10 :NameFamily|>||line||img |indent.png| img||<|n2 :000 0 20|>||<|n1 : 3|>||<| 3 :Age|>||line||img |indent.png| img||<|n2 :000 0  5|>||<|n1 : 5|>||<| 5 :Email|>||line||img |indent.png| img||<|n2 :001 0 20|>||<|n1 : 9|>||<| 9 :DataFlags|>||<|n1 :5|>|| .|
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1     :11]                                               TypeContact usertype-\n
-//	[n1 * 11:TypeContact]                                      NameGiven ""-\n
-//	[n2     :00|00|9]                                          NameFamily ""-\n
-//	[n2     :64]                                               Age n1-\n
-//	[n1     :0]                                                EMail ""-\n
-//	-no comment-                                               DataFlags n1= 5\n
-//	[n1     :9]                                                \n
-//	[n1 * 9 :NameGiven]                                        
-//	[n2     :00|00|6]                                            
-//	[n1     :0]                                                
-//	-no comment-
-//	[n1     :10]                                               
-//	[n1 * 10:NameFamily]
-//	[n2     :00|00|6]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :3]
-//	[n1 * 3 :Age]
-//	[n2     :00|00|31]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :5]
-//	[n1 * 5 :EMail]
-//	[n2     :00|00|6]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :9]
-//	[n1 * 9 :DataFlags]
-//	[n2     :00|01|31]
-//	[n4     :5]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :0]
-//	
-//	[n1     :11]                                               TypeContact usertype= 5
-//	[n1 * 11:TypeContact]                                      NameGiven ""-\n
-//	[n2     :00|01|9]                                          NameFamily ""-\n
-//	[n2     :64]                                               Age n1-\n
-//	[n4     :5]                                                EMail ""-\n
-//	[n1     :0]                                                DataFlags n1= 5\n
-//	-no comment-                                               
-//	[n1     :9]                                                
-//	[n1 * 9 :NameGiven]                                        
-//	[n2     :00|00|6]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :10]
-//	[n1 * 10:NameFamily]
-//	[n2     :00|00|6]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :3]
-//	[n1 * 3 :Age]
-//	[n2     :00|00|31]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :5]
-//	[n1 * 5 :EMail]
-//	[n2     :00|00|6]
-//	[n1     :0]
-//	-no comment-
-//	[n1     :9]
-//	[n1 * 9 :DataFlags]
-//	[n2     :00|01|31]
-//	[n4     :5]
-//	[n1     :0]
-//	-no comment-
-//	]
+	|b |Example 2:|line|Text| b|
+	|. ||img |indent.png| img|define|img |tab.png| img|Image|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n4|img |tab.png| img|Width|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n4|img |tab.png| img|Height|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n1|img |tab.png| img|Pixels|img |tab.png| img|*|img |tab.png| img|:|img |tab.png| img|1000000|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0  3|>||<|n1 :5|>||<|5 :Image|>||<|n1 :3|>||<|n2 :65|>||line||img |indent.png| img||<|n2 :000 0 23|>||<|n1 :5|>||<|5 :Width|>||line||img |indent.png| img||<|n2 :000 0 23|>||<|n1 :6|>||<|6 :Height|>||line||img |indent.png| img||<|n2 :111 1 20|>||<|n1 :6|>||<|6 :Pixels|>||<|n4 :1000000|>|| .|
+
+	|b |Example 3:|line|Text| b|
+	|. ||img |indent.png| img|define|img |tab.png| img|Binary Blob|img |tab.png| img|2|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n4|img |tab.png| img|Byte Count|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img||line||img |indent.png| img||img |indent.png| img|n1|img |tab.png| img|Byte Data|img |tab.png| img|*|img |tab.png| img|:|img |tab.png| img|1000000|img |nl.png| img|| .|
+	|b |Binary| b|
+	|. ||img |indent.png| img||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :Binary Blob|>||<|n1 :2|>||<|n2 :66|>||line||img |indent.png| img||<|n2 :000 0 23|>||<|n1 :10|>||<|10 :Byte Count|>||line||img |indent.png| img||<|n2 :111 1 20|>||<|n1 : 9|>||<| 9 :Byte Data|>||<|n4 :1000000|>|| .|
 
 
-	As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its size when we defined the type.  The size will be provided when the data for the type is provided.
+	As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its byte count when we defined the type.  The byte count will be provided when the data for the type is provided.
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1     :5]                                                Image usertype-\n
-//	[n1 * 5 :Image]                                            Width  n4- Width in pixels for the image.\n
-//	[n2     :00|00|9]                                          Height n4- Height in pixels for the image.\n
-//	[n2     :65]                                               Pixels n1* Width * Height * n1 * 3 pixel values in RGB order.\n
-//	[n1     :5]                                                \n
-//	[n1 * 5 :Width]
-//	[n2     :00|00|34]
-//	[n1     :30]
-//	[n1 * 30:Width in pixels for the image.]
-//	[n1     :6]
-//	[n1 * 6 :Height]
-//	[n2     :00|00|34]
-//	[n1     :31]
-//	[n1 * 31:Height in pixels for the image.]
-//	[n1     :6]
-//	[n1 * 3 :Pixels]
-//	[n2     :00|10|31]
-//	[n1     :50]
-//	[n1 * 50:Width * Height * n1 * 3 pixel values in RGB order.]
-//	[n1     :0]
-//	]
-//	
-//		In this situation Pixels is a byte array but the size of it is not known at definition.  Rules on its size may be dictated by who ever set the type.  Comments should be used to make it clear.
+	What would happen if a type is redefined in a MIFF file like...
 
-	|img |indent.png| img|define|img |tab.png| img|point|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r4|img |tab.png| img|value|img |tab.png| img|3|img |tab.png| img|-|img |nl.png| img|
-	...
-	|img |indent.png| img|define|img |tab.png| img|point|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|east|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|north|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|elevation|img |tab.png| img|1|img |tab.png| img|-|img |nl.png| img|
+	|. ||img |indent.png| img|define|img |tab.png| img|point|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r4|img |tab.png| img|value|img |tab.png| img|3|img |tab.png| img|-|img |nl.png| img|| .|
+	|img |indent.png| img|...
+	|. ||img |indent.png| img|define|img |tab.png| img|point|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|east|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|north|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|elevation|img |tab.png| img|1|img |tab.png| img|-|img |nl.png| img|| .|
 
-	If you redefine a userType then the previous userType will be replaced with the new one.
+	In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.
 
 
 hh	|chapter| - User Data
 
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
-	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array size]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed size]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
+	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
+	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
 
 //	.[
 //	Binary                                                     Text
 //	
-//	[n1                        :key size]                [key] [user type]= [user type data]\n
-//	[n1 * key size       :key]
+//	[n1                        :key byte count]                [key] [user type]= [user type data]\n
+//	[n1 * key byte count       :key]
 //	[n2                        :00|00|user type code]
 //	[n1                        :user type byte count]
 //	[n1 * user type byte count :user type]
 //	[*                         :user type data]
 //	
-//	[n1                        :key size]                [key] [user type]= [array size]\n
-//	[n1 * key size       :key]                           [user type data]\n
+//	[n1                        :key byte count]                [key] [user type]= [array count]\n
+//	[n1 * key byte count       :key]                           [user type data]\n
 //	[n2                        :00|01|user type code]          ...
 //	[n1                        :user type byte count]
 //	[n1 * user type byte count :user type]
-//	[n4                        :array size]
+//	[n4                        :array count]
 //	[*                         :user type data]
 //	...
 //	
-//	[n1                        :key size]                [key] [user type]z [byte count] [compressed size] [user type data]\n
-//	[n1 * key size       :key]
+//	[n1                        :key byte count]                [key] [user type]z [byte count] [compressed byte count] [user type data]\n
+//	[n1 * key byte count       :key]
 //	[n2                        :01|00|user type code]
 //	[n1                        :user type byte count]
 //	[n1 * user type byte count :user type]
 //	[n4                        :byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
+//	[n4                        :compressed byte count]
+//	[n1 * compressed byte count:compressed data]
 //	
-//	[n1                        :key size]                [key] [user type]Z [array size] [compressed size] [Base64 compressed data]\n
-//	[n1 * key size       :key]
+//	[n1                        :key byte count]                [key] [user type]Z [array count] [compressed byte count] [Base64 compressed data]\n
+//	[n1 * key byte count       :key]
 //	[n2                        :01|01|user type code]
 //	[n1                        :user type byte count]
 //	[n1 * user type byte count :user type]
-//	[n4                        :array size]
+//	[n4                        :array count]
 //	[n4                        :byte count]
-//	[n4                        :compressed size]
-//	[n1 * compressed size:compressed data]
+//	[n4                        :compressed byte count]
+//	[n1 * compressed byte count:compressed data]
 //	]
 //	
 
 
 	The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.
-	If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer size was.
+	If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer byte count was.
 
 	|img |indent.png| img|TypeContact|img |tab.png| img|Contact1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|Robbert|img |tab.png| img|de Groot|img |tab.png| img|100|img |tab.png| img|zekaric@gmail.com|img |tab.png| img|1|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|3|img |tab.png| img|5|img |nl.png| img|
 	|img |indent.png| img|TypeContact|img |tab.png| img|Contact2|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|10000|img |tab.png| img|521|img |tab.png| img|[Base64 stream]|img |nl.png| img|

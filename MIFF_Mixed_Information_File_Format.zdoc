@@ -599,18 +599,18 @@ hh	|chapter| - Define User Type
 
 hh	|chapter| - User Data
 
-	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
+	|. ||img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
-	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
+	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|| .|
 
 
 	The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.
 	If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer byte count was.
 
-	|img |indent.png| img|TypeContact|img |tab.png| img|Contact1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|Robbert|img |tab.png| img|de Groot|img |tab.png| img|100|img |tab.png| img|zekaric@gmail.com|img |tab.png| img|1|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|3|img |tab.png| img|5|img |nl.png| img|
+	|. ||img |indent.png| img|TypeContact|img |tab.png| img|Contact1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|Robbert|img |tab.png| img|de Groot|img |tab.png| img|100|img |tab.png| img|zekaric@gmail.com|img |tab.png| img|1|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|3|img |tab.png| img|5|img |nl.png| img|
 	|img |indent.png| img|TypeContact|img |tab.png| img|Contact2|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|10000|img |tab.png| img|521|img |tab.png| img|[Base64 stream]|img |nl.png| img|
 	|img |indent.png| img|TypeContact|img |tab.png| img|ContactList1|img |tab.png| img|2|img |tab.png| img|-|img |tab.png| img|Robbert|img |tab.png| img|de Groot|img |tab.png| img|100|img |tab.png| img|zekaric@gmail.com|img |tab.png| img|1|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|3|img |tab.png| img|5|img |tab.png| img|Sherlock|img |tab.png| img|Holms|img |tab.png| img|32|img |tab.png| img|221b@bakerst.uk|img |tab.png| img|10|img |tab.png| img|20|img |tab.png| img|30|img |tab.png| img|40|img |tab.png| img|50|img |nl.png| img|
-	|img |indent.png| img|TypeContact|img |tab.png| img|ContactList3|img |tab.png| img|2|img |tab.png| img|:|img |tab.png| img|100000|img |tab.png| img|5213|img |tab.png| img|[Base64 stream]|img |tab.png| img|32784|img |tab.png| img|[Base64 stream]|img |nl.png| img|
+	|img |indent.png| img|TypeContact|img |tab.png| img|ContactList3|img |tab.png| img|2|img |tab.png| img|:|img |tab.png| img|100000|img |tab.png| img|5213|img |tab.png| img|[Base64 stream]|img |tab.png| img|32784|img |tab.png| img|[Base64 stream]|img |nl.png| img|| .|
 
 

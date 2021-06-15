@@ -606,7 +606,7 @@ hh	|chapter| - User Data
 
 
 	The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.
-	If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer byte count was.
+	If compression is used then the values are collated into a buffer first before compressing.
 
 	|. ||img |indent.png| img|TypeContact|img |tab.png| img|Contact1|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|Robbert|img |tab.png| img|de Groot|img |tab.png| img|100|img |tab.png| img|zekaric@gmail.com|img |tab.png| img|1|img |tab.png| img|1|img |tab.png| img|2|img |tab.png| img|3|img |tab.png| img|5|img |nl.png| img|
 	|img |indent.png| img|TypeContact|img |tab.png| img|Contact2|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|10000|img |tab.png| img|521|img |tab.png| img|[Base64 stream]|img |nl.png| img|

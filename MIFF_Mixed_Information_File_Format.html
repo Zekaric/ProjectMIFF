@@ -92,9 +92,9 @@
 
 <h2 class="zword"><a name="2.1">2.1 - File Header</a></h2>
 <p class="zword">There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.</p>
-<p class="zword"><code><img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />TXT<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent1.png" />MIFF<img src="nl.png" /><br /><img src="indent1.png" />1<img src="nl.png" /><br /><img src="indent1.png" />TXT<img src="nl.png" /><br /><img src="indent1.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent1.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
 <p class="zword">or</p>
-<p class="zword"><code><img src="indent.png" />MIFF<img src="nl.png" /><br /><img src="indent.png" />1<img src="nl.png" /><br /><img src="indent.png" />BIN<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
+<p class="zword"><code><img src="indent1.png" />MIFF<img src="nl.png" /><br /><img src="indent1.png" />1<img src="nl.png" /><br /><img src="indent1.png" />BIN<img src="nl.png" /><br /><img src="indent1.png" />[Sub-Format Name string]<img src="nl.png" /><br /><img src="indent1.png" />[Sub-Format Version string]<img src="nl.png" /></code></p>
 <p class="zword"><img src="tab.png" /> means a tab character.  <img src="nl.png" /> means a new line character.</p>
 <ul class="zword">
 <li class="zword"><strong>Line 1</strong> - Format of the file.  MIFF.</li>
@@ -518,131 +518,21 @@ This is also a valid key with internal spaces
 <p class="zword"><code><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r4<img src="tab.png" />value<img src="tab.png" />3<img src="tab.png" />-<img src="nl.png" /></code></p>
 <p class="zword"><img src="indent.png" />...</p>
 <p class="zword"><code><img src="indent.png" />define<img src="tab.png" />point<img src="tab.png" />3<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />east<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />north<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />r8<img src="tab.png" />elevation<img src="tab.png" />1<img src="tab.png" />-<img src="nl.png" /></code></p>
-<p class="zword">In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.</p>
+<p class="zword">In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.  However this case is discouraged.</p>
+<p class="zword">Can user types be nested?  Yes, you can add an existing user type to an existing user type.</p>
+<p class="zword">Can user types be recursive or cyclic?  Technically this can happen but it is not allowed.  The reason being is that this will lead to an infinite loop and eventually a stack overflow or similar error.  There is code that will test for this and will stop an import or export when detected.</p>
 
 <h2 class="zword"><a name="3.5">3.5 - User Data</a></h2>
-<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
+<p class="zword"><code><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />-<img src="tab.png" />[user type data]<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1                        :key byte count]                [key] [user type]= [user type data]\n-->
-<!--[n1 * key byte count       :key]-->
-<!--[n2                        :00|00|user type code]-->
-<!--[n1                        :user type byte count]-->
-<!--[n1 * user type byte count :user type]-->
-<!--[*                         :user type data]-->
-<!--	
--->
-<!--[n1                        :key byte count]                [key] [user type]= [array count]\n-->
-<!--[n1 * key byte count       :key]                           [user type data]\n-->
-<!--[n2                        :00|01|user type code]          ...-->
-<!--[n1                        :user type byte count]-->
-<!--[n1 * user type byte count :user type]-->
-<!--[n4                        :array count]-->
-<!--[*                         :user type data]-->
-<!--...-->
-<!--	
--->
-<!--[n1                        :key byte count]                [key] [user type]z [byte count] [compressed byte count] [user type data]\n-->
-<!--[n1 * key byte count       :key]-->
-<!--[n2                        :01|00|user type code]-->
-<!--[n1                        :user type byte count]-->
-<!--[n1 * user type byte count :user type]-->
-<!--[n4                        :byte count]-->
-<!--[n4                        :compressed byte count]-->
-<!--[n1 * compressed byte count:compressed data]-->
-<!--	
--->
-<!--[n1                        :key byte count]                [key] [user type]Z [array count] [compressed byte count] [Base64 compressed data]\n-->
-<!--[n1 * key byte count       :key]-->
-<!--[n2                        :01|01|user type code]-->
-<!--[n1                        :user type byte count]-->
-<!--[n1 * user type byte count :user type]-->
-<!--[n4                        :array count]-->
-<!--[n4                        :byte count]-->
-<!--[n4                        :compressed byte count]-->
-<!--[n1 * compressed byte count:compressed data]-->
-<!--]-->
-<!--	
--->
+<p class="zword"><img src="indent.png" />[user type]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count](<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" /></code></p>
 <p class="zword">The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.</p>
-<p class="zword">If compression is used then the values are collated into a buffer first before compressing.  A byte count is required to know what the uncompressed buffer byte count was.</p>
-<p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />Contact1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />Robbert<img src="tab.png" />de Groot<img src="tab.png" />100<img src="tab.png" />zekaric@gmail.com<img src="tab.png" />1<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />3<img src="tab.png" />5<img src="nl.png" /></p>
+<p class="zword">If compression is used then the values are collated into a buffer first before compressing.</p>
+<p class="zword"><code><img src="indent.png" />TypeContact<img src="tab.png" />Contact1<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />Robbert<img src="tab.png" />de Groot<img src="tab.png" />100<img src="tab.png" />zekaric@gmail.com<img src="tab.png" />1<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />3<img src="tab.png" />5<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />Contact2<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />10000<img src="tab.png" />521<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
 <p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />ContactList1<img src="tab.png" />2<img src="tab.png" />-<img src="tab.png" />Robbert<img src="tab.png" />de Groot<img src="tab.png" />100<img src="tab.png" />zekaric@gmail.com<img src="tab.png" />1<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />3<img src="tab.png" />5<img src="tab.png" />Sherlock<img src="tab.png" />Holms<img src="tab.png" />32<img src="tab.png" />221b@bakerst.uk<img src="tab.png" />10<img src="tab.png" />20<img src="tab.png" />30<img src="tab.png" />40<img src="tab.png" />50<img src="nl.png" /></p>
-<p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />ContactList3<img src="tab.png" />2<img src="tab.png" />:<img src="tab.png" />100000<img src="tab.png" />5213<img src="tab.png" />[Base64 stream]<img src="tab.png" />32784<img src="tab.png" />[Base64 stream]<img src="nl.png" /></p>
-<!--.[-->
-<!--Binary                                                     Text-->
-<!--	
--->
-<!--[n1      :14]                                              ContactList2 TypeContact-\n-->
-<!--[n1 * 14 :ContactList2]                                    `Robbert\n-->
-<!--[n2      :00|00|64]                                        `de Groot\n-->
-<!--[n4      :2]                                                100\n-->
-<!--[n4      :7]                                               `zekaric@gmail.com\n-->
-<!--[n1 * 7  :Robbert]                                          1 1 2 3 5\n-->
-<!--[n4      :8]-->
-<!--[n1 * 8  :de Groot]-->
-<!--[n1      :100]-->
-<!--[n4      :17]-->
-<!--[n1 * 17 :zekaric@gmail.com]-->
-<!--[n1      :1]-->
-<!--[n1      :1]-->
-<!--[n1      :2]-->
-<!--[n1      :3]-->
-<!--[n1      :5]-->
-<!--	
--->
-<!--[n1      :14]                                              ContactList2 TypeContact= 2\n-->
-<!--[n1 * 14 :ContactList2]                                    `Robbert\n-->
-<!--[n2      :01|01|64]                                        `de Groot\n-->
-<!--[n4      :2]                                               100\n-->
-<!--[n4      :7]                                               `zekaric@gmail.com\n-->
-<!--[n1 * 7  :Robbert]                                         1 1 2 3 5\n-->
-<!--[n4      :8]                                               `Sherlock\n-->
-<!--[n1 * 8  :de Groot]                                        `Holms\n-->
-<!--[n1      :100]                                             32\n-->
-<!--[n4      :17]                                              `221b@bakerst.uk\n-->
-<!--[n1 * 17 :zekaric@gmail.com]                               10 20 30 40 50\n-->
-<!--[n1      :1]-->
-<!--[n1      :1]-->
-<!--[n1      :2]-->
-<!--[n1      :3]-->
-<!--[n1      :5]-->
-<!--[n4      :8]-->
-<!--[n1 * 8  :Sherlock]-->
-<!--[n4      :5]-->
-<!--[n1 * 5  :Holms]-->
-<!--[n1      :32]-->
-<!--[n4      :15]-->
-<!--[n1 * 15 :221b@bakerst.uk]-->
-<!--[n1      :10]-->
-<!--[n1      :20]-->
-<!--[n1      :30]-->
-<!--[n1      :40]-->
-<!--[n1      :50]-->
-<!--	
--->
-<!--[n1      :14]                                              ContactList TypeContactz 521 95 ...\n-->
-<!--[n1 * 14 :ContactList1]-->
-<!--[n2      :01|00|64]-->
-<!--[n4      :521]-->
-<!--[n4      :95]-->
-<!--[n1 * 95 :...]-->
-<!--	
--->
-<!--[n1      :14]                                              ContactList2 TypeContactZ 2 5213 954 ...\n-->
-<!--[n1 * 14 :ContactList2]-->
-<!--[n2      :01|01|64]-->
-<!--[n4      :2]-->
-<!--[n4      :5213]-->
-<!--[n4      :954]-->
-<!--[n1 * 954:...]-->
-<!--]-->
+<p class="zword"><img src="indent.png" />TypeContact<img src="tab.png" />ContactList3<img src="tab.png" />2<img src="tab.png" />:<img src="tab.png" />100000<img src="tab.png" />5213<img src="tab.png" />[Base64 stream]<img src="tab.png" />32784<img src="tab.png" />[Base64 stream]<img src="nl.png" /></code></p>
  </body>
 
 </html>

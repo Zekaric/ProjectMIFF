@@ -1,3 +1,10 @@
+v	>>>	|. ||img |indent1.png| img|
+v	__>	|img |indent1.png| img|
+v	___	|img |indent.png| img|
+v	-->	|img |tab.png| img|
+v	<--	|img |nl.png| img|
+v	<<<	| .|
+
 H	M.I.F.F.: Mixed Information File Format
 
 	|b ||. |Author:            | .|| b| Robbert de Groot
@@ -56,13 +63,13 @@ hh	|chapter| - File Header
 
 	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
-	|. ||img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|TXT|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|| .|
+	|>>>|MIFF|<--||line||__>|1|<--||line||__>|TXT|<--||line||__>|[Sub-Format Name string]|<--||line||__>|[Sub-Format Version string]|<--||<<<|
 
-		or
+	or
 	
-	|. ||img |indent.png| img|MIFF|img |nl.png| img||line||img |indent.png| img|1|img |nl.png| img||line||img |indent.png| img|BIN|img |nl.png| img||line||img |indent.png| img|[Sub-Format Name string]|img |nl.png| img||line||img |indent.png| img|[Sub-Format Version string]|img |nl.png| img|| .|
+	|>>>|MIFF|<--||line||__>|1|<--||line||__>|BIN|<--||line||__>|[Sub-Format Name string]|<--||line||__>|[Sub-Format Version string]|<--||<<<|
 
-	|img |tab.png| img| means a tab character.  |img |nl.png| img| means a new line character.
+	|-->| means a tab character.  |<--| means a new line character.  The |>| is not part of the line, is it denoting the start of the line.
 
 :[
 -	|b |Line 1| b| - Format of the file.  MIFF.

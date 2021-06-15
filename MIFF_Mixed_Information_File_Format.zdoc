@@ -592,7 +592,9 @@ hh	|chapter| - Define User Type
 	|img |indent.png| img|...
 	|. ||img |indent.png| img|define|img |tab.png| img|point|img |tab.png| img|3|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|east|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|north|img |tab.png| img|1|img |tab.png| img|-|img |tab.png| img|r8|img |tab.png| img|elevation|img |tab.png| img|1|img |tab.png| img|-|img |nl.png| img|| .|
 
-	In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.
+	In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.  However this case is discouraged.
+	Can user types be nested?  Yes, you can add an existing user type to an existing user type.
+	Can user types be recursive or cyclic?  Technically this can happen but it is not allowed.  The reason being is that this will lead to an infinite loop and eventually a stack overflow or similar error.  There is code that will test for this and will stop an import or export when detected.
 
 
 hh	|chapter| - User Data
@@ -601,46 +603,6 @@ hh	|chapter| - User Data
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|1|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|-|img |tab.png| img|[user type data]|img |nl.png| img|
 	|img |indent.png| img|[user type]|img |tab.png| img|[key]|img |tab.png| img|[array count]|img |tab.png| img|:|img |tab.png| img|[chunk byte count](|img |tab.png| img|[compressed byte count]|img |tab.png| img|[Base64 stream])*|img |nl.png| img|
-
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1                        :key byte count]                [key] [user type]= [user type data]\n
-//	[n1 * key byte count       :key]
-//	[n2                        :00|00|user type code]
-//	[n1                        :user type byte count]
-//	[n1 * user type byte count :user type]
-//	[*                         :user type data]
-//	
-//	[n1                        :key byte count]                [key] [user type]= [array count]\n
-//	[n1 * key byte count       :key]                           [user type data]\n
-//	[n2                        :00|01|user type code]          ...
-//	[n1                        :user type byte count]
-//	[n1 * user type byte count :user type]
-//	[n4                        :array count]
-//	[*                         :user type data]
-//	...
-//	
-//	[n1                        :key byte count]                [key] [user type]z [byte count] [compressed byte count] [user type data]\n
-//	[n1 * key byte count       :key]
-//	[n2                        :01|00|user type code]
-//	[n1                        :user type byte count]
-//	[n1 * user type byte count :user type]
-//	[n4                        :byte count]
-//	[n4                        :compressed byte count]
-//	[n1 * compressed byte count:compressed data]
-//	
-//	[n1                        :key byte count]                [key] [user type]Z [array count] [compressed byte count] [Base64 compressed data]\n
-//	[n1 * key byte count       :key]
-//	[n2                        :01|01|user type code]
-//	[n1                        :user type byte count]
-//	[n1 * user type byte count :user type]
-//	[n4                        :array count]
-//	[n4                        :byte count]
-//	[n4                        :compressed byte count]
-//	[n1 * compressed byte count:compressed data]
-//	]
-//	
 
 
 	The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the usertype defined them.
@@ -652,67 +614,3 @@ hh	|chapter| - User Data
 	|img |indent.png| img|TypeContact|img |tab.png| img|ContactList3|img |tab.png| img|2|img |tab.png| img|:|img |tab.png| img|100000|img |tab.png| img|5213|img |tab.png| img|[Base64 stream]|img |tab.png| img|32784|img |tab.png| img|[Base64 stream]|img |nl.png| img|
 
 
-//	.[
-//	Binary                                                     Text
-//	
-//	[n1      :14]                                              ContactList2 TypeContact-\n
-//	[n1 * 14 :ContactList2]                                    `Robbert\n
-//	[n2      :00|00|64]                                        `de Groot\n
-//	[n4      :2]                                                100\n
-//	[n4      :7]                                               `zekaric@gmail.com\n
-//	[n1 * 7  :Robbert]                                          1 1 2 3 5\n
-//	[n4      :8]
-//	[n1 * 8  :de Groot]
-//	[n1      :100]
-//	[n4      :17]
-//	[n1 * 17 :zekaric@gmail.com]
-//	[n1      :1]
-//	[n1      :1]
-//	[n1      :2]
-//	[n1      :3]
-//	[n1      :5]
-//	
-//	[n1      :14]                                              ContactList2 TypeContact= 2\n
-//	[n1 * 14 :ContactList2]                                    `Robbert\n
-//	[n2      :01|01|64]                                        `de Groot\n
-//	[n4      :2]                                               100\n
-//	[n4      :7]                                               `zekaric@gmail.com\n
-//	[n1 * 7  :Robbert]                                         1 1 2 3 5\n
-//	[n4      :8]                                               `Sherlock\n
-//	[n1 * 8  :de Groot]                                        `Holms\n
-//	[n1      :100]                                             32\n
-//	[n4      :17]                                              `221b@bakerst.uk\n
-//	[n1 * 17 :zekaric@gmail.com]                               10 20 30 40 50\n
-//	[n1      :1]
-//	[n1      :1]
-//	[n1      :2]
-//	[n1      :3]
-//	[n1      :5]
-//	[n4      :8]
-//	[n1 * 8  :Sherlock]
-//	[n4      :5]
-//	[n1 * 5  :Holms]
-//	[n1      :32]
-//	[n4      :15]
-//	[n1 * 15 :221b@bakerst.uk]
-//	[n1      :10]
-//	[n1      :20]
-//	[n1      :30]
-//	[n1      :40]
-//	[n1      :50]
-//	
-//	[n1      :14]                                              ContactList TypeContactz 521 95 ...\n
-//	[n1 * 14 :ContactList1]
-//	[n2      :01|00|64]
-//	[n4      :521]
-//	[n4      :95]
-//	[n1 * 95 :...]
-//	
-//	[n1      :14]                                              ContactList2 TypeContactZ 2 5213 954 ...\n
-//	[n1 * 14 :ContactList2]
-//	[n2      :01|01|64]
-//	[n4      :2]
-//	[n4      :5213]
-//	[n4      :954]
-//	[n1 * 954:...]
-//	]

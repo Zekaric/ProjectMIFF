@@ -110,11 +110,11 @@ Common to both Text and Binary formats, any byte data that is encode or stored a
 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
-`![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)TXT![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)`
+![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)TXT![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)
 
 or
 
-`![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)BIN![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)`
+![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)BIN![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)
 
 ![image](tab.png) means a tab character.  ![image](nl.png) means a new line character.  The |&#62;| is not part of the line, is it denoting the start of the line.
 
@@ -266,7 +266,7 @@ All real numbers are stored as a Base64 string.  No exceptions.  This is to ensu
 ### 2.3.6 - Record Composition
 
 
-`![image](indent1.png)[type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[compression flag]![image](tab.png)[value]![image](nl.png)`
+![image](indent1.png)[type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[compression flag]![image](tab.png)[value]![image](nl.png)
 
 Any space found in the key that is not a ![image](tab.png) will be part of the key.  They will be significant.  Do not strip or reduce them.
 
@@ -278,7 +278,7 @@ To be clear...
 
 **Invalid:** Absolutely no ![image](nl.png) anywhere before or within the key value line&#42;.  Absolutely no blank lines.  Absolutely no extra ![image](tab.png) anywhere in the format.
 
-`![image](indent1.png)[type code]![image](tab.png)![image](tab.png)[key]![image](nl.png)[array count] [compression flag]![image](tab.png)[value]![image](nl.png)`
+![image](indent1.png)[type code]![image](tab.png)![image](tab.png)[key]![image](nl.png)[array count] [compression flag]![image](tab.png)[value]![image](nl.png)
 
 What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
 
@@ -290,7 +290,7 @@ The Binary file byte sequence is not too different than the text file organizati
 ### 2.4.1 - Key Value Format
 
 
-`![image](indent1.png)|&#60;|n2                 :value header(aaa c tttt tttt tttt)|&#62;|<br />![image](indent.png)|&#60;|n1                 :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count + 1 :key|&#62;|<br />![image](indent.png)|&#60;|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|&#62;|<br />![image](indent.png)|&#60;|n4                 :chunk byte count (if c above is 1)|&#62;|<br />![image](indent.png)|&#60;|&#42;                  :value|&#62;|`
+![image](indent1.png)|&#60;|n2                 :value header(aaa c tttt tttt tttt)|&#62;|<br />![image](indent.png)|&#60;|n1                 :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count + 1 :key|&#62;|<br />![image](indent.png)|&#60;|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|&#62;|<br />![image](indent.png)|&#60;|n4                 :chunk byte count (if c above is 1)|&#62;|<br />![image](indent.png)|&#60;|&#42;                  :value|&#62;|
 
 #### 2.4.1.1 - Key
 
@@ -344,11 +344,11 @@ In a binary file you will have a key byte count of 0 to indicate the end of a Ke
 
 **Text**
 
-`![image](indent1.png){![image](tab.png)[key]![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)`
+![image](indent1.png){![image](tab.png)[key]![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2            :value header (000 0 1)|&#62;|<br />![image](indent.png)|&#60;|n1            :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count:key|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2            :value header (000 0 0)|&#62;|`
+![image](indent1.png)|&#60;|n2            :value header (000 0 1)|&#62;|<br />![image](indent.png)|&#60;|n1            :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count:key|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2            :value header (000 0 0)|&#62;|
 
 A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.
 
@@ -356,19 +356,19 @@ Array Count and Compression flags are never used with this value type.
 
 **Example 1:<br />Text**
 
-`![image](indent1.png){![image](tab.png)docInfo![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)`
+![image](indent1.png){![image](tab.png)docInfo![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :docInfo|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />`
+![image](indent1.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :docInfo|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />
 
 **Example 2:<br />Text**
 
-`![image](indent1.png){![image](tab.png)level1![image](nl.png)<br />![image](indent1.png){![image](tab.png)level2![image](nl.png)<br />![image](indent1.png){![image](tab.png)level3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel2![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel1![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />`
+![image](indent1.png){![image](tab.png)level1![image](nl.png)<br />![image](indent1.png){![image](tab.png)level2![image](nl.png)<br />![image](indent1.png){![image](tab.png)level3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel2![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel1![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level1|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level2|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level3|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel3|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel2|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel1|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level1|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level2|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :level3|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel3|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel2|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 1|&#62;||&#60;|n1 :13|&#62;||&#60;|13 :anotherlevel1|&#62;|<br />![image](indent.png)...<br />![image](indent.png)|&#60;|n2 :000 0 0|&#62;|
 
 ## 3.2 - Basic Values
 
@@ -377,23 +377,23 @@ Basic value encoding.  Based on what is being stored the byte streams only look 
 
 **Text**
 
-`![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[type value]![image](nl.png)`
+![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[type value]![image](nl.png)
 
-`![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
-`![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[type value])&#42;![image](nl.png)`
+![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[type value])&#42;![image](nl.png)
 
-`![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)[text type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2               :value header (000 0 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|[type byte count]:[type data]|&#62;|`
+![image](indent1.png)|&#60;|n2               :value header (000 0 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|[type byte count]:[type data]|&#62;|
 
-`![image](indent1.png)|&#60;|n2               :value header (000 1 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n4               :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2               :value header (000 1 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n4               :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;
 
-`![image](indent1.png)|&#60;|n2               :value header (aaa 0 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n??              :array count|&#62;|<br />![image](indent.png)|&#60;|[type byte count] &#42; array count:[type data]|&#62;|`
+![image](indent1.png)|&#60;|n2               :value header (aaa 0 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n??              :array count|&#62;|<br />![image](indent.png)|&#60;|[type byte count] &#42; array count:[type data]|&#62;|
 
-`![image](indent1.png)|&#60;|n2               :value header (aaa 1 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n??              :array count|&#62;|<br />![image](indent.png)|&#60;|n4               :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2               :value header (aaa 1 [type code])|&#62;|<br />![image](indent.png)|&#60;|n1               :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count   :key|&#62;|<br />![image](indent.png)|&#60;|n??              :array count|&#62;|<br />![image](indent.png)|&#60;|n4               :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;
 
 type byte counts for the simple types will be one of...
 
@@ -425,98 +425,98 @@ If using an array flag the above is repeated as many times as there are array el
 
 **Example 1:<br />Text**
 
-`![image](indent1.png)type![image](tab.png)type1![image](tab.png)1![image](tab.png)-![image](tab.png)b![image](nl.png)`
+![image](indent1.png)type![image](tab.png)type1![image](tab.png)1![image](tab.png)-![image](tab.png)b![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 2|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type1|&#62;||&#60;|n2 :8|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 2|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type1|&#62;||&#60;|n2 :8|&#62;|
 
 **Example 2:<br />Text**
 
-`![image](indent1.png)type![image](tab.png)type2![image](tab.png)2![image](tab.png)-![image](tab.png)b![image](tab.png)n4![image](nl.png)`
+![image](indent1.png)type![image](tab.png)type2![image](tab.png)2![image](tab.png)-![image](tab.png)b![image](tab.png)n4![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 5|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type2|&#62;||&#60;|n1 :2|&#62;||&#60;|n2 &#42; 2 :8 23|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 5|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type2|&#62;||&#60;|n1 :2|&#62;||&#60;|n2 &#42; 2 :8 23|&#62;|
 
 **Example 3:<br />Text**
 
-`![image](indent1.png)type![image](tab.png)type3![image](tab.png)100000![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)2342![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)4546![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)type![image](tab.png)type3![image](tab.png)100000![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)2342![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)4546![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :011 1 5|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type3|&#62;||&#60;|n4 :100000|&#62;||&#60;|n4 :10000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :2342|&#62;||&#60;|2342 :binary compressed data|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :4546|&#62;||&#60;|4546 :binary compressed data|&#62;|`
+![image](indent1.png)|&#60;|n2 :011 1 5|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :type3|&#62;||&#60;|n4 :100000|&#62;||&#60;|n4 :10000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :2342|&#62;||&#60;|2342 :binary compressed data|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :4546|&#62;||&#60;|4546 :binary compressed data|&#62;|
 
 **Example 4:<br />Text**
 
-`![image](indent1.png)b![image](tab.png)Bool1![image](tab.png)1![image](tab.png)-![image](tab.png)T![image](nl.png)`
+![image](indent1.png)b![image](tab.png)Bool1![image](tab.png)1![image](tab.png)-![image](tab.png)T![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 8|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Bool1|&#62;||&#60;|n1 :1|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 8|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Bool1|&#62;||&#60;|n1 :1|&#62;|
 
 **Example 5:<br />Text**
 
-`![image](indent1.png)b![image](tab.png)Bool2![image](tab.png)10![image](tab.png)-![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](nl.png)`
+![image](indent1.png)b![image](tab.png)Bool2![image](tab.png)10![image](tab.png)-![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 8|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Bool5|&#62;||&#60;|n1 :10|&#62;||&#60;|n1 &#42; 10 :1 1 1 1 1 0 0 0 0 0|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 8|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Bool5|&#62;||&#60;|n1 :10|&#62;||&#60;|n1 &#42; 10 :1 1 1 1 1 0 0 0 0 0|&#62;|
 
 **Example 6:<br />Text**
 
-`![image](indent1.png)i4![image](tab.png)1Int![image](tab.png)1![image](tab.png)-![image](tab.png)1024![image](nl.png)`
+![image](indent1.png)i4![image](tab.png)1Int![image](tab.png)1![image](tab.png)-![image](tab.png)1024![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 13|&#62;||&#60;|n1 :4|&#62;||&#60;|4 :1Int|&#62;||&#60;|n4 :1024|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 13|&#62;||&#60;|n1 :4|&#62;||&#60;|4 :1Int|&#62;||&#60;|n4 :1024|&#62;|
 
 **Example 7:<br />Text**
 
-`![image](indent1.png)n4![image](tab.png)&#42;Nat![image](tab.png)8![image](tab.png)-![image](tab.png)1![image](tab.png)2![image](tab.png)4![image](tab.png)8![image](tab.png)16![image](tab.png)32![image](tab.png)64![image](tab.png)128![image](nl.png)`
+![image](indent1.png)n4![image](tab.png)&#42;Nat![image](tab.png)8![image](tab.png)-![image](tab.png)1![image](tab.png)2![image](tab.png)4![image](tab.png)8![image](tab.png)16![image](tab.png)32![image](tab.png)64![image](tab.png)128![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 23|&#62;||&#60;|n1 :4|&#62;||&#60;|4 :&#42;Nat|&#62;||&#60;|n1 :8|&#62;||&#60;|n4 &#42; 8 :1 2 4 8 16 32 64 128|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 23|&#62;||&#60;|n1 :4|&#62;||&#60;|4 :&#42;Nat|&#62;||&#60;|n1 :8|&#62;||&#60;|n4 &#42; 8 :1 2 4 8 16 32 64 128|&#62;|
 
 **Example 8:<br />Text**
 
-`![image](indent1.png)r4![image](tab.png)1Real![image](tab.png)1![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](nl.png)`
+![image](indent1.png)r4![image](tab.png)1Real![image](tab.png)1![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 33|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :1Real|&#62;||&#60;|r4 :[binary r4 value]|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 33|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :1Real|&#62;||&#60;|r4 :[binary r4 value]|&#62;|
 
 **Example 9:<br />Text**
 
-`![image](indent1.png)r8![image](tab.png)&#42;Real![image](tab.png)3![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](nl.png)`
+![image](indent1.png)r8![image](tab.png)&#42;Real![image](tab.png)3![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 34|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :&#42;Real|&#62;||&#60;|n1 :3|&#62;||&#60;|n8 &#42; 3 :[binary r8 value] &#42; 3|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 34|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :&#42;Real|&#62;||&#60;|n1 :3|&#62;||&#60;|n8 &#42; 3 :[binary r8 value] &#42; 3|&#62;|
 
 ## 3.3 - String values
 
 
 **Text**
 
-`![image](indent1.png)"![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[string value]![image](nl.png)`
+![image](indent1.png)"![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[string value]![image](nl.png)
 
-`![image](indent1.png)"![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)"![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
-`![image](indent1.png)"![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[string value])&#42;![image](nl.png)`
+![image](indent1.png)"![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[string value])&#42;![image](nl.png)
 
-`![image](indent1.png)"![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)"![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2             :value header (000 0 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42;          :[string value]![image](nl.png)|&#62;|`
+![image](indent1.png)|&#60;|n2             :value header (000 0 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42;          :[string value]![image](nl.png)|&#62;|
 
-`![image](indent1.png)|&#60;|n2             :value header (000 1 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n4             :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2             :value header (000 1 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n4             :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;
 
-`![image](indent1.png)|&#60;|n2             :value header (aaa 0 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42;          :[string value](![image](tab.png)[string value])&#42;![image](nl.png)|&#62;|`
+![image](indent1.png)|&#60;|n2             :value header (aaa 0 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42;          :[string value](![image](tab.png)[string value])&#42;![image](nl.png)|&#62;|
 
-`![image](indent1.png)|&#60;|n2             :value header (aaa 1 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|n4             :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2             :value header (aaa 1 5)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|n4             :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count:binary compressed data|&#62;|)&#42;
 
 In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.
 
@@ -530,46 +530,46 @@ In a compressed byte array, the tabs in the stream will separate the strings lik
 
 **Example 1:<br />Text**
 
-`![image](indent1.png)"![image](tab.png)string1![image](tab.png)1![image](tab.png)-![image](tab.png)This is line1.\nThis is line 2.![image](nl.png)`
+![image](indent1.png)"![image](tab.png)string1![image](tab.png)1![image](tab.png)-![image](tab.png)This is line1.\nThis is line 2.![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 5|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :string1|&#62;||&#60;|(n1)&#42; :This is line1.\nThis is line 2.![image](nl.png)|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 5|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :string1|&#62;||&#60;|(n1)&#42; :This is line1.\nThis is line 2.![image](nl.png)|&#62;|
 
 **Example 2:<br />Text**
 
-`![image](indent1.png)"![image](tab.png)string2![image](tab.png)1![image](tab.png):![image](tab.png)1000000![image](tab.png)23424![image](tab.png)[Base64 stream]![image](tab.png)45894![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)"![image](tab.png)string2![image](tab.png)1![image](tab.png):![image](tab.png)1000000![image](tab.png)23424![image](tab.png)[Base64 stream]![image](tab.png)45894![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 1 5|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :string2|&#62;||&#60;|n4 :1000000|&#62;|<br />![image](indent.png)|&#60;|n4 :23424|&#62;||&#60;|23424 :binary compressed data|&#62;|<br />![image](indent.png)|&#60;|n4 :45894|&#62;||&#60;|45894 :binary compressed data|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 1 5|&#62;||&#60;|n1 :7|&#62;||&#60;|7 :string2|&#62;||&#60;|n4 :1000000|&#62;|<br />![image](indent.png)|&#60;|n4 :23424|&#62;||&#60;|23424 :binary compressed data|&#62;|<br />![image](indent.png)|&#60;|n4 :45894|&#62;||&#60;|45894 :binary compressed data|&#62;|
 
 **Example 3:<br />Text**
 
-`![image](indent1.png)"![image](tab.png)stringList1![image](tab.png)3![image](tab.png)-![image](tab.png)This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)`
+![image](indent1.png)"![image](tab.png)stringList1![image](tab.png)3![image](tab.png)-![image](tab.png)This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 5|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :stringList1|&#62;||&#60;|n1 :3|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42; :This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 5|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :stringList1|&#62;||&#60;|n1 :3|&#62;|<br />![image](indent.png)|&#60;|(n1)&#42; :This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)|&#62;|
 
 **Example 4:<br />Text**
 
-`![image](indent1.png)"![image](tab.png)stringList2![image](tab.png)3![image](tab.png):![image](tab.png)1000![image](tab.png)252![image](tab.png)[Base64 stream]![image](tab.png)543![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)"![image](tab.png)stringList2![image](tab.png)3![image](tab.png):![image](tab.png)1000![image](tab.png)252![image](tab.png)[Base64 stream]![image](tab.png)543![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 1 5|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :stringList2|&#62;||&#60;|n1 :3|&#62;||&#60;|n4 :1000|&#62;|<br />![image](indent.png)|&#60;|n4 :252|&#62;||&#60;|252 :binary compressed data|&#62;|<br />![image](indent.png)|&#60;|n4 :543|&#62;||&#60;|543 :binary compressed data|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 1 5|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :stringList2|&#62;||&#60;|n1 :3|&#62;||&#60;|n4 :1000|&#62;|<br />![image](indent.png)|&#60;|n4 :252|&#62;||&#60;|252 :binary compressed data|&#62;|<br />![image](indent.png)|&#60;|n4 :543|&#62;||&#60;|543 :binary compressed data|&#62;|
 
 ## 3.4 - Define User Type
 
 
 **Text**
 
-`![image](indent1.png)define![image](tab.png)[key]![image](tab.png)[member count]![image](tab.png)-(![image](tab.png)[type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[compression type])&#42;![image](nl.png)`
+![image](indent1.png)define![image](tab.png)[key]![image](tab.png)[member count]![image](tab.png)-(![image](tab.png)[type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[compression type])&#42;![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2             :value header (aaa 0 3)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|n2             :user type code|&#62;|<br />![image](indent.png)(|&#60;|n2                            :member variable value header (aaa c [type code])|&#62;|<br />![image](indent.png) |&#60;|n1                            :member variable key byte count|&#62;|<br />![image](indent.png) |&#60;|member variable key byte count:member variable key|&#62;|<br />![image](indent.png) |&#60;|n??                           :array count if (aaa) not 000 or 111|&#62;|<br />![image](indent.png) |&#60;|n4                            :chunk byte count if (c) is 1|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2             :value header (aaa 0 3)|&#62;|<br />![image](indent.png)|&#60;|n1             :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count :key|&#62;|<br />![image](indent.png)|&#60;|n??            :array count|&#62;|<br />![image](indent.png)|&#60;|n2             :user type code|&#62;|<br />![image](indent.png)(|&#60;|n2                            :member variable value header (aaa c [type code])|&#62;|<br />![image](indent.png) |&#60;|n1                            :member variable key byte count|&#62;|<br />![image](indent.png) |&#60;|member variable key byte count:member variable key|&#62;|<br />![image](indent.png) |&#60;|n??                           :array count if (aaa) not 000 or 111|&#62;|<br />![image](indent.png) |&#60;|n4                            :chunk byte count if (c) is 1|&#62;|)&#42;
 
 In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.
 
@@ -577,39 +577,39 @@ Compression is never used with this type code.
 
 **Example 1:<br />Text**
 
-`![image](indent1.png)define![image](tab.png)TypeContact![image](tab.png)5![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameGiven![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameFamily![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Age![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)EMail![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)DataFlags![image](tab.png)5![image](tab.png)-![image](nl.png)`
+![image](indent1.png)define![image](tab.png)TypeContact![image](tab.png)5![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameGiven![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameFamily![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Age![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)EMail![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)DataFlags![image](tab.png)5![image](tab.png)-![image](nl.png)
 
 Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :TypeContact|&#62;||&#60;|n1 :6|&#62;||&#60;|n2 :64|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :NameGiven|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 :10|&#62;||&#60;|10 :NameFamily|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 20|&#62;||&#60;|n1 : 3|&#62;||&#60;| 3 :Age|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 : 5|&#62;||&#60;| 5 :Email|&#62;|<br />![image](indent.png)|&#60;|n2 :001 0 20|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :DataFlags|&#62;||&#60;|n1 :5|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :TypeContact|&#62;||&#60;|n1 :6|&#62;||&#60;|n2 :64|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :NameGiven|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 :10|&#62;||&#60;|10 :NameFamily|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 20|&#62;||&#60;|n1 : 3|&#62;||&#60;| 3 :Age|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0  5|&#62;||&#60;|n1 : 5|&#62;||&#60;| 5 :Email|&#62;|<br />![image](indent.png)|&#60;|n2 :001 0 20|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :DataFlags|&#62;||&#60;|n1 :5|&#62;|
 
 **Example 2:<br />Text**
 
-`![image](indent1.png)define![image](tab.png)Image![image](tab.png)3![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Width![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Height![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Pixels![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)`
+![image](indent1.png)define![image](tab.png)Image![image](tab.png)3![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Width![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Height![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Pixels![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Image|&#62;||&#60;|n1 :3|&#62;||&#60;|n2 :65|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Width|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :Height|&#62;|<br />![image](indent.png)|&#60;|n2 :111 1 20|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :Pixels|&#62;||&#60;|n4 :1000000|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Image|&#62;||&#60;|n1 :3|&#62;||&#60;|n2 :65|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :5|&#62;||&#60;|5 :Width|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :Height|&#62;|<br />![image](indent.png)|&#60;|n2 :111 1 20|&#62;||&#60;|n1 :6|&#62;||&#60;|6 :Pixels|&#62;||&#60;|n4 :1000000|&#62;|
 
 **Example 3:<br />Text**
 
-`![image](indent1.png)define![image](tab.png)Binary Blob![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Byte Count![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Byte Data![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)`
+![image](indent1.png)define![image](tab.png)Binary Blob![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Byte Count![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Byte Data![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :Binary Blob|&#62;||&#60;|n1 :2|&#62;||&#60;|n2 :66|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :10|&#62;||&#60;|10 :Byte Count|&#62;|<br />![image](indent.png)|&#60;|n2 :111 1 20|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :Byte Data|&#62;||&#60;|n4 :1000000|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0  3|&#62;||&#60;|n1 :11|&#62;||&#60;|11 :Binary Blob|&#62;||&#60;|n1 :2|&#62;||&#60;|n2 :66|&#62;|<br />![image](indent.png)|&#60;|n2 :000 0 23|&#62;||&#60;|n1 :10|&#62;||&#60;|10 :Byte Count|&#62;|<br />![image](indent.png)|&#60;|n2 :111 1 20|&#62;||&#60;|n1 : 9|&#62;||&#60;| 9 :Byte Data|&#62;||&#60;|n4 :1000000|&#62;|
 
 As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its byte count when we defined the type.  The byte count will be provided when the data for the type is provided.
 
 What would happen if a type is redefined in a MIFF file like...
 
-`![image](indent1.png)define![image](tab.png)point![image](tab.png)1![image](tab.png)-![image](tab.png)r4![image](tab.png)value![image](tab.png)3![image](tab.png)-![image](nl.png)`
+![image](indent1.png)define![image](tab.png)point![image](tab.png)1![image](tab.png)-![image](tab.png)r4![image](tab.png)value![image](tab.png)3![image](tab.png)-![image](nl.png)
 
 ![image](indent.png)...
 
-`![image](indent1.png)define![image](tab.png)point![image](tab.png)3![image](tab.png)-![image](tab.png)r8![image](tab.png)east![image](tab.png)1![image](tab.png)-![image](tab.png)r8![image](tab.png)north![image](tab.png)1![image](tab.png)-![image](tab.png)r8![image](tab.png)elevation![image](tab.png)1![image](tab.png)-![image](nl.png)`
+![image](indent1.png)define![image](tab.png)point![image](tab.png)3![image](tab.png)-![image](tab.png)r8![image](tab.png)east![image](tab.png)1![image](tab.png)-![image](tab.png)r8![image](tab.png)north![image](tab.png)1![image](tab.png)-![image](tab.png)r8![image](tab.png)elevation![image](tab.png)1![image](tab.png)-![image](nl.png)
 
 In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.  However this case is discouraged.
 
@@ -624,62 +624,62 @@ The value of a user type.  A "define" needs to be present before it can be used.
 
 **Text**
 
-`![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[user type data]![image](nl.png)`
+![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[user type data]![image](nl.png)
 
-`![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
-`![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[user type data])&#42;![image](nl.png)`
+![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-(![image](tab.png)[user type data])&#42;![image](nl.png)
 
-`![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)`
+![image](indent1.png)[user type]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count](![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2                    :000 0 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|[user type data]`
+![image](indent1.png)|&#60;|n2                    :000 0 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|[user type data]
 
-`![image](indent1.png)|&#60;|n2                    :000 1 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n4                    :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count: compressed date|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2                    :000 1 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n4                    :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count: compressed date|&#62;|)&#42;
 
-`![image](indent1.png)|&#60;|n2                    :aaa 0 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n??                   :array count|&#62;|<br />![image](indent.png)[user type data]`
+![image](indent1.png)|&#60;|n2                    :aaa 0 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n??                   :array count|&#62;|<br />![image](indent.png)[user type data]
 
-`![image](indent1.png)|&#60;|n2                    :aaa 1 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n??                   :array count|&#62;|<br />![image](indent.png)|&#60;|n4                    :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count: compressed date|&#62;|)&#42;`
+![image](indent1.png)|&#60;|n2                    :aaa 1 [user type code]|&#62;|<br />![image](indent.png)|&#60;|n1                    :key byte count|&#62;|<br />![image](indent.png)|&#60;|key byte count        :key|&#62;|<br />![image](indent.png)|&#60;|n??                   :array count|&#62;|<br />![image](indent.png)|&#60;|n4                    :chunk byte count|&#62;|<br />![image](indent.png)(|&#60;|n4                   :compressed byte count|&#62;|<br />![image](indent.png) |&#60;|compressed byte count: compressed date|&#62;|)&#42;
 
 If compression is used then the values are collated into a buffer first before compressing.  Taking the types from the above section that defined them...
 
 **Example 1:<br />Text**
 
-`![image](indent1.png)TypeContact![image](tab.png)Contact1![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](nl.png)`
+![image](indent1.png)TypeContact![image](tab.png)Contact1![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 64|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Contact1|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Robbert![image](nl.png)|&#62;||&#60;|(n1)&#42; :de Groot![image](nl.png)|&#62;||&#60;|n1 :100|&#62;||&#60;|(n1)&#42; :zekaric@gmail.com![image](nl.png)|&#62;||&#60;|n1 &#42; 5:1 2 3 4 5|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 64|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Contact1|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Robbert![image](nl.png)|&#62;||&#60;|(n1)&#42; :de Groot![image](nl.png)|&#62;||&#60;|n1 :100|&#62;||&#60;|(n1)&#42; :zekaric@gmail.com![image](nl.png)|&#62;||&#60;|n1 &#42; 5:1 2 3 4 5|&#62;|
 
 **Example 2:<br />Text**
 
-`![image](indent1.png)TypeContact![image](tab.png)Contact2![image](tab.png)1![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)521![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)TypeContact![image](tab.png)Contact2![image](tab.png)1![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)521![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 1 64|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Contact1|&#62;||&#60;|n4 :10000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :521|&#62;||&#60;|521 :compressed binary data|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 1 64|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Contact1|&#62;||&#60;|n4 :10000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :521|&#62;||&#60;|521 :compressed binary data|&#62;|
 
 **Exmaple 3:<br />Text**
 
-`![image](indent1.png)TypeContact![image](tab.png)ContactList1![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](tab.png)<br />![image](indent.png)![image](indent.png)Sherlock![image](tab.png)Holms![image](tab.png)32![image](tab.png)221b@bakerst.uk![image](tab.png)10![image](tab.png)20![image](tab.png)30![image](tab.png)40![image](tab.png)50![image](nl.png)`
+![image](indent1.png)TypeContact![image](tab.png)ContactList1![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](tab.png)<br />![image](indent.png)![image](indent.png)Sherlock![image](tab.png)Holms![image](tab.png)32![image](tab.png)221b@bakerst.uk![image](tab.png)10![image](tab.png)20![image](tab.png)30![image](tab.png)40![image](tab.png)50![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 0 64|&#62;||&#60;|n1 :12|&#62;||&#60;|12 :ContactList1|&#62;||&#60;|n1 :2|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Robbert![image](nl.png)|&#62;||&#60;|(n1)&#42; :de Groot![image](nl.png)|&#62;||&#60;|n1 :100|&#62;||&#60;|(n1)&#42; :zekaric@gmail.com![image](nl.png)|&#62;||&#60;|n1 &#42; 5:1 2 3 4 5|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Sherlock![image](nl.png)|&#62;||&#60;|(n1)&#42; :Holms![image](nl.png)|&#62;||&#60;|n1 :32|&#62;||&#60;|(n1)&#42; :221b@bakerst.uk![image](nl.png)|&#62;||&#60;|n1 &#42; 5:10 20 30 40 50|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 0 64|&#62;||&#60;|n1 :12|&#62;||&#60;|12 :ContactList1|&#62;||&#60;|n1 :2|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Robbert![image](nl.png)|&#62;||&#60;|(n1)&#42; :de Groot![image](nl.png)|&#62;||&#60;|n1 :100|&#62;||&#60;|(n1)&#42; :zekaric@gmail.com![image](nl.png)|&#62;||&#60;|n1 &#42; 5:1 2 3 4 5|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|(n1)&#42; :Sherlock![image](nl.png)|&#62;||&#60;|(n1)&#42; :Holms![image](nl.png)|&#62;||&#60;|n1 :32|&#62;||&#60;|(n1)&#42; :221b@bakerst.uk![image](nl.png)|&#62;||&#60;|n1 &#42; 5:10 20 30 40 50|&#62;|
 
 **Example 4:<br />Text**
 
-`![image](indent1.png)TypeContact![image](tab.png)ContactList2![image](tab.png)2![image](tab.png):![image](tab.png)100000![image](tab.png)<br />![image](indent.png)![image](indent.png)5213![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)32784![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)TypeContact![image](tab.png)ContactList2![image](tab.png)2![image](tab.png):![image](tab.png)100000![image](tab.png)<br />![image](indent.png)![image](indent.png)5213![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)32784![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :001 1 64|&#62;||&#60;|n1 :12|&#62;||&#60;|12 :ContactList2|&#62;||&#60;|n1 :2|&#62;||&#60;|n4 :100000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :5213|&#62;||&#60;|5213 :compressed binary data|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :32784|&#62;||&#60;|32784 :compressed binary data|&#62;|`
+![image](indent1.png)|&#60;|n2 :001 1 64|&#62;||&#60;|n1 :12|&#62;||&#60;|12 :ContactList2|&#62;||&#60;|n1 :2|&#62;||&#60;|n4 :100000|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :5213|&#62;||&#60;|5213 :compressed binary data|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :32784|&#62;||&#60;|32784 :compressed binary data|&#62;|
 
 **Example 5:<br />Text**
 
-`![image](indent1.png)Image![image](tab.png)Portrait![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)256![image](tab.png)256![image](tab.png)17899![image](tab.png)[Base64 stream]![image](nl.png)`
+![image](indent1.png)Image![image](tab.png)Portrait![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)256![image](tab.png)256![image](tab.png)17899![image](tab.png)[Base64 stream]![image](nl.png)
 
 **Binary**
 
-`![image](indent1.png)|&#60;|n2 :000 0 65|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Portrait|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :256|&#62;||&#60;|n4 :256|&#62;||&#60;|n4 :17899|&#62;||&#60;|17899 :compressed binary data|&#62;|`
+![image](indent1.png)|&#60;|n2 :000 0 65|&#62;||&#60;|n1 :8|&#62;||&#60;|8 :Portrait|&#62;|<br />![image](indent.png)![image](indent.png)|&#60;|n4 :256|&#62;||&#60;|n4 :256|&#62;||&#60;|n4 :17899|&#62;||&#60;|17899 :compressed binary data|&#62;|

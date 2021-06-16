@@ -131,51 +131,51 @@ t-
 tcx	|line||b |Block Types| b||line|
 
 t-
-tcx	|. |1| .|
-tcx	|. |{| .|
+tcx	1
+tcx	{
 tc	Key-Value block begins.
 
 t-
-tcx	|. |0| .|
-tcx	|. |}| .|
+tcx	0
+tcx	}
 tc	Key-Value block ends.
 
 t-
 tcx	|line||b |Basic Types| b||line|
 
 t-
-tcx	|. |2| .|
-tcx	|. |type| .|
+tcx	2
+tcx	type
 tc	Type value.  One of these type codes or a user type code.
 
 t-
-tcx	|. |3| .|
-tcx	|. |define| .|
+tcx	3
+tcx	define
 tc	A series of key-type pairs.  You can define up to 4031 new types maximum.
 
 t-
-tcx	|. |5| .|
-tcx	|. |"| .|
+tcx	5
+tcx	"
 tc	String (UTF8) data, can be of any length.
 
 t-
-tcx	|. |8| .|
-tcx	|. |b| .|
+tcx	8
+tcx	b
 tc	Boolean value.
 
 t-
-tcx	|. |10 11 12 13 14 15 16 17 18 19| .| 
-tcx	|. |i1 i2 i3 i4 i8 i16 i32 i64 i128 i256| .|
+tcx	10 11 12 13 14 15 16 17 18 19 
+tcx	i1 i2 i3 i4 i8 i16 i32 i64 i128 i256
 tc	An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-tcx	|. |20 21 22 23 24 25 26 27 28 29| .|
-tcx	|. |n1 n2 n3 n4 n8 n16 n32 n64 n128 n256| .|
+tcx	20 21 22 23 24 25 26 27 28 29
+tcx	n1 n2 n3 n4 n8 n16 n32 n64 n128 n256
 tc	A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-tcx	|. |33 34| .|
-tcx	|. |r4 r8| .|
+tcx	33 34
+tcx	r4 r8
 tc	A real value.  
 //	I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard.
 
@@ -183,8 +183,8 @@ t-
 tcx	|line||b |User Tyes| b||line|
 
 t-
-tcx	|. |64 and higher| .|
-tcx	|. |[user type name]| .|
+tcx	64 and higher
+tcx	[user type name]
 tc	Depends on what the user type defines.  A define must exist first.
 
 ]
@@ -198,18 +198,18 @@ thx	Encoding Code (Text)
 th*	Description
 
 t-
-tc	|. |000| .|
-tc	|. |1| .|
+tc	000
+tc	1
 tc	A single value follows.  In binary, no array count present.
 
 t-
-tc	|. |001 010 011 100 101 110| .|
-tc	|. |[number of items]| .|
+tc	001 010 011 100 101 110
+tc	[number of items]
 tc	An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.
 
 t-
-tc	|. |111| .|
-tc	|. |*| .|
+tc	111
+tc	*
 tc	An unknown count array of values follows or used when defining a user type.  See User types.
 ]
 
@@ -222,13 +222,13 @@ thx	Encoding Code (Text)
 th*	Description
 
 t-
-tc	|. |0| .|
-tc	|. |-| .|
+tc	0
+tc	-
 tc	Values are inlined raw with no compression.
 
 t-
-tc	|. |1| .|
-tc	|. |:| .|
+tc	1
+tc	:
 tc	Values are broken down into smaller chunks and then each chunk compressed with zlib.
 
 ]
@@ -297,13 +297,13 @@ hhh	|chapter| - Key Value Format
 
 hhhh	|chapter| - Key
 
-	|. ||<|n1:key byte count|>|| .| defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
-	|. ||<|key byte count + 1:key|>|| .| defines the key of the key value pair.  The length of which was defined by |. ||<|key byte count|>|| .| above.  No null terminator is included in the key.
+	|<|n1:key byte count|>| defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
+	|<|key byte count + 1:key|>| defines the key of the key value pair.  The length of which was defined by |<|key byte count|>| above.  No null terminator is included in the key.
 
 
 hhhh	|chapter| - Value Header
 
-	|. ||<|n2:value header|>|| .| Value header is a 2 byte value.  
+	|<|n2:value header|>| Value header is a 2 byte value.  
 	The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.
 	The 4th high bit (c) defines is chunked compression is being used.  See section 2.2.3.4.
 	The remaining bits define the type of the key value.  0-63 type values are reserved, see section 2.2.3.2.  User types are values 64 - 4095.
@@ -311,17 +311,17 @@ hhhh	|chapter| - Value Header
 
 hhhh	|chapter| - Array Count
 
-	|. ||<|n1/n2/n4/n8/n16/n32:array count|>|| .| byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
+	|<|n1/n2/n4/n8/n16/n32:array count|>| byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
 
 
 hhhh	|chapter| - Chunk Byte Count
 
-	|. ||<|n4:chunk byte count|>|| .| Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
+	|<|n4:chunk byte count|>| Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
 
 
 hhhh	|chapter| - Value
 	
-	|. ||<|*:value|>|| .| field will vary wildly depending on the |. ||<|value header|>|| .|.  See section 3 for how the values are represented.
+	|<|*:value|>| field will vary wildly depending on the |<|value header|>|.  See section 3 for how the values are represented.
 
 
 hhhh	|chapter| - Special Case

@@ -148,51 +148,51 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr><br /><strong>Block Types</strong><br /></td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>1</code></td>
-<td class="zword"><nobr><code>{</code></td>
+<td class="zword"><nobr>1</td>
+<td class="zword"><nobr>{</td>
 <td class="zword">Key-Value block begins.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>0</code></td>
-<td class="zword"><nobr><code>}</code></td>
+<td class="zword"><nobr>0</td>
+<td class="zword"><nobr>}</td>
 <td class="zword">Key-Value block ends.</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr><br /><strong>Basic Types</strong><br /></td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>2</code></td>
-<td class="zword"><nobr><code>type</code></td>
+<td class="zword"><nobr>2</td>
+<td class="zword"><nobr>type</td>
 <td class="zword">Type value.  One of these type codes or a user type code.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>3</code></td>
-<td class="zword"><nobr><code>define</code></td>
+<td class="zword"><nobr>3</td>
+<td class="zword"><nobr>define</td>
 <td class="zword">A series of key-type pairs.  You can define up to 4031 new types maximum.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>5</code></td>
-<td class="zword"><nobr><code>"</code></td>
+<td class="zword"><nobr>5</td>
+<td class="zword"><nobr>"</td>
 <td class="zword">String (UTF8) data, can be of any length.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>8</code></td>
-<td class="zword"><nobr><code>b</code></td>
+<td class="zword"><nobr>8</td>
+<td class="zword"><nobr>b</td>
 <td class="zword">Boolean value.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>10 11 12 13 14 15 16 17 18 19</code></td>
-<td class="zword"><nobr><code>i1 i2 i3 i4 i8 i16 i32 i64 i128 i256</code></td>
+<td class="zword"><nobr>10 11 12 13 14 15 16 17 18 19</td>
+<td class="zword"><nobr>i1 i2 i3 i4 i8 i16 i32 i64 i128 i256</td>
 <td class="zword">An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>20 21 22 23 24 25 26 27 28 29</code></td>
-<td class="zword"><nobr><code>n1 n2 n3 n4 n8 n16 n32 n64 n128 n256</code></td>
+<td class="zword"><nobr>20 21 22 23 24 25 26 27 28 29</td>
+<td class="zword"><nobr>n1 n2 n3 n4 n8 n16 n32 n64 n128 n256</td>
 <td class="zword">A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>33 34</code></td>
-<td class="zword"><nobr><code>r4 r8</code></td>
+<td class="zword"><nobr>33 34</td>
+<td class="zword"><nobr>r4 r8</td>
 <td class="zword">A real value.</td>
 <!--I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard.-->
 </tr>
@@ -200,8 +200,8 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr><br /><strong>User Tyes</strong><br /></td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><code>64 and higher</code></td>
-<td class="zword"><nobr><code>[user type name]</code></td>
+<td class="zword"><nobr>64 and higher</td>
+<td class="zword"><nobr>[user type name]</td>
 <td class="zword">Depends on what the user type defines.  A define must exist first.</td>
 </tr>
 </tbody></table>
@@ -214,18 +214,18 @@ This is also a valid key with internal spaces
 <th class="zword_fill">Description</th>
 </tr>
 <tr class="zword">
-<td class="zword"><code>000</code></td>
-<td class="zword"><code>1</code></td>
+<td class="zword">000</td>
+<td class="zword">1</td>
 <td class="zword">A single value follows.  In binary, no array count present.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><code>001 010 011 100 101 110</code></td>
-<td class="zword"><code>[number of items]</code></td>
+<td class="zword">001 010 011 100 101 110</td>
+<td class="zword">[number of items]</td>
 <td class="zword">An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><code>111</code></td>
-<td class="zword"><code>*</code></td>
+<td class="zword">111</td>
+<td class="zword">*</td>
 <td class="zword">An unknown count array of values follows or used when defining a user type.  See User types.</td>
 </tr>
 </tbody></table>
@@ -238,13 +238,13 @@ This is also a valid key with internal spaces
 <th class="zword_fill">Description</th>
 </tr>
 <tr class="zword">
-<td class="zword"><code>0</code></td>
-<td class="zword"><code>-</code></td>
+<td class="zword">0</td>
+<td class="zword">-</td>
 <td class="zword">Values are inlined raw with no compression.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><code>1</code></td>
-<td class="zword"><code>:</code></td>
+<td class="zword">1</td>
+<td class="zword">:</td>
 <td class="zword">Values are broken down into smaller chunks and then each chunk compressed with zlib.</td>
 </tr>
 </tbody></table>
@@ -290,23 +290,23 @@ This is also a valid key with internal spaces
 <p class="zword"><img src="indent1.png" />&lt;n2                 :value header(aaa c tttt tttt tttt)&gt;<br /><img src="indent.png" />&lt;n1                 :key byte count&gt;<br /><img src="indent.png" />&lt;key byte count + 1 :key&gt;<br /><img src="indent.png" />&lt;n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)&gt;<br /><img src="indent.png" />&lt;n4                 :chunk byte count (if c above is 1)&gt;<br /><img src="indent.png" />&lt;*                  :value&gt;</p>
 
 <h4 class="zword"><a name="2.4.1.1">2.4.1.1 - Key</a></h4>
-<p class="zword"><code>&lt;n1:key byte count&gt;</code> defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.</p>
-<p class="zword"><code>&lt;key byte count + 1:key&gt;</code> defines the key of the key value pair.  The length of which was defined by <code>&lt;key byte count&gt;</code> above.  No null terminator is included in the key.</p>
+<p class="zword">&lt;n1:key byte count&gt; defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.</p>
+<p class="zword">&lt;key byte count + 1:key&gt; defines the key of the key value pair.  The length of which was defined by &lt;key byte count&gt; above.  No null terminator is included in the key.</p>
 
 <h4 class="zword"><a name="2.4.1.2">2.4.1.2 - Value Header</a></h4>
-<p class="zword"><code>&lt;n2:value header&gt;</code> Value header is a 2 byte value.</p>
+<p class="zword">&lt;n2:value header&gt; Value header is a 2 byte value.</p>
 <p class="zword">The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.</p>
 <p class="zword">The 4th high bit (c) defines is chunked compression is being used.  See section 2.2.3.4.</p>
 <p class="zword">The remaining bits define the type of the key value.  0-63 type values are reserved, see section 2.2.3.2.  User types are values 64 - 4095.</p>
 
 <h4 class="zword"><a name="2.4.1.3">2.4.1.3 - Array Count</a></h4>
-<p class="zword"><code>&lt;n1/n2/n4/n8/n16/n32:array count&gt;</code> byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).</p>
+<p class="zword">&lt;n1/n2/n4/n8/n16/n32:array count&gt; byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).</p>
 
 <h4 class="zword"><a name="2.4.1.4">2.4.1.4 - Chunk Byte Count</a></h4>
-<p class="zword"><code>&lt;n4:chunk byte count&gt;</code> Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.</p>
+<p class="zword">&lt;n4:chunk byte count&gt; Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.</p>
 
 <h4 class="zword"><a name="2.4.1.5">2.4.1.5 - Value</a></h4>
-<p class="zword"><code>&lt;*:value&gt;</code> field will vary wildly depending on the <code>&lt;value header&gt;</code>.  See section 3 for how the values are represented.</p>
+<p class="zword">&lt;*:value&gt; field will vary wildly depending on the &lt;value header&gt;.  See section 3 for how the values are represented.</p>
 
 <h4 class="zword"><a name="2.4.1.6">2.4.1.6 - Special Case</a></h4>
 <p class="zword">Key Value Block End will just have the value header and nothing else follows.  (aaa) will be 000, (c) will be 0, and (tttttttttttt) will be 0.</p>

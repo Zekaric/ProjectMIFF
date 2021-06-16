@@ -189,18 +189,18 @@ This is also a valid key with internal spaces
 | Binary Type Code | Text Type Code | Description |
 | --- | --- | --- |
 | <br />**Block Types**<br /> |
-| `1` | `{` | Key-Value block begins. |
-| `0` | `}` | Key-Value block ends. |
+| 1 | { | Key-Value block begins. |
+| 0 | } | Key-Value block ends. |
 | <br />**Basic Types**<br /> |
-| `2` | `type` | Type value.  One of these type codes or a user type code. |
-| `3` | `define` | A series of key-type pairs.  You can define up to 4031 new types maximum. |
-| `5` | `"` | String (UTF8) data, can be of any length. |
-| `8` | `b` | Boolean value. |
-| `10 11 12 13 14 15 16 17 18 19` | `i1 i2 i3 i4 i8 i16 i32 i64 i128 i256` | An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
-| `20 21 22 23 24 25 26 27 28 29` | `n1 n2 n3 n4 n8 n16 n32 n64 n128 n256` | A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases. |
-| `33 34` | `r4 r8` | A real value. |
+| 2 | type | Type value.  One of these type codes or a user type code. |
+| 3 | define | A series of key-type pairs.  You can define up to 4031 new types maximum. |
+| 5 | " | String (UTF8) data, can be of any length. |
+| 8 | b | Boolean value. |
+| 10 11 12 13 14 15 16 17 18 19 | i1 i2 i3 i4 i8 i16 i32 i64 i128 i256 | An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
+| 20 21 22 23 24 25 26 27 28 29 | n1 n2 n3 n4 n8 n16 n32 n64 n128 n256 | A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases. |
+| 33 34 | r4 r8 | A real value. |
 | <br />**User Tyes**<br /> |
-| `64 and higher` | `[user type name]` | Depends on what the user type defines.  A define must exist first. |
+| 64 and higher | [user type name] | Depends on what the user type defines.  A define must exist first. |
 
 
 #### 2.2.3.3 - Array Count
@@ -208,9 +208,9 @@ This is also a valid key with internal spaces
 
 | Encoding Code (Binary bits(aaa)) | Encoding Code (Text) | Description |
 | --- | --- | --- |
-| `000` | `1` | A single value follows.  In binary, no array count present. |
-| `001 010 011 100 101 110` | `[number of items]` | An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows. |
-| `111` | `&#42;` | An unknown count array of values follows or used when defining a user type.  See User types. |
+| 000 | 1 | A single value follows.  In binary, no array count present. |
+| 001 010 011 100 101 110 | [number of items] | An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows. |
+| 111 | &#42; | An unknown count array of values follows or used when defining a user type.  See User types. |
 
 
 #### 2.2.3.4 - Compression Flag
@@ -218,8 +218,8 @@ This is also a valid key with internal spaces
 
 | Encoding Code (Binary bit(c)) | Encoding Code (Text) | Description |
 | --- | --- | --- |
-| `0` | `-` | Values are inlined raw with no compression. |
-| `1` | `:` | Values are broken down into smaller chunks and then each chunk compressed with zlib. |
+| 0 | - | Values are inlined raw with no compression. |
+| 1 | : | Values are broken down into smaller chunks and then each chunk compressed with zlib. |
 
 
 #### 2.2.3.5 - Value
@@ -295,14 +295,14 @@ The Binary file byte sequence is not too different than the text file organizati
 #### 2.4.1.1 - Key
 
 
-`&lt;n1:key byte count&gt;` defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
+&lt;n1:key byte count&gt; defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
 
-`&lt;key byte count + 1:key&gt;` defines the key of the key value pair.  The length of which was defined by `&lt;key byte count&gt;` above.  No null terminator is included in the key.
+&lt;key byte count + 1:key&gt; defines the key of the key value pair.  The length of which was defined by &lt;key byte count&gt; above.  No null terminator is included in the key.
 
 #### 2.4.1.2 - Value Header
 
 
-`&lt;n2:value header&gt;` Value header is a 2 byte value.
+&lt;n2:value header&gt; Value header is a 2 byte value.
 
 The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.
 
@@ -313,17 +313,17 @@ The remaining bits define the type of the key value.  0-63 type values are reser
 #### 2.4.1.3 - Array Count
 
 
-`&lt;n1/n2/n4/n8/n16/n32:array count&gt;` byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
+&lt;n1/n2/n4/n8/n16/n32:array count&gt; byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
 
 #### 2.4.1.4 - Chunk Byte Count
 
 
-`&lt;n4:chunk byte count&gt;` Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
+&lt;n4:chunk byte count&gt; Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
 
 #### 2.4.1.5 - Value
 
 
-`&lt;&#42;:value&gt;` field will vary wildly depending on the `&lt;value header&gt;`.  See section 3 for how the values are represented.
+&lt;&#42;:value&gt; field will vary wildly depending on the &lt;value header&gt;.  See section 3 for how the values are represented.
 
 #### 2.4.1.6 - Special Case
 

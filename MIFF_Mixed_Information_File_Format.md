@@ -110,11 +110,11 @@ Common to both Text and Binary formats, any byte data that is encode or stored a
 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
-![image](indent1.png)MIFF![image](nl.png)&#60;br /&#62;![image](indent1.png)1![image](nl.png)&#60;br /&#62;![image](indent1.png)TXT![image](nl.png)&#60;br /&#62;![image](indent1.png)[Sub-Format Name string]![image](nl.png)&#60;br /&#62;![image](indent1.png)[Sub-Format Version string]![image](nl.png)
+![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)TXT![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)
 
 or
 
-![image](indent1.png)MIFF![image](nl.png)&#60;br /&#62;![image](indent1.png)1![image](nl.png)&#60;br /&#62;![image](indent1.png)BIN![image](nl.png)&#60;br /&#62;![image](indent1.png)[Sub-Format Name string]![image](nl.png)&#60;br /&#62;![image](indent1.png)[Sub-Format Version string]![image](nl.png)
+![image](indent1.png)MIFF![image](nl.png)<br />![image](indent1.png)1![image](nl.png)<br />![image](indent1.png)BIN![image](nl.png)<br />![image](indent1.png)[Sub-Format Name string]![image](nl.png)<br />![image](indent1.png)[Sub-Format Version string]![image](nl.png)
 
 ![image](tab.png) means a tab character.  ![image](nl.png) means a new line character.  The &gt; is not part of the line, is it denoting the start of the line.
 
@@ -188,10 +188,10 @@ This is also a valid key with internal spaces
 
 | Binary Type Code | Text Type Code | Description |
 | --- | --- | --- |
-| &#60;br /&#62;&#42;&#42;Block Types&#42;&#42;&#60;br /&#62; |
+| <br />&#42;&#42;Block Types&#42;&#42;<br /> |
 | &#96;1&#96; | &#96;{&#96; | Key-Value block begins. |
 | &#96;0&#96; | &#96;}&#96; | Key-Value block ends. |
-| &#60;br /&#62;&#42;&#42;Basic Types&#42;&#42;&#60;br /&#62; |
+| <br />&#42;&#42;Basic Types&#42;&#42;<br /> |
 | &#96;2&#96; | &#96;type&#96; | Type value.  One of these type codes or a user type code. |
 | &#96;3&#96; | &#96;define&#96; | A series of key-type pairs.  You can define up to 4031 new types maximum. |
 | &#96;5&#96; | &#96;"&#96; | String (UTF8) data, can be of any length. |
@@ -199,7 +199,7 @@ This is also a valid key with internal spaces
 | &#96;10 11 12 13 14 15 16 17 18 19&#96; | &#96;i1 i2 i3 i4 i8 i16 i32 i64 i128 i256&#96; | An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
 | &#96;20 21 22 23 24 25 26 27 28 29&#96; | &#96;n1 n2 n3 n4 n8 n16 n32 n64 n128 n256&#96; | A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases. |
 | &#96;33 34&#96; | &#96;r4 r8&#96; | A real value. |
-| &#60;br /&#62;&#42;&#42;User Tyes&#42;&#42;&#60;br /&#62; |
+| <br />&#42;&#42;User Tyes&#42;&#42;<br /> |
 | &#96;64 and higher&#96; | &#96;[user type name]&#96; | Depends on what the user type defines.  A define must exist first. |
 
 
@@ -290,7 +290,7 @@ The Binary file byte sequence is not too different than the text file organizati
 ### 2.4.1 - Key Value Format
 
 
-![image](indent1.png)&lt;n2                 :value header(aaa c tttt tttt tttt)&gt;&#60;br /&#62;![image](indent.png)&lt;n1                 :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count + 1 :key&gt;&#60;br /&#62;![image](indent.png)&lt;n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)&gt;&#60;br /&#62;![image](indent.png)&lt;n4                 :chunk byte count (if c above is 1)&gt;&#60;br /&#62;![image](indent.png)&lt;&#42;                  :value&gt;
+![image](indent1.png)&lt;n2                 :value header(aaa c tttt tttt tttt)&gt;<br />![image](indent.png)&lt;n1                 :key byte count&gt;<br />![image](indent.png)&lt;key byte count + 1 :key&gt;<br />![image](indent.png)&lt;n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)&gt;<br />![image](indent.png)&lt;n4                 :chunk byte count (if c above is 1)&gt;<br />![image](indent.png)&lt;&#42;                  :value&gt;
 
 #### 2.4.1.1 - Key
 
@@ -344,31 +344,31 @@ In a binary file you will have a key byte count of 0 to indicate the end of a Ke
 
 &#42;&#42;Text&#42;&#42;
 
-![image](indent1.png){![image](tab.png)[key]![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)
+![image](indent1.png){![image](tab.png)[key]![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2            :value header (000 0 1)&gt;&#60;br /&#62;![image](indent.png)&lt;n1            :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count:key&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2            :value header (000 0 0)&gt;
+![image](indent1.png)&lt;n2            :value header (000 0 1)&gt;<br />![image](indent.png)&lt;n1            :key byte count&gt;<br />![image](indent.png)&lt;key byte count:key&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2            :value header (000 0 0)&gt;
 
 A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.
 
 Array Count and Compression flags are never used with this value type.
 
-&#42;&#42;Example 1:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 1:<br />Text&#42;&#42;
 
-![image](indent1.png){![image](tab.png)docInfo![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)
-
-&#42;&#42;Binary&#42;&#42;
-
-![image](indent1.png)&lt;n2 :000 0 1&gt;&lt;n1 :7&gt;&lt;7 :docInfo&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;
-
-&#42;&#42;Example 2:&#60;br /&#62;Text&#42;&#42;
-
-![image](indent1.png){![image](tab.png)level1![image](nl.png)&#60;br /&#62;![image](indent1.png){![image](tab.png)level2![image](nl.png)&#60;br /&#62;![image](indent1.png){![image](tab.png)level3![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;![image](indent1.png){![image](tab.png)anotherLevel3![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;![image](indent1.png){![image](tab.png)anotherLevel2![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;![image](indent1.png){![image](tab.png)anotherLevel1![image](nl.png)&#60;br /&#62;![image](indent1.png)...&#60;br /&#62;![image](indent1.png)}![image](nl.png)&#60;br /&#62;
+![image](indent1.png){![image](tab.png)docInfo![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level1&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level2&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level3&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel3&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel2&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel1&gt;&#60;br /&#62;![image](indent.png)...&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 0&gt;
+![image](indent1.png)&lt;n2 :000 0 1&gt;&lt;n1 :7&gt;&lt;7 :docInfo&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />
+
+&#42;&#42;Example 2:<br />Text&#42;&#42;
+
+![image](indent1.png){![image](tab.png)level1![image](nl.png)<br />![image](indent1.png){![image](tab.png)level2![image](nl.png)<br />![image](indent1.png){![image](tab.png)level3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel3![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel2![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png)}![image](nl.png)<br />![image](indent1.png){![image](tab.png)anotherLevel1![image](nl.png)<br />![image](indent1.png)...<br />![image](indent1.png)}![image](nl.png)<br />
+
+&#42;&#42;Binary&#42;&#42;
+
+![image](indent1.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level1&gt;<br />![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level2&gt;<br />![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :6&gt;&lt;6 :level3&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel3&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel2&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />![image](indent.png)&lt;n2 :000 0 0&gt;<br />![image](indent.png)&lt;n2 :000 0 1&gt;&lt;n1 :13&gt;&lt;13 :anotherlevel1&gt;<br />![image](indent.png)...<br />![image](indent.png)&lt;n2 :000 0 0&gt;
 
 ## 3.2 - Basic Values
 
@@ -387,13 +387,13 @@ Basic value encoding.  Based on what is being stored the byte streams only look 
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2               :value header (000 0 [type code])&gt;&#60;br /&#62;![image](indent.png)&lt;n1               :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count   :key&gt;&#60;br /&#62;![image](indent.png)&lt;[type byte count]:[type data]&gt;
+![image](indent1.png)&lt;n2               :value header (000 0 [type code])&gt;<br />![image](indent.png)&lt;n1               :key byte count&gt;<br />![image](indent.png)&lt;key byte count   :key&gt;<br />![image](indent.png)&lt;[type byte count]:[type data]&gt;
 
-![image](indent1.png)&lt;n2               :value header (000 1 [type code])&gt;&#60;br /&#62;![image](indent.png)&lt;n1               :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count   :key&gt;&#60;br /&#62;![image](indent.png)&lt;n4               :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
+![image](indent1.png)&lt;n2               :value header (000 1 [type code])&gt;<br />![image](indent.png)&lt;n1               :key byte count&gt;<br />![image](indent.png)&lt;key byte count   :key&gt;<br />![image](indent.png)&lt;n4               :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
 
-![image](indent1.png)&lt;n2               :value header (aaa 0 [type code])&gt;&#60;br /&#62;![image](indent.png)&lt;n1               :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count   :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??              :array count&gt;&#60;br /&#62;![image](indent.png)&lt;[type byte count] &#42; array count:[type data]&gt;
+![image](indent1.png)&lt;n2               :value header (aaa 0 [type code])&gt;<br />![image](indent.png)&lt;n1               :key byte count&gt;<br />![image](indent.png)&lt;key byte count   :key&gt;<br />![image](indent.png)&lt;n??              :array count&gt;<br />![image](indent.png)&lt;[type byte count] &#42; array count:[type data]&gt;
 
-![image](indent1.png)&lt;n2               :value header (aaa 1 [type code])&gt;&#60;br /&#62;![image](indent.png)&lt;n1               :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count   :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??              :array count&gt;&#60;br /&#62;![image](indent.png)&lt;n4               :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
+![image](indent1.png)&lt;n2               :value header (aaa 1 [type code])&gt;<br />![image](indent.png)&lt;n1               :key byte count&gt;<br />![image](indent.png)&lt;key byte count   :key&gt;<br />![image](indent.png)&lt;n??              :array count&gt;<br />![image](indent.png)&lt;n4               :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
 
 type byte counts for the simple types will be one of...
 
@@ -423,7 +423,7 @@ Text representation for a value will be...
 
 If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one ![image](tab.png) in text mode.
 
-&#42;&#42;Example 1:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 1:<br />Text&#42;&#42;
 
 ![image](indent1.png)type![image](tab.png)type1![image](tab.png)1![image](tab.png)-![image](tab.png)b![image](nl.png)
 
@@ -431,7 +431,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :000 0 2&gt;&lt;n1 :5&gt;&lt;5 :type1&gt;&lt;n2 :8&gt;
 
-&#42;&#42;Example 2:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 2:<br />Text&#42;&#42;
 
 ![image](indent1.png)type![image](tab.png)type2![image](tab.png)2![image](tab.png)-![image](tab.png)b![image](tab.png)n4![image](nl.png)
 
@@ -439,15 +439,15 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :001 0 5&gt;&lt;n1 :5&gt;&lt;5 :type2&gt;&lt;n1 :2&gt;&lt;n2 &#42; 2 :8 23&gt;
 
-&#42;&#42;Example 3:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 3:<br />Text&#42;&#42;
 
-![image](indent1.png)type![image](tab.png)type3![image](tab.png)100000![image](tab.png):![image](tab.png)10000![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)2342![image](tab.png)[Base64 stream]![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)4546![image](tab.png)[Base64 stream]![image](nl.png)
+![image](indent1.png)type![image](tab.png)type3![image](tab.png)100000![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)2342![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)4546![image](tab.png)[Base64 stream]![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :011 1 5&gt;&lt;n1 :5&gt;&lt;5 :type3&gt;&lt;n4 :100000&gt;&lt;n4 :10000&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :2342&gt;&lt;2342 :binary compressed data&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :4546&gt;&lt;4546 :binary compressed data&gt;
+![image](indent1.png)&lt;n2 :011 1 5&gt;&lt;n1 :5&gt;&lt;5 :type3&gt;&lt;n4 :100000&gt;&lt;n4 :10000&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :2342&gt;&lt;2342 :binary compressed data&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :4546&gt;&lt;4546 :binary compressed data&gt;
 
-&#42;&#42;Example 4:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 4:<br />Text&#42;&#42;
 
 ![image](indent1.png)b![image](tab.png)Bool1![image](tab.png)1![image](tab.png)-![image](tab.png)T![image](nl.png)
 
@@ -455,7 +455,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :000 0 8&gt;&lt;n1 :5&gt;&lt;5 :Bool1&gt;&lt;n1 :1&gt;
 
-&#42;&#42;Example 5:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 5:<br />Text&#42;&#42;
 
 ![image](indent1.png)b![image](tab.png)Bool2![image](tab.png)10![image](tab.png)-![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](nl.png)
 
@@ -463,7 +463,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :001 0 8&gt;&lt;n1 :5&gt;&lt;5 :Bool5&gt;&lt;n1 :10&gt;&lt;n1 &#42; 10 :1 1 1 1 1 0 0 0 0 0&gt;
 
-&#42;&#42;Example 6:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 6:<br />Text&#42;&#42;
 
 ![image](indent1.png)i4![image](tab.png)1Int![image](tab.png)1![image](tab.png)-![image](tab.png)1024![image](nl.png)
 
@@ -471,7 +471,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :000 0 13&gt;&lt;n1 :4&gt;&lt;4 :1Int&gt;&lt;n4 :1024&gt;
 
-&#42;&#42;Example 7:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 7:<br />Text&#42;&#42;
 
 ![image](indent1.png)n4![image](tab.png)&#42;Nat![image](tab.png)8![image](tab.png)-![image](tab.png)1![image](tab.png)2![image](tab.png)4![image](tab.png)8![image](tab.png)16![image](tab.png)32![image](tab.png)64![image](tab.png)128![image](nl.png)
 
@@ -479,7 +479,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :001 0 23&gt;&lt;n1 :4&gt;&lt;4 :&#42;Nat&gt;&lt;n1 :8&gt;&lt;n4 &#42; 8 :1 2 4 8 16 32 64 128&gt;
 
-&#42;&#42;Example 8:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 8:<br />Text&#42;&#42;
 
 ![image](indent1.png)r4![image](tab.png)1Real![image](tab.png)1![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](nl.png)
 
@@ -487,7 +487,7 @@ If using an array flag the above is repeated as many times as there are array el
 
 ![image](indent1.png)&lt;n2 :000 0 33&gt;&lt;n1 :5&gt;&lt;5 :1Real&gt;&lt;r4 :[binary r4 value]&gt;
 
-&#42;&#42;Example 9:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 9:<br />Text&#42;&#42;
 
 ![image](indent1.png)r8![image](tab.png)&#42;Real![image](tab.png)3![image](tab.png)-![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](nl.png)
 
@@ -510,13 +510,13 @@ If using an array flag the above is repeated as many times as there are array el
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2             :value header (000 0 5)&gt;&#60;br /&#62;![image](indent.png)&lt;n1             :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count :key&gt;&#60;br /&#62;![image](indent.png)&lt;(n1)&#42;          :[string value]![image](nl.png)&gt;
+![image](indent1.png)&lt;n2             :value header (000 0 5)&gt;<br />![image](indent.png)&lt;n1             :key byte count&gt;<br />![image](indent.png)&lt;key byte count :key&gt;<br />![image](indent.png)&lt;(n1)&#42;          :[string value]![image](nl.png)&gt;
 
-![image](indent1.png)&lt;n2             :value header (000 1 5)&gt;&#60;br /&#62;![image](indent.png)&lt;n1             :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count :key&gt;&#60;br /&#62;![image](indent.png)&lt;n4             :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
+![image](indent1.png)&lt;n2             :value header (000 1 5)&gt;<br />![image](indent.png)&lt;n1             :key byte count&gt;<br />![image](indent.png)&lt;key byte count :key&gt;<br />![image](indent.png)&lt;n4             :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
 
-![image](indent1.png)&lt;n2             :value header (aaa 0 5)&gt;&#60;br /&#62;![image](indent.png)&lt;n1             :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??            :array count&gt;&#60;br /&#62;![image](indent.png)&lt;(n1)&#42;          :[string value](![image](tab.png)[string value])&#42;![image](nl.png)&gt;
+![image](indent1.png)&lt;n2             :value header (aaa 0 5)&gt;<br />![image](indent.png)&lt;n1             :key byte count&gt;<br />![image](indent.png)&lt;key byte count :key&gt;<br />![image](indent.png)&lt;n??            :array count&gt;<br />![image](indent.png)&lt;(n1)&#42;          :[string value](![image](tab.png)[string value])&#42;![image](nl.png)&gt;
 
-![image](indent1.png)&lt;n2             :value header (aaa 1 5)&gt;&#60;br /&#62;![image](indent.png)&lt;n1             :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??            :array count&gt;&#60;br /&#62;![image](indent.png)&lt;n4             :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
+![image](indent1.png)&lt;n2             :value header (aaa 1 5)&gt;<br />![image](indent.png)&lt;n1             :key byte count&gt;<br />![image](indent.png)&lt;key byte count :key&gt;<br />![image](indent.png)&lt;n??            :array count&gt;<br />![image](indent.png)&lt;n4             :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count:binary compressed data&gt;)&#42;
 
 In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.
 
@@ -528,7 +528,7 @@ In a compressed byte array, the tabs in the stream will separate the strings lik
 \\ - \
 ```
 
-&#42;&#42;Example 1:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 1:<br />Text&#42;&#42;
 
 ![image](indent1.png)"![image](tab.png)string1![image](tab.png)1![image](tab.png)-![image](tab.png)This is line1.\nThis is line 2.![image](nl.png)
 
@@ -536,29 +536,29 @@ In a compressed byte array, the tabs in the stream will separate the strings lik
 
 ![image](indent1.png)&lt;n2 :000 0 5&gt;&lt;n1 :7&gt;&lt;7 :string1&gt;&lt;(n1)&#42; :This is line1.\nThis is line 2.![image](nl.png)&gt;
 
-&#42;&#42;Example 2:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 2:<br />Text&#42;&#42;
 
 ![image](indent1.png)"![image](tab.png)string2![image](tab.png)1![image](tab.png):![image](tab.png)1000000![image](tab.png)23424![image](tab.png)[Base64 stream]![image](tab.png)45894![image](tab.png)[Base64 stream]![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 1 5&gt;&lt;n1 :7&gt;&lt;7 :string2&gt;&lt;n4 :1000000&gt;&#60;br /&#62;![image](indent.png)&lt;n4 :23424&gt;&lt;23424 :binary compressed data&gt;&#60;br /&#62;![image](indent.png)&lt;n4 :45894&gt;&lt;45894 :binary compressed data&gt;
+![image](indent1.png)&lt;n2 :001 1 5&gt;&lt;n1 :7&gt;&lt;7 :string2&gt;&lt;n4 :1000000&gt;<br />![image](indent.png)&lt;n4 :23424&gt;&lt;23424 :binary compressed data&gt;<br />![image](indent.png)&lt;n4 :45894&gt;&lt;45894 :binary compressed data&gt;
 
-&#42;&#42;Example 3:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 3:<br />Text&#42;&#42;
 
 ![image](indent1.png)"![image](tab.png)stringList1![image](tab.png)3![image](tab.png)-![image](tab.png)This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 0 5&gt;&lt;n1 :11&gt;&lt;11 :stringList1&gt;&lt;n1 :3&gt;&#60;br /&#62;![image](indent.png)&lt;(n1)&#42; :This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)&gt;
+![image](indent1.png)&lt;n2 :001 0 5&gt;&lt;n1 :11&gt;&lt;11 :stringList1&gt;&lt;n1 :3&gt;<br />![image](indent.png)&lt;(n1)&#42; :This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)&gt;
 
-&#42;&#42;Example 4:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 4:<br />Text&#42;&#42;
 
 ![image](indent1.png)"![image](tab.png)stringList2![image](tab.png)3![image](tab.png):![image](tab.png)1000![image](tab.png)252![image](tab.png)[Base64 stream]![image](tab.png)543![image](tab.png)[Base64 stream]![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 1 5&gt;&lt;n1 :11&gt;&lt;11 :stringList2&gt;&lt;n1 :3&gt;&lt;n4 :1000&gt;&#60;br /&#62;![image](indent.png)&lt;n4 :252&gt;&lt;252 :binary compressed data&gt;&#60;br /&#62;![image](indent.png)&lt;n4 :543&gt;&lt;543 :binary compressed data&gt;
+![image](indent1.png)&lt;n2 :001 1 5&gt;&lt;n1 :11&gt;&lt;11 :stringList2&gt;&lt;n1 :3&gt;&lt;n4 :1000&gt;<br />![image](indent.png)&lt;n4 :252&gt;&lt;252 :binary compressed data&gt;<br />![image](indent.png)&lt;n4 :543&gt;&lt;543 :binary compressed data&gt;
 
 ## 3.4 - Define User Type
 
@@ -569,37 +569,37 @@ In a compressed byte array, the tabs in the stream will separate the strings lik
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2             :value header (aaa 0 3)&gt;&#60;br /&#62;![image](indent.png)&lt;n1             :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??            :array count&gt;&#60;br /&#62;![image](indent.png)&lt;n2             :user type code&gt;&#60;br /&#62;![image](indent.png)(&lt;n2                            :member variable value header (aaa c [type code])&gt;&#60;br /&#62;![image](indent.png) &lt;n1                            :member variable key byte count&gt;&#60;br /&#62;![image](indent.png) &lt;member variable key byte count:member variable key&gt;&#60;br /&#62;![image](indent.png) &lt;n??                           :array count if (aaa) not 000 or 111&gt;&#60;br /&#62;![image](indent.png) &lt;n4                            :chunk byte count if (c) is 1&gt;)&#42;
+![image](indent1.png)&lt;n2             :value header (aaa 0 3)&gt;<br />![image](indent.png)&lt;n1             :key byte count&gt;<br />![image](indent.png)&lt;key byte count :key&gt;<br />![image](indent.png)&lt;n??            :array count&gt;<br />![image](indent.png)&lt;n2             :user type code&gt;<br />![image](indent.png)(&lt;n2                            :member variable value header (aaa c [type code])&gt;<br />![image](indent.png) &lt;n1                            :member variable key byte count&gt;<br />![image](indent.png) &lt;member variable key byte count:member variable key&gt;<br />![image](indent.png) &lt;n??                           :array count if (aaa) not 000 or 111&gt;<br />![image](indent.png) &lt;n4                            :chunk byte count if (c) is 1&gt;)&#42;
 
 In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.
 
 Compression is never used with this type code.
 
-&#42;&#42;Example 1:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 1:<br />Text&#42;&#42;
 
-![image](indent1.png)define![image](tab.png)TypeContact![image](tab.png)5![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)"![image](tab.png)NameGiven![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)"![image](tab.png)NameFamily![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n1![image](tab.png)Age![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)"![image](tab.png)EMail![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n1![image](tab.png)DataFlags![image](tab.png)5![image](tab.png)-![image](nl.png)
+![image](indent1.png)define![image](tab.png)TypeContact![image](tab.png)5![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameGiven![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)NameFamily![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Age![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)"![image](tab.png)EMail![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)DataFlags![image](tab.png)5![image](tab.png)-![image](nl.png)
 
 Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :TypeContact&gt;&lt;n1 :6&gt;&lt;n2 :64&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 : 9&gt;&lt; 9 :NameGiven&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 :10&gt;&lt;10 :NameFamily&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 20&gt;&lt;n1 : 3&gt;&lt; 3 :Age&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 : 5&gt;&lt; 5 :Email&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :001 0 20&gt;&lt;n1 : 9&gt;&lt; 9 :DataFlags&gt;&lt;n1 :5&gt;
+![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :TypeContact&gt;&lt;n1 :6&gt;&lt;n2 :64&gt;<br />![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 : 9&gt;&lt; 9 :NameGiven&gt;<br />![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 :10&gt;&lt;10 :NameFamily&gt;<br />![image](indent.png)&lt;n2 :000 0 20&gt;&lt;n1 : 3&gt;&lt; 3 :Age&gt;<br />![image](indent.png)&lt;n2 :000 0  5&gt;&lt;n1 : 5&gt;&lt; 5 :Email&gt;<br />![image](indent.png)&lt;n2 :001 0 20&gt;&lt;n1 : 9&gt;&lt; 9 :DataFlags&gt;&lt;n1 :5&gt;
 
-&#42;&#42;Example 2:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 2:<br />Text&#42;&#42;
 
-![image](indent1.png)define![image](tab.png)Image![image](tab.png)3![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n4![image](tab.png)Width![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n4![image](tab.png)Height![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n1![image](tab.png)Pixels![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
-
-&#42;&#42;Binary&#42;&#42;
-
-![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :5&gt;&lt;5 :Image&gt;&lt;n1 :3&gt;&lt;n2 :65&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :5&gt;&lt;5 :Width&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :6&gt;&lt;6 :Height&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :111 1 20&gt;&lt;n1 :6&gt;&lt;6 :Pixels&gt;&lt;n4 :1000000&gt;
-
-&#42;&#42;Example 3:&#60;br /&#62;Text&#42;&#42;
-
-![image](indent1.png)define![image](tab.png)Binary Blob![image](tab.png)2![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n4![image](tab.png)Byte Count![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)n1![image](tab.png)Byte Data![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
+![image](indent1.png)define![image](tab.png)Image![image](tab.png)3![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Width![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Height![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Pixels![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :Binary Blob&gt;&lt;n1 :2&gt;&lt;n2 :66&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :10&gt;&lt;10 :Byte Count&gt;&#60;br /&#62;![image](indent.png)&lt;n2 :111 1 20&gt;&lt;n1 : 9&gt;&lt; 9 :Byte Data&gt;&lt;n4 :1000000&gt;
+![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :5&gt;&lt;5 :Image&gt;&lt;n1 :3&gt;&lt;n2 :65&gt;<br />![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :5&gt;&lt;5 :Width&gt;<br />![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :6&gt;&lt;6 :Height&gt;<br />![image](indent.png)&lt;n2 :111 1 20&gt;&lt;n1 :6&gt;&lt;6 :Pixels&gt;&lt;n4 :1000000&gt;
+
+&#42;&#42;Example 3:<br />Text&#42;&#42;
+
+![image](indent1.png)define![image](tab.png)Binary Blob![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n4![image](tab.png)Byte Count![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)n1![image](tab.png)Byte Data![image](tab.png)&#42;![image](tab.png):![image](tab.png)1000000![image](nl.png)
+
+&#42;&#42;Binary&#42;&#42;
+
+![image](indent1.png)&lt;n2 :001 0  3&gt;&lt;n1 :11&gt;&lt;11 :Binary Blob&gt;&lt;n1 :2&gt;&lt;n2 :66&gt;<br />![image](indent.png)&lt;n2 :000 0 23&gt;&lt;n1 :10&gt;&lt;10 :Byte Count&gt;<br />![image](indent.png)&lt;n2 :111 1 20&gt;&lt;n1 : 9&gt;&lt; 9 :Byte Data&gt;&lt;n4 :1000000&gt;
 
 As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its byte count when we defined the type.  The byte count will be provided when the data for the type is provided.
 
@@ -634,52 +634,52 @@ The value of a user type.  A "define" needs to be present before it can be used.
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2                    :000 0 [user type code]&gt;&#60;br /&#62;![image](indent.png)&lt;n1                    :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count        :key&gt;[user type data]
+![image](indent1.png)&lt;n2                    :000 0 [user type code]&gt;<br />![image](indent.png)&lt;n1                    :key byte count&gt;<br />![image](indent.png)&lt;key byte count        :key&gt;[user type data]
 
-![image](indent1.png)&lt;n2                    :000 1 [user type code]&gt;&#60;br /&#62;![image](indent.png)&lt;n1                    :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count        :key&gt;&#60;br /&#62;![image](indent.png)&lt;n4                    :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count: compressed date&gt;)&#42;
+![image](indent1.png)&lt;n2                    :000 1 [user type code]&gt;<br />![image](indent.png)&lt;n1                    :key byte count&gt;<br />![image](indent.png)&lt;key byte count        :key&gt;<br />![image](indent.png)&lt;n4                    :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count: compressed date&gt;)&#42;
 
-![image](indent1.png)&lt;n2                    :aaa 0 [user type code]&gt;&#60;br /&#62;![image](indent.png)&lt;n1                    :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count        :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??                   :array count&gt;&#60;br /&#62;![image](indent.png)[user type data]
+![image](indent1.png)&lt;n2                    :aaa 0 [user type code]&gt;<br />![image](indent.png)&lt;n1                    :key byte count&gt;<br />![image](indent.png)&lt;key byte count        :key&gt;<br />![image](indent.png)&lt;n??                   :array count&gt;<br />![image](indent.png)[user type data]
 
-![image](indent1.png)&lt;n2                    :aaa 1 [user type code]&gt;&#60;br /&#62;![image](indent.png)&lt;n1                    :key byte count&gt;&#60;br /&#62;![image](indent.png)&lt;key byte count        :key&gt;&#60;br /&#62;![image](indent.png)&lt;n??                   :array count&gt;&#60;br /&#62;![image](indent.png)&lt;n4                    :chunk byte count&gt;&#60;br /&#62;![image](indent.png)(&lt;n4                   :compressed byte count&gt;&#60;br /&#62;![image](indent.png) &lt;compressed byte count: compressed date&gt;)&#42;
+![image](indent1.png)&lt;n2                    :aaa 1 [user type code]&gt;<br />![image](indent.png)&lt;n1                    :key byte count&gt;<br />![image](indent.png)&lt;key byte count        :key&gt;<br />![image](indent.png)&lt;n??                   :array count&gt;<br />![image](indent.png)&lt;n4                    :chunk byte count&gt;<br />![image](indent.png)(&lt;n4                   :compressed byte count&gt;<br />![image](indent.png) &lt;compressed byte count: compressed date&gt;)&#42;
 
 If compression is used then the values are collated into a buffer first before compressing.  Taking the types from the above section that defined them...
 
-&#42;&#42;Example 1:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 1:<br />Text&#42;&#42;
 
-![image](indent1.png)TypeContact![image](tab.png)Contact1![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](nl.png)
-
-&#42;&#42;Binary&#42;&#42;
-
-![image](indent1.png)&lt;n2 :000 0 64&gt;&lt;n1 :8&gt;&lt;8 :Contact1&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Robbert![image](nl.png)&gt;&lt;(n1)&#42; :de Groot![image](nl.png)&gt;&lt;n1 :100&gt;&lt;(n1)&#42; :zekaric@gmail.com![image](nl.png)&gt;&lt;n1 &#42; 5:1 2 3 4 5&gt;
-
-&#42;&#42;Example 2:&#60;br /&#62;Text&#42;&#42;
-
-![image](indent1.png)TypeContact![image](tab.png)Contact2![image](tab.png)1![image](tab.png):![image](tab.png)10000![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)521![image](tab.png)[Base64 stream]![image](nl.png)
+![image](indent1.png)TypeContact![image](tab.png)Contact1![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :000 1 64&gt;&lt;n1 :8&gt;&lt;8 :Contact1&gt;&lt;n4 :10000&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :521&gt;&lt;521 :compressed binary data&gt;
+![image](indent1.png)&lt;n2 :000 0 64&gt;&lt;n1 :8&gt;&lt;8 :Contact1&gt;<br />![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Robbert![image](nl.png)&gt;&lt;(n1)&#42; :de Groot![image](nl.png)&gt;&lt;n1 :100&gt;&lt;(n1)&#42; :zekaric@gmail.com![image](nl.png)&gt;&lt;n1 &#42; 5:1 2 3 4 5&gt;
 
-&#42;&#42;Exmaple 3:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Example 2:<br />Text&#42;&#42;
 
-![image](indent1.png)TypeContact![image](tab.png)ContactList1![image](tab.png)2![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)Sherlock![image](tab.png)Holms![image](tab.png)32![image](tab.png)221b@bakerst.uk![image](tab.png)10![image](tab.png)20![image](tab.png)30![image](tab.png)40![image](tab.png)50![image](nl.png)
-
-&#42;&#42;Binary&#42;&#42;
-
-![image](indent1.png)&lt;n2 :001 0 64&gt;&lt;n1 :12&gt;&lt;12 :ContactList1&gt;&lt;n1 :2&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Robbert![image](nl.png)&gt;&lt;(n1)&#42; :de Groot![image](nl.png)&gt;&lt;n1 :100&gt;&lt;(n1)&#42; :zekaric@gmail.com![image](nl.png)&gt;&lt;n1 &#42; 5:1 2 3 4 5&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Sherlock![image](nl.png)&gt;&lt;(n1)&#42; :Holms![image](nl.png)&gt;&lt;n1 :32&gt;&lt;(n1)&#42; :221b@bakerst.uk![image](nl.png)&gt;&lt;n1 &#42; 5:10 20 30 40 50&gt;
-
-&#42;&#42;Example 4:&#60;br /&#62;Text&#42;&#42;
-
-![image](indent1.png)TypeContact![image](tab.png)ContactList2![image](tab.png)2![image](tab.png):![image](tab.png)100000![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)5213![image](tab.png)[Base64 stream]![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)32784![image](tab.png)[Base64 stream]![image](nl.png)
+![image](indent1.png)TypeContact![image](tab.png)Contact2![image](tab.png)1![image](tab.png):![image](tab.png)10000![image](tab.png)<br />![image](indent.png)![image](indent.png)521![image](tab.png)[Base64 stream]![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :001 1 64&gt;&lt;n1 :12&gt;&lt;12 :ContactList2&gt;&lt;n1 :2&gt;&lt;n4 :100000&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :5213&gt;&lt;5213 :compressed binary data&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :32784&gt;&lt;32784 :compressed binary data&gt;
+![image](indent1.png)&lt;n2 :000 1 64&gt;&lt;n1 :8&gt;&lt;8 :Contact1&gt;&lt;n4 :10000&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :521&gt;&lt;521 :compressed binary data&gt;
 
-&#42;&#42;Example 5:&#60;br /&#62;Text&#42;&#42;
+&#42;&#42;Exmaple 3:<br />Text&#42;&#42;
 
-![image](indent1.png)Image![image](tab.png)Portrait![image](tab.png)1![image](tab.png)-![image](tab.png)&#60;br /&#62;![image](indent.png)![image](indent.png)256![image](tab.png)256![image](tab.png)17899![image](tab.png)[Base64 stream]![image](nl.png)
+![image](indent1.png)TypeContact![image](tab.png)ContactList1![image](tab.png)2![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)Robbert![image](tab.png)de Groot![image](tab.png)100![image](tab.png)zekaric@gmail.com![image](tab.png)1![image](tab.png)1![image](tab.png)2![image](tab.png)3![image](tab.png)5![image](tab.png)<br />![image](indent.png)![image](indent.png)Sherlock![image](tab.png)Holms![image](tab.png)32![image](tab.png)221b@bakerst.uk![image](tab.png)10![image](tab.png)20![image](tab.png)30![image](tab.png)40![image](tab.png)50![image](nl.png)
 
 &#42;&#42;Binary&#42;&#42;
 
-![image](indent1.png)&lt;n2 :000 0 65&gt;&lt;n1 :8&gt;&lt;8 :Portrait&gt;&#60;br /&#62;![image](indent.png)![image](indent.png)&lt;n4 :256&gt;&lt;n4 :256&gt;&lt;n4 :17899&gt;&lt;17899 :compressed binary data&gt;
+![image](indent1.png)&lt;n2 :001 0 64&gt;&lt;n1 :12&gt;&lt;12 :ContactList1&gt;&lt;n1 :2&gt;<br />![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Robbert![image](nl.png)&gt;&lt;(n1)&#42; :de Groot![image](nl.png)&gt;&lt;n1 :100&gt;&lt;(n1)&#42; :zekaric@gmail.com![image](nl.png)&gt;&lt;n1 &#42; 5:1 2 3 4 5&gt;<br />![image](indent.png)![image](indent.png)&lt;(n1)&#42; :Sherlock![image](nl.png)&gt;&lt;(n1)&#42; :Holms![image](nl.png)&gt;&lt;n1 :32&gt;&lt;(n1)&#42; :221b@bakerst.uk![image](nl.png)&gt;&lt;n1 &#42; 5:10 20 30 40 50&gt;
+
+&#42;&#42;Example 4:<br />Text&#42;&#42;
+
+![image](indent1.png)TypeContact![image](tab.png)ContactList2![image](tab.png)2![image](tab.png):![image](tab.png)100000![image](tab.png)<br />![image](indent.png)![image](indent.png)5213![image](tab.png)[Base64 stream]![image](tab.png)<br />![image](indent.png)![image](indent.png)32784![image](tab.png)[Base64 stream]![image](nl.png)
+
+&#42;&#42;Binary&#42;&#42;
+
+![image](indent1.png)&lt;n2 :001 1 64&gt;&lt;n1 :12&gt;&lt;12 :ContactList2&gt;&lt;n1 :2&gt;&lt;n4 :100000&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :5213&gt;&lt;5213 :compressed binary data&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :32784&gt;&lt;32784 :compressed binary data&gt;
+
+&#42;&#42;Example 5:<br />Text&#42;&#42;
+
+![image](indent1.png)Image![image](tab.png)Portrait![image](tab.png)1![image](tab.png)-![image](tab.png)<br />![image](indent.png)![image](indent.png)256![image](tab.png)256![image](tab.png)17899![image](tab.png)[Base64 stream]![image](nl.png)
+
+&#42;&#42;Binary&#42;&#42;
+
+![image](indent1.png)&lt;n2 :000 0 65&gt;&lt;n1 :8&gt;&lt;8 :Portrait&gt;<br />![image](indent.png)![image](indent.png)&lt;n4 :256&gt;&lt;n4 :256&gt;&lt;n4 :17899&gt;&lt;17899 :compressed binary data&gt;

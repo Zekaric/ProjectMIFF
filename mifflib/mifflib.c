@@ -227,8 +227,6 @@ func: miffSetHeader
 MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const * const key, 
    MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
 {
-   MiffN4 memSize;
-
    returnFalseIf(
       !_isStarted ||
       !miff);
@@ -290,43 +288,46 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
    }
 
    // If compression is used, prep the internal buffer
-   memSize = 0;
-   if      (compressFlag == miffCompressFlagCOMPRESS)
+   if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
-      memSize = count * _TypeGetSize(miff, type);
-   }
-   else if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
-   {
-      memSize = chunkByteCount;
-   }
-
-   if (miff->compressMemByteCount < memSize)
-   {
-      _MemDestroy(miff->compressMemByteData);
-   
-      // Allocate the buffer.
-      miff->compressMemByteData = _MemCreateTypeArray(count * _TypeGetSize(miff, type), MiffN1);
-      if (!miff->compressMemByteData)
+      // We need a larger buffer than what we currently have.
+      if (miff->compressMemByteCountActual < chunkByteCount)
       {
-         miff->currentRecord.type = miffValueTypeNONE;
-         returnFalse;
+         miff->compressMemByteCountActual = chunkByteCount;
+
+         _MemDestroy(miff->compressMemByteData);
+   
+         // Allocate the buffer.
+         miff->compressMemByteData = _MemCreateTypeArray(chunkByteCount, MiffN1);
+         if (!miff->compressMemByteData)
+         {
+            miff->currentRecord.type = miffValueTypeNONE;
+            returnFalse;
+         }
       }
+      // Clear out the buffer just for good measure.
+      else
+      {
+         _MemClearTypeArray(miff->compressMemByteCountActual, MiffN1, miff->compressMemByteData);
+      }
+      // Set the byte count of the internal memory.
+      miff->compressMemByteCount = chunkByteCount;
+      miff->compressMemByteIndex = 0;
    }
-   miff->compressMemByteCount = memSize;
-   miff->compressMemByteIndex = 0;
-   _MemClearTypeArray(memSize, MiffN1, miff->compressMemByteData);
 
    returnTrue;
 }
 
 /******************************************************************************
-func: miffSet1BinaryData1
+func: miffSetHeaderDefine
 ******************************************************************************/
-MiffBool miffSet1BinaryData1(Miff * const miff, MiffC2 const * const key, MiffN4 const byteCount, 
-   MiffN1 const * const value)
+MiffBool miffSetHeaderDefine(Miff * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count)
 {
-   returnFalseIf(!miffSetHeader(          miff, miffValueTypeBINARY_DATA_1, key, 1, miffCompressFlagNONE, 0));
-   returnFalseIf(!miffSetValueBinaryData1(miff, byteCount, value));
+   returnFalseIf(miffSetHeader(              miff, miffValueTypeDEFINE, key, count, miffCompressFlagNONE, 0));
+
+   returnFalseIf(!_WriteTxtValueN(           miff, type));
+   returnFalseIf(!_WriteTxtRecordSeparator(  miff));
+
    returnTrue;
 }
 
@@ -337,17 +338,6 @@ MiffBool miffSet1Boolean(Miff * const miff, MiffC2 const * const key, MiffBool c
 {
    returnFalseIf(!miffSetHeader(      miff, miffValueTypeBOOLEAN, key, 1, miffCompressFlagNONE, 0));
    returnFalseIf(!miffSetValueBoolean(miff, value));
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffSet1EmbeddedFile1
-******************************************************************************/
-MiffBool miffSet1EmbeddedFile1(Miff * const miff, MiffC2 const * const key, 
-   MiffC2 const * const fileType, MiffN4 const byteCount, MiffN1 const * const value)
-{
-   returnFalseIf(!miffSetHeader(            miff, miffValueTypeEMBEDDED_FILE_1, key, 1, miffCompressFlagNONE, 0));
-   returnFalseIf(!miffSetValueEmbeddedFile1(miff, fileType, byteCount, value));
    returnTrue;
 }
 
@@ -432,16 +422,6 @@ MiffBool miffSet1N8(Miff * const miff, MiffC2 const * const key, MiffN8 const va
 }
 
 /******************************************************************************
-func: miffSet1PathC2
-******************************************************************************/
-MiffBool miffSet1PathC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
-{
-   returnFalseIf(!miffSetHeader(    miff, miffValueTypePATH, key, 1, miffCompressFlagNONE, 0));
-   returnFalseIf(!miffSetValuePathC2(miff, value));
-   returnTrue;
-}
-
-/******************************************************************************
 func: miffSet1R4
 ******************************************************************************/
 MiffBool miffSet1R4(Miff * const miff, MiffC2 const * const key, MiffR4 const value)
@@ -511,7 +491,6 @@ MiffBool miffSetNI1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNI2
 ******************************************************************************/
@@ -526,7 +505,6 @@ MiffBool miffSetNI2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    }
    returnTrue;
 }
-
 
 /******************************************************************************
 func: miffSetNI4
@@ -543,7 +521,6 @@ MiffBool miffSetNI4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNI8
 ******************************************************************************/
@@ -558,7 +535,6 @@ MiffBool miffSetNI8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    }
    returnTrue;
 }
-
 
 /******************************************************************************
 func: miffSetNN1
@@ -575,7 +551,6 @@ MiffBool miffSetNN1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNN2
 ******************************************************************************/
@@ -590,7 +565,6 @@ MiffBool miffSetNN2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    }
    returnTrue;
 }
-
 
 /******************************************************************************
 func: miffSetNN4
@@ -607,7 +581,6 @@ MiffBool miffSetNN4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNN8
 ******************************************************************************/
@@ -622,23 +595,6 @@ MiffBool miffSetNN8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    }
    returnTrue;
 }
-
-
-/******************************************************************************
-func: miffSetNPathC2
-******************************************************************************/
-MiffBool miffSetNPathC2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffC2 const * const * const value)
-{
-   MiffN4 index;
-
-   returnFalseIf(!miffSetHeader(miff, miffValueTypePATH, key, count, miffCompressFlagNONE, 0));
-   forCount(index, count)
-   {
-      returnFalseIf(!miffSetValuePathC2(miff, value[index]));
-   }
-   returnTrue;
-}
-
 
 /******************************************************************************
 func: miffSetNR4
@@ -655,7 +611,6 @@ MiffBool miffSetNR4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNR8
 ******************************************************************************/
@@ -670,7 +625,6 @@ MiffBool miffSetNR8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    }
    returnTrue;
 }
-
 
 /******************************************************************************
 func: miffSetNType
@@ -687,7 +641,6 @@ MiffBool miffSetNType(Miff * const miff, MiffC2 const * const key, MiffN4 const 
    returnTrue;
 }
 
-
 /******************************************************************************
 func: miffSetNStringC2
 ******************************************************************************/
@@ -700,58 +653,6 @@ MiffBool miffSetNStringC2(Miff * const miff, MiffC2 const * const key, MiffN4 co
    {
       returnFalseIf(!miffSetValueStringC2(miff, value[index]));
    }
-   returnTrue;
-}
-
-
-/******************************************************************************
-func: miffSetValueBinaryData1
-******************************************************************************/
-MiffBool miffSetValueBinaryData1(Miff * const miff, MiffN4 const byteCount, MiffN1 const * const value)
-{
-   MiffN4 index;
-
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !(miff->currentRecord.type == miffValueTypeBINARY_DATA_1 
-        // ||
-        //miff->currentRecord.type == miffValueTypeBINARY_DATA_2 ||
-        //miff->currentRecord.type == miffValueTypeBINARY_DATA_3 ||
-        //miff->currentRecord.type == miffValueTypeBINARY_DATA_4
-         ));
-
-   switch (miff->currentRecord.type)
-   {
-   case miffValueTypeBINARY_DATA_1:
-      returnFalseIf(!_WriteTxtValueN(miff, (MiffN8) byteCount));
-      break;
-
-   //case miffValueTypeBINARY_DATA_2:
-   //case miffValueTypeBINARY_DATA_3:
-   //case miffValueTypeBINARY_DATA_4:
-   //   returnFalse;
-   }
-
-   returnFalseIf(!_WriteTxtRecordSeparator(miff));
-
-   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
-   {
-      _Base64Restart();
-
-      forCount(index, byteCount)
-      {
-         returnFalseIf(!_Base64Set(miff, value[index]));
-      }
-      returnFalseIf(!_Base64SetEnd(miff));
-   }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
-   {
-      _CompressAndWrite(miff, byteCount, value);
-   }
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
    returnTrue;
 }
 
@@ -771,53 +672,6 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
    
    returnFalseIf(!_WriteTxtC1(miff, c1));
   
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffSetValueEmbeddedFile1
-******************************************************************************/
-MiffBool miffSetValueEmbeddedFile1(Miff * const miff, MiffC2 const * const fileType, 
-   MiffN4 const byteCount, MiffN1 const * const value)
-{
-   MiffN4 index;
-
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !(miff->currentRecord.type == miffValueTypeEMBEDDED_FILE_1
-        // ||
-        //miff->currentRecord.type == miffValueTypeEMBEDDED_FILE_2 ||
-        //miff->currentRecord.type == miffValueTypeEMBEDDED_FILE_3 ||
-        //miff->currentRecord.type == miffValueTypeEMBEDDED_FILE_4
-         ));
-
-   returnFalseIf(!_WriteTxtC2(             miff, fileType));
-   returnFalseIf(!_WriteTxtRecordSeparator(miff));
-
-   switch (miff->currentRecord.type)
-   {
-   case miffValueTypeEMBEDDED_FILE_1:
-      returnFalseIf(!_WriteTxtValueN(miff, (MiffN8) byteCount));
-      break;
-
-   //case miffValueTypeEMBEDDED_FILE_2:
-   //case miffValueTypeEMBEDDED_FILE_3:
-   //case miffValueTypeEMBEDDED_FILE_4:
-   //   returnFalse;
-   }
-
-   returnFalseIf(!_WriteTxtRecordSeparator(miff));
-
-   _Base64Restart();
-   forCount(index, byteCount)
-   {
-      returnFalseIf(!_Base64Set(miff, value[index]));
-   }
-   returnFalseIf(!_Base64SetEnd(miff));
-
    returnFalseIf(!_CurrentIndexInc(miff));
 
    returnTrue;
@@ -952,24 +806,6 @@ MiffBool miffSetValueN8(Miff * const miff, MiffN8 const value)
 }
 
 /******************************************************************************
-func: miffSetValuePathC2
-******************************************************************************/
-MiffBool miffSetValuePathC2(Miff * const miff, MiffC2 const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !value      ||
-      miff->currentRecord.type != miffValueTypePATH);
-
-   returnFalseIf(!_WriteTxtValueC2(miff, value));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
-}
-
-/******************************************************************************
 func: miffSetValueR4
 ******************************************************************************/
 MiffBool miffSetValueR4(Miff * const miff, MiffR4 const value)
@@ -1037,16 +873,16 @@ MiffBool miffSetValueType(Miff * const miff, MiffValueType const value)
 }
 
 /******************************************************************************
-func: miffSetValueUserType
+func: miffSetValueDefine
 ******************************************************************************/
-MiffBool miffSetValueUserType(Miff * const miff, MiffValueType const type, MiffC2 const * const name,
-   MiffN4 const count)
+MiffBool miffSetValueDefine(Miff * const miff, MiffValueType const type, MiffC2 const * const name,
+   MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
 {
    returnFalseIf(
       !_isStarted ||
       !miff       ||
       !name       ||
-      miff->currentRecord.type != miffValueTypeUSER_TYPE);
+      miff->currentRecord.type != miffValueTypeDEFINE);
 
    returnFalseIf(!_WriteTxtValueType(      miff, type));
    returnFalseIf(!_WriteTxtRecordSeparator(miff));
@@ -1059,6 +895,13 @@ MiffBool miffSetValueUserType(Miff * const miff, MiffValueType const type, MiffC
    else
    {
       returnFalseIf(!_WriteTxtValueN(      miff, count));
+   }
+   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, compressFlag));
+   if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   {
+      returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+      returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
    }
 
    returnFalseIf(!_CurrentIndexInc(miff));
@@ -1836,18 +1679,9 @@ static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
 
       type[typeByteCount] = 0;
       if      (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "{"))      miff->valueType = miffValueTypeKEY_VALUE_BLOCK;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "*"))      miff->valueType = miffValueTypeBINARY_DATA_1;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "**"))     miff->valueType = miffValueTypeBINARY_DATA_2;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "***"))    miff->valueType = miffValueTypeBINARY_DATA_3;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "****"))   miff->valueType = miffValueTypeBINARY_DATA_4;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "[*]"))    miff->valueType = miffValueTypeEMBEDDED_FILE_1;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "[**]"))   miff->valueType = miffValueTypeEMBEDDED_FILE_2;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "[***]"))  miff->valueType = miffValueTypeEMBEDDED_FILE_3;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "[****]")) miff->valueType = miffValueTypeEMBEDDED_FILE_4;
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "type"))   miff->valueType = miffValueTypeTYPE;
+      else if (_MemIsEqual(typeByteCount, type, 8, (MiffN1 *) "define")) miff->valueType = miffValueTypeDEFINE;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "\""))     miff->valueType = miffValueTypeSTRING;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "->"))     miff->valueType = miffValueTypePATH;
-      else if (_MemIsEqual(typeByteCount, type, 8, (MiffN1 *) "define")) miff->valueType = miffValueTypeUSER_TYPE;
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "bool"))   miff->valueType = miffValueTypeBOOLEAN;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i1"))     miff->valueType = miffValueTypeI1;
       else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i2"))     miff->valueType = miffValueTypeI2;

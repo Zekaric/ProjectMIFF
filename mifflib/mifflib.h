@@ -65,53 +65,38 @@ typedef enum
 {
    miffValueTypeNONE,
 
-   miffValueTypeKEY_VALUE_BLOCK_START        = 1,
-   miffValueTypeKEY_VALUE_BLOCK_STOP         = 2,
-   miffValueTypeBINARY_DATA_1                = 5,
-   //miffValueTypeBINARY_DATA_2,                    
-   //miffValueTypeBINARY_DATA_3,                    
-   //miffValueTypeBINARY_DATA_4,                    
-   miffValueTypeEMBEDDED_FILE_1              = 10,
-   //miffValueTypeEMBEDDED_FILE_2,                  
-   //miffValueTypeEMBEDDED_FILE_3,                  
-   //miffValueTypeEMBEDDED_FILE_4,                  
-   miffValueTypeTYPE                         = 15,
-   miffValueTypeSTRING,                           
-   miffValueTypePATH,                             
-   miffValueTypeUSER_TYPE,                        
-   miffValueTypeBOOLEAN,                          
-   miffValueTypeI1                           = 21,
-   miffValueTypeI2,                               
-   miffValueTypeI3,                               
-   miffValueTypeI4,                               
-   miffValueTypeI8,                               
-   miffValueTypeI16,                              
-   miffValueTypeI32,                              
-   miffValueTypeI64,                              
-   miffValueTypeI128,                             
-   miffValueTypeI256,                             
-   miffValueTypeN1                           = 31,
-   miffValueTypeN2,                               
-   miffValueTypeN3,                               
-   miffValueTypeN4,                               
-   miffValueTypeN8,                               
-   miffValueTypeN16,                              
-   miffValueTypeN32,                              
-   miffValueTypeN64,                              
-   miffValueTypeN128,                             
-   miffValueTypeN256,                             
-   //miffValueTypeR2                           = 52,
-   miffValueTypeR4                           = 54,
-   miffValueTypeR8,                               
-   // miffValueTypeR16,                              
-   // miffValueTypeR32,                              
-   // miffValueTypeR64,                              
-   // miffValueTypeR128,                             
-   // miffValueTypeR256,                             
-   
+   miffValueTypeKEY_VALUE_BLOCK_STOP,
+   miffValueTypeKEY_VALUE_BLOCK_START,
+   miffValueTypeTYPE,
+   miffValueTypeDEFINE,
+   miffValueTypeSTRING                       = 5,
+   miffValueTypeBOOLEAN                      = 8,
+   miffValueTypeI1                           = 10,
+   miffValueTypeI2,
+   miffValueTypeI3,
+   miffValueTypeI4,
+   miffValueTypeI8,
+   miffValueTypeI16,
+   miffValueTypeI32,
+   miffValueTypeI64,
+   miffValueTypeI128,
+   miffValueTypeI256,
+   miffValueTypeN1                           = 20,
+   miffValueTypeN2,
+   miffValueTypeN3,
+   miffValueTypeN4,
+   miffValueTypeN8,
+   miffValueTypeN16,
+   miffValueTypeN32,
+   miffValueTypeN64,
+   miffValueTypeN128,
+   miffValueTypeN256,
+   miffValueTypeR4                           = 33,
+   miffValueTypeR8,
+
    miffValueTypeFIRST_USER_TYPE              = 64,
 
-   miffValueTypeLAST_USER_TYPE               = 0x07FF
+   miffValueTypeLAST_USER_TYPE               = 0x0FFF
 } MiffValueType;
 
 #define miffArrayCountUNKNOWN                ((MiffN4) 0xFFFFFFFF)
@@ -120,8 +105,7 @@ typedef enum
 typedef enum
 {
    miffCompressFlagNONE                      = 0x0,
-   miffCompressFlagCOMPRESS                  = 0x1,
-   miffCompressFlagCHUNK_COMPRESS            = 0x2
+   miffCompressFlagCHUNK_COMPRESS            = 0x1
 } MiffCompressFlag;
 
 /******************************************************************************
@@ -218,7 +202,7 @@ typedef MiffBool (*MiffGetBuffer)(        void * const dataRepo, MiffN4 const by
 
 typedef MiffBool (*MiffSetBuffer)(        void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const data);
 
-typedef struct 
+typedef struct
 {
    MiffC2                      nameC2[256];
    MiffValueType               type;
@@ -249,7 +233,7 @@ typedef struct
    // The list of user types
    MiffN2                      userTypeCount;
    MiffUserType                userTypeList[2048];
-   
+
    // Data repo getters and setters.
    void                       *dataRepo;
    MiffGetBuffer               getBuffer;
@@ -265,6 +249,7 @@ typedef struct
 
    // Temporary storage for compressed memory.
    MiffN4                      compressChunkByteCount;
+   MiffN4                      compressMemByteCountActual;
    MiffN4                      compressMemByteCount;
    MiffN4                      compressMemByteIndex;
    MiffN1                     *compressMemByteData;
@@ -281,7 +266,7 @@ prototype:
 // MiffBool        miffCreateReaderContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
 Miff           *miffCreateWriter(                                     MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
 MiffBool        miffCreateWriterContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
-                                                              
+
 void            miffDestroy(                       Miff       * const miff);
 void            miffDestroyContent(                Miff       * const miff);
 
@@ -306,9 +291,8 @@ void            miffDestroyContent(                Miff       * const miff);
 MiffBool        miffSetBlockStart(           Miff       * const miff, MiffC2 const * const key);
 MiffBool        miffSetBlockStop(            Miff       * const miff);
 MiffBool        miffSetHeader(               Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
-MiffBool        miffSet1BinaryData1(         Miff       * const miff, MiffC2 const * const key, MiffN4 const byteCount, MiffN1 const * const value);
+MiffBool        miffSetHeaderDefine(         Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count);
 MiffBool        miffSet1Boolean(             Miff       * const miff, MiffC2 const * const key, MiffBool              const value);
-MiffBool        miffSet1EmbeddedFile1(       Miff       * const miff, MiffC2 const * const key, MiffC2 const * const fileType, MiffN4 const byteCount, MiffN1 const * const value);
 MiffBool        miffSet1I1(                  Miff       * const miff, MiffC2 const * const key, MiffI1                const value);
 MiffBool        miffSet1I2(                  Miff       * const miff, MiffC2 const * const key, MiffI2                const value);
 MiffBool        miffSet1I4(                  Miff       * const miff, MiffC2 const * const key, MiffI4                const value);
@@ -317,7 +301,6 @@ MiffBool        miffSet1N1(                  Miff       * const miff, MiffC2 con
 MiffBool        miffSet1N2(                  Miff       * const miff, MiffC2 const * const key, MiffN2                const value);
 MiffBool        miffSet1N4(                  Miff       * const miff, MiffC2 const * const key, MiffN4                const value);
 MiffBool        miffSet1N8(                  Miff       * const miff, MiffC2 const * const key, MiffN8                const value);
-MiffBool        miffSet1PathC2(              Miff       * const miff, MiffC2 const * const key, MiffC2        const * const value);
 MiffBool        miffSet1R4(                  Miff       * const miff, MiffC2 const * const key, MiffR4                const value);
 MiffBool        miffSet1R8(                  Miff       * const miff, MiffC2 const * const key, MiffR8                const value);
 MiffBool        miffSet1Type(                Miff       * const miff, MiffC2 const * const key, MiffValueType         const value);
@@ -331,14 +314,12 @@ MiffBool        miffSetNN1(                  Miff       * const miff, MiffC2 con
 MiffBool        miffSetNN2(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN2                const * const value);
 MiffBool        miffSetNN4(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN4                const * const value);
 MiffBool        miffSetNN8(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN8                const * const value);
-MiffBool        miffSetNPathC2(              Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffC2        const * const * const value);
 MiffBool        miffSetNR4(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffR4                const * const value);
 MiffBool        miffSetNR8(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffR8                const * const value);
 MiffBool        miffSetNType(                Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffValueType         const * const value);
 MiffBool        miffSetNStringC2(            Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffC2        const * const * const value);
-MiffBool        miffSetValueBinaryData1(     Miff       * const miff, MiffN4 const byteCount, MiffN1 const * const value);
 MiffBool        miffSetValueBoolean(         Miff       * const miff, MiffBool              const value);
-MiffBool        miffSetValueEmbeddedFile1(   Miff       * const miff, MiffC2 const * const fileType, MiffN4 const byteCount, MiffN1 const * const value);
+MiffBool        miffSetValueDefine(          Miff       * const miff, MiffValueType         const type, MiffC2 const * const name, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
 MiffBool        miffSetValueI1(              Miff       * const miff, MiffI1                const value);
 MiffBool        miffSetValueI2(              Miff       * const miff, MiffI2                const value);
 MiffBool        miffSetValueI4(              Miff       * const miff, MiffI4                const value);
@@ -347,18 +328,12 @@ MiffBool        miffSetValueN1(              Miff       * const miff, MiffN1    
 MiffBool        miffSetValueN2(              Miff       * const miff, MiffN2                const value);
 MiffBool        miffSetValueN4(              Miff       * const miff, MiffN4                const value);
 MiffBool        miffSetValueN8(              Miff       * const miff, MiffN8                const value);
-MiffBool        miffSetValuePathC2(          Miff       * const miff, MiffC2        const * const value);
 MiffBool        miffSetValueR4(              Miff       * const miff, MiffR4                const value);
 MiffBool        miffSetValueR8(              Miff       * const miff, MiffR8                const value);
 MiffBool        miffSetValueStringC2(        Miff       * const miff, MiffC2        const * const value);
 MiffBool        miffSetValueType(            Miff       * const miff, MiffValueType         const value);
-MiffBool        miffSetValueUserType(        Miff       * const miff, MiffValueType         const type, MiffC2 const * const name, MiffN4 const count);
 
 MiffBool        miffStart(                         MiffMemCreate const memCreate, MiffMemDestroy const memDestroy, MiffMemCompressBound const memCompressBound, MiffMemCompress const memCompress, MiffMemDecompress const memDecompress);
 void            miffStop(                          void);
-
-// MiffBool        miffUserTypeAddVar(                Miff       * const miff, MiffC2 const * const name, MiffValueType const type, MiffN4 const arrayCount);
-// MiffValueType   miffUserTypeStart(                 Miff       * const miff, MiffC2 const * const name);
-// void            miffUserTypeStop(                  Miff       * const miff);
 
 #endif

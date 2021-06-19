@@ -40,6 +40,23 @@ include:
 global:
 function
 ******************************************************************************/
+MiffBool _WriteCompressByte(Miff * const miff, MiffN1 const byte)
+{
+   miff->compressMemByteData[miff->compressMemByteIndex++] = byte;
+
+   if (miff->compressMemByteIndex == miff->compressChunkByteCount)
+   {
+      returnFalseIf(!_CompressAndWrite(miff, miff->compressChunkByteCount, miff->compressMemByteData));
+
+      // Reset the buffer.
+      miff->compressMemByteIndex = 0;
+      _MemClearTypeArray(miff->compressChunkByteCount, MiffN1, miff->compressMemByteData);
+   }
+
+   returnTrue;
+}
+
+
 /******************************************************************************
 func: _WriteTxtC1
 ******************************************************************************/
@@ -92,10 +109,6 @@ MiffBool _WriteTxtRecordCompressFlag(Miff const * const miff, MiffCompressFlag c
    if      (compressFlag == miffCompressFlagNONE)
    {
       return _WriteTxtC1(miff, (MiffC1 *) "-");
-   }
-   else if (compressFlag == miffCompressFlagCOMPRESS)
-   {
-      return _WriteTxtC1(miff, (MiffC1 *) ".");
    }
    else if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
@@ -152,18 +165,9 @@ MiffBool _WriteTxtType(Miff const * const miff, MiffValueType const value)
    {
    case miffValueTypeKEY_VALUE_BLOCK_START:  return _WriteTxtC1(miff, (MiffC1 *) "{"     );
    case miffValueTypeKEY_VALUE_BLOCK_STOP:   return _WriteTxtC1(miff, (MiffC1 *) "}"     );
-   case miffValueTypeBINARY_DATA_1:          return _WriteTxtC1(miff, (MiffC1 *) "*"     );
-   //case miffValueTypeBINARY_DATA_2:          return _WriteTxtC1(miff, (MiffC1 *) "**"    );
-   //case miffValueTypeBINARY_DATA_3:          return _WriteTxtC1(miff, (MiffC1 *) "***"   );
-   //case miffValueTypeBINARY_DATA_4:          return _WriteTxtC1(miff, (MiffC1 *) "****"  );
-   case miffValueTypeEMBEDDED_FILE_1:        return _WriteTxtC1(miff, (MiffC1 *) "[*]"   );
-   //case miffValueTypeEMBEDDED_FILE_2:        return _WriteTxtC1(miff, (MiffC1 *) "[**]"  );
-   //case miffValueTypeEMBEDDED_FILE_3:        return _WriteTxtC1(miff, (MiffC1 *) "[***]" );
-   //case miffValueTypeEMBEDDED_FILE_4:        return _WriteTxtC1(miff, (MiffC1 *) "[****]");
    case miffValueTypeTYPE:                   return _WriteTxtC1(miff, (MiffC1 *) "type"  );
+   case miffValueTypeDEFINE:                 return _WriteTxtC1(miff, (MiffC1 *) "define");
    case miffValueTypeSTRING:                 return _WriteTxtC1(miff, (MiffC1 *) "\""    );
-   case miffValueTypePATH:                   return _WriteTxtC1(miff, (MiffC1 *) "->"    );
-   case miffValueTypeUSER_TYPE:              return _WriteTxtC1(miff, (MiffC1 *) "define");
    case miffValueTypeBOOLEAN:                return _WriteTxtC1(miff, (MiffC1 *) "b"     );
    case miffValueTypeI1:                     return _WriteTxtC1(miff, (MiffC1 *) "i1"    );
    case miffValueTypeI2:                     return _WriteTxtC1(miff, (MiffC1 *) "i2"    );
@@ -185,14 +189,8 @@ MiffBool _WriteTxtType(Miff const * const miff, MiffValueType const value)
    case miffValueTypeN64:                    return _WriteTxtC1(miff, (MiffC1 *) "n64"   );
    case miffValueTypeN128:                   return _WriteTxtC1(miff, (MiffC1 *) "n128"  );
    case miffValueTypeN256:                   return _WriteTxtC1(miff, (MiffC1 *) "n256"  );
-   //case miffValueTypeR2:                     return _WriteTxtC1(miff, (MiffC1 *) "r2"    );
    case miffValueTypeR4:                     return _WriteTxtC1(miff, (MiffC1 *) "r4"    );
    case miffValueTypeR8:                     return _WriteTxtC1(miff, (MiffC1 *) "r8"    );
-   //case miffValueTypeR16:                    return _WriteTxtC1(miff, (MiffC1 *) "r16"   );
-   //case miffValueTypeR32:                    return _WriteTxtC1(miff, (MiffC1 *) "r32"   );
-   //case miffValueTypeR64:                    return _WriteTxtC1(miff, (MiffC1 *) "r64"   );
-   //case miffValueTypeR128:                   return _WriteTxtC1(miff, (MiffC1 *) "r128"  );
-   //case miffValueTypeR256:                   return _WriteTxtC1(miff, (MiffC1 *) "r256"  );
 
    default:
       // user type.
@@ -230,19 +228,6 @@ func: _WriteTxtValue2
 ******************************************************************************/
 MiffBool _WriteTxtValue2(Miff const * const miff, MiffValueType const type, Miff2 const value)
 {
-   //if (type == miffValueTypeR2)
-   //{
-   //   Miff2 vtemp;
-   //
-   //   vtemp = value;
-   //   _ByteSwap2(miff, &vtemp);
-   //
-   //   returnFalseIf(!_Base64Set(miff, value.byte[0]));
-   //   returnFalseIf(!_Base64Set(miff, value.byte[1]));
-   //
-   //   return _Base64SetEnd(miff);
-   //}
-
    if (type == miffValueTypeI2)
    {
       return _WriteTxtValueI(miff, (MiffI8) value.i);
@@ -414,10 +399,10 @@ MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
       // Write out the value.
       returnFalseIf(!_WriteTxtValue1(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Populate the internal buffer before compression.
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
+      returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
    }
 
    // Write out the separator, ender, compressed data.
@@ -438,14 +423,14 @@ MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
       // Write out the value
       returnFalseIf(!_WriteTxtValue2(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap2(miff, &value);
-
+   
       // Populate the internal buffer before compression.
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
+      _WriteCompressByte(miff, value.byte[0]);
+      _WriteCompressByte(miff, value.byte[1]);
    }
 
    returnFalseIf(!_CurrentIndexInc(miff));
@@ -465,16 +450,16 @@ MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
       // Write out the value
       returnFalseIf(!_WriteTxtValue4(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap4(miff, &value);
-
+   
       // Populate the internal buffer before compression.
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[2];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[3];
+      _WriteCompressByte(miff, value.byte[0]);
+      _WriteCompressByte(miff, value.byte[1]);
+      _WriteCompressByte(miff, value.byte[2]);
+      _WriteCompressByte(miff, value.byte[3]);
    }
 
    returnFalseIf(!_CurrentIndexInc(miff));
@@ -494,20 +479,20 @@ MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
       // Write out the value
       returnFalseIf(!_WriteTxtValue8(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap8(miff, &value);
-
+   
       // Populate the internal buffer before compression.
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[0];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[1];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[2];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[3];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[4];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[5];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[6];
-      miff->compressMemByteData[miff->compressMemByteIndex++] = value.byte[7];
+      _WriteCompressByte(miff, value.byte[0]);
+      _WriteCompressByte(miff, value.byte[1]);
+      _WriteCompressByte(miff, value.byte[2]);
+      _WriteCompressByte(miff, value.byte[3]);
+      _WriteCompressByte(miff, value.byte[4]);
+      _WriteCompressByte(miff, value.byte[5]);
+      _WriteCompressByte(miff, value.byte[6]);
+      _WriteCompressByte(miff, value.byte[7]);
    }
 
    returnFalseIf(!_CurrentIndexInc(miff));

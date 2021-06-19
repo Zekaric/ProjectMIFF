@@ -63,14 +63,6 @@ MiffN4 _TypeGetSize(Miff const * const miff, MiffValueType const type)
 
    switch(type)
    {
-   case miffValueTypeBINARY_DATA_1:
-   //case miffValueTypeBINARY_DATA_2:
-   //case miffValueTypeBINARY_DATA_3:
-   //case miffValueTypeBINARY_DATA_4:
-   case miffValueTypeEMBEDDED_FILE_1:
-   //case miffValueTypeEMBEDDED_FILE_2:
-   //case miffValueTypeEMBEDDED_FILE_3:
-   //case miffValueTypeEMBEDDED_FILE_4:
    case miffValueTypeBOOLEAN:
    case miffValueTypeI1:
    case miffValueTypeN1:
@@ -79,7 +71,6 @@ MiffN4 _TypeGetSize(Miff const * const miff, MiffValueType const type)
    case miffValueTypeTYPE:
    case miffValueTypeI2:                               
    case miffValueTypeN2:
-   //case miffValueTypeR2:
       return 2;
 
    case miffValueTypeI3:

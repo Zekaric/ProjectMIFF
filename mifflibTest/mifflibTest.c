@@ -201,10 +201,15 @@ func: _TestWrite
 ******************************************************************************/
 static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 {
-   FILE  *file;
-   Miff  *miff;
-   MiffI4 index;
-   MiffN1 binary[] =
+   FILE           *file;
+   Miff           *miff;
+   MiffValueType   idMatrix,
+                   idPoint,
+                   idBinary,
+                   idBinaryZ;
+   MiffI4          index,
+                   iterIndex;
+   MiffN1          binary[] =
    {
         0,   0,   0,
         1,   1,   1,
@@ -463,7 +468,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       254, 254, 254,
       255, 255, 255
    };
-   MiffN1 n1array[] =
+   MiffN1          n1array[] =
    {
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
@@ -498,7 +503,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
    };
-   MiffN2 n2array[] =
+   MiffN2          n2array[] =
    {
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
@@ -533,7 +538,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
    };
-   MiffN4 n4array[] =
+   MiffN4          n4array[] =
    {
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
@@ -568,7 +573,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
    };
-   MiffN8 n8array[] =
+   MiffN8          n8array[] =
    {
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
@@ -603,7 +608,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
    };
-   MiffR4 reals4[300] =
+   MiffR4          reals4[300] =
    {
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
@@ -656,7 +661,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
    };
-   MiffR8 reals8[300] =
+   MiffR8          reals8[300] =
    {
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
@@ -709,7 +714,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
    };
-   MiffC2 *strings[10] =
+   MiffC2         *strings[10] =
    {
       L"the quick brown fox jumped over the lazy dog.",
       L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
@@ -722,7 +727,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       L"No one expects the Spanish Inquisition!",
       L"And now for something completely different."
    };
-   MiffBool bools[100] =
+   MiffBool        bools[100] =
    {
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
@@ -808,18 +813,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      miffSet1PathC2(       miff, L"Path",     L"Subfolder/SubSubFolder/FileName.txt");
-
-      miffSet1EmbeddedFile1(miff, L"File",     L"DAT", 256 * 3, binary);
-
-      miffSet1BinaryData1(  miff, L"Binary",           256 * 3, binary);
-
-      miffSetHeader(          miff, miffValueTypeBINARY_DATA_1, L"Binary Compressed", 1, miffCompressFlagCOMPRESS, 0);
-      miffSetValueBinaryData1(miff, 256 * 3, n1array);
-
       miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) n1array);
       miffSetNN1(           miff, L"N1_Array",     256,     n1array);
-      miffSetHeader(        miff, miffValueTypeI1, L"I1 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      miffSetHeader(        miff, miffValueTypeI1, L"I1 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI1(miff, ((MiffI1 *) n1array)[index]);
@@ -827,7 +823,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) n2array);
       miffSetNN2(           miff, L"N2_Array",     256,     n2array);
-      miffSetHeader(        miff, miffValueTypeI2, L"I2 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      miffSetHeader(        miff, miffValueTypeI2, L"I2 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI2(miff, ((MiffI2 *) n2array)[index]);
@@ -835,7 +831,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) n4array);
       miffSetNN4(           miff, L"N4_Array",     256,     n4array);
-      miffSetHeader(        miff, miffValueTypeI4, L"I4 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      miffSetHeader(        miff, miffValueTypeI4, L"I4 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI4(miff, ((MiffI4 *) n4array)[index]);
@@ -843,7 +839,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) n8array);
       miffSetNN8(           miff, L"N8_Array",     256,     n8array);
-      miffSetHeader(        miff, miffValueTypeI8, L"I8 Array Compressed", 256 * 3, miffCompressFlagCOMPRESS, 0);
+      miffSetHeader(        miff, miffValueTypeI8, L"I8 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI8(miff, ((MiffI8 *) n8array)[index]);
@@ -851,24 +847,88 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNR4(           miff, L"R4_Array",     300,     reals4);
       miffSetNR8(           miff, L"R8_Array",     300,     reals8);
-      miffSetHeader(        miff, miffValueTypeR8, L"R8 Array Compressed", 300, miffCompressFlagCOMPRESS, 0);
+      miffSetHeader(        miff, miffValueTypeR8, L"R8 Array Compressed", 300, miffCompressFlagCHUNK_COMPRESS, 9999);
       for (index = 0; index < 300; index++)
       {
          miffSetValueR8(miff, reals8[index]);
       }
 
-      miffSetNStringC2(     miff, L"String_Array", 10,      strings);
+      miffSetNStringC2(     miff, L"String_Array", 10,   strings);
 
-      miffSetNBoolean(      miff, L"Bool_Array",   100,     bools);
+      miffSetNBoolean(      miff, L"Bool_Array",   100,  bools);
 
-      miffSetHeader(        miff, miffValueTypeUSER_TYPE, L"Matrix",  1, miffCompressFlagNONE, 0);
-      miffSetValueUserType( miff, miffValueTypeR4,        L"Cell",   16);
+      idMatrix = miffValueTypeFIRST_USER_TYPE + 0;
+      miffSetHeaderDefine(  miff, idMatrix, L"Matrix", 1);
+      {
+         miffSetValueDefine(miff, miffValueTypeR4,       L"Cell",  16, miffCompressFlagNONE, 0);
+      }
 
-      miffSetHeader(        miff, miffValueTypeUSER_TYPE, L"Point",   4, miffCompressFlagNONE, 0);
-      miffSetValueUserType( miff, miffValueTypeSTRING,    L"String",  1);
-      miffSetValueUserType( miff, miffValueTypeR4,        L"E",       1);
-      miffSetValueUserType( miff, miffValueTypeR4,        L"N",       1);
-      miffSetValueUserType( miff, miffValueTypeR4,        L"Z",       1);
+      idPoint  = miffValueTypeFIRST_USER_TYPE + 1;
+      miffSetHeaderDefine(  miff, idPoint, L"Point",  4);
+      {
+         miffSetValueDefine(miff, miffValueTypeSTRING,   L"ID",    1, miffCompressFlagNONE, 0);
+         miffSetValueDefine(miff, miffValueTypeR4,       L"E",     1, miffCompressFlagNONE, 0);
+         miffSetValueDefine(miff, miffValueTypeR4,       L"N",     1, miffCompressFlagNONE, 0);
+         miffSetValueDefine(miff, miffValueTypeR4,       L"Z",     1, miffCompressFlagNONE, 0);
+      }
+
+      idBinary = miffValueTypeFIRST_USER_TYPE + 2;
+      miffSetHeaderDefine(  miff, idBinary, L"Blob",   2);
+      {
+         miffSetValueDefine(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE, 0);
+         miffSetValueDefine(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagNONE, 0);
+      }
+
+      idBinaryZ = miffValueTypeFIRST_USER_TYPE + 2;
+      miffSetHeaderDefine(  miff, idBinaryZ, L"Blob",   2);
+      {
+         miffSetValueDefine(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE,           0);
+         miffSetValueDefine(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagCHUNK_COMPRESS, 9999);
+      }
+
+#if 0
+      miffSetHeader(        miff, idBinary, L"BinValue", 1, miffCompressFlagNONE, 0);
+      miffSetValueN4(       miff, 256 * 3);
+      miffSetValueNext(     miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(miff, binary[index]);
+      }
+      // Required because in the define Bytes is an unknown size.
+      miffSetValueEnd(      miff);
+
+      miffSetHeader(        miff, idBinary, L"BinValueArray", 2, miffCompressFlagNONE, 0);
+      miffSetN4(            miff, 256 * 3);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(miff, binary[index]);
+      }
+      // Required because in the define Bytes is an unknown size.
+      miffSetValueNext(     miff);
+      miffSetN4(            miff, 256 * 3);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(miff, n1array[index]);
+      }
+      // Required because in the define Bytes is an unknown size.
+      miffSetValueEnd(      miff);
+
+      miffSetHeader(        miff, idBinary, L"BinValueArray", 2, miffCompressFlagCHUNK_COMPRESS, 9999);
+      miffSetN4(            miff, 256 * 3);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(miff, binary[index]);
+      }
+      // Required because in the define Bytes is an unknown size.
+      miffSetValueNext(     miff);
+      miffSetN4(            miff, 256 * 3);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(miff, n1array[index]);
+      }
+      // Required because in the define Bytes is an unknown size.
+      miffSetValueEnd(      miff);
+#endif
 
       miffSetBlockStart(miff, L"KeyValueBlock");
       {

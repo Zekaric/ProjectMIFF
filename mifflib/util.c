@@ -40,10 +40,21 @@ MiffBool _CompressAndWrite(Miff * const miff, MiffN4 const byteCount, void const
    MiffN4    cbyteCount;
    MiffN1   *cbyteData;
 
+   // Special but valide case.
+   if (byteCount == 0)
+   {
+      returnFalseIf(!_WriteTxtValueN(miff, (MiffN8) 0));
+   
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
+
+      returnTrue;
+   }
+
+   // Compress the buffer.  It may not be the same size as miff->compressChunkByteCount.
    cbyteCount = _MemCompressBound(byteCount);
    cbyteData  = _MemCreateTypeArray(cbyteCount, MiffN1);
    returnFalseIf(!cbyteData);
-      
+         
    returnFalseIf(!_MemCompress(byteCount, byteData, &cbyteCount, cbyteData));
 
    returnFalseIf(!_WriteTxtValueN(miff, (MiffN8) cbyteCount));
@@ -75,15 +86,13 @@ MiffBool _CurrentIndexInc(Miff * const miff)
        miff->currentRecord.type == miffValueTypeKEY_VALUE_BLOCK_STOP  ||
        miff->currentIndex       == miff->currentRecord.arrayCount)
    {
-      // Compressing arrays of basic or user types
-      if (!(miff->currentRecord.type == miffValueTypeBINARY_DATA_1   ||
-            miff->currentRecord.type == miffValueTypeEMBEDDED_FILE_1 ||
-            miff->currentRecord.type == miffValueTypeSTRING)            &&
-          miff->currentRecord.compressFlag == miffCompressFlagCOMPRESS)
+      // Finish the last chunk.
+      if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
       {
-         returnFalseIf(!_CompressAndWrite(miff, miff->compressMemByteCount, miff->compressMemByteData));
+         returnFalseIf(!_CompressAndWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
       }
 
+      // Reset the record.
       miff->currentRecord.type = miffValueTypeNONE;
       returnFalseIf(!_WriteTxtRecordEnder(miff));
    }

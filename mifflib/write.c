@@ -44,18 +44,18 @@ MiffBool _WriteCompressByte(Miff * const miff, MiffN1 const byte)
 {
    miff->compressMemByteData[miff->compressMemByteIndex++] = byte;
 
-   if (miff->compressMemByteIndex == miff->compressChunkByteCount)
+   if (miff->compressMemByteIndex == miff->compressMemByteCount)
    {
-      returnFalseIf(!_CompressAndWrite(miff, miff->compressChunkByteCount, miff->compressMemByteData));
+      returnFalseIf(!_CompressAndWrite(       miff, miff->compressMemByteCount, miff->compressMemByteData));
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
 
       // Reset the buffer.
       miff->compressMemByteIndex = 0;
-      _MemClearTypeArray(miff->compressChunkByteCount, MiffN1, miff->compressMemByteData);
+      _MemClearTypeArray(miff->compressMemByteCount, MiffN1, miff->compressMemByteData);
    }
 
    returnTrue;
 }
-
 
 /******************************************************************************
 func: _WriteTxtC1

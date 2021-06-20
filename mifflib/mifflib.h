@@ -248,7 +248,6 @@ typedef struct
    void                       *memByteData;
 
    // Temporary storage for compressed memory.
-   MiffN4                      compressChunkByteCount;
    MiffN4                      compressMemByteCountActual;
    MiffN4                      compressMemByteCount;
    MiffN4                      compressMemByteIndex;

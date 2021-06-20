@@ -839,7 +839,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) n8array);
       miffSetNN8(           miff, L"N8_Array",     256,     n8array);
-      miffSetHeader(        miff, miffValueTypeI8, L"I8 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 9999);
+      miffSetHeader(        miff, miffValueTypeI8, L"I8 Array Compressed", 256 * 3, miffCompressFlagCHUNK_COMPRESS, 4000);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI8(miff, ((MiffI8 *) n8array)[index]);

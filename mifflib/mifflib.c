@@ -910,7 +910,6 @@ MiffBool miffSetValueDefine(Miff * const miff, MiffValueType const type, MiffC2 
 }
 
 
-
 #if 0
 /******************************************************************************
 func: miffCreateReader

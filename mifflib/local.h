@@ -94,6 +94,7 @@ void      _C1ToC2(                     MiffN4 const c1Count, MiffC1 const * cons
 void      _C1ToC2Key(                  MiffN4 const c1Count, MiffC1 const * const c1, MiffN1 * const c2Count,  MiffC2 *  const c2);
 MiffI8    _C1ToI(                      MiffN4 const c1Count, MiffC1 const * const c1);
 MiffN8    _C1ToN(                      MiffN4 const c1Count, MiffC1 const * const c1);
+MiffC2   *_C2Append(                   MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c);
 MiffC2   *_C2Clone(                    MiffN4 const c2Count, MiffC2 const * const c2);
 MiffBool  _C2ToC1(                     MiffN4 const c2Count, MiffC2 const * const c2, MiffN4 * const c1Count, MiffC1 ** const c1);
 MiffBool  _C2ToC1Key(                  MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * const c1Count, MiffC1 *  const c1);
@@ -123,6 +124,8 @@ void      _MemStop(                    void);
 #define   _MemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MemCreate(          (COUNT) * sizeof(TYPE))
 
 MiffN4    _TypeGetSize(                Miff const * const miff, MiffValueType const type);
+
+MiffBool  _UserTypeUnroll(             Miff       * const miff, MiffC2 const * const name, MiffValueType const type);
 
 MiffBool  _WriteCompressByte(          Miff       * const miff, MiffN1 const byte);
 MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * const value);

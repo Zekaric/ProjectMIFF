@@ -210,6 +210,35 @@ MiffN8 _C1ToN(MiffN4 const c1Count, MiffC1 const * const c1)
 }
 
 /******************************************************************************
+func: _C2Append
+******************************************************************************/
+MiffC2 *_C2Append(MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c)
+{
+   MiffN4    length,
+             offset;
+   MiffC2   *result;
+
+   length = _C2GetCount(a) + _C2GetCount(b) + _C2GetCount(c) + 1;
+
+   result = _MemCreateTypeArray(length, MiffC2);
+   returnNullIf(!result);
+
+   offset = 0;
+   length = _C2GetCount(a);
+   _MemCopyTypeArray(length, MiffC2, &result[offset], a);
+   
+   offset += length;
+   length  = _C2GetCount(b);
+   _MemCopyTypeArray(length, MiffC2, &result[offset], b);
+   
+   offset += length;
+   length  = _C2GetCount(c);
+   _MemCopyTypeArray(length, MiffC2, &result[offset], c);
+
+   return result;
+}
+
+/******************************************************************************
 func: _C2Clone
 ******************************************************************************/
 MiffC2 *_C2Clone(MiffN4 const c2Count, MiffC2 const * const c2)

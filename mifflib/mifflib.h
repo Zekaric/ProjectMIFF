@@ -204,7 +204,7 @@ typedef MiffBool (*MiffSetBuffer)(        void * const dataRepo, MiffN4 const by
 
 typedef struct
 {
-   MiffC2                      nameC2[256];
+   MiffC2                      nameC2[257];
    MiffValueType               type;
    MiffN4                      arrayCount;
    MiffCompressFlag            compressFlag;
@@ -213,8 +213,14 @@ typedef struct
 
 typedef struct
 {
-   MiffN1                      nameC2Count;
-   MiffC2                      nameC2[256];
+   MiffC2                     *nameC2;
+   MiffTypeRecord              type;
+} MiffUnrollRecord;
+
+typedef struct
+{
+   MiffBool                    isSet;
+   MiffC2                      nameC2[257];
    MiffN4                      varCount;
    MiffTypeRecord             *varList;
 } MiffUserType;
@@ -227,12 +233,18 @@ typedef struct
    MiffMethod                  method;
    MiffBool                    isByteSwapping;
 
-   MiffC2                      subFormatNameC2[256];
+   MiffC2                      subFormatNameC2[257];
    MiffN8                      subFormatVersion;
 
    // The list of user types
-   MiffN2                      userTypeCount;
-   MiffUserType                userTypeList[2048];
+   MiffN4                      defineCurrentIndex;
+   MiffN4                      defineIndex;
+   MiffUserType                defineList[4096];
+
+   MiffValueType               defineUnrolledType;
+   MiffN4                      defineUnrolledCount;
+   MiffUnrollRecord           *defineUnrolledArray;
+   MiffN4                      defineUnrolledArrayCount;
 
    // Data repo getters and setters.
    void                       *dataRepo;

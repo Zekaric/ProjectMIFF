@@ -194,7 +194,7 @@ MiffBool _WriteTxtType(Miff const * const miff, MiffValueType const value)
 
    default:
       // user type.
-      return _WriteTxtC2(miff, miff->userTypeList[value - miffValueTypeFIRST_USER_TYPE].nameC2);
+      return _WriteTxtC2(miff, miff->defineList[value - miffValueTypeFIRST_USER_TYPE].nameC2);
    }
 
    returnFalse;

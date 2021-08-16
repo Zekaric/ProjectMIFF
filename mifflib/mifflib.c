@@ -271,8 +271,8 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
 
    // Set the current index of the next value.
    miff->currentIndex                 = 0;
-   miff->defineIndex                = 0;
-   miff->defineCurrentIndex         = type - miffValueTypeFIRST_USER_TYPE;
+   miff->defineIndex                  = 0;
+   miff->defineCurrentIndex           = type - miffValueTypeFIRST_USER_TYPE;
    if (miff->defineCurrentIndex >= 0 &&
        miff->defineUnrolledType != type)
    {

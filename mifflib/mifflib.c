@@ -120,6 +120,8 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    count = min(255, _C2GetCount(subFormatName));
    _MemCopyTypeArray(count, MiffC2, miff->subFormatNameC2, subFormatName);
 
+   returnFalseIf(!_CreateDefineList(miff));
+
    // Write the miff header.
    _WriteTxtC1(         miff, (MiffC1 *) "MIFF");
    _WriteTxtRecordEnder(miff);
@@ -227,8 +229,6 @@ func: miffSetHeader
 MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const * const key, 
    MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
 {
-   MiffN4  index;
-
    returnFalseIf(
       !_isStarted ||
       !miff);
@@ -272,25 +272,14 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
    // Set the current index of the next value.
    miff->currentIndex                 = 0;
    miff->defineIndex                  = 0;
-   miff->defineCurrentIndex           = type - miffValueTypeFIRST_USER_TYPE;
-   if (miff->defineCurrentIndex >= 0 &&
-       miff->defineUnrolledType != type)
+   miff->defineCurrentType            = type;
+   // Unroll the type.
+   if (miff->defineCurrentType != miff->defineUnrolledType)
    {
-      // Different unrolled value present.
-      // For all unrolled type strings.
-      forCount(index, miff->defineUnrolledCount)
-      {
-         // Clean up the string memory.
-         _MemDestroy(miff->defineUnrolledArray[index].nameC2);
-      }
-
-      // Clean out the memory.
-      _MemClearTypeArray(miff->defineUnrolledCount, MiffUnrollRecord, miff->defineUnrolledArray);
-
-      miff->defineUnrolledCount = 0;
-
-      // Unroll the type.
-      _UserTypeUnroll(miff, miff->defineList[miff->defineCurrentIndex].nameC2, miff->defineCurrentIndex);
+      _UserTypeUnroll(
+         miff,
+         miff->defineList[miff->defineCurrentType].nameC2,
+         miff->defineCurrentType);
    }
    
    // Write out the record.
@@ -371,7 +360,7 @@ MiffBool miffSetHeaderDefine(Miff * const miff, MiffValueType const type, MiffC2
    returnFalseIf(!miff->defineList[index].varList);
 
    // Setting the index of the type we are defining.
-   miff->defineCurrentIndex = index;
+   miff->defineCurrentType = index;
 
    returnTrue;
 }
@@ -949,11 +938,11 @@ MiffBool miffSetValueDefine(Miff * const miff, MiffValueType const type, MiffC2 
       returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
    }
 
-   _MemCopyTypeArray(256, MiffC2, miff->defineList[miff->defineCurrentIndex].varList[miff->defineIndex].nameC2, name);
-   miff->defineList[miff->defineCurrentIndex].varList[miff->defineIndex].arrayCount     = count;
-   miff->defineList[miff->defineCurrentIndex].varList[miff->defineIndex].chunkByteCount = chunkByteCount;
-   miff->defineList[miff->defineCurrentIndex].varList[miff->defineIndex].compressFlag   = compressFlag;
-   miff->defineList[miff->defineCurrentIndex].varList[miff->defineIndex].type           = type;
+   _MemCopyTypeArray(256, MiffC2, miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].nameC2, name);
+   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].arrayCount     = count;
+   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].chunkByteCount = chunkByteCount;
+   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].compressFlag   = compressFlag;
+   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].type           = type;
 
    // Check if type already exists.
    if (type >= miffValueTypeFIRST_USER_TYPE)

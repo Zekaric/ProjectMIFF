@@ -34,6 +34,9 @@ prototype:
 global:
 function:
 ******************************************************************************/
+/******************************************************************************
+func: _CompressAndWrite
+******************************************************************************/
 MiffBool _CompressAndWrite(Miff * const miff, MiffN4 const byteCount, void const * const byteData)
 {
    MiffN4    index;
@@ -76,6 +79,56 @@ MiffBool _CompressAndWrite(Miff * const miff, MiffN4 const byteCount, void const
 }
 
 /******************************************************************************
+func: _CreateDefineList
+******************************************************************************/
+MiffBool _CreateDefineList(Miff * const miff)
+{
+   int index;
+
+   forCount(index, miffValueTypeFIRST_USER_TYPE)
+   {
+      miff->defineList[index].isSet                 = miffBoolTRUE;
+      miff->defineList[index].varCount              = 1;
+      miff->defineList[index].varList               = _MemCreateTypeArray(1, MiffTypeRecord);
+      returnFalseIf(!miff->defineList[index].varList);
+      miff->defineList[index].varList[0].arrayCount = 1;
+      _MemCopyTypeArray(6, MiffC2, miff->defineList[index].varList[0].nameC2, L"value");
+      miff->defineList[index].varList[0].type       = (MiffValueType) index;
+   }
+
+   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeKEY_VALUE_BLOCK_STOP ].nameC2, L"}");
+   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeKEY_VALUE_BLOCK_START].nameC2, L"{");
+   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeTYPE                 ].nameC2, L"type");
+   _MemCopyTypeArray(6, MiffC2, miff->defineList[miffValueTypeDEFINE               ].nameC2, L"define");
+   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeSTRING               ].nameC2, L"\"");
+   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeBOOLEAN              ].nameC2, L"b");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI1                   ].nameC2, L"i1");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI2                   ].nameC2, L"i2");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI3                   ].nameC2, L"i3");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI4                   ].nameC2, L"i4");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI8                   ].nameC2, L"i8");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI16                  ].nameC2, L"i16");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI32                  ].nameC2, L"i32");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI64                  ].nameC2, L"i64");
+   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeI128                 ].nameC2, L"i128");
+   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeI256                 ].nameC2, L"i256");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN1                   ].nameC2, L"n1");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN2                   ].nameC2, L"n2");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN3                   ].nameC2, L"n3");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN4                   ].nameC2, L"n4");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN8                   ].nameC2, L"n8");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN16                  ].nameC2, L"n16");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN32                  ].nameC2, L"n32");
+   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN64                  ].nameC2, L"n64");
+   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeN128                 ].nameC2, L"n128");
+   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeN256                 ].nameC2, L"n256");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeR4                   ].nameC2, L"r4");
+   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeR8                   ].nameC2, L"r8");
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _CurrentIndexInc
 ******************************************************************************/
 MiffBool _CurrentIndexInc(Miff * const miff)
@@ -84,7 +137,7 @@ MiffBool _CurrentIndexInc(Miff * const miff)
    {
       miff->defineIndex++;
 
-      if (miff->defineIndex == miff->defineList[miff->defineCurrentIndex].varCount)
+      if (miff->defineIndex == miff->defineList[miff->defineCurrentType].varCount)
       {
          returnFalseIf(!_WriteTxtRecordSeparator(miff));
       }
@@ -147,6 +200,19 @@ MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValue
    MiffN4  index;
    MiffC2 *nameTemp;
    
+   // Different unrolled value present.
+   // For all unrolled type strings.
+   forCount(index, miff->defineUnrolledCount)
+   {
+      // Clean up the string memory.
+      _MemDestroy(miff->defineUnrolledArray[index].nameC2);
+   }
+
+   // Clean out the memory.
+   _MemClearTypeArray(miff->defineUnrolledCount, MiffUnrollRecord, miff->defineUnrolledArray);
+
+   miff->defineUnrolledCount = 0;
+
    forCount(index, miff->defineList[type].varCount)
    {
       // Need to inflate the unrolled list.

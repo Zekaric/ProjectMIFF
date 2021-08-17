@@ -237,8 +237,8 @@ typedef struct
    MiffN8                      subFormatVersion;
 
    // The list of user types
-   MiffI4                      defineCurrentIndex;
-   MiffI4                      defineIndex;
+   MiffValueType               defineCurrentType;
+   MiffN4                      defineIndex;
    MiffUserType                defineList[4096];
 
    MiffValueType               defineUnrolledType;

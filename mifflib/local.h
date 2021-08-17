@@ -103,6 +103,7 @@ MiffN4    _C2LetterToC4Letter(         MiffC2 const * const c2, MiffC4 * const c
 MiffN4    _C4LetterToC1Letter(         MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
 MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
 MiffBool  _CompressAndWrite(           Miff * const miff, MiffN4 const byteCount, void const * const byteData);
+MiffBool  _CreateDefineList(           Miff * const miff);
 MiffBool  _CurrentIndexInc(            Miff       * const miff);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))

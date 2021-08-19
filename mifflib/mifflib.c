@@ -335,12 +335,12 @@ MiffBool miffSetHeaderDefine(Miff * const miff, MiffValueType const type, MiffC2
 {
    int index;
 
-   returnFalseIf(miffSetHeader(              miff, miffValueTypeDEFINE, key, count, miffCompressFlagNONE, 0));
+   returnFalseIf(!miffSetHeader(             miff, miffValueTypeDEFINE, key, count, miffCompressFlagNONE, 0));
 
    returnFalseIf(!_WriteTxtValueN(           miff, type));
    returnFalseIf(!_WriteTxtRecordSeparator(  miff));
 
-   index = type - miffValueTypeFIRST_USER_TYPE;
+   index = type;
 
    // Clean out the old.
    if (miff->defineList[index].isSet)
@@ -350,7 +350,7 @@ MiffBool miffSetHeaderDefine(Miff * const miff, MiffValueType const type, MiffC2
    }
 
    // Copy the name over.
-   _MemCopyTypeArray(_C2GetCount(key), MiffC2, miff->defineList[type - miffValueTypeFIRST_USER_TYPE].nameC2, key); 
+   _MemCopyTypeArray(_C2GetCount(key), MiffC2, miff->defineList[type].nameC2, key); 
 
    // Initialize the type.
    miff->defineList[index].isSet    = miffBoolTRUE;
@@ -947,7 +947,7 @@ MiffBool miffSetValueDefine(Miff * const miff, MiffValueType const type, MiffC2 
    // Check if type already exists.
    if (type >= miffValueTypeFIRST_USER_TYPE)
    {
-      returnFalseIf(!miff->defineList[type - miffValueTypeFIRST_USER_TYPE].isSet);
+      returnFalseIf(!miff->defineList[type].isSet);
    }
 
    returnFalseIf(!_CurrentIndexInc(miff));

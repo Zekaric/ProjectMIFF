@@ -873,7 +873,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          miffSetValueDefine(miff, miffValueTypeR4,       L"Z",     1, miffCompressFlagNONE, 0);
       }
 
-      idPoly = miffValueTypeFIRST_USER_TYPE + 4;
+      idPoly = miffValueTypeFIRST_USER_TYPE + 2;
       miffSetHeaderDefine(  miff, idPoly, L"Poly", 2);
       {
          miffSetValueDefine(miff, miffValueTypeSTRING,   L"ID",    1,                     miffCompressFlagNONE, 0);
@@ -888,13 +888,13 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       }
 
       idBinaryZ = miffValueTypeFIRST_USER_TYPE + 4;
-      miffSetHeaderDefine(  miff, idBinaryZ, L"Blob",   2);
+      miffSetHeaderDefine(  miff, idBinaryZ, L"BlobZ",   2);
       {
          miffSetValueDefine(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE,           0);
          miffSetValueDefine(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagCHUNK_COMPRESS, 9999);
       }
 
-      miffSetHeader(miff, idPoly, L"1Poly", 1, miffCompressFlagNONE, 0);
+      //miffSetHeader(miff, idPoly, L"1Poly", 1, miffCompressFlagNONE, 0);
 
 #if 0
       miffSetHeader(        miff, idBinary, L"BinValue", 1, miffCompressFlagNONE, 0);

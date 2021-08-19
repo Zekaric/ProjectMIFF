@@ -139,15 +139,15 @@ MiffBool _CurrentIndexInc(Miff * const miff)
 
       if (miff->defineIndex == miff->defineList[miff->defineCurrentType].varCount)
       {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
+         returnFalseIf(!_WriteTxtRecordEnder(miff));
+
+         // Reset the record.
+         miff->currentRecord.type = miffValueTypeNONE;
       }
       else
       {
-         returnFalseIf(!_WriteTxtRecordEnder(miff));
+         returnFalseIf(!_WriteTxtRecordSeparator(miff));
       }
-
-      // Reset the record.
-      miff->currentRecord.type = miffValueTypeNONE;
 
       returnTrue;
    }

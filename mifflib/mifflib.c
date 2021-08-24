@@ -224,6 +224,104 @@ MiffBool miffSetBlockStop(Miff * const miff)
 }
 
 /******************************************************************************
+func: miffSetDefineHeader
+******************************************************************************/
+MiffBool miffSetDefineHeader(Miff * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count)
+{
+   int index;
+
+   returnFalseIf(!miffSetHeader(miff, miffValueTypeDEFINE, key, count, miffCompressFlagNONE, 0));
+
+   returnFalseIf(!_WriteTxtValueN(miff, type));
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+
+   index = type;
+
+   // Clean out the old.
+   if (miff->typeList[index].isSet)
+   {
+      _MemDestroy(miff->typeList[index].varList);
+      _MemClearType(MiffType, &(miff->typeList[index]));
+   }
+
+   // Copy the name over.
+   _MemCopyTypeArray(_C2GetCount(key), MiffC2, miff->typeList[type].nameC2, key);
+
+   // Initialize the type.
+   miff->typeList[index].isSet    = miffBoolTRUE;
+   miff->typeVarIndex             = 0;
+   miff->typeList[index].varCount = count;
+   miff->typeList[index].varList  = _MemCreateTypeArray(count, MiffTypeRecord);
+   returnFalseIf(!miff->typeList[index].varList);
+
+   // Setting the index of the type we are defining.
+   miff->typeCurrent.type = index;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetDefineValue
+******************************************************************************/
+MiffBool miffSetDefineValue(Miff * const miff, MiffValueType const type, MiffC2 const * const name,
+   MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !name       ||
+      miff->typeCurrent.type != miffValueTypeDEFINE);
+
+   returnFalseIf(!_WriteTxtValueType(miff, type));
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   returnFalseIf(!_WriteTxtValueC2(miff, name));
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   if (count == miffArrayCountUNKNOWN)
+   {
+      returnFalseIf(!_WriteTxtValueC2(miff, miffArrayCountUNKNOWN_C2));
+   }
+   else
+   {
+      returnFalseIf(!_WriteTxtValueN(miff, count));
+   }
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, compressFlag));
+   if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   {
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
+      returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
+   }
+
+   _MemCopyTypeArray(256, MiffC2, miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].nameC2, name);
+   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].arrayCount     = count;
+   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].chunkByteCount = chunkByteCount;
+   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].compressFlag   = compressFlag;
+   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].type           = type;
+
+   // Check if type already exists.
+   if (type >= miffValueTypeFIRST_USER_TYPE)
+   {
+      returnFalseIf(!miff->typeList[type].isSet);
+   }
+
+   miff->typeVarIndex++;
+
+   if (miff->typeVarIndex == miff->typeList[miff->typeCurrent.type].varCount)
+   {
+      returnFalseIf(!_WriteTxtRecordEnder(miff));
+
+      // Reset the record.
+      miff->typeCurrent.type = miffValueTypeNONE;
+   }
+   else
+   {
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffSetHeader
 ******************************************************************************/
 MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const * const key, 
@@ -233,9 +331,13 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
       !_isStarted ||
       !miff);
 
+   // Write the type for the record.  Common for all cases.
+   returnFalseIf(!_WriteTxtRecordType( miff, type));
+
+   // We are ending a key value block.
    if (type == miffValueTypeKEY_VALUE_BLOCK_STOP)
    {
-      returnFalseIf(!_WriteTxtRecordType( miff, type));
+      // TODO key value block stack pop.
       returnFalseIf(!_WriteTxtRecordEnder(miff));
       returnTrue;
    }
@@ -243,55 +345,56 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
    returnFalseIf(!key);
 
    // Copy the key.
-   _MemClearTypeArray(256, MiffC2, miff->currentRecord.nameC2);
-   _MemCopyTypeArray( 255, MiffC2, miff->currentRecord.nameC2, key);
+   _MemClearTypeArray(256, MiffC2, miff->typeCurrent.nameC2);
+   _MemCopyTypeArray( 255, MiffC2, miff->typeCurrent.nameC2, key);
 
+   // We are starting a new key value block.
    if (type == miffValueTypeKEY_VALUE_BLOCK_START)
    {
-      returnFalseIf(!_WriteTxtRecordType(     miff, type));
+      // TODO key value block stack push.
       returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->currentRecord.nameC2));
+      returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->typeCurrent.nameC2));
 
       if (count != miffArrayCountUNKNOWN)
       {
          returnFalseIf(!_WriteTxtRecordSeparator( miff));
-         returnFalseIf(!_WriteTxtRecordArrayCount(miff, miff->currentRecord.arrayCount));
+         returnFalseIf(!_WriteTxtRecordArrayCount(miff, miff->typeCurrent.arrayCount));
       }
 
       return _WriteTxtRecordEnder(miff);
    }
 
    // Set the type and array.
-   miff->currentRecord.type           = type;
-   miff->currentRecord.arrayCount     = count;
+   miff->typeCurrent.type           = type;
+   miff->typeCurrent.arrayCount     = count;
 
    // Reset the compress flag.
-   miff->currentRecord.compressFlag   = compressFlag;
-   miff->currentRecord.chunkByteCount = chunkByteCount;
+   miff->typeCurrent.compressFlag   = compressFlag;
+   miff->typeCurrent.chunkByteCount = chunkByteCount;
 
    // Set the current index of the next value.
-   miff->currentIndex                 = 0;
-   miff->defineIndex                  = 0;
-   miff->defineCurrentType            = type;
+   miff->typeCurrentIndex           = 0;
+   miff->typeVarIndex               = 0;
+   miff->typeVarArrayIndex          = 0;
+
    // Unroll the type.
-   if (miff->defineCurrentType != miff->defineUnrolledType)
+   if (miff->typeCurrent.type != miff->typeUnrolledType)
    {
       _UserTypeUnroll(
          miff,
-         miff->defineList[miff->defineCurrentType].nameC2,
-         miff->defineCurrentType);
+         miff->typeList[miff->typeCurrent.type].nameC2,
+         miff->typeCurrent.type);
    }
    
    // Write out the record.
-   returnFalseIf(!_WriteTxtRecordType(        miff, type));
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordKeyC2(       miff, miff->currentRecord.nameC2));
+   returnFalseIf(!_WriteTxtRecordKeyC2(       miff, miff->typeCurrent.nameC2));
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
    returnFalseIf(!_WriteTxtRecordArrayCount(  miff, count));
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
    returnFalseIf(!_WriteTxtRecordCompressFlag(miff, compressFlag));
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
       returnFalseIf(!_WriteTxtRecordSeparator(miff));
@@ -311,7 +414,7 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
          miff->compressMemByteData = _MemCreateTypeArray(chunkByteCount, MiffN1);
          if (!miff->compressMemByteData)
          {
-            miff->currentRecord.type = miffValueTypeNONE;
+            miff->typeCurrent.type = miffValueTypeNONE;
             returnFalse;
          }
       }
@@ -324,43 +427,6 @@ MiffBool miffSetHeader(Miff * const miff, MiffValueType const type, MiffC2 const
       miff->compressMemByteCount = chunkByteCount;
       miff->compressMemByteIndex = 0;
    }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffSetHeaderDefine
-******************************************************************************/
-MiffBool miffSetHeaderDefine(Miff * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count)
-{
-   int index;
-
-   returnFalseIf(!miffSetHeader(             miff, miffValueTypeDEFINE, key, count, miffCompressFlagNONE, 0));
-
-   returnFalseIf(!_WriteTxtValueN(           miff, type));
-   returnFalseIf(!_WriteTxtRecordSeparator(  miff));
-
-   index = type;
-
-   // Clean out the old.
-   if (miff->defineList[index].isSet)
-   {
-      _MemDestroy(miff->defineList[index].varList);
-      _MemClearType(MiffUserType, &(miff->defineList[index]));
-   }
-
-   // Copy the name over.
-   _MemCopyTypeArray(_C2GetCount(key), MiffC2, miff->defineList[type].nameC2, key); 
-
-   // Initialize the type.
-   miff->defineList[index].isSet    = miffBoolTRUE;
-   miff->defineIndex                = 0;
-   miff->defineList[index].varCount = count;
-   miff->defineList[index].varList  = _MemCreateTypeArray(count, MiffTypeRecord);
-   returnFalseIf(!miff->defineList[index].varList);
-
-   // Setting the index of the type we are defining.
-   miff->defineCurrentType = index;
 
    returnTrue;
 }
@@ -700,7 +766,7 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffValueTypeBOOLEAN);
+      miff->typeCurrent.type != miffValueTypeBOOLEAN);
 
    c1 = (MiffC1 *) (value ? "T" : "F");
    
@@ -840,6 +906,20 @@ MiffBool miffSetValueN8(Miff * const miff, MiffN8 const value)
 }
 
 /******************************************************************************
+func: miffSetValueNext
+******************************************************************************/
+MiffBool miffSetValueNext(Miff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   returnFalseIf(!_CurrentIndexInc(miff));
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffSetValueR4
 ******************************************************************************/
 MiffBool miffSetValueR4(Miff * const miff, MiffR4 const value)
@@ -880,7 +960,7 @@ MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffValueTypeSTRING);
+      miff->typeCurrent.type != miffValueTypeSTRING);
 
    returnFalseIf(!_WriteTxtValueC2(miff, value));
 
@@ -897,58 +977,9 @@ MiffBool miffSetValueType(Miff * const miff, MiffValueType const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffValueTypeTYPE);
+      miff->typeCurrent.type != miffValueTypeTYPE);
 
    returnFalseIf(!_WriteTxtValueType(miff, value));
-
-   returnFalseIf(!_CurrentIndexInc(miff));
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffSetValueDefine
-******************************************************************************/
-MiffBool miffSetValueDefine(Miff * const miff, MiffValueType const type, MiffC2 const * const name,
-   MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !name       ||
-      miff->currentRecord.type != miffValueTypeDEFINE);
-
-   returnFalseIf(!_WriteTxtValueType(      miff, type));
-   returnFalseIf(!_WriteTxtRecordSeparator(miff));
-   returnFalseIf(!_WriteTxtValueC2(        miff, name));
-   returnFalseIf(!_WriteTxtRecordSeparator(miff));
-   if (count == miffArrayCountUNKNOWN)
-   {
-      returnFalseIf(!_WriteTxtValueC2(     miff, miffArrayCountUNKNOWN_C2));
-   }
-   else
-   {
-      returnFalseIf(!_WriteTxtValueN(      miff, count));
-   }
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, compressFlag));
-   if (compressFlag == miffCompressFlagCHUNK_COMPRESS)
-   {
-      returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-      returnFalseIf(!_WriteTxtRecordChunkSize(miff, chunkByteCount));
-   }
-
-   _MemCopyTypeArray(256, MiffC2, miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].nameC2, name);
-   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].arrayCount     = count;
-   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].chunkByteCount = chunkByteCount;
-   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].compressFlag   = compressFlag;
-   miff->defineList[miff->defineCurrentType].varList[miff->defineIndex].type           = type;
-
-   // Check if type already exists.
-   if (type >= miffValueTypeFIRST_USER_TYPE)
-   {
-      returnFalseIf(!miff->defineList[type].isSet);
-   }
 
    returnFalseIf(!_CurrentIndexInc(miff));
 

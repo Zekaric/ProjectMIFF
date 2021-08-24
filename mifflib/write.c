@@ -194,7 +194,7 @@ MiffBool _WriteTxtType(Miff const * const miff, MiffValueType const value)
 
    default:
       // user type.
-      return _WriteTxtC2(miff, miff->defineList[value].nameC2);
+      return _WriteTxtC2(miff, miff->typeList[value].nameC2);
    }
 
    returnFalse;
@@ -392,14 +392,14 @@ func: _WriteValue1
 ******************************************************************************/
 MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
 {
-   returnFalseIf(miff->currentRecord.type != type);
+   returnFalseIf(miff->typeCurrent.type != type);
 
-   if (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
       // Write out the value.
       returnFalseIf(!_WriteTxtValue1(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   else if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Populate the internal buffer before compression.
       returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
@@ -416,14 +416,14 @@ func: _WriteValue2
 ******************************************************************************/
 MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
 {
-   returnFalseIf(miff->currentRecord.type != type);
+   returnFalseIf(miff->typeCurrent.type != type);
 
-   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
       // Write out the value
       returnFalseIf(!_WriteTxtValue2(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   else if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap2(miff, &value);
@@ -443,14 +443,14 @@ func: _WriteValue4
 ******************************************************************************/
 MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
 {
-   returnFalseIf(miff->currentRecord.type != type);
+   returnFalseIf(miff->typeCurrent.type != type);
 
-   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
       // Write out the value
       returnFalseIf(!_WriteTxtValue4(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   else if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap4(miff, &value);
@@ -472,14 +472,14 @@ func: _WriteValue8
 ******************************************************************************/
 MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
 {
-   returnFalseIf(miff->currentRecord.type != type);
+   returnFalseIf(miff->typeCurrent.type != type);
 
-   if      (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+   if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
       // Write out the value
       returnFalseIf(!_WriteTxtValue8(miff, type, value));
    }
-   else if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   else if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
    {
       // Ensure proper byte order.
       _ByteSwap8(miff, &value);

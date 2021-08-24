@@ -223,7 +223,7 @@ typedef struct
    MiffC2                      nameC2[257];
    MiffN4                      varCount;
    MiffTypeRecord             *varList;
-} MiffUserType;
+} MiffType;
 
 typedef struct
 {
@@ -236,24 +236,23 @@ typedef struct
    MiffC2                      subFormatNameC2[257];
    MiffN8                      subFormatVersion;
 
-   // The list of user types
-   MiffValueType               defineCurrentType;
-   MiffN4                      defineIndex;
-   MiffUserType                defineList[4096];
+   // The list of types, all types even the predefined base types.
+   MiffType                    typeList[4096];
 
-   MiffValueType               defineUnrolledType;
-   MiffN4                      defineUnrolledCount;
-   MiffUnrollRecord           *defineUnrolledArray;
-   MiffN4                      defineUnrolledArrayCount;
+   MiffTypeRecord              typeCurrent;
+   MiffN8                      typeCurrentIndex;
+   MiffN4                      typeVarIndex;
+   MiffN8                      typeVarArrayIndex;
+
+   MiffValueType               typeUnrolledType;
+   MiffN4                      typeUnrolledCount;
+   MiffUnrollRecord           *typeUnrolledArray;
+   MiffN4                      typeUnrolledArrayCount;
 
    // Data repo getters and setters.
    void                       *dataRepo;
    MiffGetBuffer               getBuffer;
    MiffSetBuffer               setBuffer;
-
-   // Current record key value.
-   MiffTypeRecord              currentRecord;
-   MiffN4                      currentIndex;
 
    // Temporary storage for uncompressed memory.
    MiffN4                      memByteCount;
@@ -301,8 +300,9 @@ void            miffDestroyContent(                Miff       * const miff);
 
 MiffBool        miffSetBlockStart(           Miff       * const miff, MiffC2 const * const key);
 MiffBool        miffSetBlockStop(            Miff       * const miff);
+MiffBool        miffSetDefineHeader(         Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count);
+MiffBool        miffSetDefineValue(          Miff       * const miff, MiffValueType         const type, MiffC2 const * const name, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
 MiffBool        miffSetHeader(               Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
-MiffBool        miffSetHeaderDefine(         Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count);
 MiffBool        miffSet1Boolean(             Miff       * const miff, MiffC2 const * const key, MiffBool              const value);
 MiffBool        miffSet1I1(                  Miff       * const miff, MiffC2 const * const key, MiffI1                const value);
 MiffBool        miffSet1I2(                  Miff       * const miff, MiffC2 const * const key, MiffI2                const value);
@@ -330,7 +330,6 @@ MiffBool        miffSetNR8(                  Miff       * const miff, MiffC2 con
 MiffBool        miffSetNType(                Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffValueType         const * const value);
 MiffBool        miffSetNStringC2(            Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffC2        const * const * const value);
 MiffBool        miffSetValueBoolean(         Miff       * const miff, MiffBool              const value);
-MiffBool        miffSetValueDefine(          Miff       * const miff, MiffValueType         const type, MiffC2 const * const name, MiffN4 const count, MiffCompressFlag const compressFlag, MiffN4 const chunkByteCount);
 MiffBool        miffSetValueI1(              Miff       * const miff, MiffI1                const value);
 MiffBool        miffSetValueI2(              Miff       * const miff, MiffI2                const value);
 MiffBool        miffSetValueI4(              Miff       * const miff, MiffI4                const value);
@@ -339,6 +338,7 @@ MiffBool        miffSetValueN1(              Miff       * const miff, MiffN1    
 MiffBool        miffSetValueN2(              Miff       * const miff, MiffN2                const value);
 MiffBool        miffSetValueN4(              Miff       * const miff, MiffN4                const value);
 MiffBool        miffSetValueN8(              Miff       * const miff, MiffN8                const value);
+MiffBool        miffSetValueNext(            Miff       * const miff);
 MiffBool        miffSetValueR4(              Miff       * const miff, MiffR4                const value);
 MiffBool        miffSetValueR8(              Miff       * const miff, MiffR8                const value);
 MiffBool        miffSetValueStringC2(        Miff       * const miff, MiffC2        const * const value);

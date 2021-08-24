@@ -87,43 +87,43 @@ MiffBool _CreateDefineList(Miff * const miff)
 
    forCount(index, miffValueTypeFIRST_USER_TYPE)
    {
-      miff->defineList[index].isSet                 = miffBoolTRUE;
-      miff->defineList[index].varCount              = 1;
-      miff->defineList[index].varList               = _MemCreateTypeArray(1, MiffTypeRecord);
-      returnFalseIf(!miff->defineList[index].varList);
-      miff->defineList[index].varList[0].arrayCount = 1;
-      _MemCopyTypeArray(6, MiffC2, miff->defineList[index].varList[0].nameC2, L"value");
-      miff->defineList[index].varList[0].type       = (MiffValueType) index;
+      miff->typeList[index].isSet                 = miffBoolTRUE;
+      miff->typeList[index].varCount              = 1;
+      miff->typeList[index].varList               = _MemCreateTypeArray(1, MiffTypeRecord);
+      returnFalseIf(!miff->typeList[index].varList);
+      miff->typeList[index].varList[0].arrayCount = 1;
+      _MemCopyTypeArray(6, MiffC2, miff->typeList[index].varList[0].nameC2, L"value");
+      miff->typeList[index].varList[0].type       = (MiffValueType) index;
    }
 
-   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeKEY_VALUE_BLOCK_STOP ].nameC2, L"}");
-   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeKEY_VALUE_BLOCK_START].nameC2, L"{");
-   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeTYPE                 ].nameC2, L"type");
-   _MemCopyTypeArray(6, MiffC2, miff->defineList[miffValueTypeDEFINE               ].nameC2, L"define");
-   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeSTRING               ].nameC2, L"\"");
-   _MemCopyTypeArray(1, MiffC2, miff->defineList[miffValueTypeBOOLEAN              ].nameC2, L"b");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI1                   ].nameC2, L"i1");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI2                   ].nameC2, L"i2");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI3                   ].nameC2, L"i3");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI4                   ].nameC2, L"i4");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeI8                   ].nameC2, L"i8");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI16                  ].nameC2, L"i16");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI32                  ].nameC2, L"i32");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeI64                  ].nameC2, L"i64");
-   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeI128                 ].nameC2, L"i128");
-   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeI256                 ].nameC2, L"i256");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN1                   ].nameC2, L"n1");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN2                   ].nameC2, L"n2");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN3                   ].nameC2, L"n3");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN4                   ].nameC2, L"n4");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeN8                   ].nameC2, L"n8");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN16                  ].nameC2, L"n16");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN32                  ].nameC2, L"n32");
-   _MemCopyTypeArray(3, MiffC2, miff->defineList[miffValueTypeN64                  ].nameC2, L"n64");
-   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeN128                 ].nameC2, L"n128");
-   _MemCopyTypeArray(4, MiffC2, miff->defineList[miffValueTypeN256                 ].nameC2, L"n256");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeR4                   ].nameC2, L"r4");
-   _MemCopyTypeArray(2, MiffC2, miff->defineList[miffValueTypeR8                   ].nameC2, L"r8");
+   _MemCopyTypeArray(1, MiffC2, miff->typeList[miffValueTypeKEY_VALUE_BLOCK_STOP ].nameC2, L"}");
+   _MemCopyTypeArray(1, MiffC2, miff->typeList[miffValueTypeKEY_VALUE_BLOCK_START].nameC2, L"{");
+   _MemCopyTypeArray(4, MiffC2, miff->typeList[miffValueTypeTYPE                 ].nameC2, L"type");
+   _MemCopyTypeArray(6, MiffC2, miff->typeList[miffValueTypeDEFINE               ].nameC2, L"define");
+   _MemCopyTypeArray(1, MiffC2, miff->typeList[miffValueTypeSTRING               ].nameC2, L"\"");
+   _MemCopyTypeArray(1, MiffC2, miff->typeList[miffValueTypeBOOLEAN              ].nameC2, L"b");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeI1                   ].nameC2, L"i1");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeI2                   ].nameC2, L"i2");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeI3                   ].nameC2, L"i3");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeI4                   ].nameC2, L"i4");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeI8                   ].nameC2, L"i8");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeI16                  ].nameC2, L"i16");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeI32                  ].nameC2, L"i32");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeI64                  ].nameC2, L"i64");
+   _MemCopyTypeArray(4, MiffC2, miff->typeList[miffValueTypeI128                 ].nameC2, L"i128");
+   _MemCopyTypeArray(4, MiffC2, miff->typeList[miffValueTypeI256                 ].nameC2, L"i256");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeN1                   ].nameC2, L"n1");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeN2                   ].nameC2, L"n2");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeN3                   ].nameC2, L"n3");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeN4                   ].nameC2, L"n4");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeN8                   ].nameC2, L"n8");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeN16                  ].nameC2, L"n16");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeN32                  ].nameC2, L"n32");
+   _MemCopyTypeArray(3, MiffC2, miff->typeList[miffValueTypeN64                  ].nameC2, L"n64");
+   _MemCopyTypeArray(4, MiffC2, miff->typeList[miffValueTypeN128                 ].nameC2, L"n128");
+   _MemCopyTypeArray(4, MiffC2, miff->typeList[miffValueTypeN256                 ].nameC2, L"n256");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeR4                   ].nameC2, L"r4");
+   _MemCopyTypeArray(2, MiffC2, miff->typeList[miffValueTypeR8                   ].nameC2, L"r8");
 
    returnTrue;
 }
@@ -133,18 +133,45 @@ func: _CurrentIndexInc
 ******************************************************************************/
 MiffBool _CurrentIndexInc(Miff * const miff)
 {
-   if (miff->currentRecord.type == miffValueTypeDEFINE)
+   // Special case.
+   if (miff->typeCurrent.type == miffValueTypeKEY_VALUE_BLOCK_START ||
+       miff->typeCurrent.type == miffValueTypeKEY_VALUE_BLOCK_STOP)
    {
-      miff->defineIndex++;
+      // Reset the record.
+      miff->typeCurrent.type = miffValueTypeNONE;
+      returnFalseIf(!_WriteTxtRecordEnder(miff));
+      returnTrue;
+   }
 
-      if (miff->defineIndex == miff->defineList[miff->defineCurrentType].varCount)
+   // Move to the next index in the var array.
+   miff->typeVarArrayIndex++;
+
+   // Are we still writing out elements in the array?
+   if (miff->typeVarArrayIndex < miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount)
+   {
+      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE &&
+          miff->typeUnrolledArray[miff->typeVarIndex].type.compressFlag == miffCompressFlagNONE)
       {
-         returnFalseIf(!_WriteTxtRecordEnder(miff));
-
-         // Reset the record.
-         miff->currentRecord.type = miffValueTypeNONE;
+         returnFalseIf(!_WriteTxtRecordSeparator(miff));
       }
-      else
+
+      // If we don't know the size of the array then reset the index.
+      if (miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount == miffArrayCountUNKNOWN)
+      {
+         miff->typeVarArrayIndex = 0;
+      }
+
+      returnTrue;
+   }
+
+   // Restart the type var array index;
+   miff->typeVarArrayIndex = 0;
+
+   // Move to the next type in the unroll.
+   miff->typeVarIndex++;
+   if (miff->typeVarIndex < miff->typeUnrolledArrayCount)
+   {
+      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
       {
          returnFalseIf(!_WriteTxtRecordSeparator(miff));
       }
@@ -152,29 +179,38 @@ MiffBool _CurrentIndexInc(Miff * const miff)
       returnTrue;
    }
 
-   miff->currentIndex++;
+   // Restart the type var index.
+   miff->typeVarIndex = 0;
 
-   if (miff->currentRecord.type == miffValueTypeKEY_VALUE_BLOCK_START ||
-       miff->currentRecord.type == miffValueTypeKEY_VALUE_BLOCK_STOP  ||
-       miff->currentIndex       == miff->currentRecord.arrayCount)
-   {
-      // Finish the last chunk.
-      if (miff->currentRecord.compressFlag == miffCompressFlagCHUNK_COMPRESS)
-      {
-         returnFalseIf(!_CompressAndWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
-      }
+   // Move to the next array item in the type
+   miff->typeCurrentIndex++;
 
-      // Reset the record.
-      miff->currentRecord.type = miffValueTypeNONE;
-      returnFalseIf(!_WriteTxtRecordEnder(miff));
-   }
-   else
+   // Are we still writing out elements?
+   if (miff->typeCurrentIndex < miff->typeCurrent.arrayCount)
    {
-      if (miff->currentRecord.compressFlag == miffCompressFlagNONE)
+      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
       {
          returnFalseIf(!_WriteTxtRecordSeparator(miff));
       }
+
+      // if we don't know the size of the array then reset the index.
+      if (miff->typeCurrent.arrayCount == miffArrayCountUNKNOWN)
+      {
+         miff->typeCurrentIndex = 0;
+      }
+
+      returnTrue;
    }
+   
+   // Finish the last chunk.
+   if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
+   {
+      returnFalseIf(!_CompressAndWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
+   }
+
+   // Reset the record.
+   miff->typeCurrent.type = miffValueTypeNONE;
+   returnFalseIf(!_WriteTxtRecordEnder(miff));
 
    returnTrue;
 }
@@ -202,68 +238,68 @@ MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValue
    
    // Different unrolled value present.
    // For all unrolled type strings.
-   forCount(index, miff->defineUnrolledCount)
+   forCount(index, miff->typeUnrolledCount)
    {
       // Clean up the string memory.
-      _MemDestroy(miff->defineUnrolledArray[index].nameC2);
+      _MemDestroy(miff->typeUnrolledArray[index].nameC2);
    }
 
    // Clean out the memory.
-   _MemClearTypeArray(miff->defineUnrolledCount, MiffUnrollRecord, miff->defineUnrolledArray);
+   _MemClearTypeArray(miff->typeUnrolledCount, MiffUnrollRecord, miff->typeUnrolledArray);
 
-   miff->defineUnrolledCount = 0;
+   miff->typeUnrolledCount = 0;
 
-   forCount(index, miff->defineList[type].varCount)
+   forCount(index, miff->typeList[type].varCount)
    {
       // Need to inflate the unrolled list.
-      if (miff->defineIndex == miff->defineUnrolledArrayCount)
+      if (miff->typeVarIndex == miff->typeUnrolledArrayCount)
       {
          MiffUnrollRecord *rollTemp;
 
          // Create new buffers.
-         rollTemp = _MemCreateTypeArray(miff->defineUnrolledArrayCount + 80, MiffUnrollRecord);
+         rollTemp = _MemCreateTypeArray(miff->typeUnrolledArrayCount + 80, MiffUnrollRecord);
          returnFalseIf(!rollTemp);
 
          // Copy over the old buffer.
-         _MemCopyTypeArray(miff->defineUnrolledArrayCount, MiffUnrollRecord, rollTemp, miff->defineUnrolledArray);
+         _MemCopyTypeArray(miff->typeUnrolledArrayCount, MiffUnrollRecord, rollTemp, miff->typeUnrolledArray);
 
          // Destroy the old buffers.
-         _MemDestroy(miff->defineUnrolledArray);
+         _MemDestroy(miff->typeUnrolledArray);
 
          // Use the new buffers.
-         miff->defineUnrolledArray = rollTemp;
+         miff->typeUnrolledArray = rollTemp;
 
          // Set the new buffer size.
-         miff->defineUnrolledArrayCount += 80;
+         miff->typeUnrolledArrayCount += 80;
       }
 
       // Simple type.
-      if (miff->defineList[type].varList[index].type < miffValueTypeFIRST_USER_TYPE)
+      if (miff->typeList[type].varList[index].type < miffValueTypeFIRST_USER_TYPE)
       {
-         miff->defineUnrolledArray[miff->defineIndex].nameC2 = _C2Append(name, L".", miff->defineList[type].varList[index].nameC2);
-         returnFalseIf(miff->defineUnrolledArray[miff->defineIndex].nameC2);
+         miff->typeUnrolledArray[miff->typeVarIndex].nameC2 = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
+         returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].nameC2);
 
-         miff->defineUnrolledArray[miff->defineIndex].type.arrayCount      = miff->defineList[type].varList[index].arrayCount;
-         miff->defineUnrolledArray[miff->defineIndex].type.chunkByteCount  = miff->defineList[type].varList[index].chunkByteCount;
-         miff->defineUnrolledArray[miff->defineIndex].type.compressFlag    = miff->defineList[type].varList[index].compressFlag;
-         miff->defineUnrolledArray[miff->defineIndex].type.type            = miff->defineList[type].varList[index].type;
-         miff->defineIndex++;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount      = miff->typeList[type].varList[index].arrayCount;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.chunkByteCount  = miff->typeList[type].varList[index].chunkByteCount;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.compressFlag    = miff->typeList[type].varList[index].compressFlag;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.type            = miff->typeList[type].varList[index].type;
+         miff->typeVarIndex++;
       }
       // User type.
       else 
       {
-         nameTemp = _C2Append(name, L".", miff->defineList[type].varList[index].nameC2);
+         nameTemp = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
          returnFalseIf(!nameTemp);
 
          // Recurse into the type to fill in the fields.
-         returnFalseIf(_UserTypeUnroll(miff, nameTemp, miff->defineList[type].varList[index].type));
+         returnFalseIf(_UserTypeUnroll(miff, nameTemp, miff->typeList[type].varList[index].type));
 
          _MemDestroy(nameTemp);
       }
    }
 
    // Set the unrolled count.
-   miff->defineUnrolledCount = miff->defineIndex;
+   miff->typeUnrolledCount = miff->typeVarIndex;
 
    returnTrue;
 }

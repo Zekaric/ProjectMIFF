@@ -753,13 +753,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       }
 
       // Create a miff file.
-      miff = miffCreateWriter(
-         miffBoolTRUE,
-         _SetBuffer,
-         mode,
-         L"MiffTestFile",
-         1,
-         (void *) file);
+      miff = miffCreateWriter(miffBoolTRUE, _SetBuffer, mode, L"MiffTestFile", 1, (void *) file);
       if (!miff)
       {
          break;
@@ -859,44 +853,43 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffSetNBoolean(      miff, L"Bool_Array",   100,  bools);
 
       idMatrix = miffValueTypeFIRST_USER_TYPE + 0;
-      miffSetHeaderDefine(  miff, idMatrix, L"Matrix", 1);
+      miffSetDefineHeader(  miff, idMatrix, L"Matrix", 1);
       {
-         miffSetValueDefine(miff, miffValueTypeR4,       L"Cell",  16, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeR4,       L"Cell",  16, miffCompressFlagNONE, 0);
       }
 
       idPoint  = miffValueTypeFIRST_USER_TYPE + 1;
-      miffSetHeaderDefine(  miff, idPoint, L"Point",  4);
+      miffSetDefineHeader(  miff, idPoint, L"Point",  4);
       {
-         miffSetValueDefine(miff, miffValueTypeSTRING,   L"ID",    1, miffCompressFlagNONE, 0);
-         miffSetValueDefine(miff, miffValueTypeR4,       L"E",     1, miffCompressFlagNONE, 0);
-         miffSetValueDefine(miff, miffValueTypeR4,       L"N",     1, miffCompressFlagNONE, 0);
-         miffSetValueDefine(miff, miffValueTypeR4,       L"Z",     1, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeSTRING,   L"ID",    1, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeR4,       L"E",     1, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeR4,       L"N",     1, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeR4,       L"Z",     1, miffCompressFlagNONE, 0);
       }
 
       idPoly = miffValueTypeFIRST_USER_TYPE + 2;
-      miffSetHeaderDefine(  miff, idPoly, L"Poly", 2);
+      miffSetDefineHeader(  miff, idPoly, L"Poly", 2);
       {
-         miffSetValueDefine(miff, miffValueTypeSTRING,   L"ID",    1,                     miffCompressFlagNONE, 0);
-         miffSetValueDefine(miff, idPoint,               L"PList", miffArrayCountUNKNOWN, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeSTRING,   L"ID",    1,                     miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, idPoint,               L"PList", miffArrayCountUNKNOWN, miffCompressFlagNONE, 0);
       }
 
       idBinary = miffValueTypeFIRST_USER_TYPE + 3;
-      miffSetHeaderDefine(  miff, idBinary, L"Blob",   2);
+      miffSetDefineHeader(  miff, idBinary, L"Blob",   2);
       {
-         miffSetValueDefine(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE, 0);
-         miffSetValueDefine(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE, 0);
+         miffSetDefineValue(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagNONE, 0);
       }
 
       idBinaryZ = miffValueTypeFIRST_USER_TYPE + 4;
-      miffSetHeaderDefine(  miff, idBinaryZ, L"BlobZ",   2);
+      miffSetDefineHeader(  miff, idBinaryZ, L"BlobZ",   2);
       {
-         miffSetValueDefine(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE,           0);
-         miffSetValueDefine(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagCHUNK_COMPRESS, 9999);
+         miffSetDefineValue(miff, miffValueTypeN4,       L"Count", 1,                     miffCompressFlagNONE,           0);
+         miffSetDefineValue(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffCompressFlagCHUNK_COMPRESS, 9999);
       }
 
       //miffSetHeader(miff, idPoly, L"1Poly", 1, miffCompressFlagNONE, 0);
 
-#if 0
       miffSetHeader(        miff, idBinary, L"BinValue", 1, miffCompressFlagNONE, 0);
       miffSetValueN4(       miff, 256 * 3);
       miffSetValueNext(     miff);
@@ -907,6 +900,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       // Required because in the define Bytes is an unknown size.
       miffSetValueEnd(      miff);
 
+#if 0
       miffSetHeader(        miff, idBinary, L"BinValueArray", 2, miffCompressFlagNONE, 0);
       miffSetN4(            miff, 256 * 3);
       for (index = 0; index < 256 * 3; index++)

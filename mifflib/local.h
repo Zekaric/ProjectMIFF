@@ -54,6 +54,7 @@ constant:
 
 #define breakIf(EXP)                               if (EXP) { break;    }
 #define continueIf(EXP)                            if (EXP) { continue; }
+#define gotoIf(EXP, LABEL)                         if (EXP) { goto LABEL; }
 
 #define min(A, B)                                  (((A) < (B)) ? (A) : (B))
 #define max(A, B)                                  (((A) < (B)) ? (B) : (A))
@@ -104,7 +105,6 @@ MiffN4    _C4LetterToC1Letter(         MiffC4 const c4Letter, MiffC1 * const a, 
 MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
 MiffBool  _CompressAndWrite(           Miff * const miff, MiffN4 const byteCount, void const * const byteData);
 MiffBool  _CreateDefineList(           Miff * const miff);
-MiffBool  _CurrentIndexInc(            Miff       * const miff);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
 #define   _C2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))

@@ -129,93 +129,6 @@ MiffBool _CreateDefineList(Miff * const miff)
 }
 
 /******************************************************************************
-func: _CurrentIndexInc
-******************************************************************************/
-MiffBool _CurrentIndexInc(Miff * const miff)
-{
-   // Special case.
-   if (miff->typeCurrent.type == miffValueTypeKEY_VALUE_BLOCK_START ||
-       miff->typeCurrent.type == miffValueTypeKEY_VALUE_BLOCK_STOP)
-   {
-      // Reset the record.
-      miff->typeCurrent.type = miffValueTypeNONE;
-      returnFalseIf(!_WriteTxtRecordEnder(miff));
-      returnTrue;
-   }
-
-   // Move to the next index in the var array.
-   miff->typeVarArrayIndex++;
-
-   // Are we still writing out elements in the array?
-   if (miff->typeVarArrayIndex < miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount)
-   {
-      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE &&
-          miff->typeUnrolledArray[miff->typeVarIndex].type.compressFlag == miffCompressFlagNONE)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
-
-      // If we don't know the size of the array then reset the index.
-      if (miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount == miffArrayCountUNKNOWN)
-      {
-         miff->typeVarArrayIndex = 0;
-      }
-
-      returnTrue;
-   }
-
-   // Restart the type var array index;
-   miff->typeVarArrayIndex = 0;
-
-   // Move to the next type in the unroll.
-   miff->typeVarIndex++;
-   if (miff->typeVarIndex < miff->typeUnrolledArrayCount)
-   {
-      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
-
-      returnTrue;
-   }
-
-   // Restart the type var index.
-   miff->typeVarIndex = 0;
-
-   // Move to the next array item in the type
-   miff->typeCurrentIndex++;
-
-   // Are we still writing out elements?
-   if (miff->typeCurrentIndex < miff->typeCurrent.arrayCount)
-   {
-      if (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
-
-      // if we don't know the size of the array then reset the index.
-      if (miff->typeCurrent.arrayCount == miffArrayCountUNKNOWN)
-      {
-         miff->typeCurrentIndex = 0;
-      }
-
-      returnTrue;
-   }
-   
-   // Finish the last chunk.
-   if (miff->typeCurrent.compressFlag == miffCompressFlagCHUNK_COMPRESS)
-   {
-      returnFalseIf(!_CompressAndWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
-   }
-
-   // Reset the record.
-   miff->typeCurrent.type = miffValueTypeNONE;
-   returnFalseIf(!_WriteTxtRecordEnder(miff));
-
-   returnTrue;
-}
-
-/******************************************************************************
 func: _MemIsEqual
 
 Compare two binary buffers for equality.
@@ -277,7 +190,7 @@ MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValue
       if (miff->typeList[type].varList[index].type < miffValueTypeFIRST_USER_TYPE)
       {
          miff->typeUnrolledArray[miff->typeVarIndex].nameC2 = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
-         returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].nameC2);
+         returnFalseIf(!miff->typeUnrolledArray[miff->typeVarIndex].nameC2);
 
          miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount      = miff->typeList[type].varList[index].arrayCount;
          miff->typeUnrolledArray[miff->typeVarIndex].type.chunkByteCount  = miff->typeList[type].varList[index].chunkByteCount;
@@ -300,6 +213,7 @@ MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValue
 
    // Set the unrolled count.
    miff->typeUnrolledCount = miff->typeVarIndex;
+   miff->typeVarIndex      = 0;
 
    returnTrue;
 }

@@ -392,7 +392,7 @@ func: _WriteValue1
 ******************************************************************************/
 MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
 {
-   returnFalseIf(miff->typeCurrent.type != type);
+   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
 
    if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
@@ -405,9 +405,6 @@ MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
       returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
    }
 
-   // Write out the separator, ender, compressed data.
-   returnFalseIf(!_CurrentIndexInc(miff));
-
    returnTrue;
 }
 
@@ -416,7 +413,7 @@ func: _WriteValue2
 ******************************************************************************/
 MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
 {
-   returnFalseIf(miff->typeCurrent.type != type);
+   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
 
    if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
@@ -433,8 +430,6 @@ MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
       _WriteCompressByte(miff, value.byte[1]);
    }
 
-   returnFalseIf(!_CurrentIndexInc(miff));
-
    returnTrue;
 }
 
@@ -443,7 +438,7 @@ func: _WriteValue4
 ******************************************************************************/
 MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
 {
-   returnFalseIf(miff->typeCurrent.type != type);
+   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
 
    if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
@@ -462,8 +457,6 @@ MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
       _WriteCompressByte(miff, value.byte[3]);
    }
 
-   returnFalseIf(!_CurrentIndexInc(miff));
-
    returnTrue;
 }
 
@@ -472,7 +465,7 @@ func: _WriteValue8
 ******************************************************************************/
 MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
 {
-   returnFalseIf(miff->typeCurrent.type != type);
+   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
 
    if      (miff->typeCurrent.compressFlag == miffCompressFlagNONE)
    {
@@ -494,8 +487,6 @@ MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
       _WriteCompressByte(miff, value.byte[6]);
       _WriteCompressByte(miff, value.byte[7]);
    }
-
-   returnFalseIf(!_CurrentIndexInc(miff));
 
    returnTrue;
 }

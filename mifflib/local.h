@@ -103,7 +103,9 @@ MiffN4    _C1LetterToC4Letter(         MiffC1 const * const c1, MiffC4 * const c
 MiffN4    _C2LetterToC4Letter(         MiffC2 const * const c2, MiffC4 * const c4);
 MiffN4    _C4LetterToC1Letter(         MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
 MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
-MiffBool  _CompressAndWrite(           Miff * const miff, MiffN4 const byteCount, void const * const byteData);
+MiffBool  _CompressStart(              Miff * const miff, MiffN4 const compressedChunkByteCount);
+void      _CompressStop(               Miff * const miff);
+MiffBool  _CompressWrite(              Miff * const miff, MiffN4 const byteCount, void const * const byteData);
 MiffBool  _CreateDefineList(           Miff * const miff);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
@@ -133,7 +135,7 @@ MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * c
 MiffBool  _WriteTxtC2(                 Miff const * const miff, MiffC2 const * const value);
 MiffBool  _WriteTxtRecordArrayCount(   Miff const * const miff, MiffN4 const count);
 MiffBool  _WriteTxtRecordChunkSize(    Miff const * const miff, MiffN4 const chunkSize);
-MiffBool  _WriteTxtRecordCompressFlag( Miff const * const miff, MiffCompressFlag const compressFlag);
+MiffBool  _WriteTxtRecordCompressFlag( Miff const * const miff, MiffBool const isCompressed);
 MiffBool  _WriteTxtRecordEnder(        Miff const * const miff);
 MiffBool  _WriteTxtRecordKeyC2(        Miff const * const miff, MiffC2 const * const key);
 MiffBool  _WriteTxtRecordSeparator(    Miff const * const miff);

@@ -35,9 +35,53 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _CompressAndWrite
+func: _CompressStart
 ******************************************************************************/
-MiffBool _CompressAndWrite(Miff * const miff, MiffN4 const byteCount, void const * const byteData)
+MiffBool _CompressStart(Miff * const miff, MiffN4 const compressedChunkByteCount)
+{
+   miff->isCompressed             = miffBoolTRUE;
+   miff->compressedChunkByteCount = compressedChunkByteCount;
+
+   // We need a larger buffer than what we currently have.
+   if (miff->compressMemByteCountActual < miff->compressedChunkByteCount)
+   {
+      miff->compressMemByteCountActual = miff->compressedChunkByteCount;
+
+      _MemDestroy(miff->compressMemByteData);
+
+      // Allocate the buffer.
+      miff->compressMemByteData = _MemCreateTypeArray(miff->compressedChunkByteCount, MiffN1);
+      if (!miff->compressMemByteData)
+      {
+         miff->typeCurrent.type = miffValueTypeNONE;
+         returnFalse;
+      }
+   }
+   // Clear out the buffer just for good measure.
+   else
+   {
+      _MemClearTypeArray(miff->compressMemByteCountActual, MiffN1, miff->compressMemByteData);
+   }
+
+   // Set the byte count of the internal memory.
+   miff->compressMemByteCount = miff->compressedChunkByteCount;
+   miff->compressMemByteIndex = 0;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _CompressStop
+******************************************************************************/
+void _CompressStop(Miff * const miff)
+{
+   miff->isCompressed = miffBoolFALSE;
+}
+
+/******************************************************************************
+func: _CompressWrite
+******************************************************************************/
+MiffBool _CompressWrite(Miff * const miff, MiffN4 const byteCount, void const * const byteData)
 {
    MiffN4    index;
    MiffN4    cbyteCount;
@@ -192,10 +236,10 @@ MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValue
          miff->typeUnrolledArray[miff->typeVarIndex].nameC2 = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
          returnFalseIf(!miff->typeUnrolledArray[miff->typeVarIndex].nameC2);
 
-         miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount      = miff->typeList[type].varList[index].arrayCount;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.chunkByteCount  = miff->typeList[type].varList[index].chunkByteCount;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.compressFlag    = miff->typeList[type].varList[index].compressFlag;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.type            = miff->typeList[type].varList[index].type;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount                = miff->typeList[type].varList[index].arrayCount;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.isCompressed              = miff->typeList[type].varList[index].isCompressed;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.compressedChunkByteCount  = miff->typeList[type].varList[index].compressedChunkByteCount;
+         miff->typeUnrolledArray[miff->typeVarIndex].type.type                      = miff->typeList[type].varList[index].type;
          miff->typeVarIndex++;
       }
       // User type.

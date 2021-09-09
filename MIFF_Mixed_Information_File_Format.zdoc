@@ -87,8 +87,8 @@ hh	|chapter| - Content
 
 hhh	|chapter| - Binary Syte Sequences
 	
-		Everything within |" ||<|| "| and |" ||>|| "| is a byte sequence of a known byte count.  Each byte seqence is immediately followed by the next byte sequence.  Nothing extra is added between sequences.
-		A byte sequence is represented by |" ||<|| "| [byte count] |" |:| "| [name of this byte sequence] |" ||>|| "|, where byte count is a number indicating the number of bytes this sequence uses.  This byte count can be represented by a value defined in an earlier byte sequence.
+	Everything within |" ||<|| "| and |" ||>|| "| is a byte sequence of a known byte count.  Each byte seqence is immediately followed by the next byte sequence.  Nothing extra is added between sequences.
+	A byte sequence is represented by |" ||<|| "| [byte count] |" |:| "| [name of this byte sequence] |" ||>|| "|, where byte count is a number indicating the number of bytes this sequence uses.  This byte count can be represented by a value defined in an earlier byte sequence.
 
 hhh	|chapter| - Numbers
 
@@ -563,7 +563,7 @@ hh	|chapter| - Define User Type
 
 	|b |Text| b|
 
-	|__>|define|-->|[key]|-->|[member count]|-->|-(|-->|[type code]|-->|[key]|-->|[array count]|-->|[compression type])*|<--|
+	|__>|define|-->|[key]|-->|[member count]|-->|-|-->|[type code](r|-->|[key]|-->|[array count]|-->|[compression type])*|<--|
 
 	|b |Binary| b|
 
@@ -573,18 +573,18 @@ hh	|chapter| - Define User Type
 	Compression is never used with this type code.
 
 	|b |Example 1:|line|Text| b|
-	|__>|define|-->|TypeContact|-->|5|-->|-|-->||line||___||___|"|-->|NameGiven|-->|1|-->|-|-->||line||___||___|"|-->|NameFamily|-->|1|-->|-|-->||line||___||___|n1|-->|Age|-->|1|-->|-|-->||line||___||___|"|-->|EMail|-->|1|-->|-|-->||line||___||___|n1|-->|DataFlags|-->|5|-->|-|<--|
+	|__>|define|-->|TypeContact|-->|5|-->|-|-->|64|-->||line||___||___|"|-->|NameGiven|-->|1|-->|-|-->||line||___||___|"|-->|NameFamily|-->|1|-->|-|-->||line||___||___|n1|-->|Age|-->|1|-->|-|-->||line||___||___|"|-->|EMail|-->|1|-->|-|-->||line||___||___|n1|-->|DataFlags|-->|5|-->|-|<--|
 	Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.
 	|b |Binary| b|
 	|__>||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :TypeContact|>||<|n1 :6|>||<|n2 :64|>||line||___||<|n2 :000 0  5|>||<|n1 : 9|>||<| 9 :NameGiven|>||line||___||<|n2 :000 0  5|>||<|n1 :10|>||<|10 :NameFamily|>||line||___||<|n2 :000 0 20|>||<|n1 : 3|>||<| 3 :Age|>||line||___||<|n2 :000 0  5|>||<|n1 : 5|>||<| 5 :Email|>||line||___||<|n2 :001 0 20|>||<|n1 : 9|>||<| 9 :DataFlags|>||<|n1 :5|>|
 
 	|b |Example 2:|line|Text| b|
-	|__>|define|-->|Image|-->|3|-->|-|-->||line||___||___|n4|-->|Width|-->|1|-->|-|-->||line||___||___|n4|-->|Height|-->|1|-->|-|-->||line||___||___|n1|-->|Pixels|-->|*|-->|:|-->|1000000|<--|
+	|__>|define|-->|Image|-->|3|-->|-|-->|65|-->||line||___||___|n4|-->|Width|-->|1|-->|-|-->||line||___||___|n4|-->|Height|-->|1|-->|-|-->||line||___||___|n1|-->|Pixels|-->|*|-->|:|-->|1000000|<--|
 	|b |Binary| b|
 	|__>||<|n2 :001 0  3|>||<|n1 :5|>||<|5 :Image|>||<|n1 :3|>||<|n2 :65|>||line||___||<|n2 :000 0 23|>||<|n1 :5|>||<|5 :Width|>||line||___||<|n2 :000 0 23|>||<|n1 :6|>||<|6 :Height|>||line||___||<|n2 :111 1 20|>||<|n1 :6|>||<|6 :Pixels|>||<|n4 :1000000|>|
 
 	|b |Example 3:|line|Text| b|
-	|__>|define|-->|Binary Blob|-->|2|-->|-|-->||line||___||___|n4|-->|Byte Count|-->|1|-->|-|-->||line||___||___|n1|-->|Byte Data|-->|*|-->|:|-->|1000000|<--|
+	|__>|define|-->|Binary Blob|-->|2|-->|-|-->|66|-->||line||___||___|n4|-->|Byte Count|-->|1|-->|-|-->||line||___||___|n1|-->|Byte Data|-->|*|-->|:|-->|1000000|<--|
 	|b |Binary| b|
 	|__>||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :Binary Blob|>||<|n1 :2|>||<|n2 :66|>||line||___||<|n2 :000 0 23|>||<|n1 :10|>||<|10 :Byte Count|>||line||___||<|n2 :111 1 20|>||<|n1 : 9|>||<| 9 :Byte Data|>||<|n4 :1000000|>|
 

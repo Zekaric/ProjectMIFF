@@ -172,6 +172,295 @@ void miffDestroyContent(Miff * const miff)
 }
 
 /******************************************************************************
+func: miffRecordGetVarArrayCount
+******************************************************************************/
+MiffN8 miffRecordGetVarArrayCount(Miff * const miff)
+{
+   MiffType       type;
+   MiffTypeRecord typeRecord;
+   MiffTypeStack  typeStack;
+
+   return0If(
+      !_isStarted ||
+      !miff);
+
+   typeStack  = miff->typeStack[miff->typeStackIndex];
+   typeRecord = typeStack.type;
+   type       = miff->typeList[typeRecord.type];
+
+   return0If(typeStack.varIndex   >= type.varCount);
+   return0If(typeStack.arrayIndex >= typeRecord.arrayCount);
+
+   return typeRecord.arrayCount;
+}
+
+/******************************************************************************
+func: miffRecordGetVarName
+******************************************************************************/
+MiffC2 *miffRecordGetVarName(Miff * const miff)
+{
+   MiffType       type;
+   MiffTypeRecord typeRecord;
+   MiffTypeStack  typeStack;
+
+   returnNullIf(
+      !_isStarted ||
+      !miff);
+
+   typeStack  = miff->typeStack[miff->typeStackIndex];
+   typeRecord = typeStack.type;
+   type       = miff->typeList[typeRecord.type];
+
+   returnNullIf(typeStack.varIndex   >= type.varCount);
+   returnNullIf(typeStack.arrayIndex >= typeRecord.arrayCount);
+
+   return miff->typeStack[miff->typeStackIndex].type.nameC2;
+}
+
+/******************************************************************************
+func: miffRecordGetVarType
+******************************************************************************/
+MiffValueType miffRecordGetVarType(Miff * const miff)
+{
+   MiffType       type;
+   MiffTypeRecord typeRecord;
+   MiffTypeStack  typeStack;
+
+   returnIf(
+         !_isStarted ||
+         !miff,
+      miffValueTypeNONE);
+
+   typeStack  = miff->typeStack[miff->typeStackIndex];
+   typeRecord = typeStack.type;
+   type       = miff->typeList[typeRecord.type];
+
+   returnIf(typeStack.varIndex   >= type.varCount,         miffValueTypeNONE);
+   returnIf(typeStack.arrayIndex >= typeRecord.arrayCount, miffValueTypeNONE);
+
+   return typeRecord.type;
+}
+
+/******************************************************************************
+func: miffRecordGetVarCount
+******************************************************************************/
+MiffN8 miffRecordGetVarCount(Miff * const miff)
+{
+   MiffType       type;
+   MiffTypeRecord typeRecord;
+   MiffTypeStack  typeStack;
+
+   return0If(
+      !_isStarted ||
+      !miff);
+
+   typeStack  = miff->typeStack[miff->typeStackIndex];
+   typeRecord = typeStack.type;
+   type       = miff->typeList[typeRecord.type];
+
+   return0If(typeStack.varIndex   >= type.varCount);
+   return0If(typeStack.arrayIndex >= typeRecord.arrayCount);
+
+   return type.varCount;
+}
+
+/******************************************************************************
+func: miffRecordPopType
+******************************************************************************/
+MiffBool miffRecordPopType(Miff * const miff)
+{
+   returnFalseIf(miff->typeStackIndex == 0);
+
+   miff->typeStackIndex--;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordPushType
+******************************************************************************/
+MiffBool miffRecordPushType(Miff * const miff)
+{
+   MiffN4   index;
+   MiffType type;
+
+   returnFalseIf(miff->typeStackIndex == 31);
+
+   index = miff->typeStackIndex;
+
+   type  = miff->typeList[miff->typeStack[index].type.type];
+
+   miff->typeStack[index + 1].arrayIndex = 0;
+   miff->typeStack[index + 1].varIndex   = 0;
+   miff->typeStack[index + 1].type       = type.varList[miff->typeStack[index].varIndex];
+
+   miff->typeStackIndex++;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordSetBegin
+******************************************************************************/
+MiffBool miffRecordSetBegin(Miff * const miff, MiffValueType const type, MiffC2 const * const key,
+   MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Write the type for the record.  Common for all cases.
+   returnFalseIf(!_WriteTxtRecordType(miff, type));
+
+   // We are ending a key value block.
+   if (type == miffValueTypeKEY_VALUE_BLOCK_STOP)
+   {
+      // TODO key value block stack pop.
+      returnFalseIf(!_WriteTxtRecordEnder(miff));
+      returnTrue;
+   }
+
+   returnFalseIf(!key);
+
+   // Copy the key.
+   miff->typeStackIndex                             = 0;
+   miff->typeStack[0].arrayIndex                    = 0;
+   miff->typeStack[0].varIndex                      = 0;
+   miff->typeStack[0].type.type                     = type;
+   miff->typeStack[0].type.arrayCount               = count;
+   miff->typeStack[0].type.isCompressed             = isCompressed;
+   miff->typeStack[0].type.compressedChunkByteCount = compressedChunkByteCount;
+   _MemClearTypeArray(257,              MiffC2, miff->typeStack[0].type.nameC2);
+   _MemCopyTypeArray( _C2GetCount(key), MiffC2, miff->typeStack[0].type.nameC2, key);
+
+   // We are starting a new key value block.
+   if (type == miffValueTypeKEY_VALUE_BLOCK_START)
+   {
+      // TODO key value block stack push.
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
+      returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->typeStack[0].type.nameC2));
+
+      return _WriteTxtRecordEnder(miff);
+   }
+
+   // Write out the record.
+   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+   returnFalseIf(!_WriteTxtRecordKeyC2(       miff, miff->typeStack[0].type.nameC2));
+   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+   returnFalseIf(!_WriteTxtRecordArrayCount(  miff, count));
+   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, isCompressed));
+   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
+   if (isCompressed)
+   {
+      returnFalseIf(!_WriteTxtRecordChunkSize(miff, compressedChunkByteCount));
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   }
+
+   // If compression is used, prep the internal buffer
+   if (isCompressed)
+   {
+      // Prepare the compression buffer.
+      _CompressStart(miff, compressedChunkByteCount);
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordSetEnd
+******************************************************************************/
+MiffBool miffRecordSetEnd(Miff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Finish the last chunk.
+   if (miff->isCompressed)
+   {
+      returnFalseIf(!_CompressWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
+      _CompressStop(miff);
+   }
+
+   // Write the record ender
+   returnFalseIf(!_WriteTxtRecordEnder(miff));
+
+   // The current type should end up being NONE.  It if isn't then the caller didn't
+   // fullfill the record requirements.
+   miff->typeStack[0].type.type = miffValueTypeNONE;
+   miff->typeStackIndex         = 0;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordSetNextVariable
+******************************************************************************/
+MiffBool miffRecordSetNextVariable(Miff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Type already ended
+   if (miff->typeStack[miff->typeStackIndex].type.type == miffValueTypeNONE)
+   {
+      returnFalse;
+   }
+
+   // Move to the next type in the unroll.
+   miff->typeStack[miff->typeStackIndex].varIndex++;
+   if (miff->typeStack[miff->typeStackIndex].varIndex < 
+         miff->typeList[miff->typeStack[miff->typeStackIndex].type.type].varCount)
+   {
+      if (!miff->isCompressed)
+      {
+         returnFalseIf(!_WriteTxtRecordSeparator(miff));
+      }
+
+      // Restart compression if the next var is compressed.
+      //if (!miff->isCompressed &&
+      //     miff->typeStack[miff->typeStackIndex].type.isCompressed)
+      //{
+      //   returnFalseIf(
+      //      !_CompressStart(
+      //         miff,
+      //         miff->typeStack[miff->typeStackIndex].type.compressedChunkByteCount));
+      //}
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordSetNextArrayItem
+******************************************************************************/
+MiffBool miffRecordSetNextArrayItem(Miff * const miff, MiffN8 const index, MiffN8 const count)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Type already ended
+   returnFalseIf(miff->typeStack[miff->typeStackIndex].type.type == miffValueTypeNONE)
+
+   // Move to the next array item
+   miff->typeStack[miff->typeStackIndex].arrayIndex++;
+
+   // Are we still writing out elements?
+   if (index != count - 1)
+   {
+      if (!miff->isCompressed)
+      {
+         returnFalseIf(!_WriteTxtRecordSeparator(miff));
+      }
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffStart
 ******************************************************************************/
 MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc,
@@ -249,13 +538,14 @@ MiffBool miffSetDefineHeader(Miff * const miff, MiffValueType const type, MiffC2
 
    // Initialize the type.
    miff->typeList[index].isSet    = miffBoolTRUE;
-   miff->typeVarIndex             = 0;
+   miff->typeStack[0].varIndex    = 0;
    miff->typeList[index].varCount = count;
    miff->typeList[index].varList  = _MemCreateTypeArray(count, MiffTypeRecord);
    returnFalseIf(!miff->typeList[index].varList);
 
    // Setting the index of the type we are defining.
-   miff->typeCurrent.type = index;
+   miff->typeStack[0].type.type = index;
+   miff->typeStackIndex         = 0;
 
    returnTrue;
 }
@@ -270,7 +560,7 @@ MiffBool miffSetDefineValue(Miff * const miff, MiffValueType const type, MiffC2 
       !_isStarted ||
       !miff       ||
       !name       ||
-      miff->typeCurrent.type < miffValueTypeFIRST_USER_TYPE);
+      miff->typeStack[0].type.type < miffValueTypeFIRST_USER_TYPE);
 
    returnFalseIf(!_WriteTxtValueType(      miff, type));
    returnFalseIf(!_WriteTxtRecordSeparator(miff));
@@ -292,11 +582,11 @@ MiffBool miffSetDefineValue(Miff * const miff, MiffValueType const type, MiffC2 
       returnFalseIf(!_WriteTxtRecordChunkSize(miff, compressedChunkByteCount));
    }
 
-   _MemCopyTypeArray(256, MiffC2, miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].nameC2, name);
-   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].arrayCount               = count;
-   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].compressedChunkByteCount = compressedChunkByteCount;
-   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].isCompressed             = isCompressed;
-   miff->typeList[miff->typeCurrent.type].varList[miff->typeVarIndex].type                     = type;
+   _MemCopyTypeArray(256, MiffC2, miff->typeList[miff->typeStack[0].type.type].varList[miff->typeStack[0].varIndex].nameC2, name);
+   miff->typeList[miff->typeStack[0].type.type].varList[miff->typeStack[0].varIndex].arrayCount               = count;
+   miff->typeList[miff->typeStack[0].type.type].varList[miff->typeStack[0].varIndex].compressedChunkByteCount = compressedChunkByteCount;
+   miff->typeList[miff->typeStack[0].type.type].varList[miff->typeStack[0].varIndex].isCompressed             = isCompressed;
+   miff->typeList[miff->typeStack[0].type.type].varList[miff->typeStack[0].varIndex].type                     = type;
 
    // Check if type already exists.
    if (type >= miffValueTypeFIRST_USER_TYPE)
@@ -304,244 +594,18 @@ MiffBool miffSetDefineValue(Miff * const miff, MiffValueType const type, MiffC2 
       returnFalseIf(!miff->typeList[type].isSet);
    }
 
-   miff->typeVarIndex++;
+   miff->typeStack[0].varIndex++;
 
-   if (miff->typeVarIndex == miff->typeList[miff->typeCurrent.type].varCount)
+   if (miff->typeStack[0].varIndex == miff->typeList[miff->typeStack[0].type.type].varCount)
    {
       returnFalseIf(!_WriteTxtRecordEnder(miff));
 
       // Reset the record.
-      miff->typeCurrent.type = miffValueTypeNONE;
+      miff->typeStack[0].type.type = miffValueTypeNONE;
    }
    else
    {
       returnFalseIf(!_WriteTxtRecordSeparator(miff));
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffRecordSetBegin
-******************************************************************************/
-MiffBool miffRecordSetBegin(Miff * const miff, MiffValueType const type, MiffC2 const * const key, 
-   MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Write the type for the record.  Common for all cases.
-   returnFalseIf(!_WriteTxtRecordType( miff, type));
-
-   // We are ending a key value block.
-   if (type == miffValueTypeKEY_VALUE_BLOCK_STOP)
-   {
-      // TODO key value block stack pop.
-      returnFalseIf(!_WriteTxtRecordEnder(miff));
-      returnTrue;
-   }
-   
-   returnFalseIf(!key);
-
-   // Copy the key.
-   _MemClearTypeArray(256, MiffC2, miff->typeCurrent.nameC2);
-   _MemCopyTypeArray( 255, MiffC2, miff->typeCurrent.nameC2, key);
-
-   // We are starting a new key value block.
-   if (type == miffValueTypeKEY_VALUE_BLOCK_START)
-   {
-      // TODO key value block stack push.
-      returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->typeCurrent.nameC2));
-
-      if (count != miffArrayCountUNKNOWN)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator( miff));
-         returnFalseIf(!_WriteTxtRecordArrayCount(miff, miff->typeCurrent.arrayCount));
-      }
-
-      return _WriteTxtRecordEnder(miff);
-   }
-
-   // Set the type and array.
-   miff->typeCurrent.type           = type;
-   miff->typeCurrent.arrayCount     = count;
-
-   // Reset the compress flag.
-   miff->typeCurrent.isCompressed             = isCompressed;
-   miff->typeCurrent.compressedChunkByteCount = compressedChunkByteCount;
-
-   // Set the current index of the next value.
-   miff->typeCurrentIndex           = 0;
-   miff->typeVarIndex               = 0;
-   miff->typeVarArrayIndex          = 0;
-
-   // Unroll the type.
-   if (miff->typeCurrent.type != miff->typeUnrolledType)
-   {
-      _UserTypeUnroll(
-         miff,
-         miff->typeList[miff->typeCurrent.type].nameC2,
-         miff->typeCurrent.type);
-   }
-   
-   // Write out the record.
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordKeyC2(       miff, miff->typeCurrent.nameC2));
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordArrayCount(  miff, count));
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, isCompressed));
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   if (isCompressed)
-   {
-      returnFalseIf(!_WriteTxtRecordChunkSize(miff, compressedChunkByteCount));
-      returnFalseIf(!_WriteTxtRecordSeparator(miff));
-   }
-
-   // If compression is used, prep the internal buffer
-   if (isCompressed)
-   {
-      // Prepare the compression buffer.
-      _CompressStart(miff, compressedChunkByteCount);
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffRecordSetEnd
-******************************************************************************/
-MiffBool miffRecordSetEnd(Miff * const miff)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Finish the last chunk.
-   if (miff->isCompressed)
-   {
-      returnFalseIf(!_CompressWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
-      _CompressStop(miff);
-   }
-
-   // Write the record ender
-   returnFalseIf(!_WriteTxtRecordEnder(miff));
-
-   // The current type should end up being NONE.  It if isn't then the caller didn't
-   // fullfill the record requirements.
-   miff->typeCurrent.type = miffValueTypeNONE;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffRecordSetNextVarValue
-******************************************************************************/
-MiffBool miffRecordSetNextVarValue(Miff * const miff, MiffN8 const index, MiffN8 const count)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Type already ended
-   if (miff->typeCurrent.type == miffValueTypeNONE)
-   {
-      returnFalse;
-   }
-
-   // Move to the next index in the defined var array.
-   miff->typeVarArrayIndex++;
-
-   // Are we still writing out elements in the defined var array?
-   if (index != count - 1)
-   {
-      // If not compressed then...
-      if (!miff->isCompressed)
-      {
-         // Add a separator.
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffRecordSetNextVar
-******************************************************************************/
-MiffBool miffRecordSetNextVar(Miff * const miff)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Type already ended
-   if (miff->typeCurrent.type == miffValueTypeNONE)
-   {
-      returnFalse;
-   }
-
-   // Restart the type var array index;
-   miff->typeVarArrayIndex = 0;
-
-   // Finish off the compressed buffer if it was a compressed var
-   if (!miff->typeCurrent.isCompressed &&
-        miff->isCompressed)
-   {
-      returnFalseIf(!_CompressWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
-      _CompressStop(miff);
-   }
-
-   // Move to the next type in the unroll.
-   miff->typeVarIndex++;
-   if (miff->typeVarIndex < miff->typeUnrolledCount)
-   {
-      if (miff->isCompressed)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
-
-      // Restart compression if the next var is compressed.
-      if (!miff->typeCurrent.isCompressed &&
-           miff->typeUnrolledArray[miff->typeVarIndex].type.isCompressed)
-      {
-         returnFalseIf(
-            !_CompressStart(
-               miff,
-               miff->typeUnrolledArray[miff->typeVarIndex].type.compressedChunkByteCount));
-      }
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffRecordSetNextValue
-******************************************************************************/
-MiffBool miffRecordSetNextValue(Miff * const miff, MiffN8 const index, MiffN8 const count)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Type already ended
-   if (miff->typeCurrent.type == miffValueTypeNONE)
-   {
-      returnFalse;
-   }
-
-   // Move to the next array item
-   miff->typeCurrentIndex++;
-
-   // Are we still writing out elements?
-   if (index != count - 1)
-   {
-      if (!miff->isCompressed)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
    }
 
    returnTrue;
@@ -701,7 +765,7 @@ MiffBool miffSetNBoolean(Miff * const miff, MiffC2 const * const key, MiffN4 con
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueBoolean(   miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -718,7 +782,7 @@ MiffBool miffSetNI1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI1(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -735,7 +799,7 @@ MiffBool miffSetNI2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI2(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -752,7 +816,7 @@ MiffBool miffSetNI4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI4(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -769,7 +833,7 @@ MiffBool miffSetNI8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI8(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -786,7 +850,7 @@ MiffBool miffSetNN1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN1(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -803,7 +867,7 @@ MiffBool miffSetNN2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN2(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -820,7 +884,7 @@ MiffBool miffSetNN4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN4(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -837,7 +901,7 @@ MiffBool miffSetNN8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN8(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -854,7 +918,7 @@ MiffBool miffSetNR4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueR4(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -871,7 +935,7 @@ MiffBool miffSetNR8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueR8(        miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -888,7 +952,7 @@ MiffBool miffSetNType(Miff * const miff, MiffC2 const * const key, MiffN4 const 
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueType(      miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -905,7 +969,7 @@ MiffBool miffSetNStringC2(Miff * const miff, MiffC2 const * const key, MiffN4 co
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueStringC2(  miff, value[index]));
-      returnFalseIf(!miffRecordSetNextValue(miff, index, count));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
    returnTrue;
@@ -921,7 +985,7 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->typeUnrolledArray[miff->typeVarIndex].type.type != miffValueTypeBOOLEAN);
+      miff->typeStack[miff->typeStackIndex].type.type != miffValueTypeBOOLEAN);
 
    c1 = (MiffC1 *) (value ? "T" : "F");
    
@@ -1099,7 +1163,7 @@ MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->typeUnrolledArray[miff->typeVarIndex].type.type != miffValueTypeSTRING);
+      miff->typeStack[miff->typeStackIndex].type.type != miffValueTypeSTRING);
 
    returnFalseIf(!_WriteTxtValueC2(miff, value));
 
@@ -1114,7 +1178,7 @@ MiffBool miffSetValueType(Miff * const miff, MiffValueType const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->typeUnrolledArray[miff->typeVarIndex].type.type != miffValueTypeTYPE);
+      miff->typeStack[miff->typeStackIndex].type.type != miffValueTypeTYPE);
 
    returnFalseIf(!_WriteTxtValueType(miff, value));
 

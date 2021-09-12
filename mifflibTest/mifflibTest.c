@@ -812,8 +812,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(   miff, miffValueTypeI1, L"I1 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI1(           miff, ((MiffI1 *) n1array)[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueI1(            miff, ((MiffI1 *) n1array)[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
@@ -822,8 +822,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(   miff, miffValueTypeI2, L"I2 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI2(           miff, ((MiffI2 *) n2array)[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueI2(            miff, ((MiffI2 *) n2array)[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
@@ -832,8 +832,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(   miff, miffValueTypeI4, L"I4 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI4(           miff, ((MiffI4 *) n4array)[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueI4(            miff, ((MiffI4 *) n4array)[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
@@ -842,8 +842,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(   miff, miffValueTypeI8, L"I8 ArrayZ", 256 * 3, miffBoolTRUE, 4000);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI8(           miff, ((MiffI8 *) n8array)[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueI8(            miff, ((MiffI8 *) n8array)[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
@@ -852,8 +852,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(   miff, miffValueTypeR8, L"R8 ArrayZ", 300, miffBoolTRUE, 9999);
       for (index = 0; index < 300; index++)
       {
-         miffSetValueR8(           miff, reals8[index]);
-         miffRecordSetNextVarValue(miff, index, 300);
+         miffSetValueR8(            miff, reals8[index]);
+         miffRecordSetNextArrayItem(miff, index, 300);
       }
       miffRecordSetEnd(miff);
 
@@ -897,110 +897,143 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          miffSetDefineValue(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffBoolTRUE,  9999);
       }
 
-      miffRecordSetBegin(  miff, idBinary, L"BinValue", 1, miffBoolFALSE, 0);
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
+      miffRecordSetBegin(        miff, idBinary, L"BinValue", 1, miffBoolFALSE, 0);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
-      // Required because in the define Bytes is an unknown size.
-      miffRecordSetEnd(      miff);
-
-      miffRecordSetBegin(  miff, idBinary, L"BinList", 2, miffBoolFALSE, 0);
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
-      }
-      miffRecordSetNextValue(miff, 0, 2);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(        miff, 256 * 3);
-      miffRecordSetNextVar(  miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(           miff, n1array[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
-      }
-      // Required because in the define Bytes is an unknown size.
-      miffRecordSetEnd(      miff);
-
-      miffRecordSetBegin(  miff, idBinary, L"BinListZ", 2, miffBoolTRUE, 9999);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
-      }
-      miffRecordSetNextValue(miff, 0, 2);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(        miff, 256 * 3);
-      miffRecordSetNextVar(  miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(           miff, n1array[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
-      }
-      // Required because in the define Bytes is an unknown size.
-      miffRecordSetEnd(      miff);
+      miffRecordPopType(         miff);
+      miffRecordSetEnd(          miff);
 
 
-      miffRecordSetBegin(  miff, idBinaryZ, L"BinZValue", 1, miffBoolFALSE, 0);
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
+      miffRecordSetBegin(        miff, idBinary, L"BinList", 2, miffBoolFALSE, 0);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
-      // Required because in the define Bytes is an unknown size.
+      miffRecordPopType(         miff);
+
+      miffRecordSetNextArrayItem(miff, 0, 2);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(            miff, n1array[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
+      }
+      miffRecordPopType(         miff);
+      miffRecordSetEnd(          miff);
+
+
+      miffRecordSetBegin(        miff, idBinary, L"BinListZ", 2, miffBoolTRUE, 9999);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
+      }
+      miffRecordPopType(         miff);
+
+      miffRecordSetNextArrayItem(miff, 0, 2);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(            miff, n1array[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
+      }
+      miffRecordPopType(         miff);
+      miffRecordSetEnd(          miff);
+
+
+      miffRecordSetBegin(        miff, idBinaryZ, L"BinZValue", 1, miffBoolFALSE, 0);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
+      }
+      miffRecordPopType(         miff);
       miffRecordSetEnd(miff);
 
-      miffRecordSetBegin(  miff, idBinaryZ, L"BinZList", 2, miffBoolFALSE, 0);
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
+      miffRecordSetBegin(        miff, idBinaryZ, L"BinZList", 2, miffBoolFALSE, 0);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
-      miffRecordSetNextValue(miff, 0, 2);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(        miff, 256 * 3);
-      miffRecordSetNextVar(  miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(           miff, n1array[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
-      }
-      // Required because in the define Bytes is an unknown size.
-      miffRecordSetEnd(miff);
+      miffRecordPopType(         miff);
 
-      miffRecordSetBegin(  miff, idBinaryZ, L"BinZListZ", 2, miffBoolTRUE, 9999);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(      miff, 256 * 3);
-      miffRecordSetNextVar(miff);
+      miffRecordSetNextArrayItem(miff, 0, 2);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueN1(           miff, binary[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueN1(            miff, n1array[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
-      miffRecordSetNextValue(miff, 0, 2);
-      // Required because in the define Bytes is an unknown size.
-      miffSetValueN4(        miff, 256 * 3);
-      miffRecordSetNextVar(  miff);
+      miffRecordPopType(         miff);
+      miffRecordSetEnd(          miff);
+
+
+      miffRecordSetBegin(        miff, idBinaryZ, L"BinZListZ", 2, miffBoolTRUE, 9999);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueN1(           miff, n1array[index]);
-         miffRecordSetNextVarValue(miff, index, 256 * 3);
+         miffSetValueN1(            miff, binary[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
-      // Required because in the define Bytes is an unknown size.
-      miffRecordSetEnd(miff);
+      miffRecordPopType(         miff);
+
+      miffRecordSetNextArrayItem(miff, 0, 2);
+      miffRecordPushType(        miff);
+      miffSetValueN4(            miff, 256 * 3);
+      miffRecordPopType(         miff);
+      miffRecordSetNextVariable( miff);
+      miffRecordPushType(        miff);
+      for (index = 0; index < 256 * 3; index++)
+      {
+         miffSetValueN1(            miff, n1array[index]);
+         miffRecordSetNextArrayItem(miff, index, 256 * 3);
+      }
+      miffRecordPopType(         miff);
+      miffRecordSetEnd(          miff);
 
 
       miffSetBlockStart(miff, L"KeyValueBlock");

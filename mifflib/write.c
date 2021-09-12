@@ -388,7 +388,7 @@ func: _WriteValue1
 ******************************************************************************/
 MiffBool _WriteValue1(Miff * const miff, MiffValueType const type, Miff1 value)
 {
-   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
+   returnFalseIf(miff->typeStack[miff->typeStackIndex].type.type != type);
 
    if (!miff->isCompressed)
    {
@@ -407,7 +407,7 @@ func: _WriteValue2
 ******************************************************************************/
 MiffBool _WriteValue2(Miff * const miff, MiffValueType const type, Miff2 value)
 {
-   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
+   returnFalseIf(miff->typeStack[miff->typeStackIndex].type.type != type);
 
    if (!miff->isCompressed)
    {
@@ -430,7 +430,7 @@ func: _WriteValue4
 ******************************************************************************/
 MiffBool _WriteValue4(Miff * const miff, MiffValueType const type, Miff4 value)
 {
-   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
+   returnFalseIf(miff->typeStack[miff->typeStackIndex].type.type != type);
 
    if (!miff->isCompressed)
    {
@@ -456,7 +456,7 @@ func: _WriteValue8
 ******************************************************************************/
 MiffBool _WriteValue8(Miff * const miff, MiffValueType const type, Miff8 value)
 {
-   returnFalseIf(miff->typeUnrolledArray[miff->typeVarIndex].type.type != type);
+   returnFalseIf(miff->typeStack[miff->typeStackIndex].type.type != type);
 
    if (!miff->isCompressed)
    {

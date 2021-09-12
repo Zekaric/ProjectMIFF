@@ -53,7 +53,7 @@ MiffBool _CompressStart(Miff * const miff, MiffN4 const compressedChunkByteCount
       miff->compressMemByteData = _MemCreateTypeArray(miff->compressedChunkByteCount, MiffN1);
       if (!miff->compressMemByteData)
       {
-         miff->typeCurrent.type = miffValueTypeNONE;
+         miff->typeStack[miff->typeStackIndex].type.type = miffValueTypeNONE;
          returnFalse;
       }
    }
@@ -182,82 +182,5 @@ MiffBool _MemIsEqual(MiffN4 const countA, MiffN1 const * const memA, MiffN4 cons
 {
    returnFalseIf(countA != countB);
    returnFalseIf(memcmp(memA, memB, countA) != 0);
-   returnTrue;
-}
-
-/******************************************************************************
-func: _UserTypeUnroll
-******************************************************************************/
-MiffBool _UserTypeUnroll(Miff * const miff, MiffC2 const * const name, MiffValueType const type)
-{
-   MiffN4  index;
-   MiffC2 *nameTemp;
-   
-   // Different unrolled value present.
-   // For all unrolled type strings.
-   forCount(index, miff->typeUnrolledCount)
-   {
-      // Clean up the string memory.
-      _MemDestroy(miff->typeUnrolledArray[index].nameC2);
-   }
-
-   // Clean out the memory.
-   _MemClearTypeArray(miff->typeUnrolledCount, MiffUnrollRecord, miff->typeUnrolledArray);
-
-   miff->typeUnrolledCount = 0;
-
-   forCount(index, miff->typeList[type].varCount)
-   {
-      // Need to inflate the unrolled list.
-      if (miff->typeVarIndex == miff->typeUnrolledArrayCount)
-      {
-         MiffUnrollRecord *rollTemp;
-
-         // Create new buffers.
-         rollTemp = _MemCreateTypeArray(miff->typeUnrolledArrayCount + 80, MiffUnrollRecord);
-         returnFalseIf(!rollTemp);
-
-         // Copy over the old buffer.
-         _MemCopyTypeArray(miff->typeUnrolledArrayCount, MiffUnrollRecord, rollTemp, miff->typeUnrolledArray);
-
-         // Destroy the old buffers.
-         _MemDestroy(miff->typeUnrolledArray);
-
-         // Use the new buffers.
-         miff->typeUnrolledArray = rollTemp;
-
-         // Set the new buffer size.
-         miff->typeUnrolledArrayCount += 80;
-      }
-
-      // Simple type.
-      if (miff->typeList[type].varList[index].type < miffValueTypeFIRST_USER_TYPE)
-      {
-         miff->typeUnrolledArray[miff->typeVarIndex].nameC2 = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
-         returnFalseIf(!miff->typeUnrolledArray[miff->typeVarIndex].nameC2);
-
-         miff->typeUnrolledArray[miff->typeVarIndex].type.arrayCount                = miff->typeList[type].varList[index].arrayCount;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.isCompressed              = miff->typeList[type].varList[index].isCompressed;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.compressedChunkByteCount  = miff->typeList[type].varList[index].compressedChunkByteCount;
-         miff->typeUnrolledArray[miff->typeVarIndex].type.type                      = miff->typeList[type].varList[index].type;
-         miff->typeVarIndex++;
-      }
-      // User type.
-      else 
-      {
-         nameTemp = _C2Append(name, L".", miff->typeList[type].varList[index].nameC2);
-         returnFalseIf(!nameTemp);
-
-         // Recurse into the type to fill in the fields.
-         returnFalseIf(_UserTypeUnroll(miff, nameTemp, miff->typeList[type].varList[index].type));
-
-         _MemDestroy(nameTemp);
-      }
-   }
-
-   // Set the unrolled count.
-   miff->typeUnrolledCount = miff->typeVarIndex;
-   miff->typeVarIndex      = 0;
-
    returnTrue;
 }

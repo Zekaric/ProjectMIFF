@@ -207,17 +207,18 @@ typedef struct
 
 typedef struct
 {
-   MiffC2                     *nameC2;
-   MiffTypeRecord              type;
-} MiffUnrollRecord;
-
-typedef struct
-{
    MiffBool                    isSet;
    MiffC2                      nameC2[257];
    MiffN4                      varCount;
    MiffTypeRecord             *varList;
 } MiffType;
+
+typedef struct
+{
+   MiffTypeRecord              type;
+   MiffN4                      arrayIndex;
+   MiffN4                      varIndex;
+} MiffTypeStack;
 
 typedef struct
 {
@@ -233,15 +234,8 @@ typedef struct
    // The list of types, all types even the predefined base types.
    MiffType                    typeList[4096];
 
-   MiffTypeRecord              typeCurrent;
-   MiffN8                      typeCurrentIndex;
-   MiffN4                      typeVarIndex;
-   MiffN8                      typeVarArrayIndex;
-
-   MiffValueType               typeUnrolledType;
-   MiffN4                      typeUnrolledCount;
-   MiffUnrollRecord           *typeUnrolledArray;
-   MiffN4                      typeUnrolledArrayCount;
+   MiffTypeStack               typeStack[32];
+   MiffN4                      typeStackIndex;
 
    // Data repo getters and setters.
    void                       *dataRepo;
@@ -295,11 +289,19 @@ void            miffDestroyContent(                Miff       * const miff);
 // Miff128         miffGetValue128(                   Miff const * const miff);
 // Miff256         miffGetValue256(                   Miff const * const miff);
 
+MiffN8          miffRecordGetVarArrayCount(        Miff       * const miff);
+MiffC2         *miffRecordGetVarName(              Miff       * const miff);
+MiffValueType   miffRecordGetVarType(              Miff       * const miff);
+MiffN8          miffRecordGetVarCount(             Miff       * const miff);
+
+MiffBool        miffRecordPopType(                 Miff       * const miff);
+MiffBool        miffRecordPushType(                Miff       * const miff);
+
 MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffValueType const type, MiffC2 const * const key, MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount);
 MiffBool        miffRecordSetEnd(                  Miff       * const miff);
-MiffBool        miffRecordSetNextVarValue(         Miff       * const miff, MiffN8 const index, MiffN8 const count);
-MiffBool        miffRecordSetNextVar(              Miff       * const miff);
-MiffBool        miffRecordSetNextValue(            Miff       * const miff, MiffN8 const index, MiffN8 const count);
+MiffBool        miffRecordSetNextArrayItem(        Miff       * const miff, MiffN8 const index, MiffN8 const count);
+MiffBool        miffRecordSetNextVariable(         Miff       * const miff);
+
 
 MiffBool        miffSetBlockStart(                 Miff       * const miff, MiffC2 const * const key);
 MiffBool        miffSetBlockStop(                  Miff       * const miff);

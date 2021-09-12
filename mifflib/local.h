@@ -128,8 +128,6 @@ void      _MemStop(                    void);
 
 MiffN4    _TypeGetSize(                Miff const * const miff, MiffValueType const type);
 
-MiffBool  _UserTypeUnroll(             Miff       * const miff, MiffC2 const * const name, MiffValueType const type);
-
 MiffBool  _WriteCompressByte(          Miff       * const miff, MiffN1 const byte);
 MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * const value);
 MiffBool  _WriteTxtC2(                 Miff const * const miff, MiffC2 const * const value);

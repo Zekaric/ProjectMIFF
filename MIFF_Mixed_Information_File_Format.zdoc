@@ -61,11 +61,23 @@ hh	|chapter| - File Header
 
 	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
 
-	|__>|MIFF|<--||line||__>|1|<--||line||__>|TXT|<--||line||__>|[Sub-Format Name string]|<--||line||__>|[Sub-Format Version string]|<--|
+.[
+|>| MIFF|<--|
+|>| 1|<--|
+|>| TXT|<--|
+|>| [Sub-Format Name string]|<--|
+|>| [Sub-Format Version string]|<--|
+]
 
 	or
-	
-	|__>|MIFF|<--||line||__>|1|<--||line||__>|BIN|<--||line||__>|[Sub-Format Name string]|<--||line||__>|[Sub-Format Version string]|<--|
+
+.[
+|>| MIFF|<--|
+|>| 1|<--|
+|>| BIN|<--|
+|>| [Sub-Format Name string]|<--|
+|>| [Sub-Format Version string]|<--|
+]
 
 	|-->| means a tab character.  |<--| means a new line character.  The |>| is not part of the line, is it denoting the start of the line.
 
@@ -112,7 +124,7 @@ hhhh	|chapter| - Key
 
 .[
 12345
-;':][.,<>]'
+;':][.,|<||>|]`
 a_b_c
 $cost
 été
@@ -141,17 +153,12 @@ tcx	}
 tc	Key-Value block ends.
 
 t-
-tcx	|line||b |Basic Types| b||line|
+tcx	|line||b |Basic Value Types| b||line|
 
 t-
 tcx	2
 tcx	type
 tc	Type value.  One of these type codes or a user type code.
-
-t-
-tcx	3
-tcx	define
-tc	A series of key-type pairs.  You can define up to 4031 new types maximum.
 
 t-
 tcx	5
@@ -177,15 +184,74 @@ t-
 tcx	33 34
 tcx	r4 r8
 tc	A real value.  
-//	I do realize there are no standards for r16 - r256 but these are just placeholders for the future if they ever become standard.
 
 t-
-tcx	|line||b |User Tyes| b||line|
+tcx	40 41 42 43
+tcx	abi1 abi2 abi4 abi8
+tc	A 2D point using integers.
 
 t-
-tcx	64 and higher
-tcx	[user type name]
-tc	Depends on what the user type defines.  A define must exist first.
+tcx	50 51 52 53
+tcx	abn1 abn2 abn4 abn8
+tc	A 2D point using naturals.
+
+t-
+tcx	62 63
+tcx	abr4 abr8
+tc	A 2D point using reals.
+
+t-
+tcx	70 71 72 73
+tcx	abci1 abci2 abci4 abci8
+tc	A 3D point using integers.
+
+t-
+tcx	80 81 82 83
+tcx	abcn1 abcn2 abcn4 abcn8
+tc	A 3D point using naturals.
+
+t-
+tcx	92 93
+tcx	abcr4 abcr8
+tc	A 3D point using reals.
+
+t-
+tcx	100 101 102 103
+tcx	abcdi1 abcdi2 abcdi4 abcdi8
+tc	A 4D point using integers.
+
+t-
+tcx	110 111 112 113
+tcx	abcdn1 abcdn2 abcdn4 abcdn8
+tc	A 4D point using naturals.
+
+t-
+tcx	122 123
+tcx	abcdr4 abcdr8
+tc	A 4D point using reals.
+
+t-
+tcx	132 133
+tcx	mat2x2r4 mat2x2r8
+tc	A 2x2 r4 or r8 matrix
+
+t-
+tcx	142 143
+tcx	mat3x3r4 mat3x3r8
+tc	A 3x3 r4 or r8 matrix
+
+t-
+tcx	152 153
+tcx	mat4x4r4 mat4x4r8
+tc	A 4x4 r4 or r8 matrix
+
+t-
+tcx	|line||b | Variable Value Type| b||line|
+
+t-
+tcx	7
+tcx	v
+tc	Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used.
 
 ]
 
@@ -271,7 +337,7 @@ hhh	|chapter| - Real Number Representation
 
 hhh	|chapter| - Record Composition
 
-	|__>|[type code]|-->|[key]|-->|[array count]|-->|[compression flag]|-->|[value]|<--|
+.	|>| [type code]|-->|[key]|-->|[array count]|-->|[compression flag]|-->|[value]|<--|
 
 	Any space found in the key that is not a |-->| will be part of the key.  They will be significant.  Do not strip or reduce them.
 	There has to be one |-->| separator between each part.
@@ -281,7 +347,7 @@ hhh	|chapter| - Record Composition
 	
 	|b |Invalid:| b| Absolutely no |<--| anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra |-->| anywhere in the format.
 
-	|__>|[type code]|-->||-->|[key]|<--|[array count] [compression flag]|-->|[value]|<--|
+.	|>| [type code]|-->||-->|[key]|<--|[array count] [compression flag]|-->|[value]|<--|
 
 	What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
 
@@ -292,7 +358,14 @@ hh	|chapter| - Binary
 	
 hhh	|chapter| - Key Value Format
 
-	|__>||<|n2                 :value header(aaa c tttt tttt tttt)|>||line||___||<|n1                 :key byte count|>||line||___||<|key byte count + 1 :key|>||line||___||<|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|>||line||___||<|n4                 :chunk byte count (if c above is 1)|>||line||___||<|*                  :value|>|
+.[
+|<|n2                 :value header(aaa c tttt tttt tttt)|>|
+|<|n1                 :key byte count|>|
+|<|key byte count + 1 :key|>|
+|<|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|>|
+|<|n4                 :chunk byte count (if c above is 1)|>|
+|<|*                  :value|>|
+]
 
 
 hhhh	|chapter| - Key
@@ -329,7 +402,7 @@ hhhh	|chapter| - Special Case
 	Key Value Block End will just have the value header and nothing else follows.  (aaa) will be 000, (c) will be 0, and (tttttttttttt) will be 0.
 
 
-h	|chapter| - Fromat: Value Specifics
+h	|chapter| - Format: Value Specifics
 
 
 hh	|chapter| - Key-Value Block Begin and End.
@@ -340,31 +413,82 @@ hh	|chapter| - Key-Value Block Begin and End.
 
 	|b |Text| b|
 
-	|__>|{|-->|[key]|<--||line||__>|...|line||__>|}|<--|
+.[
+|>| {|-->|[key]|<--|
+|>| ...
+|>| }|<--|
+]
 
 	|b |Binary| b|
 
-	|__>||<|n2            :value header (000 0 1)|>||line||___||<|n1            :key byte count|>||line||___||<|key byte count:key|>||line||___|...|line||___||<|n2            :value header (000 0 0)|>|
+.[
+|<|n2            :value header (000 0 1)|>|
+|<|n1            :key byte count|>|
+|<|key byte count:key|>|
+...
+|<|n2            :value header (000 0 0)|>|
+]
 
 	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.
 	Array Count and Compression flags are never used with this value type.
 
 	|b |Example 1:|line|Text| b|
 
-	|__>|{|-->|docInfo|<--||line||__>|...|line||__>|}|<--|
+.[
+|>| {|-->|docInfo|<--|
+|>| ...
+|>| }|<--|
+]
 
 	|b |Binary| b|
 
-	|__>||<|n2 :000 0 1|>||<|n1 :7|>||<|7 :docInfo|>||line||___|...|line||___||<|n2 :000 0 0|>||line|
-	
+.[
+|<|n2 :000 0 1|>||<|n1 :7|>||<|7 :docInfo|>|
+...
+|<|n2 :000 0 0|>||line|
+]
+
 	|b |Example 2:|line|Text| b|
 
-	|__>|{|-->|level1|<--||line||__>|{|-->|level2|<--||line||__>|{|-->|level3|<--||line||__>|...|line||__>|}|<--||line||__>|{|-->|anotherLevel3|<--||line||__>|...|line||__>|}|<--||line||__>|}|<--||line||__>|{|-->|anotherLevel2|<--||line||__>|...|line||__>|}|<--||line||__>|}|<--||line||__>|{|-->|anotherLevel1|<--||line||__>|...|line||__>|}|<--||line|
+.[
+|>| {|-->|level1|<--|
+|>| {|-->|level2|<--|
+|>| {|-->|level3|<--|
+|>| ...
+|>| }|<--|
+|>| {|-->|anotherLevel3|<--|
+|>| ...
+|>| }|<--|
+|>| }|<--|
+|>| {|-->|anotherLevel2|<--|
+|>| ...
+|>| }|<--|
+|>| }|<--|
+|>| {|-->|anotherLevel1|<--|
+|>| ...
+|>| }|<--||line|
+]
 
 	|b |Binary| b|
 
-	|__>||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level1|>||line||___||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level2|>||line||___||<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level3|>||line||___|...|line||___||<|n2 :000 0 0|>||line||___||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel3|>||line||___|...|line||___||<|n2 :000 0 0|>||line||___||<|n2 :000 0 0|>||line||___||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel2|>||line||___|...|line||___||<|n2 :000 0 0|>||line||___||<|n2 :000 0 0|>||line||___||<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel1|>||line||___|...|line||___||<|n2 :000 0 0|>|
-
+.[
+|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level1|>|
+|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level2|>|
+|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level3|>|
+...
+|<|n2 :000 0 0|>|
+|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel3|>|
+...
+|<|n2 :000 0 0|>|
+|<|n2 :000 0 0|>|
+|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel2|>|
+...
+|<|n2 :000 0 0|>|
+|<|n2 :000 0 0|>|
+|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel1|>|
+...
+|<|n2 :000 0 0|>|
+]
 
 hh	|chapter| - Basic Values
 
@@ -372,20 +496,42 @@ hh	|chapter| - Basic Values
 
 	|b |Text| b|
 
-	|__>|[text type code]|-->|[key]|-->|1|-->|-|-->|[type value]|<--|
-	|__>|[text type code]|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-	|__>|[text type code]|-->|[key]|-->|[array count]|-->|-(|-->|[type value])*|<--|
-	|__>|[text type code]|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+.[
+|>| [text type code]|-->|[key]|-->|1|-->|-|-->|[type value]|<--|
+|>| [text type code]|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| [text type code]|-->|[key]|-->|[array count]|-->|-(|-->|[type value])*|<--|
+|>| [text type code]|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+]
 
 	|b |Binary| b|
 
-	|__>||<|n2               :value header (000 0 [type code])|>||line||___||<|n1               :key byte count|>||line||___||<|key byte count   :key|>||line||___||<|[type byte count]:[type data]|>|
+.[
+|<|n2               :value header (000 0 [type code])|>|
+|<|n1               :key byte count|>|
+|<|key byte count   :key|>|
+|<|[type byte count]:[type data]|>|
 
-	|__>||<|n2               :value header (000 1 [type code])|>||line||___||<|n1               :key byte count|>||line||___||<|key byte count   :key|>||line||___||<|n4               :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count:binary compressed data|>|)*
+|<|n2               :value header (000 1 [type code])|>|
+|<|n1               :key byte count|>|
+|<|key byte count   :key|>|
+|<|n4               :chunk byte count|>|
+(|<|n4                   :compressed byte count|>|
+ |<|compressed byte count:binary compressed data|>|)*
 
-	|__>||<|n2               :value header (aaa 0 [type code])|>||line||___||<|n1               :key byte count|>||line||___||<|key byte count   :key|>||line||___||<|n??              :array count|>||line||___||<|[type byte count] * array count:[type data]|>|
+|<|n2               :value header (aaa 0 [type code])|>|
+|<|n1               :key byte count|>|
+|<|key byte count   :key|>|
+|<|n??              :array count|>|
+|<|[type byte count] * array count:[type data]|>|
 
-	|__>||<|n2               :value header (aaa 1 [type code])|>||line||___||<|n1               :key byte count|>||line||___||<|key byte count   :key|>||line||___||<|n??              :array count|>||line||___||<|n4               :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count:binary compressed data|>|)*
+|<|n2               :value header (aaa 1 [type code])|>|
+|<|n1               :key byte count|>|
+|<|key byte count   :key|>|
+|<|n??              :array count|>|
+|<|n4               :chunk byte count|>|
+(|<|n4                   :compressed byte count|>|
+ |<|compressed byte count:binary compressed data|>|)*
+]
 
 	type byte counts for the simple types will be one of...
 
@@ -398,35 +544,55 @@ tcx	b, i1, n1
 tc	1
 
 t-
-tcx	type, i2, n2
+tcx	type, i2, n2, abi1, abn1
 tc	2
 
 t-
-tcx	i3, n3
+tcx	abci1, abcn1
 tc	3
 
 t-
-tcx	i4, n4, r4
+tcx	i4, n4, r4, abi2, abn2, abcdi1, abcdn2
 tc	4
 
 t-
-tcx	i8, n8, r8
+tcx	abci1, abcn1
+tc	6
+
+t-
+tcx	i8, n8, r8, abi4, abn4, abr4, abcdi2, abcdn2
 tc	8
 
 t-
-tcx	i16, n16
+tcx	abci4, abcn4, abcr4
+tc	12
+
+t-
+tcx	i16, n16, abi8, abn8, abr8, abcdi4, abcdn4, abcdr4, mat2x2r4r
 tc	16
 
 t-
-tcx	i32, n32
+tcx	abci8, abcn8, abcr8
+tc	24
+
+t-
+tcx	i32, n32, abcdi8, abcdn8, abcdr8, mat2x2r8
 tc	32
 
 t-
-tcx	i64, n64
+tcx	mat3x3r4
+tc	36
+
+t-
+tcx	i64, n64, mat4x4r4
 tc	64
 
 t-
-tcx	i128, n128
+tcx	mat3x3r8
+tc	72
+
+t-
+tcx	i128, n128, mat4x4r8
 tc	128
 
 t-
@@ -466,68 +632,98 @@ tcx	Byte count of type.  Big endian order.
 	If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one |-->| in text mode.
 
 	|b |Example 1:|line|Text| b|
-	|__>|type|-->|type1|-->|1|-->|-|-->|b|<--|
+.	|>| type|-->|type1|-->|1|-->|-|-->|b|<--|
 	|b |Binary| b|
-	|__>||<|n2 :000 0 2|>||<|n1 :5|>||<|5 :type1|>||<|n2 :8|>|
+.	|<|n2 :000 0 2|>||<|n1 :5|>||<|5 :type1|>||<|n2 :8|>|
 
 	|b |Example 2:|line|Text| b|
-	|__>|type|-->|type2|-->|2|-->|-|-->|b|-->|n4|<--|
+.	|>| type|-->|type2|-->|2|-->|-|-->|b|-->|n4|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 0 5|>||<|n1 :5|>||<|5 :type2|>||<|n1 :2|>||<|n2 * 2 :8 23|>|
+.	|<|n2 :001 0 5|>||<|n1 :5|>||<|5 :type2|>||<|n1 :2|>||<|n2 * 2 :8 23|>|
 
 	|b |Example 3:|line|Text| b|
-	|__>|type|-->|type3|-->|100000|-->|:|-->|10000|-->||line||___||___|2342|-->|[Base64 stream]|-->||line||___||___|4546|-->|[Base64 stream]|<--|
+.[
+type|-->|type3|-->|100000|-->|:|-->|10000|-->|
+  2342|-->|[Base64 stream]|-->|
+  4546|-->|[Base64 stream]|<--|
+]
 	|b |Binary| b|
-	|__>||<|n2 :011 1 5|>||<|n1 :5|>||<|5 :type3|>||<|n4 :100000|>||<|n4 :10000|>||line||___||___||<|n4 :2342|>||<|2342 :binary compressed data|>||line||___||___||<|n4 :4546|>||<|4546 :binary compressed data|>|
+.[
+|<|n2 :011 1 5|>||<|n1 :5|>||<|5 :type3|>||<|n4 :100000|>||<|n4 :10000|>|
+  |<|n4 :2342|>||<|2342 :binary compressed data|>|
+  |<|n4 :4546|>||<|4546 :binary compressed data|>|
+]
 
 	|b |Example 4:|line|Text| b|
-	|__>|b|-->|Bool1|-->|1|-->|-|-->|T|<--|
+.	|>| b|-->|Bool1|-->|1|-->|-|-->|T|<--|
 	|b |Binary| b|
-	|__>||<|n2 :000 0 8|>||<|n1 :5|>||<|5 :Bool1|>||<|n1 :1|>|
+.	|<|n2 :000 0 8|>||<|n1 :5|>||<|5 :Bool1|>||<|n1 :1|>|
 
 	|b |Example 5:|line|Text| b|
-	|__>|b|-->|Bool2|-->|10|-->|-|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
+.	|>| b|-->|Bool2|-->|10|-->|-|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 0 8|>||<|n1 :5|>||<|5 :Bool5|>||<|n1 :10|>||<|n1 * 10 :1 1 1 1 1 0 0 0 0 0|>|
+.	|<|n2 :001 0 8|>||<|n1 :5|>||<|5 :Bool5|>||<|n1 :10|>||<|n1 * 10 :1 1 1 1 1 0 0 0 0 0|>|
 
 	|b |Example 6:|line|Text| b|
-	|__>|i4|-->|1Int|-->|1|-->|-|-->|1024|<--|
+.	|>| i4|-->|1Int|-->|1|-->|-|-->|1024|<--|
 	|b |Binary| b|
-	|__>||<|n2 :000 0 13|>||<|n1 :4|>||<|4 :1Int|>||<|n4 :1024|>|
+.	|<|n2 :000 0 13|>||<|n1 :4|>||<|4 :1Int|>||<|n4 :1024|>|
 
 	|b |Example 7:|line|Text| b|
-	|__>|n4|-->|*Nat|-->|8|-->|-|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
+.	|>| n4|-->|*Nat|-->|8|-->|-|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 0 23|>||<|n1 :4|>||<|4 :*Nat|>||<|n1 :8|>||<|n4 * 8 :1 2 4 8 16 32 64 128|>|
+.	|<|n2 :001 0 23|>||<|n1 :4|>||<|4 :*Nat|>||<|n1 :8|>||<|n4 * 8 :1 2 4 8 16 32 64 128|>|
 
 	|b |Example 8:|line|Text| b|
-	|__>|r4|-->|1Real|-->|1|-->|-|-->|[Base64 encoded value]|<--|
+.	|>| r4|-->|1Real|-->|1|-->|-|-->|[Base64 encoded value]|<--|
 	|b |Binary| b|
-	|__>||<|n2 :000 0 33|>||<|n1 :5|>||<|5 :1Real|>||<|r4 :[binary r4 value]|>|
+.	|<|n2 :000 0 33|>||<|n1 :5|>||<|5 :1Real|>||<|r4 :[binary r4 value]|>|
 
 	|b |Example 9:|line|Text| b|
-	|__>|r8|-->|*Real|-->|3|-->|-|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
+.	|>| r8|-->|*Real|-->|3|-->|-|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 0 34|>||<|n1 :5|>||<|5 :*Real|>||<|n1 :3|>||<|n8 * 3 :[binary r8 value] * 3|>|
+.	|<|n2 :001 0 34|>||<|n1 :5|>||<|5 :*Real|>||<|n1 :3|>||<|n8 * 3 :[binary r8 value] * 3|>|
 
 hh	|chapter| - String values
 
 	|b |Text| b|
 
-	|__>|"|-->|[key]|-->|1|-->|-|-->|[string value]|<--|
-	|__>|"|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-	|__>|"|-->|[key]|-->|[array count]|-->|-(|-->|[string value])*|<--|
-	|__>|"|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+.[
+|>| "|-->|[key]|-->|1|-->|-|-->|[string value]|<--|
+|>| "|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| "|-->|[key]|-->|[array count]|-->|-(|-->|[string value])*|<--|
+|>| "|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+]
 
 	|b |Binary| b|
-	
-	|__>||<|n2             :value header (000 0 5)|>||line||___||<|n1             :key byte count|>||line||___||<|key byte count :key|>||line||___||<|(n1)*          :[string value]|<--||>|
 
-	|__>||<|n2             :value header (000 1 5)|>||line||___||<|n1             :key byte count|>||line||___||<|key byte count :key|>||line||___||<|n4             :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count:binary compressed data|>|)*
+.[
+|<|n2             :value header (000 0 5)|>|
+|<|n1             :key byte count|>|
+|<|key byte count :key|>|
+|<|(n1)*          :[string value]|<--||>|
 
-	|__>||<|n2             :value header (aaa 0 5)|>||line||___||<|n1             :key byte count|>||line||___||<|key byte count :key|>||line||___||<|n??            :array count|>||line||___||<|(n1)*          :[string value](|-->|[string value])*|<--||>|
+|<|n2             :value header (000 1 5)|>|
+|<|n1             :key byte count|>|
+|<|key byte count :key|>|
+|<|n4             :chunk byte count|>|
+(|<|n4                   :compressed byte count|>|
+|<|compressed byte count:binary compressed data|>|)*
 
-	|__>||<|n2             :value header (aaa 1 5)|>||line||___||<|n1             :key byte count|>||line||___||<|key byte count :key|>||line||___||<|n??            :array count|>||line||___||<|n4             :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count:binary compressed data|>|)*
+|<|n2             :value header (aaa 0 5)|>|
+|<|n1             :key byte count|>|
+|<|key byte count :key|>|
+|<|n??            :array count|>|
+|<|(n1)*          :[string value](|-->|[string value])*|<--||>|
+
+|<|n2             :value header (aaa 1 5)|>|
+|<|n1             :key byte count|>|
+|<|key byte count :key|>|
+|<|n??            :array count|>|
+|<|n4             :chunk byte count|>|
+(|<|n4                   :compressed byte count|>|
+|<|compressed byte count:binary compressed data|>|)*
+]
 
 	In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.
 	In a compressed byte array, the tabs in the stream will separate the strings like they do in the uncompressed text record.  The new line character will indicate the end of the string.
@@ -539,108 +735,47 @@ hh	|chapter| - String values
 ]
 
 	|b |Example 1:|line|Text| b|
-	|__>|"|-->|string1|-->|1|-->|-|-->|This is line1.\nThis is line 2.|<--|
+.	|>| "|-->|string1|-->|1|-->|-|-->|This is line1.\nThis is line 2.|<--|
 	|b |Binary| b|
-	|__>||<|n2 :000 0 5|>||<|n1 :7|>||<|7 :string1|>||<|(n1)* :This is line1.\nThis is line 2.|<--||>|
+.	|<|n2 :000 0 5|>||<|n1 :7|>||<|7 :string1|>||<|(n1)* :This is line1.\nThis is line 2.|<--||>|
 
 	|b |Example 2:|line|Text| b|
-	|__>|"|-->|string2|-->|1|-->|:|-->|1000000|-->|23424|-->|[Base64 stream]|-->|45894|-->|[Base64 stream]|<--|
+.	|>| "|-->|string2|-->|1|-->|:|-->|1000000|-->|23424|-->|[Base64 stream]|-->|45894|-->|[Base64 stream]|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 1 5|>||<|n1 :7|>||<|7 :string2|>||<|n4 :1000000|>||line||___||<|n4 :23424|>||<|23424 :binary compressed data|>||line||___||<|n4 :45894|>||<|45894 :binary compressed data|>|
+.[
+|<|n2 :001 1 5|>||<|n1 :7|>||<|7 :string2|>||<|n4 :1000000|>|
+|<|n4 :23424|>||<|23424 :binary compressed data|>|
+|<|n4 :45894|>||<|45894 :binary compressed data|>|
+]
 
 	|b |Example 3:|line|Text| b|
-	|__>|"|-->|stringList1|-->|3|-->|-|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
+.	|>| "|-->|stringList1|-->|3|-->|-|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 0 5|>||<|n1 :11|>||<|11 :stringList1|>||<|n1 :3|>||line||___||<|(n1)* :This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--||>|
+.[
+|<|n2 :001 0 5|>||<|n1 :11|>||<|11 :stringList1|>||<|n1 :3|>|
+|<|(n1)* :This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--||>|
+]
 
 	|b |Example 4:|line|Text| b|
-	|__>|"|-->|stringList2|-->|3|-->|:|-->|1000|-->|252|-->|[Base64 stream]|-->|543|-->|[Base64 stream]|<--|
+.	|>| "|-->|stringList2|-->|3|-->|:|-->|1000|-->|252|-->|[Base64 stream]|-->|543|-->|[Base64 stream]|<--|
 	|b |Binary| b|
-	|__>||<|n2 :001 1 5|>||<|n1 :11|>||<|11 :stringList2|>||<|n1 :3|>||<|n4 :1000|>||line||___||<|n4 :252|>||<|252 :binary compressed data|>||line||___||<|n4 :543|>||<|543 :binary compressed data|>|
+.[
+|<|n2 :001 1 5|>||<|n1 :11|>||<|11 :stringList2|>||<|n1 :3|>||<|n4 :1000|>|
+|<|n4 :252|>||<|252 :binary compressed data|>|
+|<|n4 :543|>||<|543 :binary compressed data|>|
+]
 
+hh	|chapter| - Variable values
 
-hh	|chapter| - Define User Type
+	Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
 
 	|b |Text| b|
 
-	|__>|define|-->|[key]|-->|[member count]|-->|-|-->|[type code](r|-->|[key]|-->|[array count]|-->|[compression type])*|<--|
+.[
+|>| v|-->|[key]|-->|*|-->|-|-->|[tab delimited values]|<--|
+|>| v|-->|[key]|-->|*|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+]
 
 	|b |Binary| b|
 
-	|__>||<|n2             :value header (aaa 0 3)|>||line||___||<|n1             :key byte count|>||line||___||<|key byte count :key|>||line||___||<|n??            :array count|>||line||___||<|n2             :user type code|>||line||___|(|<|n2                            :member variable value header (aaa c [type code])|>||line||___| |<|n1                            :member variable key byte count|>||line||___| |<|member variable key byte count:member variable key|>||line||___| |<|n??                           :array count if (aaa) not 000 or 111|>||line||___| |<|n4                            :chunk byte count if (c) is 1|>|)*
-
-	In the binary, the [user type code] is something the writer of the MIFF defines.  There is nothing special about this value except that it should be a value between 64 and 4095.  Also, no two user types can have the same user type code.
-	Compression is never used with this type code.
-
-	|b |Example 1:|line|Text| b|
-	|__>|define|-->|TypeContact|-->|5|-->|-|-->|64|-->||line||___||___|"|-->|NameGiven|-->|1|-->|-|-->||line||___||___|"|-->|NameFamily|-->|1|-->|-|-->||line||___||___|n1|-->|Age|-->|1|-->|-|-->||line||___||___|"|-->|EMail|-->|1|-->|-|-->||line||___||___|n1|-->|DataFlags|-->|5|-->|-|<--|
-	Note: There are no new lines or spacing for indentation.  The above would all be on a signle line where each character follows right after each other.  It is only shown this way to make it easier to see the structure.
-	|b |Binary| b|
-	|__>||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :TypeContact|>||<|n1 :6|>||<|n2 :64|>||line||___||<|n2 :000 0  5|>||<|n1 : 9|>||<| 9 :NameGiven|>||line||___||<|n2 :000 0  5|>||<|n1 :10|>||<|10 :NameFamily|>||line||___||<|n2 :000 0 20|>||<|n1 : 3|>||<| 3 :Age|>||line||___||<|n2 :000 0  5|>||<|n1 : 5|>||<| 5 :Email|>||line||___||<|n2 :001 0 20|>||<|n1 : 9|>||<| 9 :DataFlags|>||<|n1 :5|>|
-
-	|b |Example 2:|line|Text| b|
-	|__>|define|-->|Image|-->|3|-->|-|-->|65|-->||line||___||___|n4|-->|Width|-->|1|-->|-|-->||line||___||___|n4|-->|Height|-->|1|-->|-|-->||line||___||___|n1|-->|Pixels|-->|*|-->|:|-->|1000000|<--|
-	|b |Binary| b|
-	|__>||<|n2 :001 0  3|>||<|n1 :5|>||<|5 :Image|>||<|n1 :3|>||<|n2 :65|>||line||___||<|n2 :000 0 23|>||<|n1 :5|>||<|5 :Width|>||line||___||<|n2 :000 0 23|>||<|n1 :6|>||<|6 :Height|>||line||___||<|n2 :111 1 20|>||<|n1 :6|>||<|6 :Pixels|>||<|n4 :1000000|>|
-
-	|b |Example 3:|line|Text| b|
-	|__>|define|-->|Binary Blob|-->|2|-->|-|-->|66|-->||line||___||___|n4|-->|Byte Count|-->|1|-->|-|-->||line||___||___|n1|-->|Byte Data|-->|*|-->|:|-->|1000000|<--|
-	|b |Binary| b|
-	|__>||<|n2 :001 0  3|>||<|n1 :11|>||<|11 :Binary Blob|>||<|n1 :2|>||<|n2 :66|>||line||___||<|n2 :000 0 23|>||<|n1 :10|>||<|10 :Byte Count|>||line||___||<|n2 :111 1 20|>||<|n1 : 9|>||<| 9 :Byte Data|>||<|n4 :1000000|>|
-
-
-	As shown in the above, "Pixels" or "Byte Data" is an array of values but this array appears to be variable in length and we do not know its byte count when we defined the type.  The byte count will be provided when the data for the type is provided.
-
-	What would happen if a type is redefined in a MIFF file like...
-
-	|__>|define|-->|point|-->|1|-->|-|-->|r4|-->|value|-->|3|-->|-|<--|
-	|___|...
-	|__>|define|-->|point|-->|3|-->|-|-->|r8|-->|east|-->|1|-->|-|-->|r8|-->|north|-->|1|-->|-|-->|r8|-->|elevation|-->|1|-->|-|<--|
-
-	In both text and binary, if you redefine a user type then the previous user type will be replaced with the new one.  However this case is discouraged.
-	Can user types be nested?  Yes, you can add an existing user type to an existing user type.
-	Can user types be recursive or cyclic?  Technically this can happen but it is not allowed.  The reason being is that this will lead to an infinite loop and eventually a stack overflow or similar error.  There is code that will test for this and will stop an import or export when detected.
-
-
-hh	|chapter| - User Data
-
-	The value of a user type.  A "define" needs to be present before it can be used.  The values that follow are in the order that the user type defined them and are similarly displayed in the form that the user type defined them.
-
-	|b |Text| b|
-	|__>|[user type]|-->|[key]|-->|1|-->|-|-->|[user type data]|<--|
-	|__>|[user type]|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-	|__>|[user type]|-->|[key]|-->|[array count]|-->|-(|-->|[user type data])*|<--|
-	|__>|[user type]|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-	
-	|b |Binary| b|
-	|__>||<|n2                    :000 0 [user type code]|>||line||___||<|n1                    :key byte count|>||line||___||<|key byte count        :key|>|[user type data]
-	|__>||<|n2                    :000 1 [user type code]|>||line||___||<|n1                    :key byte count|>||line||___||<|key byte count        :key|>||line||___||<|n4                    :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count: compressed date|>|)*
-	|__>||<|n2                    :aaa 0 [user type code]|>||line||___||<|n1                    :key byte count|>||line||___||<|key byte count        :key|>||line||___||<|n??                   :array count|>||line||___|[user type data]
-	|__>||<|n2                    :aaa 1 [user type code]|>||line||___||<|n1                    :key byte count|>||line||___||<|key byte count        :key|>||line||___||<|n??                   :array count|>||line||___||<|n4                    :chunk byte count|>||line||___|(|<|n4                   :compressed byte count|>||line||___| |<|compressed byte count: compressed date|>|)*
-
-	If compression is used then the values are collated into a buffer first before compressing.  Taking the types from the above section that defined them...
-
-	|b |Example 1:|line|Text| b|
-	|__>|TypeContact|-->|Contact1|-->|1|-->|-|-->||line||___||___|Robbert|-->|de Groot|-->|100|-->|zekaric@gmail.com|-->|1|-->|1|-->|2|-->|3|-->|5|<--|
-	|b |Binary| b|
-	|__>||<|n2 :000 0 64|>||<|n1 :8|>||<|8 :Contact1|>||line||___||___||<|(n1)* :Robbert|<--||>||<|(n1)* :de Groot|<--||>||<|n1 :100|>||<|(n1)* :zekaric@gmail.com|<--||>||<|n1 * 5:1 2 3 4 5|>|
-	
-	|b |Example 2:|line|Text| b|
-	|__>|TypeContact|-->|Contact2|-->|1|-->|:|-->|10000|-->||line||___||___|521|-->|[Base64 stream]|<--|
-	|b |Binary| b|
-	|__>||<|n2 :000 1 64|>||<|n1 :8|>||<|8 :Contact1|>||<|n4 :10000|>||line||___||___||<|n4 :521|>||<|521 :compressed binary data|>|
-	
-	|b |Exmaple 3:|line|Text| b|
-	|__>|TypeContact|-->|ContactList1|-->|2|-->|-|-->||line||___||___|Robbert|-->|de Groot|-->|100|-->|zekaric@gmail.com|-->|1|-->|1|-->|2|-->|3|-->|5|-->||line||___||___|Sherlock|-->|Holms|-->|32|-->|221b@bakerst.uk|-->|10|-->|20|-->|30|-->|40|-->|50|<--|
-	|b |Binary| b|
-	|__>||<|n2 :001 0 64|>||<|n1 :12|>||<|12 :ContactList1|>||<|n1 :2|>||line||___||___||<|(n1)* :Robbert|<--||>||<|(n1)* :de Groot|<--||>||<|n1 :100|>||<|(n1)* :zekaric@gmail.com|<--||>||<|n1 * 5:1 2 3 4 5|>||line||___||___||<|(n1)* :Sherlock|<--||>||<|(n1)* :Holms|<--||>||<|n1 :32|>||<|(n1)* :221b@bakerst.uk|<--||>||<|n1 * 5:10 20 30 40 50|>|
-	
-	|b |Example 4:|line|Text| b|
-	|__>|TypeContact|-->|ContactList2|-->|2|-->|:|-->|100000|-->||line||___||___|5213|-->|[Base64 stream]|-->||line||___||___|32784|-->|[Base64 stream]|<--|
-	|b |Binary| b|
-	|__>||<|n2 :001 1 64|>||<|n1 :12|>||<|12 :ContactList2|>||<|n1 :2|>||<|n4 :100000|>||line||___||___||<|n4 :5213|>||<|5213 :compressed binary data|>||line||___||___||<|n4 :32784|>||<|32784 :compressed binary data|>|
-
-	|b |Example 5:|line|Text| b|
-	|__>|Image|-->|Portrait|-->|1|-->|-|-->||line||___||___|256|-->|256|-->|17899|-->|[Base64 stream]|<--|
-	|b |Binary| b|
-	|__>||<|n2 :000 0 65|>||<|n1 :8|>||<|8 :Portrait|>||line||___||___||<|n4 :256|>||<|n4 :256|>||<|n4 :17899|>||<|17899 :compressed binary data|>|
+	todo.

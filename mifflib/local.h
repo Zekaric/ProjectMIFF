@@ -106,7 +106,6 @@ MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, 
 MiffBool  _CompressStart(              Miff * const miff, MiffN4 const compressedChunkByteCount);
 void      _CompressStop(               Miff * const miff);
 MiffBool  _CompressWrite(              Miff * const miff, MiffN4 const byteCount, void const * const byteData);
-MiffBool  _CreateDefineList(           Miff * const miff);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
 #define   _C2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))
@@ -126,7 +125,7 @@ void      _MemStop(                    void);
 #define   _MemCreateType(            TYPE)           (TYPE *) _MemCreate(                    sizeof(TYPE))
 #define   _MemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MemCreate(          (COUNT) * sizeof(TYPE))
 
-MiffN4    _TypeGetSize(                Miff const * const miff, MiffValueType const type);
+MiffN4    _TypeGetSize(                Miff const * const miff, MiffType const type);
 
 MiffBool  _WriteCompressByte(          Miff       * const miff, MiffN1 const byte);
 MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * const value);
@@ -137,19 +136,19 @@ MiffBool  _WriteTxtRecordCompressFlag( Miff const * const miff, MiffBool const i
 MiffBool  _WriteTxtRecordEnder(        Miff const * const miff);
 MiffBool  _WriteTxtRecordKeyC2(        Miff const * const miff, MiffC2 const * const key);
 MiffBool  _WriteTxtRecordSeparator(    Miff const * const miff);
-MiffBool  _WriteTxtRecordType(         Miff const * const miff, MiffValueType const type);
-MiffBool  _WriteTxtType(               Miff const * const miff,                           MiffValueType const value);
-MiffBool  _WriteTxtValue1(             Miff const * const miff, MiffValueType const type, Miff1  const value);
-MiffBool  _WriteTxtValue2(             Miff const * const miff, MiffValueType const type, Miff2  const value);
-MiffBool  _WriteTxtValue4(             Miff const * const miff, MiffValueType const type, Miff4  const value);
-MiffBool  _WriteTxtValue8(             Miff const * const miff, MiffValueType const type, Miff8  const value);
+MiffBool  _WriteTxtRecordType(         Miff const * const miff, MiffType const type);
+MiffBool  _WriteTxtType(               Miff const * const miff,                           MiffType const value);
+MiffBool  _WriteTxtValue1(             Miff const * const miff, MiffType const type, Miff1  const value);
+MiffBool  _WriteTxtValue2(             Miff const * const miff, MiffType const type, Miff2  const value);
+MiffBool  _WriteTxtValue4(             Miff const * const miff, MiffType const type, Miff4  const value);
+MiffBool  _WriteTxtValue8(             Miff const * const miff, MiffType const type, Miff8  const value);
 MiffBool  _WriteTxtValueI(             Miff const * const miff,                           MiffI8 const value);
 MiffBool  _WriteTxtValueN(             Miff const * const miff,                           MiffN8 const value);
-MiffBool  _WriteTxtValueType(          Miff const * const miff,                           MiffValueType const value);
+MiffBool  _WriteTxtValueType(          Miff const * const miff,                           MiffType const value);
 MiffBool  _WriteTxtValueC2(            Miff const * const miff,                           MiffC2 const * const value);
-MiffBool  _WriteValue1(                Miff       * const miff, MiffValueType const type, Miff1 value);
-MiffBool  _WriteValue2(                Miff       * const miff, MiffValueType const type, Miff2 value);
-MiffBool  _WriteValue4(                Miff       * const miff, MiffValueType const type, Miff4 value);
-MiffBool  _WriteValue8(                Miff       * const miff, MiffValueType const type, Miff8 value);
+MiffBool  _WriteValue1(                Miff       * const miff, MiffType const type, Miff1 value);
+MiffBool  _WriteValue2(                Miff       * const miff, MiffType const type, Miff2 value);
+MiffBool  _WriteValue4(                Miff       * const miff, MiffType const type, Miff4 value);
+MiffBool  _WriteValue8(                Miff       * const miff, MiffType const type, Miff8 value);
 
 #endif

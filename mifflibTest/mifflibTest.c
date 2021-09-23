@@ -203,11 +203,6 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 {
    FILE           *file;
    Miff           *miff;
-   MiffValueType   idMatrix,
-                   idPoint,
-                   idPoly,
-                   idBinary,
-                   idBinaryZ;
    MiffI4          index;
    MiffN1          binary[] =
    {
@@ -740,6 +735,36 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
    };
+   MiffABI1   abi1   = { -10, -20 };
+   MiffABI2   abi2   = { -10, -20 };
+   MiffABI4   abi4   = { -10, -20 };
+   MiffABN1   abn1   = {  10,  20 };
+   MiffABN2   abn2   = {  10,  20 };
+   MiffABN4   abn4   = {  10,  20 };
+   MiffABR4   abr4   = {  11.1f, 22.2f };
+   MiffABR8   abr8   = {  11.1,  22.2 };
+   MiffABCI1  abci1  = { -10, -20, -30 };
+   MiffABCI2  abci2  = { -10, -20, -30 };
+   MiffABCI4  abci4  = { -10, -20, -30 };
+   MiffABCN1  abcn1  = {  10,  20,  30 };
+   MiffABCN2  abcn2  = {  10,  20,  30 };
+   MiffABCN4  abcn4  = {  10,  20,  30 };
+   MiffABCR4  abcr4  = {  11.1f, 22.2f, 33.3f };
+   MiffABCR8  abcr8  = {  11.1,  22.2,  33.3 };
+   MiffABCDI1 abcdi1 = { -10, -20, -30, -40 };
+   MiffABCDI2 abcdi2 = { -10, -20, -30, -40 };
+   MiffABCDI4 abcdi4 = { -10, -20, -30, -40 };
+   MiffABCDN1 abcdn1 = {  10,  20,  30,  40 };
+   MiffABCDN2 abcdn2 = {  10,  20,  30,  40 };
+   MiffABCDN4 abcdn4 = {  10,  20,  30,  40 };
+   MiffABCDR4 abcdr4 = {  11.1f, 22.2f, 33.3f, 44.4f };
+   MiffABCDR8 abcdr8 = {  11.1,  22.2,  33.3,  44.4 };
+   MiffMatrix2x2R4 matrix2x2r4 = { 1.1f, 1.2f,             2.1f, 2.2f };
+   MiffMatrix2x2R8 matrix2x2r8 = { 1.1,  1.2,              2.1,  2.2  };
+   MiffMatrix3x3R4 matrix3x3r4 = { 1.1f, 1.2f, 1.3f,       2.1f, 2.2f, 2.3f,       3.1f, 3.2f, 3.3f };
+   MiffMatrix3x3R8 matrix3x3r8 = { 1.1,  1.2,  1.3,        2.1,  2.2,  2.3,        3.1,  3.2,  3.3  };
+   MiffMatrix4x4R4 matrix4x4r4 = { 1.1f, 1.2f, 1.3f, 1.4f, 2.1f, 2.2f, 2.3f, 2.4f, 3.1f, 3.2f, 3.3f, 3.4f, 4.1f, 4.2f, 4.3f, 4.4f };
+   MiffMatrix4x4R8 matrix4x4r8 = { 1.1,  1.2,  1.3,  1.4,  2.1,  2.2,  2.3,  2.4,  3.1,  3.2,  3.3,  3.4,  4.1,  4.2,  4.3,  4.4 };
 
    file = NULL;
    miff = NULL;
@@ -802,14 +827,45 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffSet1R8(           miff, L"R8_-1",    -1.0);
       miffSet1R8(           miff, L"R8_PI",    3.14159);
 
-      miffSet1Type(         miff, L"TypeBool", miffValueTypeBOOLEAN);
-      miffSet1Type(         miff, L"TypeKey",  miffValueTypeTYPE);
+      miffSet1Type(         miff, L"TypeBool", miffTypeBOOLEAN);
+      miffSet1Type(         miff, L"TypeKey",  miffTypeTYPE);
 
       miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
+      miffRecordSetBegin(miff, miffTypeABI1,        L"ABI1",   1, miffBoolFALSE, 0); miffSetValueABI1(       miff, &abi1       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABI2,        L"ABI2",   1, miffBoolFALSE, 0); miffSetValueABI2(       miff, &abi2       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABI4,        L"ABI4",   1, miffBoolFALSE, 0); miffSetValueABI4(       miff, &abi4       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABN1,        L"ABN1",   1, miffBoolFALSE, 0); miffSetValueABN1(       miff, &abn1       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABN2,        L"ABN2",   1, miffBoolFALSE, 0); miffSetValueABN2(       miff, &abn2       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABN4,        L"ABN4",   1, miffBoolFALSE, 0); miffSetValueABN4(       miff, &abn4       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABR4,        L"ABR4",   1, miffBoolFALSE, 0); miffSetValueABR4(       miff, &abr4       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABR8,        L"ABR8",   1, miffBoolFALSE, 0); miffSetValueABR8(       miff, &abr8       ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCI1,       L"ABCI1",  1, miffBoolFALSE, 0); miffSetValueABCI1(      miff, &abci1      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCI2,       L"ABCI2",  1, miffBoolFALSE, 0); miffSetValueABCI2(      miff, &abci2      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCI4,       L"ABCI4",  1, miffBoolFALSE, 0); miffSetValueABCI4(      miff, &abci4      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCN1,       L"ABCN1",  1, miffBoolFALSE, 0); miffSetValueABCN1(      miff, &abcn1      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCN2,       L"ABCN2",  1, miffBoolFALSE, 0); miffSetValueABCN2(      miff, &abcn2      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCN4,       L"ABCN4",  1, miffBoolFALSE, 0); miffSetValueABCN4(      miff, &abcn4      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCR4,       L"ABCR4",  1, miffBoolFALSE, 0); miffSetValueABCR4(      miff, &abcr4      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCR8,       L"ABCR8",  1, miffBoolFALSE, 0); miffSetValueABCR8(      miff, &abcr8      ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDI1,      L"ABCDI1", 1, miffBoolFALSE, 0); miffSetValueABCDI1(     miff, &abcdi1     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDI2,      L"ABCDI2", 1, miffBoolFALSE, 0); miffSetValueABCDI2(     miff, &abcdi2     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDI4,      L"ABCDI4", 1, miffBoolFALSE, 0); miffSetValueABCDI4(     miff, &abcdi4     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDN1,      L"ABCDN1", 1, miffBoolFALSE, 0); miffSetValueABCDN1(     miff, &abcdn1     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDN2,      L"ABCDN2", 1, miffBoolFALSE, 0); miffSetValueABCDN2(     miff, &abcdn2     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDN4,      L"ABCDN4", 1, miffBoolFALSE, 0); miffSetValueABCDN4(     miff, &abcdn4     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDR4,      L"ABCDR4", 1, miffBoolFALSE, 0); miffSetValueABCDR4(     miff, &abcdr4     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeABCDR8,      L"ABCDR8", 1, miffBoolFALSE, 0); miffSetValueABCDR8(     miff, &abcdr8     ); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX2X2R4, L"mat224", 1, miffBoolFALSE, 0); miffSetValueMatrix2x2R4(miff, &matrix2x2r4); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX2X2R8, L"mat228", 1, miffBoolFALSE, 0); miffSetValueMatrix2x2R8(miff, &matrix2x2r8); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX3X3R4, L"mat334", 1, miffBoolFALSE, 0); miffSetValueMatrix3x3R4(miff, &matrix3x3r4); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX3X3R8, L"mat338", 1, miffBoolFALSE, 0); miffSetValueMatrix3x3R8(miff, &matrix3x3r8); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, L"mat444", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R4(miff, &matrix4x4r4); miffRecordSetEnd(miff);
+      miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, L"mat448", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R8(miff, &matrix4x4r8); miffRecordSetEnd(miff);
+
       miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) n1array);
       miffSetNN1(           miff, L"N1_Array",     256,     n1array);
-      miffRecordSetBegin(   miff, miffValueTypeI1, L"I1 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
+      miffRecordSetBegin(   miff, miffTypeI1, L"I1 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI1(            miff, ((MiffI1 *) n1array)[index]);
@@ -819,7 +875,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) n2array);
       miffSetNN2(           miff, L"N2_Array",     256,     n2array);
-      miffRecordSetBegin(   miff, miffValueTypeI2, L"I2 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
+      miffRecordSetBegin(   miff, miffTypeI2, L"I2 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI2(            miff, ((MiffI2 *) n2array)[index]);
@@ -829,7 +885,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) n4array);
       miffSetNN4(           miff, L"N4_Array",     256,     n4array);
-      miffRecordSetBegin(   miff, miffValueTypeI4, L"I4 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
+      miffRecordSetBegin(   miff, miffTypeI4, L"I4 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI4(            miff, ((MiffI4 *) n4array)[index]);
@@ -839,7 +895,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) n8array);
       miffSetNN8(           miff, L"N8_Array",     256,     n8array);
-      miffRecordSetBegin(   miff, miffValueTypeI8, L"I8 ArrayZ", 256 * 3, miffBoolTRUE, 4000);
+      miffRecordSetBegin(   miff, miffTypeI8, L"I8 ArrayZ", 256 * 3, miffBoolTRUE, 4000);
       for (index = 0; index < 256 * 3; index++)
       {
          miffSetValueI8(            miff, ((MiffI8 *) n8array)[index]);
@@ -849,7 +905,7 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSetNR4(           miff, L"R4_Array",     300,     reals4);
       miffSetNR8(           miff, L"R8_Array",     300,     reals8);
-      miffRecordSetBegin(   miff, miffValueTypeR8, L"R8 ArrayZ", 300, miffBoolTRUE, 9999);
+      miffRecordSetBegin(   miff, miffTypeR8, L"R8 ArrayZ", 300, miffBoolTRUE, 9999);
       for (index = 0; index < 300; index++)
       {
          miffSetValueR8(            miff, reals8[index]);
@@ -860,181 +916,6 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffSetNStringC2(     miff, L"String_Array", 10,   strings);
 
       miffSetNBoolean(      miff, L"Bool_Array",   100,  bools);
-
-      idMatrix = miffValueTypeFIRST_USER_TYPE + 0;
-      miffSetDefineHeader(  miff, idMatrix, L"Matrix", 1);
-      {
-         miffSetDefineValue(miff, miffValueTypeR4,       L"Cell",  16, miffBoolFALSE, 0);
-      }
-
-      idPoint  = miffValueTypeFIRST_USER_TYPE + 1;
-      miffSetDefineHeader(  miff, idPoint, L"Point",  4);
-      {
-         miffSetDefineValue(miff, miffValueTypeSTRING,   L"ID",    1, miffBoolFALSE, 0);
-         miffSetDefineValue(miff, miffValueTypeR4,       L"E",     1, miffBoolFALSE, 0);
-         miffSetDefineValue(miff, miffValueTypeR4,       L"N",     1, miffBoolFALSE, 0);
-         miffSetDefineValue(miff, miffValueTypeR4,       L"Z",     1, miffBoolFALSE, 0);
-      }
-
-      idPoly = miffValueTypeFIRST_USER_TYPE + 2;
-      miffSetDefineHeader(  miff, idPoly, L"Poly", 2);
-      {
-         miffSetDefineValue(miff, miffValueTypeSTRING,   L"ID",    1,                     miffBoolFALSE, 0);
-         miffSetDefineValue(miff, idPoint,               L"PList", miffArrayCountUNKNOWN, miffBoolFALSE, 0);
-      }
-
-      idBinary = miffValueTypeFIRST_USER_TYPE + 3;
-      miffSetDefineHeader(  miff, idBinary, L"Blob",   2);
-      {
-         miffSetDefineValue(miff, miffValueTypeN4,       L"Count", 1,                     miffBoolFALSE, 0);
-         miffSetDefineValue(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffBoolFALSE, 0);
-      }
-
-      idBinaryZ = miffValueTypeFIRST_USER_TYPE + 4;
-      miffSetDefineHeader(  miff, idBinaryZ, L"BlobZ",   2);
-      {
-         miffSetDefineValue(miff, miffValueTypeN4,       L"Count", 1,                     miffBoolFALSE, 0);
-         miffSetDefineValue(miff, miffValueTypeN1,       L"Bytes", miffArrayCountUNKNOWN, miffBoolTRUE,  9999);
-      }
-
-      miffRecordSetBegin(        miff, idBinary, L"BinValue", 1, miffBoolFALSE, 0);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(          miff);
-
-
-      miffRecordSetBegin(        miff, idBinary, L"BinList", 2, miffBoolFALSE, 0);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-
-      miffRecordSetNextArrayItem(miff, 0, 2);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, n1array[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(          miff);
-
-
-      miffRecordSetBegin(        miff, idBinary, L"BinListZ", 2, miffBoolTRUE, 9999);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-
-      miffRecordSetNextArrayItem(miff, 0, 2);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, n1array[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(          miff);
-
-
-      miffRecordSetBegin(        miff, idBinaryZ, L"BinZValue", 1, miffBoolFALSE, 0);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(miff);
-
-      miffRecordSetBegin(        miff, idBinaryZ, L"BinZList", 2, miffBoolFALSE, 0);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-
-      miffRecordSetNextArrayItem(miff, 0, 2);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, n1array[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(          miff);
-
-
-      miffRecordSetBegin(        miff, idBinaryZ, L"BinZListZ", 2, miffBoolTRUE, 9999);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, binary[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-
-      miffRecordSetNextArrayItem(miff, 0, 2);
-      miffRecordPushType(        miff);
-      miffSetValueN4(            miff, 256 * 3);
-      miffRecordPopType(         miff);
-      miffRecordSetNextVariable( miff);
-      miffRecordPushType(        miff);
-      for (index = 0; index < 256 * 3; index++)
-      {
-         miffSetValueN1(            miff, n1array[index]);
-         miffRecordSetNextArrayItem(miff, index, 256 * 3);
-      }
-      miffRecordPopType(         miff);
-      miffRecordSetEnd(          miff);
-
 
       miffSetBlockStart(miff, L"KeyValueBlock");
       {
@@ -1082,8 +963,8 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
          miffSet1R8(           miff, L"R8_-1",    -1.0);
          miffSet1R8(           miff, L"R8_PI",    3.14159);
 
-         miffSet1Type(         miff, L"TypeBool", miffValueTypeBOOLEAN);
-         miffSet1Type(         miff, L"TypeType", miffValueTypeTYPE);
+         miffSet1Type(         miff, L"TypeBool", miffTypeBOOLEAN);
+         miffSet1Type(         miff, L"TypeType", miffTypeTYPE);
 
          miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 

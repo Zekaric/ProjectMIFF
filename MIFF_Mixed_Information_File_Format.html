@@ -718,11 +718,41 @@ This is also a valid key with internal spaces
 <h2 class="zword"><a name="3.4">3.4 - Variable values</a></h2>
 <p class="zword">Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.</p>
 <p class="zword"><strong>Text</strong></p>
-<p class="zwordPre">&gt; v<img src="tab.png" />[key]<img src="tab.png" />*<img src="tab.png" />-<img src="tab.png" />[tab delimited values]<img src="nl.png" />
-&gt; v<img src="tab.png" />[key]<img src="tab.png" />*<img src="tab.png" />:<img src="tab.png" />[chunk byte count]<img src="tab.png" />(<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" />
+<p class="zwordPre">&gt; v<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />-<img src="tab.png" />[tab delimited values]<img src="nl.png" />
+&gt; v<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />:<img src="tab.png" />[chunk byte count]<img src="tab.png" />(<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" />
+&gt; v<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />-<img src="tab.png" />[tab delimited values]<img src="nl.png" />
+&gt; v<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />:<img src="tab.png" />[chunk byte count]<img src="tab.png" />(<img src="tab.png" />[compressed byte count]<img src="tab.png" />[Base64 stream])*<img src="nl.png" />
 </p>
 <p class="zword"><strong>Binary</strong></p>
-<p class="zword">todo.</p>
+<p class="zwordPre">&lt;n2            :value header (000 0 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+([refer to the other types on how values are stored])*
+
+
+&lt;n2            :value header (000 1 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n4            :chunk byte count&gt;
+(&lt;n4                   :compressed byte count&gt;
+ &lt;compressed byte count:binary compressed data&gt;)*
+
+
+&lt;n2            :value header (aaa 0 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n??           :array count&gt;
+([refer to the other types on how values are stored])*
+
+
+&lt;n2            :value header (aaa 1 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n??           :array count&gt;
+(&lt;n4                   :chunk byte count&gt;
+ &lt;compressed byte count:binary compressed data&gt;)*
+</p>
+<p class="zword">A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has not idea what one value means.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control on what goes into the variable type.</p>
  </body>
 
 </html>

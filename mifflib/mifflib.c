@@ -380,6 +380,270 @@ MiffBool miffSetBlockStop(Miff * const miff)
 }
 
 /******************************************************************************
+func: miffSet1ABI1
+******************************************************************************/
+MiffBool miffSet1ABI1(Miff * const miff, MiffC2 const * const key, MiffABI1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABI1(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABI2
+******************************************************************************/
+MiffBool miffSet1ABI2(Miff * const miff, MiffC2 const * const key, MiffABI2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABI2(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABI4
+******************************************************************************/
+MiffBool miffSet1ABI4(Miff * const miff, MiffC2 const * const key, MiffABI4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABI4(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABN1
+******************************************************************************/
+MiffBool miffSet1ABN1(Miff * const miff, MiffC2 const * const key, MiffABN1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABN1(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABN2
+******************************************************************************/
+MiffBool miffSet1ABN2(Miff * const miff, MiffC2 const * const key, MiffABN2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABN2(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABN4
+******************************************************************************/
+MiffBool miffSet1ABN4(Miff * const miff, MiffC2 const * const key, MiffABN4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABN4(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABR4
+******************************************************************************/
+MiffBool miffSet1ABR4(Miff * const miff, MiffC2 const * const key, MiffABR4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABR4(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABR8
+******************************************************************************/
+MiffBool miffSet1ABR8(Miff * const miff, MiffC2 const * const key, MiffABR8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABR8(   miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCI1
+******************************************************************************/
+MiffBool miffSet1ABCI1(Miff * const miff, MiffC2 const * const key, MiffABCI1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCI1(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCI2
+******************************************************************************/
+MiffBool miffSet1ABCI2(Miff * const miff, MiffC2 const * const key, MiffABCI2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCI2(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCI4
+******************************************************************************/
+MiffBool miffSet1ABCI4(Miff * const miff, MiffC2 const * const key, MiffABCI4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCI4(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCN1
+******************************************************************************/
+MiffBool miffSet1ABCN1(Miff * const miff, MiffC2 const * const key, MiffABCN1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCN1(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCN2
+******************************************************************************/
+MiffBool miffSet1ABCN2(Miff * const miff, MiffC2 const * const key, MiffABCN2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCN2(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCN4
+******************************************************************************/
+MiffBool miffSet1ABCN4(Miff * const miff, MiffC2 const * const key, MiffABCN4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCN4(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCR4
+******************************************************************************/
+MiffBool miffSet1ABCR4(Miff * const miff, MiffC2 const * const key, MiffABCR4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCR4(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCR8
+******************************************************************************/
+MiffBool miffSet1ABCR8(Miff * const miff, MiffC2 const * const key, MiffABCR8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCR8(  miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDI1
+******************************************************************************/
+MiffBool miffSet1ABCDI1(Miff * const miff, MiffC2 const * const key, MiffABCDI1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDI1( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDI2
+******************************************************************************/
+MiffBool miffSet1ABCDI2(Miff * const miff, MiffC2 const * const key, MiffABCDI2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDI2( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDI4
+******************************************************************************/
+MiffBool miffSet1ABCDI4(Miff * const miff, MiffC2 const * const key, MiffABCDI4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDI4( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDN1
+******************************************************************************/
+MiffBool miffSet1ABCDN1(Miff * const miff, MiffC2 const * const key, MiffABCDN1 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDN1( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDN2
+******************************************************************************/
+MiffBool miffSet1ABCDN2(Miff * const miff, MiffC2 const * const key, MiffABCDN2 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDN2( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDN4
+******************************************************************************/
+MiffBool miffSet1ABCDN4(Miff * const miff, MiffC2 const * const key, MiffABCDN4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDN4( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDR4
+******************************************************************************/
+MiffBool miffSet1ABCDR4(Miff * const miff, MiffC2 const * const key, MiffABCDR4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDR4( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1ABCDR8
+******************************************************************************/
+MiffBool miffSet1ABCDR8(Miff * const miff, MiffC2 const * const key, MiffABCDR8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueABCDR8( miff, value));
+   returnFalseIf(!miffRecordSetEnd(   miff));
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffSet1Boolean
 ******************************************************************************/
 MiffBool miffSet1Boolean(Miff * const miff, MiffC2 const * const key, MiffBool const value)
@@ -431,6 +695,72 @@ MiffBool miffSet1I8(Miff * const miff, MiffC2 const * const key, MiffI8 const va
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, 1, miffBoolFALSE, 0));
    returnFalseIf(!miffSetValueI8(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix2x2R4
+******************************************************************************/
+MiffBool miffSet1Matrix2x2R4(Miff * const miff, MiffC2 const * const key, MiffMatrix2x2R4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix2x2R4(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix2x2R8
+******************************************************************************/
+MiffBool miffSet1Matrix2x2R8(Miff * const miff, MiffC2 const * const key, MiffMatrix2x2R8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix2x2R8(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix3x3R4
+******************************************************************************/
+MiffBool miffSet1Matrix3x3R4(Miff * const miff, MiffC2 const * const key, MiffMatrix3x3R4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix3x3R4(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix3x3R8
+******************************************************************************/
+MiffBool miffSet1Matrix3x3R8(Miff * const miff, MiffC2 const * const key, MiffMatrix3x3R8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix3x3R8(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix4x4R4
+******************************************************************************/
+MiffBool miffSet1Matrix4x4R4(Miff * const miff, MiffC2 const * const key, MiffMatrix4x4R4 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix4x4R4(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSet1Matrix4x4R8
+******************************************************************************/
+MiffBool miffSet1Matrix4x4R8(Miff * const miff, MiffC2 const * const key, MiffMatrix4x4R8 const * const value)
+{
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffSetValueMatrix4x4R8(miff, value));
+   returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
 }
 
@@ -523,6 +853,414 @@ MiffBool miffSet1StringC2(Miff * const miff, MiffC2 const * const key, MiffC2 co
 }
 
 /******************************************************************************
+func: miffSetNABI1
+******************************************************************************/
+MiffBool miffSetNABI1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABI1(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABI2
+******************************************************************************/
+MiffBool miffSetNABI2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABI2(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABI4
+******************************************************************************/
+MiffBool miffSetNABI4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABI4(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABN1
+******************************************************************************/
+MiffBool miffSetNABN1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABN1(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABN2
+******************************************************************************/
+MiffBool miffSetNABN2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABN2(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABN4
+******************************************************************************/
+MiffBool miffSetNABN4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABN4(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABR4
+******************************************************************************/
+MiffBool miffSetNABR4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABR4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABR4(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABR8
+******************************************************************************/
+MiffBool miffSetNABR8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABR8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABR8(          miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCI1
+******************************************************************************/
+MiffBool miffSetNABCI1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCI1(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCI2
+******************************************************************************/
+MiffBool miffSetNABCI2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCI2(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCI4
+******************************************************************************/
+MiffBool miffSetNABCI4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCI4(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCN1
+******************************************************************************/
+MiffBool miffSetNABCN1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCN1(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCN2
+******************************************************************************/
+MiffBool miffSetNABCN2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCN2(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCN4
+******************************************************************************/
+MiffBool miffSetNABCN4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCN4(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCR4
+******************************************************************************/
+MiffBool miffSetNABCR4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCR4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCR4(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCR8
+******************************************************************************/
+MiffBool miffSetNABCR8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCR8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCR8(         miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDI1
+******************************************************************************/
+MiffBool miffSetNABCDI1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDI1(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDI2
+******************************************************************************/
+MiffBool miffSetNABCDI2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDI2(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDI4
+******************************************************************************/
+MiffBool miffSetNABCDI4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDI4(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDN1
+******************************************************************************/
+MiffBool miffSetNABCDN1(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN1 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN1, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDN1(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDN2
+******************************************************************************/
+MiffBool miffSetNABCDN2(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN2 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN2, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDN2(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDN4
+******************************************************************************/
+MiffBool miffSetNABCDN4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDN4(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDR4
+******************************************************************************/
+MiffBool miffSetNABCDR4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDR4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDR4(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNABCDR8
+******************************************************************************/
+MiffBool miffSetNABCDR8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDR8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueABCDR8(        miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffSetNBoolean
 ******************************************************************************/
 MiffBool miffSetNBoolean(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffBool const * const value)
@@ -532,7 +1270,7 @@ MiffBool miffSetNBoolean(Miff * const miff, MiffC2 const * const key, MiffN4 con
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeBOOLEAN, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueBoolean(   miff, value[index]));
+      returnFalseIf(!miffSetValueBoolean(       miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -549,7 +1287,7 @@ MiffBool miffSetNI1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeI1, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueI1(        miff, value[index]));
+      returnFalseIf(!miffSetValueI1(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -566,7 +1304,7 @@ MiffBool miffSetNI2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeI2, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueI2(        miff, value[index]));
+      returnFalseIf(!miffSetValueI2(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -583,7 +1321,7 @@ MiffBool miffSetNI4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeI4, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueI4(        miff, value[index]));
+      returnFalseIf(!miffSetValueI4(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -600,7 +1338,109 @@ MiffBool miffSetNI8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueI8(        miff, value[index]));
+      returnFalseIf(!miffSetValueI8(            miff, value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix2x2R4
+******************************************************************************/
+MiffBool miffSetNMatrix2x2R4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix2x2R4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix2x2R4(   miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix2x2R8
+******************************************************************************/
+MiffBool miffSetNMatrix2x2R8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix2x2R8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix2x2R8(   miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix3x3R4
+******************************************************************************/
+MiffBool miffSetNMatrix3x3R4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix3x3R4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix3x3R4(   miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix3x3R8
+******************************************************************************/
+MiffBool miffSetNMatrix3x3R8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix3x3R8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix3x3R8(   miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix4x4R4
+******************************************************************************/
+MiffBool miffSetNMatrix4x4R4(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix4x4R4 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix4x4R4(   miff, &value[index]));
+      returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
+   }
+   returnFalseIf(!miffRecordSetEnd(miff));
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffSetNMatrix4x4R8
+******************************************************************************/
+MiffBool miffSetNMatrix4x4R8(Miff * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix4x4R8 const * const value)
+{
+   MiffN4 index;
+
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, key, count, miffBoolFALSE, 0));
+   forCount(index, count)
+   {
+      returnFalseIf(!miffSetValueMatrix4x4R8(   miff, &value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -617,7 +1457,7 @@ MiffBool miffSetNN1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeN1, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueN1(        miff, value[index]));
+      returnFalseIf(!miffSetValueN1(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -634,7 +1474,7 @@ MiffBool miffSetNN2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeN2, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueN2(        miff, value[index]));
+      returnFalseIf(!miffSetValueN2(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -651,7 +1491,7 @@ MiffBool miffSetNN4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeN4, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueN4(        miff, value[index]));
+      returnFalseIf(!miffSetValueN4(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -668,7 +1508,7 @@ MiffBool miffSetNN8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeN8, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueN8(        miff, value[index]));
+      returnFalseIf(!miffSetValueN8(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -685,7 +1525,7 @@ MiffBool miffSetNR4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeR4, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueR4(        miff, value[index]));
+      returnFalseIf(!miffSetValueR4(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -702,7 +1542,7 @@ MiffBool miffSetNR8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeR8, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueR8(        miff, value[index]));
+      returnFalseIf(!miffSetValueR8(            miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -719,7 +1559,7 @@ MiffBool miffSetNType(Miff * const miff, MiffC2 const * const key, MiffN4 const 
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeTYPE, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueType(      miff, value[index]));
+      returnFalseIf(!miffSetValueType(          miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -736,7 +1576,7 @@ MiffBool miffSetNStringC2(Miff * const miff, MiffC2 const * const key, MiffN4 co
    returnFalseIf(!miffRecordSetBegin(miff, miffTypeSTRING, key, count, miffBoolFALSE, 0));
    forCount(index, count)
    {
-      returnFalseIf(!miffSetValueStringC2(  miff, value[index]));
+      returnFalseIf(!miffSetValueStringC2(      miff, value[index]));
       returnFalseIf(!miffRecordSetNextArrayItem(miff, index, count));
    }
    returnFalseIf(!miffRecordSetEnd(miff));
@@ -755,7 +1595,8 @@ MiffBool miffSetValueABI1(Miff * const miff, MiffABI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABI1);
+      !(miff->currentRecord.type == miffTypeABI1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abi = *value;
 
@@ -780,7 +1621,8 @@ MiffBool miffSetValueABI2(Miff * const miff, MiffABI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABI2);
+      !(miff->currentRecord.type == miffTypeABI2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abi = *value;
 
@@ -805,7 +1647,8 @@ MiffBool miffSetValueABI4(Miff * const miff, MiffABI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABI4);
+      !(miff->currentRecord.type == miffTypeABI4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abi = *value;
 
@@ -830,7 +1673,8 @@ MiffBool miffSetValueABN1(Miff * const miff, MiffABN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABN1);
+      !(miff->currentRecord.type == miffTypeABN1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abn = *value;
 
@@ -855,7 +1699,8 @@ MiffBool miffSetValueABN2(Miff * const miff, MiffABN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABN2);
+      !(miff->currentRecord.type == miffTypeABN2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abn = *value;
 
@@ -880,7 +1725,8 @@ MiffBool miffSetValueABN4(Miff * const miff, MiffABN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABN4);
+      !(miff->currentRecord.type == miffTypeABN4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abn = *value;
 
@@ -905,7 +1751,8 @@ MiffBool miffSetValueABR4(Miff * const miff, MiffABR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABR4);
+      !(miff->currentRecord.type == miffTypeABR4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abr = *value;
 
@@ -930,7 +1777,8 @@ MiffBool miffSetValueABR8(Miff * const miff, MiffABR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABR8);
+      !(miff->currentRecord.type == miffTypeABR8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abr = *value;
 
@@ -955,7 +1803,8 @@ MiffBool miffSetValueABCI1(Miff * const miff, MiffABCI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCI1);
+      !(miff->currentRecord.type == miffTypeABCI1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abci = *value;
 
@@ -982,7 +1831,8 @@ MiffBool miffSetValueABCI2(Miff * const miff, MiffABCI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCI2);
+      !(miff->currentRecord.type == miffTypeABCI2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abci = *value;
 
@@ -1009,7 +1859,8 @@ MiffBool miffSetValueABCI4(Miff * const miff, MiffABCI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCI4);
+      !(miff->currentRecord.type == miffTypeABCI4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abci = *value;
 
@@ -1036,7 +1887,8 @@ MiffBool miffSetValueABCN1(Miff * const miff, MiffABCN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCN1);
+      !(miff->currentRecord.type == miffTypeABCN1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcn = *value;
 
@@ -1063,7 +1915,8 @@ MiffBool miffSetValueABCN2(Miff * const miff, MiffABCN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCN2);
+      !(miff->currentRecord.type == miffTypeABCN2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcn = *value;
 
@@ -1090,7 +1943,8 @@ MiffBool miffSetValueABCN4(Miff * const miff, MiffABCN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCN4);
+      !(miff->currentRecord.type == miffTypeABCN4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcn = *value;
 
@@ -1117,7 +1971,8 @@ MiffBool miffSetValueABCR4(Miff * const miff, MiffABCR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCR4);
+      !(miff->currentRecord.type == miffTypeABCR4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcr = *value;
 
@@ -1144,7 +1999,8 @@ MiffBool miffSetValueABCR8(Miff * const miff, MiffABCR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCR8);
+      !(miff->currentRecord.type == miffTypeABCR8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcr = *value;
 
@@ -1171,7 +2027,8 @@ MiffBool miffSetValueABCDI1(Miff * const miff, MiffABCDI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDI1);
+      !(miff->currentRecord.type == miffTypeABCDI1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdi = *value;
 
@@ -1200,7 +2057,8 @@ MiffBool miffSetValueABCDI2(Miff * const miff, MiffABCDI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDI2);
+      !(miff->currentRecord.type == miffTypeABCDI2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdi = *value;
 
@@ -1229,7 +2087,8 @@ MiffBool miffSetValueABCDI4(Miff * const miff, MiffABCDI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDI4);
+      !(miff->currentRecord.type == miffTypeABCDI4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdi = *value;
 
@@ -1258,7 +2117,8 @@ MiffBool miffSetValueABCDN1(Miff * const miff, MiffABCDN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDN1);
+      !(miff->currentRecord.type == miffTypeABCDN1 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdn = *value;
 
@@ -1287,7 +2147,8 @@ MiffBool miffSetValueABCDN2(Miff * const miff, MiffABCDN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDN2);
+      !(miff->currentRecord.type == miffTypeABCDN2 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdn = *value;
 
@@ -1316,7 +2177,8 @@ MiffBool miffSetValueABCDN4(Miff * const miff, MiffABCDN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDN4);
+      !(miff->currentRecord.type == miffTypeABCDN4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdn = *value;
 
@@ -1345,7 +2207,8 @@ MiffBool miffSetValueABCDR4(Miff * const miff, MiffABCDR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDR4);
+      !(miff->currentRecord.type == miffTypeABCDR4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdr = *value;
 
@@ -1374,7 +2237,8 @@ MiffBool miffSetValueABCDR8(Miff * const miff, MiffABCDR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeABCDR8);
+      !(miff->currentRecord.type == miffTypeABCDR8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    vtemp.abcdr = *value;
 
@@ -1401,7 +2265,8 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeBOOLEAN);
+      !(miff->currentRecord.type == miffTypeBOOLEAN ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    c1 = (MiffC1 *) (value ? "T" : "F");
    
@@ -1485,7 +2350,8 @@ MiffBool miffSetValueMatrix2x2R4(Miff * const miff, MiffMatrix2x2R4 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX2X2R4);
+      !(miff->currentRecord.type == miffTypeMATRIX2X2R4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix2x2R4, &vtemp.matrix2x2r, value);
 
@@ -1513,7 +2379,8 @@ MiffBool miffSetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX2X2R8);
+      !(miff->currentRecord.type == miffTypeMATRIX2X2R8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix2x2R4, &vtemp.matrix2x2r, value);
 
@@ -1541,7 +2408,8 @@ MiffBool miffSetValueMatrix3x3R4(Miff * const miff, MiffMatrix3x3R4 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX3X3R4);
+      !(miff->currentRecord.type == miffTypeMATRIX3X3R4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix3x3R4, &vtemp.matrix3x3r, value);
 
@@ -1579,7 +2447,8 @@ MiffBool miffSetValueMatrix3x3R8(Miff * const miff, MiffMatrix3x3R8 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX3X3R8);
+      !(miff->currentRecord.type == miffTypeMATRIX3X3R8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix3x3R8, &vtemp.matrix3x3r, value);
 
@@ -1617,7 +2486,8 @@ MiffBool miffSetValueMatrix4x4R4(Miff * const miff, MiffMatrix4x4R4 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX4X4R4);
+      !(miff->currentRecord.type == miffTypeMATRIX4X4R4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix4x4R4, &vtemp.matrix4x4r, value);
 
@@ -1669,7 +2539,8 @@ MiffBool miffSetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 const * cons
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeMATRIX4X4R8);
+      !(miff->currentRecord.type == miffTypeMATRIX4X4R8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    _MemCopyTypeArray(1, MiffMatrix4x4R4, &vtemp.matrix4x4r, value);
 
@@ -1816,7 +2687,8 @@ MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      miff->currentRecord.type != miffTypeSTRING);
+      !(miff->currentRecord.type == miffTypeSTRING ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    returnFalseIf(!_WriteTxtValueC2(miff, value));
 
@@ -1831,7 +2703,8 @@ MiffBool miffSetValueType(Miff * const miff, MiffType const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      miff->currentRecord.type != miffTypeTYPE);
+      !(miff->currentRecord.type == miffTypeTYPE ||
+        miff->currentRecord.type == miffTypeVARIABLE));
 
    returnFalseIf(!_WriteTxtValueType(miff, value));
 

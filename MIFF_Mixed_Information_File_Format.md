@@ -763,10 +763,42 @@ Variable records should be used sparingly or when using the basic types would ma
 **Text**
 
 ```
-&gt; v![image](tab.png)[key]![image](tab.png)&#42;![image](tab.png)-![image](tab.png)[tab delimited values]![image](nl.png)
-&gt; v![image](tab.png)[key]![image](tab.png)&#42;![image](tab.png):![image](tab.png)[chunk byte count]![image](tab.png)(![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
+&gt; v![image](tab.png)[key]![image](tab.png)1![image](tab.png)-![image](tab.png)[tab delimited values]![image](nl.png)
+&gt; v![image](tab.png)[key]![image](tab.png)1![image](tab.png):![image](tab.png)[chunk byte count]![image](tab.png)(![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
+&gt; v![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)-![image](tab.png)[tab delimited values]![image](nl.png)
+&gt; v![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png):![image](tab.png)[chunk byte count]![image](tab.png)(![image](tab.png)[compressed byte count]![image](tab.png)[Base64 stream])&#42;![image](nl.png)
 ```
 
 **Binary**
 
-todo.
+```
+&lt;n2            :value header (000 0 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+([refer to the other types on how values are stored])&#42;
+
+
+&lt;n2            :value header (000 1 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n4            :chunk byte count&gt;
+(&lt;n4                   :compressed byte count&gt;
+ &lt;compressed byte count:binary compressed data&gt;)&#42;
+
+
+&lt;n2            :value header (aaa 0 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n??           :array count&gt;
+([refer to the other types on how values are stored])&#42;
+
+
+&lt;n2            :value header (aaa 1 7)&gt;
+&lt;n1            :key byte count&gt;
+&lt;key byte count:key&gt;
+&lt;n??           :array count&gt;
+(&lt;n4                   :chunk byte count&gt;
+ &lt;compressed byte count:binary compressed data&gt;)&#42;
+```
+
+A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has not idea what one value means.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control on what goes into the variable type.

@@ -863,6 +863,14 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, L"mat444", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R4(miff, &matrix4x4r4); miffRecordSetEnd(miff);
       miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, L"mat448", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R8(miff, &matrix4x4r8); miffRecordSetEnd(miff);
 
+      miffRecordSetBegin(miff, miffTypeVARIABLE, L"variableIntStrReal", 1, miffBoolFALSE, 0);
+      miffSetValueI4(miff, 42);
+      miffRecordSetNextArrayItem(miff, 0, 0);
+      miffSetValueStringC2(miff, L"Yes, but what is the question?");
+      miffRecordSetNextArrayItem(miff, 0, 0);
+      miffSetValueR8(miff, 3.14159);
+      miffRecordSetEnd(miff);
+
       miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) n1array);
       miffSetNN1(           miff, L"N1_Array",     256,     n1array);
       miffRecordSetBegin(   miff, miffTypeI1, L"I1 ArrayZ", 256 * 3, miffBoolTRUE, 9999);

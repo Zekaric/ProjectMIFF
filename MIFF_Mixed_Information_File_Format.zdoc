@@ -772,10 +772,39 @@ hh	|chapter| - Variable values
 	|b |Text| b|
 
 .[
-|>| v|-->|[key]|-->|*|-->|-|-->|[tab delimited values]|<--|
-|>| v|-->|[key]|-->|*|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| v|-->|[key]|-->|1|-->|-|-->|[tab delimited values]|<--|
+|>| v|-->|[key]|-->|1|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| v|-->|[key]|-->|[array count]|-->|-|-->|[tab delimited values]|<--|
+|>| v|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
 ]
 
 	|b |Binary| b|
 
-	todo.
+.[
+|<|n2            :value header (000 0 7)|>|
+|<|n1            :key byte count|>|
+|<|key byte count:key|>|
+([refer to the other types on how values are stored])*
+
+|<|n2            :value header (000 1 7)|>|
+|<|n1            :key byte count|>|
+|<|key byte count:key|>|
+|<|n4            :chunk byte count|>|
+(|<|n4                   :compressed byte count|>|
+ |<|compressed byte count:binary compressed data|>|)*
+
+|<|n2            :value header (aaa 0 7)|>|
+|<|n1            :key byte count|>|
+|<|key byte count:key|>|
+|<|n??           :array count|>|
+([refer to the other types on how values are stored])*
+
+|<|n2            :value header (aaa 1 7)|>|
+|<|n1            :key byte count|>|
+|<|key byte count:key|>|
+|<|n??           :array count|>|
+(|<|n4                   :chunk byte count|>|
+ |<|compressed byte count:binary compressed data|>|)*
+]
+
+	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has not idea what one value means.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control on what goes into the variable type.

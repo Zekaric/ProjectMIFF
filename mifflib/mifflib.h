@@ -138,25 +138,25 @@ typedef enum
 type:
 ******************************************************************************/
 // Integer types
-#define MiffI1       char
-#define MiffI2       short
-#define MiffI4       int
-#define MiffI8       int64_t
+typedef char                             MiffI1;
+typedef short                            MiffI2;
+typedef int                              MiffI4;
+typedef int64_t                          MiffI8;
 // Natural types
-#define MiffN1       unsigned char
-#define MiffN2       unsigned short
-#define MiffN4       unsigned int
-#define MiffN8       uint64_t
+typedef unsigned char                    MiffN1;
+typedef unsigned short                   MiffN2;
+typedef int                              MiffN4;
+typedef uint64_t                         MiffN8;
 // Real types
-#define MiffR4       float
-#define MiffR8       double
+typedef float                            MiffR4;
+typedef double                           MiffR8;
 // String char types
 // C1 = UTF8
-#define MiffC1       MiffN1
+typedef MiffN1                           MiffC1;
 // C2 = UTF16
-#define MiffC2       wchar_t
+typedef wchar_t                          MiffC2;
 // C4 = UTF32
-#define MiffC4       MiffN4
+typedef MiffN4                           MiffC4;
 
 #pragma pack(1)
 typedef struct { MiffI1   a, b;        } MiffABI1;
@@ -405,7 +405,7 @@ void            miffDestroyContent(                Miff       * const miff);
 
 MiffN8          miffRecordGetCount(                Miff       * const miff);
 MiffC2         *miffRecordGetName(                 Miff       * const miff);
-MiffType   miffRecordGetType(                 Miff       * const miff);
+MiffType        miffRecordGetType(                 Miff       * const miff);
 
 MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType const type, MiffC2 const * const key, MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount);
 MiffBool        miffRecordSetEnd(                  Miff       * const miff);
@@ -413,32 +413,92 @@ MiffBool        miffRecordSetNextArrayItem(        Miff       * const miff, Miff
 
 MiffBool        miffSetBlockStart(                 Miff       * const miff, MiffC2 const * const key);
 MiffBool        miffSetBlockStop(                  Miff       * const miff);
-MiffBool        miffSet1Boolean(                   Miff       * const miff, MiffC2 const * const key, MiffBool              const value);
-MiffBool        miffSet1I1(                        Miff       * const miff, MiffC2 const * const key, MiffI1                const value);
-MiffBool        miffSet1I2(                        Miff       * const miff, MiffC2 const * const key, MiffI2                const value);
-MiffBool        miffSet1I4(                        Miff       * const miff, MiffC2 const * const key, MiffI4                const value);
-MiffBool        miffSet1I8(                        Miff       * const miff, MiffC2 const * const key, MiffI8                const value);
-MiffBool        miffSet1N1(                        Miff       * const miff, MiffC2 const * const key, MiffN1                const value);
-MiffBool        miffSet1N2(                        Miff       * const miff, MiffC2 const * const key, MiffN2                const value);
-MiffBool        miffSet1N4(                        Miff       * const miff, MiffC2 const * const key, MiffN4                const value);
-MiffBool        miffSet1N8(                        Miff       * const miff, MiffC2 const * const key, MiffN8                const value);
-MiffBool        miffSet1R4(                        Miff       * const miff, MiffC2 const * const key, MiffR4                const value);
-MiffBool        miffSet1R8(                        Miff       * const miff, MiffC2 const * const key, MiffR8                const value);
-MiffBool        miffSet1Type(                      Miff       * const miff, MiffC2 const * const key, MiffType         const value);
-MiffBool        miffSet1StringC2(                  Miff       * const miff, MiffC2 const * const key, MiffC2        const * const value);
-MiffBool        miffSetNBoolean(                   Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffBool              const * const value);
-MiffBool        miffSetNI1(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffI1                const * const value);
-MiffBool        miffSetNI2(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffI2                const * const value);
-MiffBool        miffSetNI4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffI4                const * const value);
-MiffBool        miffSetNI8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffI8                const * const value);
-MiffBool        miffSetNN1(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN1                const * const value);
-MiffBool        miffSetNN2(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN2                const * const value);
-MiffBool        miffSetNN4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN4                const * const value);
-MiffBool        miffSetNN8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffN8                const * const value);
-MiffBool        miffSetNR4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffR4                const * const value);
-MiffBool        miffSetNR8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffR8                const * const value);
-MiffBool        miffSetNType(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffType         const * const value);
-MiffBool        miffSetNStringC2(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const counst, MiffC2        const * const * const value);
+MiffBool        miffSet1ABI1(                      Miff       * const miff, MiffC2 const * const key, MiffABI1        const * const value);
+MiffBool        miffSet1ABI2(                      Miff       * const miff, MiffC2 const * const key, MiffABI2        const * const value);
+MiffBool        miffSet1ABI4(                      Miff       * const miff, MiffC2 const * const key, MiffABI4        const * const value);
+MiffBool        miffSet1ABN1(                      Miff       * const miff, MiffC2 const * const key, MiffABN1        const * const value);
+MiffBool        miffSet1ABN2(                      Miff       * const miff, MiffC2 const * const key, MiffABN2        const * const value);
+MiffBool        miffSet1ABN4(                      Miff       * const miff, MiffC2 const * const key, MiffABN4        const * const value);
+MiffBool        miffSet1ABR4(                      Miff       * const miff, MiffC2 const * const key, MiffABR4        const * const value);
+MiffBool        miffSet1ABR8(                      Miff       * const miff, MiffC2 const * const key, MiffABR8        const * const value);
+MiffBool        miffSet1ABCI1(                     Miff       * const miff, MiffC2 const * const key, MiffABCI1       const * const value);
+MiffBool        miffSet1ABCI2(                     Miff       * const miff, MiffC2 const * const key, MiffABCI2       const * const value);
+MiffBool        miffSet1ABCI4(                     Miff       * const miff, MiffC2 const * const key, MiffABCI4       const * const value);
+MiffBool        miffSet1ABCN1(                     Miff       * const miff, MiffC2 const * const key, MiffABCN1       const * const value);
+MiffBool        miffSet1ABCN2(                     Miff       * const miff, MiffC2 const * const key, MiffABCN2       const * const value);
+MiffBool        miffSet1ABCN4(                     Miff       * const miff, MiffC2 const * const key, MiffABCN4       const * const value);
+MiffBool        miffSet1ABCR4(                     Miff       * const miff, MiffC2 const * const key, MiffABCR4       const * const value);
+MiffBool        miffSet1ABCR8(                     Miff       * const miff, MiffC2 const * const key, MiffABCR8       const * const value);
+MiffBool        miffSet1ABCDI1(                    Miff       * const miff, MiffC2 const * const key, MiffABCDI1      const * const value);
+MiffBool        miffSet1ABCDI2(                    Miff       * const miff, MiffC2 const * const key, MiffABCDI2      const * const value);
+MiffBool        miffSet1ABCDI4(                    Miff       * const miff, MiffC2 const * const key, MiffABCDI4      const * const value);
+MiffBool        miffSet1ABCDN1(                    Miff       * const miff, MiffC2 const * const key, MiffABCDN1      const * const value);
+MiffBool        miffSet1ABCDN2(                    Miff       * const miff, MiffC2 const * const key, MiffABCDN2      const * const value);
+MiffBool        miffSet1ABCDN4(                    Miff       * const miff, MiffC2 const * const key, MiffABCDN4      const * const value);
+MiffBool        miffSet1ABCDR4(                    Miff       * const miff, MiffC2 const * const key, MiffABCDR4      const * const value);
+MiffBool        miffSet1ABCDR8(                    Miff       * const miff, MiffC2 const * const key, MiffABCDR8      const * const value);
+MiffBool        miffSet1Boolean(                   Miff       * const miff, MiffC2 const * const key, MiffBool                const value);
+MiffBool        miffSet1I1(                        Miff       * const miff, MiffC2 const * const key, MiffI1                  const value);
+MiffBool        miffSet1I2(                        Miff       * const miff, MiffC2 const * const key, MiffI2                  const value);
+MiffBool        miffSet1I4(                        Miff       * const miff, MiffC2 const * const key, MiffI4                  const value);
+MiffBool        miffSet1I8(                        Miff       * const miff, MiffC2 const * const key, MiffI8                  const value);
+MiffBool        miffSet1Matrix2x2R4(               Miff       * const miff, MiffC2 const * const key, MiffMatrix2x2R4 const * const value);
+MiffBool        miffSet1Matrix2x2R8(               Miff       * const miff, MiffC2 const * const key, MiffMatrix2x2R8 const * const value);
+MiffBool        miffSet1Matrix3x3R4(               Miff       * const miff, MiffC2 const * const key, MiffMatrix3x3R4 const * const value);
+MiffBool        miffSet1Matrix3x3R8(               Miff       * const miff, MiffC2 const * const key, MiffMatrix3x3R8 const * const value);
+MiffBool        miffSet1Matrix4x4R4(               Miff       * const miff, MiffC2 const * const key, MiffMatrix4x4R4 const * const value);
+MiffBool        miffSet1Matrix4x4R8(               Miff       * const miff, MiffC2 const * const key, MiffMatrix4x4R8 const * const value);
+MiffBool        miffSet1N1(                        Miff       * const miff, MiffC2 const * const key, MiffN1                  const value);
+MiffBool        miffSet1N2(                        Miff       * const miff, MiffC2 const * const key, MiffN2                  const value);
+MiffBool        miffSet1N4(                        Miff       * const miff, MiffC2 const * const key, MiffN4                  const value);
+MiffBool        miffSet1N8(                        Miff       * const miff, MiffC2 const * const key, MiffN8                  const value);
+MiffBool        miffSet1R4(                        Miff       * const miff, MiffC2 const * const key, MiffR4                  const value);
+MiffBool        miffSet1R8(                        Miff       * const miff, MiffC2 const * const key, MiffR8                  const value);
+MiffBool        miffSet1Type(                      Miff       * const miff, MiffC2 const * const key, MiffType                const value);
+MiffBool        miffSet1StringC2(                  Miff       * const miff, MiffC2 const * const key, MiffC2          const * const value);
+MiffBool        miffSetNABI1(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI1        const * const value);
+MiffBool        miffSetNABI2(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI2        const * const value);
+MiffBool        miffSetNABI4(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABI4        const * const value);
+MiffBool        miffSetNABN1(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN1        const * const value);
+MiffBool        miffSetNABN2(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN2        const * const value);
+MiffBool        miffSetNABN4(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABN4        const * const value);
+MiffBool        miffSetNABR4(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABR4        const * const value);
+MiffBool        miffSetNABR8(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABR8        const * const value);
+MiffBool        miffSetNABCI1(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI1       const * const value);
+MiffBool        miffSetNABCI2(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI2       const * const value);
+MiffBool        miffSetNABCI4(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCI4       const * const value);
+MiffBool        miffSetNABCN1(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN1       const * const value);
+MiffBool        miffSetNABCN2(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN2       const * const value);
+MiffBool        miffSetNABCN4(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCN4       const * const value);
+MiffBool        miffSetNABCR4(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCR4       const * const value);
+MiffBool        miffSetNABCR8(                     Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCR8       const * const value);
+MiffBool        miffSetNABCDI1(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI1      const * const value);
+MiffBool        miffSetNABCDI2(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI2      const * const value);
+MiffBool        miffSetNABCDI4(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDI4      const * const value);
+MiffBool        miffSetNABCDN1(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN1      const * const value);
+MiffBool        miffSetNABCDN2(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN2      const * const value);
+MiffBool        miffSetNABCDN4(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDN4      const * const value);
+MiffBool        miffSetNABCDR4(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDR4      const * const value);
+MiffBool        miffSetNABCDR8(                    Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffABCDR8      const * const value);
+MiffBool        miffSetNBoolean(                   Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffBool        const * const value);
+MiffBool        miffSetNI1(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffI1          const * const value);
+MiffBool        miffSetNI2(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffI2          const * const value);
+MiffBool        miffSetNI4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffI4          const * const value);
+MiffBool        miffSetNI8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffI8          const * const value);
+MiffBool        miffSetNMatrix2x2R4(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix2x2R4 const * const value);
+MiffBool        miffSetNMatrix2x2R8(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix2x2R8 const * const value);
+MiffBool        miffSetNMatrix3x3R4(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix3x3R4 const * const value);
+MiffBool        miffSetNMatrix3x3R8(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix3x3R8 const * const value);
+MiffBool        miffSetNMatrix4x4R4(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix4x4R4 const * const value);
+MiffBool        miffSetNMatrix4x4R8(               Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffMatrix4x4R8 const * const value);
+MiffBool        miffSetNN1(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffN1          const * const value);
+MiffBool        miffSetNN2(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffN2          const * const value);
+MiffBool        miffSetNN4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffN4          const * const value);
+MiffBool        miffSetNN8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffN8          const * const value);
+MiffBool        miffSetNR4(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffR4          const * const value);
+MiffBool        miffSetNR8(                        Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffR8          const * const value);
+MiffBool        miffSetNType(                      Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffType        const * const value);
+MiffBool        miffSetNStringC2(                  Miff       * const miff, MiffC2 const * const key, MiffN4 const count, MiffC2  const * const * const value);
 MiffBool        miffSetValueABI1(                  Miff       * const miff, MiffABI1        const * const value);
 MiffBool        miffSetValueABI2(                  Miff       * const miff, MiffABI2        const * const value);
 MiffBool        miffSetValueABI4(                  Miff       * const miff, MiffABI4        const * const value);

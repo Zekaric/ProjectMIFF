@@ -368,6 +368,11 @@ typedef struct
    MiffN4                      compressMemByteCount;
    MiffN4                      compressMemByteIndex;
    MiffN1                     *compressMemByteData;
+
+   // Temporary storage for reading
+   MiffN4                      readByteCountActual;
+   MiffN4                      readByteCount;
+   MiffN1                     *readByteData;
 } Miff;
 
 /******************************************************************************
@@ -377,8 +382,8 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-// Miff           *miffCreateReader(                                           MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
-// MiffBool        miffCreateReaderContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
+Miff           *miffCreateReader(                                           MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
+MiffBool        miffCreateReaderContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
 Miff           *miffCreateWriter(                                           MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
 MiffBool        miffCreateWriterContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
 

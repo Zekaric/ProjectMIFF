@@ -69,6 +69,11 @@ constant:
 #define returnTrueIf( EXP)                         if (EXP) { returnTrue;     }
 #define returnVoidIf( EXP)                         if (EXP) { return;         }
 
+#define MIFF_HEADER_FILETYPE_STR                   "MIFF"
+#define MIFF_HEADER_VERSION_STR                    "1"
+#define MIFF_HEADER_BIN_STR                        "BIN"
+#define MIFF_HEADER_TXT_STR                        "TXT"
+
 /******************************************************************************
 type:
 ******************************************************************************/
@@ -124,6 +129,8 @@ void      _MemStop(                    void);
 #define   _MemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
 #define   _MemCreateType(            TYPE)           (TYPE *) _MemCreate(                    sizeof(TYPE))
 #define   _MemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MemCreate(          (COUNT) * sizeof(TYPE))
+
+MiffBool  _ReadTxtLine(                Miff       * const miff);
 
 MiffN4    _TypeGetSize(                Miff const * const miff, MiffType const type);
 

@@ -467,7 +467,7 @@ MiffN4 _C4LetterToC2Letter(MiffC4 const c4, MiffC2 * const a, MiffC2 * const b)
 {
    return0If(!a || !b);
 
-   if (c4 > 0x0000FFFF)
+   if (c4 < 0x0000FFFF)
    {
       *b = 0;
       *a = (MiffC2) c4;

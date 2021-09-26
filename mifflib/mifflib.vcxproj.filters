@@ -39,6 +39,9 @@
     <ClCompile Include="type.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mifflib.h">

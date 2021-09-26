@@ -61,6 +61,80 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
+func: miffCreateReader
+******************************************************************************/
+Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, 
+   void * const dataRepo)
+{
+   Miff *miff;
+
+   returnNullIf(!_isStarted);
+
+   // Create the miff structure.
+   miff = _MemCreateType(Miff);
+   returnNullIf(!miff);
+
+   // Initialize the miff structure.
+   if (!miffCreateReaderContent(miff, isByteSwaping, getBufferFunc, dataRepo))
+   {
+      _MemDestroy(miff);
+      returnNull;
+   }
+
+   // return the miff structure
+   return miff;
+}
+
+/******************************************************************************
+func: miffCreateReaderContent
+******************************************************************************/
+MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping, 
+   MiffGetBuffer getBufferFunc, void * const dataRepo)
+{
+   MiffN1 ntemp;
+
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !getBufferFunc);
+
+   _MemClearType(Miff, miff);
+   miff->method               = miffMethodREADING;
+   miff->dataRepo             = dataRepo;
+   miff->isByteSwapping       = isByteSwaping;
+   miff->getBuffer            = getBufferFunc;
+   miff->readByteCountActual  = 1024;
+   miff->readByteCount        = 0;
+   miff->readByteData         = _MemCreateTypeArray(1024, MiffN1);
+   returnFalseIf(!miff->readByteData);
+
+   // Read the header.
+   _ReadTxtLine(miff);
+   returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 4, (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
+   _ReadTxtLine(miff);
+   returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 1, (MiffN1 *) MIFF_HEADER_VERSION_STR));
+   _ReadTxtLine(miff);
+   if      (_MemIsEqual(miff->readByteCount, miff->readByteData, 3, (MiffN1 *) MIFF_HEADER_TXT_STR))
+   {
+      miff->mode = miffModeTEXT;
+   }
+   else if (_MemIsEqual(miff->readByteCount, miff->readByteData, 3, (MiffN1 *) MIFF_HEADER_BIN_STR))
+   {
+      miff->mode = miffModeBINARY;
+   }
+   else
+   {
+      returnFalse;
+   }
+   _ReadTxtLine(miff);
+   _C1ToC2Key(  miff->readByteCount, (MiffC1 *) miff->readByteData, &ntemp, miff->subFormatNameC2);
+   _ReadTxtLine(miff);
+   miff->subFormatVersion = _C1ToN(miff->readByteCount, miff->readByteData);
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffCreateWriter
 ******************************************************************************/
 Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, 
@@ -110,6 +184,7 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
       !subFormatVersion);
 
    _MemClearType(Miff, miff);
+   miff->version              = 1;
    miff->method               = miffMethodWRITING;
    miff->mode                 = mode;
    miff->dataRepo             = dataRepo;
@@ -121,17 +196,17 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    _MemCopyTypeArray(count, MiffC2, miff->subFormatNameC2, subFormatName);
 
    // Write the miff header.
-   _WriteTxtC1(         miff, (MiffC1 *) "MIFF");
+   _WriteTxtC1(         miff, (MiffC1 *) MIFF_HEADER_FILETYPE_STR);
    _WriteTxtRecordEnder(miff);
-   _WriteTxtC1(         miff, (MiffC1 *) "1");
+   _WriteTxtC1(         miff, (MiffC1 *) MIFF_HEADER_VERSION_STR);
    _WriteTxtRecordEnder(miff);
    if (mode == miffModeBINARY)
    {
-      _WriteTxtC1(      miff, (MiffC1 *) "BIN");
+      _WriteTxtC1(      miff, (MiffC1 *) MIFF_HEADER_BIN_STR);
    }
    else
    {
-      _WriteTxtC1(      miff, (MiffC1 *) "TXT");
+      _WriteTxtC1(      miff, (MiffC1 *) MIFF_HEADER_TXT_STR);
    }
    _WriteTxtRecordEnder(miff);
 
@@ -2712,53 +2787,6 @@ MiffBool miffSetValueType(Miff * const miff, MiffType const value)
 }
 
 #if 0
-/******************************************************************************
-func: miffCreateReader
-******************************************************************************/
-Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, 
-   void * const dataRepo)
-{
-   Miff *miff;
-
-   returnNullIf(!_isStarted);
-
-   // Create the miff structure.
-   miff = memCreateType(Miff);
-   returnNullIf(!miff);
-
-   // Initialize the miff structure.
-   if (!miffCreateReaderContent(miff, isByteSwaping, getBufferFunc, dataRepo))
-   {
-      memDestroy(miff);
-      returnNull;
-   }
-
-   // return the miff structure
-   return miff;
-}
-
-/******************************************************************************
-func: miffCreateReaderContent
-******************************************************************************/
-MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping, 
-   MiffGetBuffer getBufferFunc, void * const dataRepo)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !getBufferFunc);
-
-   memClearType(Miff, miff);
-   miff->method         = miffMethodREADING;
-   miff->isByteSwapping = isByteSwaping;
-   miff->getBuffer      = getBufferFunc;
-   miff->dataRepo       = dataRepo;
-
-#pragma message("TODO Read the header.")
-
-   returnTrue;
-}
-
 /******************************************************************************
 func: miffGetFileFlagIsBinary
 ******************************************************************************/

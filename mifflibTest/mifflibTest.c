@@ -32,180 +32,8 @@ type:
 /******************************************************************************
 variable:
 ******************************************************************************/
-
-/******************************************************************************
-prototype:
-******************************************************************************/
-static void    *_MemCreate(         MiffN4 const memByteCount);
-static void     _MemDestroy(        void * const mem);
-static MiffBool _MemCompress(       MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
-static MiffN4   _MemCompressBound(  MiffN4 const memByteCount);
-static MiffBool _MemDecompress(     MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
-
-static MiffBool _SetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
-
-static MiffBool _TestWrite(         MiffC2 * const fileName, MiffMode const mode);
-
-/******************************************************************************
-global:
-function:
-******************************************************************************/
-/******************************************************************************
-func: main
-******************************************************************************/
-int main(int acount, char **alist)
+static MiffN1               _binary[] =
 {
-   int   result;
-
-   acount; alist;
-
-   result = 0;
-
-   // Start miff library.
-   if (!miffStart(_MemCreate, _MemDestroy, _MemCompressBound, _MemCompress, _MemDecompress))
-   {
-      result = 1;
-      goto DONE;
-   }
-
-   // Test the writing.
-   if (!_TestWrite(L"MiffFileTestTxt.miff", miffModeTEXT))
-   {
-      result = 2;
-      goto DONE;
-   }
-
-//   if (!_TestWrite(L"MiffFileTestBin.miff", miffModeBINARY))
-//   {
-//      result = 3;
-//      goto DONE;
-//   }
-
-DONE:
-   // Stop miff library.
-   miffStop();
-
-   return result;
-}
-
-/******************************************************************************
-local:
-function:
-******************************************************************************/
-/******************************************************************************
-func: _MemCreate
-******************************************************************************/
-void *_MemCreate(MiffN4 const memByteCount)
-{
-   return calloc(1, (size_t) memByteCount);
-}
-
-/******************************************************************************
-func: _MemDestroy
-******************************************************************************/
-void _MemDestroy(void * const mem)
-{
-   free(mem);
-}
-
-/******************************************************************************
-func: _MemCompressBound
-******************************************************************************/
-MiffN4 _MemCompressBound(MiffN4 const memByteCount)
-{
-   return compressBound((uLong) memByteCount);
-}
-
-/******************************************************************************
-func: _MemCompress
-******************************************************************************/
-MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
-   MiffN4 * const compressMemByteCount, void * const compressMem)
-{
-   uLongf minSize;
-   MiffN4 result;
-
-   if (!memByteCount         || !mem ||
-       !compressMemByteCount || !compressMem)
-   {
-      return miffBoolFALSE;
-   }
-
-   result                 = (MiffN4) ~Z_OK;
-   minSize                = (uLongf) *compressMemByteCount;
-   *compressMemByteCount  = 0;
-
-   // Compress the buffer.
-   result = compress2(
-      (Bytef *) compressMem,
-      &minSize,
-      (Bytef const *) mem,
-      (uLong) memByteCount,
-      Z_DEFAULT_COMPRESSION);
-
-   if (result != Z_OK)
-   {
-      return miffBoolFALSE;
-   }
-
-   *compressMemByteCount = minSize;
-
-   return miffBoolTRUE;
-}
-
-/******************************************************************************
-func: _MemDecompress
-******************************************************************************/
-MiffBool _MemDecompress(MiffN4 const compressMemByteCount, void const * const compressMem,
-   MiffN4 * const memByteCount, void * const mem)
-{
-   MiffN4 result;
-   uLongf size;
-
-   if (!compressMem || !compressMemByteCount ||
-       !mem         || !memByteCount)
-   {
-      return miffBoolFALSE;
-   }
-
-   size          = (uLongf) *memByteCount;
-   *memByteCount = 0;
-
-   // Uncompress the buffer.
-   result = uncompress(
-      (Bytef *) mem,
-      &size,
-      (Bytef const *) compressMem,
-      (uLong) compressMemByteCount);
-
-   if (result != Z_OK)
-   {
-      return miffBoolFALSE;
-   }
-
-   *memByteCount = size;
-
-   return miffBoolTRUE;
-}
-
-/******************************************************************************
-func: miffSetBuffer
-******************************************************************************/
-static MiffBool _SetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
-{
-   return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
-}
-
-/******************************************************************************
-func: _TestWrite
-******************************************************************************/
-static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
-{
-   FILE           *file;
-   Miff           *miff;
-   MiffI4          index;
-   MiffN1          binary[] =
-   {
         0,   0,   0,
         1,   1,   1,
         2,   2,   2,
@@ -462,9 +290,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       253, 253, 253,
       254, 254, 254,
       255, 255, 255
-   };
-   MiffN1          n1array[] =
-   {
+};
+static MiffN1               _n1array[] =
+{
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
       65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
@@ -497,9 +325,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-   };
-   MiffN2          n2array[] =
-   {
+};
+static MiffN2               _n2array[] =
+{
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
       65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
@@ -532,9 +360,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-   };
-   MiffN4          n4array[] =
-   {
+};
+static MiffN4               _n4array[] =
+{
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
       65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
@@ -567,9 +395,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-   };
-   MiffN8          n8array[] =
-   {
+};
+static MiffN8               _n8array[] =
+{
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
       65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
@@ -602,9 +430,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-   };
-   MiffR4          reals4[300] =
-   {
+};
+static MiffR4               _reals4[300] =
+{
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
@@ -655,9 +483,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.14259,
-   };
-   MiffR8          reals8[300] =
-   {
+};
+static MiffR8               _reals8[300] =
+{
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
@@ -708,9 +536,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.14259,
-   };
-   MiffC2         *strings[10] =
-   {
+};
+static MiffC2              *_strings[10] =
+{
       L"the quick brown fox jumped over the lazy dog.",
       L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
       L"I fart in your general direction.",
@@ -721,9 +549,9 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       L"I fart in your general direction.",
       L"No one expects the Spanish Inquisition!",
       L"And now for something completely different."
-   };
-   MiffBool        bools[100] =
-   {
+};
+static MiffBool             _bools[100] =
+{
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
@@ -734,44 +562,273 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-   };
-   MiffABI1   abi1   = { -10, -20 };
-   MiffABI2   abi2   = { -10, -20 };
-   MiffABI4   abi4   = { -10, -20 };
-   MiffABN1   abn1   = {  10,  20 };
-   MiffABN2   abn2   = {  10,  20 };
-   MiffABN4   abn4   = {  10,  20 };
-   MiffABR4   abr4   = {  11.1f, 22.2f };
-   MiffABR8   abr8   = {  11.1,  22.2 };
-   MiffABCI1  abci1  = { -10, -20, -30 };
-   MiffABCI2  abci2  = { -10, -20, -30 };
-   MiffABCI4  abci4  = { -10, -20, -30 };
-   MiffABCN1  abcn1  = {  10,  20,  30 };
-   MiffABCN2  abcn2  = {  10,  20,  30 };
-   MiffABCN4  abcn4  = {  10,  20,  30 };
-   MiffABCR4  abcr4  = {  11.1f, 22.2f, 33.3f };
-   MiffABCR8  abcr8  = {  11.1,  22.2,  33.3 };
-   MiffABCDI1 abcdi1 = { -10, -20, -30, -40 };
-   MiffABCDI2 abcdi2 = { -10, -20, -30, -40 };
-   MiffABCDI4 abcdi4 = { -10, -20, -30, -40 };
-   MiffABCDN1 abcdn1 = {  10,  20,  30,  40 };
-   MiffABCDN2 abcdn2 = {  10,  20,  30,  40 };
-   MiffABCDN4 abcdn4 = {  10,  20,  30,  40 };
-   MiffABCDR4 abcdr4 = {  11.1f, 22.2f, 33.3f, 44.4f };
-   MiffABCDR8 abcdr8 = {  11.1,  22.2,  33.3,  44.4 };
-   MiffMatrix2x2R4 matrix2x2r4 = { 1.1f, 1.2f,             2.1f, 2.2f };
-   MiffMatrix2x2R8 matrix2x2r8 = { 1.1,  1.2,              2.1,  2.2  };
-   MiffMatrix3x3R4 matrix3x3r4 = { 1.1f, 1.2f, 1.3f,       2.1f, 2.2f, 2.3f,       3.1f, 3.2f, 3.3f };
-   MiffMatrix3x3R8 matrix3x3r8 = { 1.1,  1.2,  1.3,        2.1,  2.2,  2.3,        3.1,  3.2,  3.3  };
-   MiffMatrix4x4R4 matrix4x4r4 = { 1.1f, 1.2f, 1.3f, 1.4f, 2.1f, 2.2f, 2.3f, 2.4f, 3.1f, 3.2f, 3.3f, 3.4f, 4.1f, 4.2f, 4.3f, 4.4f };
-   MiffMatrix4x4R8 matrix4x4r8 = { 1.1,  1.2,  1.3,  1.4,  2.1,  2.2,  2.3,  2.4,  3.1,  3.2,  3.3,  3.4,  4.1,  4.2,  4.3,  4.4 };
+};
+static MiffABI1             _abi1        = { -10, -20 };
+static MiffABI2             _abi2        = { -10, -20 };
+static MiffABI4             _abi4        = { -10, -20 };
+static MiffABN1             _abn1        = {  10,  20 };
+static MiffABN2             _abn2        = {  10,  20 };
+static MiffABN4             _abn4        = {  10,  20 };
+static MiffABR4             _abr4        = {  11.1f, 22.2f };
+static MiffABR8             _abr8        = {  11.1,  22.2 };
+static MiffABCI1            _abci1       = { -10, -20, -30 };
+static MiffABCI2            _abci2       = { -10, -20, -30 };
+static MiffABCI4            _abci4       = { -10, -20, -30 };
+static MiffABCN1            _abcn1       = {  10,  20,  30 };
+static MiffABCN2            _abcn2       = {  10,  20,  30 };
+static MiffABCN4            _abcn4       = {  10,  20,  30 };
+static MiffABCR4            _abcr4       = {  11.1f, 22.2f, 33.3f };
+static MiffABCR8            _abcr8       = {  11.1,  22.2,  33.3 };
+static MiffABCDI1           _abcdi1      = { -10, -20, -30, -40 };
+static MiffABCDI2           _abcdi2      = { -10, -20, -30, -40 };
+static MiffABCDI4           _abcdi4      = { -10, -20, -30, -40 };
+static MiffABCDN1           _abcdn1      = {  10,  20,  30,  40 };
+static MiffABCDN2           _abcdn2      = {  10,  20,  30,  40 };
+static MiffABCDN4           _abcdn4      = {  10,  20,  30,  40 };
+static MiffABCDR4           _abcdr4      = {  11.1f, 22.2f, 33.3f, 44.4f };
+static MiffABCDR8           _abcdr8      = {  11.1,  22.2,  33.3,  44.4 };
+static MiffMatrix2x2R4      _matrix2x2r4 = { 1.1f, 1.2f,             2.1f, 2.2f };
+static MiffMatrix2x2R8      _matrix2x2r8 = { 1.1,  1.2,              2.1,  2.2  };
+static MiffMatrix3x3R4      _matrix3x3r4 = { 1.1f, 1.2f, 1.3f,       2.1f, 2.2f, 2.3f,       3.1f, 3.2f, 3.3f };
+static MiffMatrix3x3R8      _matrix3x3r8 = { 1.1,  1.2,  1.3,        2.1,  2.2,  2.3,        3.1,  3.2,  3.3  };
+static MiffMatrix4x4R4      _matrix4x4r4 = { 1.1f, 1.2f, 1.3f, 1.4f, 2.1f, 2.2f, 2.3f, 2.4f, 3.1f, 3.2f, 3.3f, 3.4f, 4.1f, 4.2f, 4.3f, 4.4f };
+static MiffMatrix4x4R8      _matrix4x4r8 = { 1.1,  1.2,  1.3,  1.4,  2.1,  2.2,  2.3,  2.4,  3.1,  3.2,  3.3,  3.4,  4.1,  4.2,  4.3,  4.4 };
 
-   file = NULL;
-   miff = NULL;
+
+/******************************************************************************
+prototype:
+******************************************************************************/
+static MiffBool _GetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
+
+static void    *_MemCreate(         MiffN4 const memByteCount);
+static void     _MemDestroy(        void * const mem);
+static MiffBool _MemCompress(       MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
+static MiffN4   _MemCompressBound(  MiffN4 const memByteCount);
+static MiffBool _MemDecompress(     MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
+
+static MiffBool _SetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
+
+static MiffBool _TestRead(          MiffC2 const * const fileName);
+static MiffBool _TestWrite(         MiffC2 const * const fileName, MiffMode const mode);
+
+/******************************************************************************
+global:
+function:
+******************************************************************************/
+/******************************************************************************
+func: main
+******************************************************************************/
+int main(int acount, char **alist)
+{
+   int   result;
+
+   acount; alist;
+
+   result = 0;
+
+   // Start miff library.
+   if (!miffStart(_MemCreate, _MemDestroy, _MemCompressBound, _MemCompress, _MemDecompress))
+   {
+      result = 1;
+      goto DONE;
+   }
+
+   // Test the writing.
+   if (!_TestWrite(L"MiffFileTestTxt.miff", miffModeTEXT))
+   {
+      result = 2;
+      goto DONE;
+   }
+
+//   if (!_TestWrite(L"MiffFileTestBin.miff", miffModeBINARY))
+//   {
+//      result = 3;
+//      goto DONE;
+//   }
+
+   if (!_TestRead(L"MiffFileTestTxt.miff"))
+   {
+      result = 4;
+      goto DONE;
+   }
+
+DONE:
+   // Stop miff library.
+   miffStop();
+
+   return result;
+}
+
+/******************************************************************************
+local:
+function:
+******************************************************************************/
+/******************************************************************************
+func: _GetBuffer
+******************************************************************************/
+static MiffBool _GetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
+{
+   return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
+}
+
+/******************************************************************************
+func: _MemCreate
+******************************************************************************/
+void *_MemCreate(MiffN4 const memByteCount)
+{
+   return calloc(1, (size_t) memByteCount);
+}
+
+/******************************************************************************
+func: _MemDestroy
+******************************************************************************/
+void _MemDestroy(void * const mem)
+{
+   free(mem);
+}
+
+/******************************************************************************
+func: _MemCompressBound
+******************************************************************************/
+MiffN4 _MemCompressBound(MiffN4 const memByteCount)
+{
+   return compressBound((uLong) memByteCount);
+}
+
+/******************************************************************************
+func: _MemCompress
+******************************************************************************/
+MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
+   MiffN4 * const compressMemByteCount, void * const compressMem)
+{
+   uLongf minSize;
+   MiffN4 result;
+
+   if (!memByteCount         || !mem ||
+       !compressMemByteCount || !compressMem)
+   {
+      return miffBoolFALSE;
+   }
+
+   result                 = (MiffN4) ~Z_OK;
+   minSize                = (uLongf) *compressMemByteCount;
+   *compressMemByteCount  = 0;
+
+   // Compress the buffer.
+   result = compress2(
+      (Bytef *) compressMem,
+      &minSize,
+      (Bytef const *) mem,
+      (uLong) memByteCount,
+      Z_DEFAULT_COMPRESSION);
+
+   if (result != Z_OK)
+   {
+      return miffBoolFALSE;
+   }
+
+   *compressMemByteCount = minSize;
+
+   return miffBoolTRUE;
+}
+
+/******************************************************************************
+func: _MemDecompress
+******************************************************************************/
+MiffBool _MemDecompress(MiffN4 const compressMemByteCount, void const * const compressMem,
+   MiffN4 * const memByteCount, void * const mem)
+{
+   MiffN4 result;
+   uLongf size;
+
+   if (!compressMem || !compressMemByteCount ||
+       !mem         || !memByteCount)
+   {
+      return miffBoolFALSE;
+   }
+
+   size          = (uLongf) *memByteCount;
+   *memByteCount = 0;
+
+   // Uncompress the buffer.
+   result = uncompress(
+      (Bytef *) mem,
+      &size,
+      (Bytef const *) compressMem,
+      (uLong) compressMemByteCount);
+
+   if (result != Z_OK)
+   {
+      return miffBoolFALSE;
+   }
+
+   *memByteCount = size;
+
+   return miffBoolTRUE;
+}
+
+/******************************************************************************
+func: _SetBuffer
+******************************************************************************/
+static MiffBool _SetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
+{
+   return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
+}
+
+/******************************************************************************
+func: _TestRead
+******************************************************************************/
+static MiffBool _TestRead(MiffC2 const * const fileName)
+{
+   FILE           *file;
+   Miff           *miff;
+   MiffBool        result;
+
+   file   = NULL;
+   miff   = NULL;
+   result = miffBoolFALSE;
+
+   for (;;)
+   {
+      if (_wfopen_s(&file, fileName, L"rb") != 0)
+      {
+         break;
+      }
+
+      // Set Miff up for reading.
+      miff = miffCreateReader(miffBoolTRUE, _GetBuffer, (void *) file);
+      if (!miff)
+      {
+         break;
+      }
+
+      result = miffBoolTRUE;
+      break;
+   }
+
+   miffDestroy(miff);
+   fclose(file);
+
+   return result;
+}
+
+/******************************************************************************
+func: _TestWrite
+******************************************************************************/
+static MiffBool _TestWrite(MiffC2 const * const fileName, MiffMode const mode)
+{
+   FILE           *file;
+   Miff           *miff;
+   MiffI4          index;
+   MiffBool        result;
+
+   file   = NULL;
+   miff   = NULL;
+   result = miffBoolFALSE;
 
    for(;;)
    {
-      if (_wfopen_s(&file, fileName, L"wb") != 0)
+      if (_wfopen_s(&file, (wchar_t *) fileName, L"wb") != 0)
       {
          break;
       }
@@ -832,36 +889,36 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
       miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      miffRecordSetBegin(miff, miffTypeABI1,        L"ABI1",   1, miffBoolFALSE, 0); miffSetValueABI1(       miff, &abi1       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABI2,        L"ABI2",   1, miffBoolFALSE, 0); miffSetValueABI2(       miff, &abi2       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABI4,        L"ABI4",   1, miffBoolFALSE, 0); miffSetValueABI4(       miff, &abi4       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABN1,        L"ABN1",   1, miffBoolFALSE, 0); miffSetValueABN1(       miff, &abn1       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABN2,        L"ABN2",   1, miffBoolFALSE, 0); miffSetValueABN2(       miff, &abn2       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABN4,        L"ABN4",   1, miffBoolFALSE, 0); miffSetValueABN4(       miff, &abn4       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABR4,        L"ABR4",   1, miffBoolFALSE, 0); miffSetValueABR4(       miff, &abr4       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABR8,        L"ABR8",   1, miffBoolFALSE, 0); miffSetValueABR8(       miff, &abr8       ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCI1,       L"ABCI1",  1, miffBoolFALSE, 0); miffSetValueABCI1(      miff, &abci1      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCI2,       L"ABCI2",  1, miffBoolFALSE, 0); miffSetValueABCI2(      miff, &abci2      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCI4,       L"ABCI4",  1, miffBoolFALSE, 0); miffSetValueABCI4(      miff, &abci4      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCN1,       L"ABCN1",  1, miffBoolFALSE, 0); miffSetValueABCN1(      miff, &abcn1      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCN2,       L"ABCN2",  1, miffBoolFALSE, 0); miffSetValueABCN2(      miff, &abcn2      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCN4,       L"ABCN4",  1, miffBoolFALSE, 0); miffSetValueABCN4(      miff, &abcn4      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCR4,       L"ABCR4",  1, miffBoolFALSE, 0); miffSetValueABCR4(      miff, &abcr4      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCR8,       L"ABCR8",  1, miffBoolFALSE, 0); miffSetValueABCR8(      miff, &abcr8      ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDI1,      L"ABCDI1", 1, miffBoolFALSE, 0); miffSetValueABCDI1(     miff, &abcdi1     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDI2,      L"ABCDI2", 1, miffBoolFALSE, 0); miffSetValueABCDI2(     miff, &abcdi2     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDI4,      L"ABCDI4", 1, miffBoolFALSE, 0); miffSetValueABCDI4(     miff, &abcdi4     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDN1,      L"ABCDN1", 1, miffBoolFALSE, 0); miffSetValueABCDN1(     miff, &abcdn1     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDN2,      L"ABCDN2", 1, miffBoolFALSE, 0); miffSetValueABCDN2(     miff, &abcdn2     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDN4,      L"ABCDN4", 1, miffBoolFALSE, 0); miffSetValueABCDN4(     miff, &abcdn4     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDR4,      L"ABCDR4", 1, miffBoolFALSE, 0); miffSetValueABCDR4(     miff, &abcdr4     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeABCDR8,      L"ABCDR8", 1, miffBoolFALSE, 0); miffSetValueABCDR8(     miff, &abcdr8     ); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX2X2R4, L"mat224", 1, miffBoolFALSE, 0); miffSetValueMatrix2x2R4(miff, &matrix2x2r4); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX2X2R8, L"mat228", 1, miffBoolFALSE, 0); miffSetValueMatrix2x2R8(miff, &matrix2x2r8); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX3X3R4, L"mat334", 1, miffBoolFALSE, 0); miffSetValueMatrix3x3R4(miff, &matrix3x3r4); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX3X3R8, L"mat338", 1, miffBoolFALSE, 0); miffSetValueMatrix3x3R8(miff, &matrix3x3r8); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, L"mat444", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R4(miff, &matrix4x4r4); miffRecordSetEnd(miff);
-      miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, L"mat448", 1, miffBoolFALSE, 0); miffSetValueMatrix4x4R8(miff, &matrix4x4r8); miffRecordSetEnd(miff);
+      miffSet1ABI1(       miff, L"ABI1",   &_abi1       );
+      miffSet1ABI2(       miff, L"ABI2",   &_abi2       );
+      miffSet1ABI4(       miff, L"ABI4",   &_abi4       );
+      miffSet1ABN1(       miff, L"ABN1",   &_abn1       );
+      miffSet1ABN2(       miff, L"ABN2",   &_abn2       );
+      miffSet1ABN4(       miff, L"ABN4",   &_abn4       );
+      miffSet1ABR4(       miff, L"ABR4",   &_abr4       );
+      miffSet1ABR8(       miff, L"ABR8",   &_abr8       );
+      miffSet1ABCI1(      miff, L"ABCI1",  &_abci1      );
+      miffSet1ABCI2(      miff, L"ABCI2",  &_abci2      );
+      miffSet1ABCI4(      miff, L"ABCI4",  &_abci4      );
+      miffSet1ABCN1(      miff, L"ABCN1",  &_abcn1      );
+      miffSet1ABCN2(      miff, L"ABCN2",  &_abcn2      );
+      miffSet1ABCN4(      miff, L"ABCN4",  &_abcn4      );
+      miffSet1ABCR4(      miff, L"ABCR4",  &_abcr4      );
+      miffSet1ABCR8(      miff, L"ABCR8",  &_abcr8      );
+      miffSet1ABCDI1(     miff, L"ABCDI1", &_abcdi1     );
+      miffSet1ABCDI2(     miff, L"ABCDI2", &_abcdi2     );
+      miffSet1ABCDI4(     miff, L"ABCDI4", &_abcdi4     );
+      miffSet1ABCDN1(     miff, L"ABCDN1", &_abcdn1     );
+      miffSet1ABCDN2(     miff, L"ABCDN2", &_abcdn2     );
+      miffSet1ABCDN4(     miff, L"ABCDN4", &_abcdn4     );
+      miffSet1ABCDR4(     miff, L"ABCDR4", &_abcdr4     );
+      miffSet1ABCDR8(     miff, L"ABCDR8", &_abcdr8     );
+      miffSet1Matrix2x2R4(miff, L"mat224", &_matrix2x2r4);
+      miffSet1Matrix2x2R8(miff, L"mat228", &_matrix2x2r8);
+      miffSet1Matrix3x3R4(miff, L"mat334", &_matrix3x3r4);
+      miffSet1Matrix3x3R8(miff, L"mat338", &_matrix3x3r8);
+      miffSet1Matrix4x4R4(miff, L"mat444", &_matrix4x4r4);
+      miffSet1Matrix4x4R8(miff, L"mat448", &_matrix4x4r8);
 
       miffRecordSetBegin(miff, miffTypeVARIABLE, L"variableIntStrReal", 1, miffBoolFALSE, 0);
       miffSetValueI4(miff, 42);
@@ -871,59 +928,59 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
       miffSetValueR8(miff, 3.14159);
       miffRecordSetEnd(miff);
 
-      miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) n1array);
-      miffSetNN1(           miff, L"N1_Array",     256,     n1array);
+      miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) _n1array);
+      miffSetNN1(           miff, L"N1_Array",     256,     _n1array);
       miffRecordSetBegin(   miff, miffTypeI1, L"I1 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI1(            miff, ((MiffI1 *) n1array)[index]);
+         miffSetValueI1(            miff, ((MiffI1 *) _n1array)[index]);
          miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
-      miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) n2array);
-      miffSetNN2(           miff, L"N2_Array",     256,     n2array);
+      miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) _n2array);
+      miffSetNN2(           miff, L"N2_Array",     256,     _n2array);
       miffRecordSetBegin(   miff, miffTypeI2, L"I2 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI2(            miff, ((MiffI2 *) n2array)[index]);
+         miffSetValueI2(            miff, ((MiffI2 *) _n2array)[index]);
          miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
-      miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) n4array);
-      miffSetNN4(           miff, L"N4_Array",     256,     n4array);
+      miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) _n4array);
+      miffSetNN4(           miff, L"N4_Array",     256,     _n4array);
       miffRecordSetBegin(   miff, miffTypeI4, L"I4 ArrayZ", 256 * 3, miffBoolTRUE, 9999);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI4(            miff, ((MiffI4 *) n4array)[index]);
+         miffSetValueI4(            miff, ((MiffI4 *) _n4array)[index]);
          miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
-      miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) n8array);
-      miffSetNN8(           miff, L"N8_Array",     256,     n8array);
+      miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) _n8array);
+      miffSetNN8(           miff, L"N8_Array",     256,     _n8array);
       miffRecordSetBegin(   miff, miffTypeI8, L"I8 ArrayZ", 256 * 3, miffBoolTRUE, 4000);
       for (index = 0; index < 256 * 3; index++)
       {
-         miffSetValueI8(            miff, ((MiffI8 *) n8array)[index]);
+         miffSetValueI8(            miff, ((MiffI8 *) _n8array)[index]);
          miffRecordSetNextArrayItem(miff, index, 256 * 3);
       }
       miffRecordSetEnd(miff);
 
-      miffSetNR4(           miff, L"R4_Array",     300,     reals4);
-      miffSetNR8(           miff, L"R8_Array",     300,     reals8);
+      miffSetNR4(           miff, L"R4_Array",     300,     _reals4);
+      miffSetNR8(           miff, L"R8_Array",     300,     _reals8);
       miffRecordSetBegin(   miff, miffTypeR8, L"R8 ArrayZ", 300, miffBoolTRUE, 9999);
       for (index = 0; index < 300; index++)
       {
-         miffSetValueR8(            miff, reals8[index]);
+         miffSetValueR8(            miff, _reals8[index]);
          miffRecordSetNextArrayItem(miff, index, 300);
       }
       miffRecordSetEnd(miff);
 
-      miffSetNStringC2(     miff, L"String_Array", 10,   strings);
+      miffSetNStringC2(     miff, L"String_Array", 10,   _strings);
 
-      miffSetNBoolean(      miff, L"Bool_Array",   100,  bools);
+      miffSetNBoolean(      miff, L"Bool_Array",   100,  _bools);
 
       miffSetBlockStart(miff, L"KeyValueBlock");
       {
@@ -976,15 +1033,16 @@ static MiffBool _TestWrite(MiffC2 * const fileName, MiffMode const mode)
 
          miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-         miffSetNStringC2(     miff, L"String_Array", 10,      strings);
+         miffSetNStringC2(     miff, L"String_Array", 10,      _strings);
       }
       miffSetBlockStop(miff);
 
+      result = miffBoolTRUE;
       break;
    }
 
    miffDestroy(miff);
    fclose(file);
 
-   return miffBoolTRUE;
+   return result;
 }

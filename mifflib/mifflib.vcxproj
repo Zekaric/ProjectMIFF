@@ -171,6 +171,7 @@
     <ClCompile Include="byteSwap.c" />
     <ClCompile Include="mem.c" />
     <ClCompile Include="mifflib.c" />
+    <ClCompile Include="read.c" />
     <ClCompile Include="string.c" />
     <ClCompile Include="type.c" />
     <ClCompile Include="util.c" />

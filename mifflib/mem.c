@@ -55,6 +55,29 @@ void _MemDestroy(void * const mem)
 }
 
 /******************************************************************************
+func: _MemCompare
+******************************************************************************/
+MiffI4 _MemCompare(MiffN4 const byteCount, void const * const buffA, void const * const buffB)
+{
+   MiffN4 index;
+   MiffN1 *ba,
+          *bb;
+   MiffI4  result;
+
+   ba = (MiffN1 *) buffA;
+   bb = (MiffN1 *) buffB;
+   for (index = 0; index < byteCount; index++)
+   {
+      result = ((MiffI4) ba[index]) - ((MiffI4) bb[index]);
+
+      if (result < 0) return -1;
+      if (result > 0) return  1;
+   }
+
+   return 0;
+}
+
+/******************************************************************************
 func: _MemCompressBound
 ******************************************************************************/
 MiffN4 _MemCompressBound(MiffN4 const memByteCount)
@@ -65,7 +88,7 @@ MiffN4 _MemCompressBound(MiffN4 const memByteCount)
 /******************************************************************************
 func: _MemCompress
 ******************************************************************************/
-MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem, 
+MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
    MiffN4 * const compressMemByteCount, void * const compressMem)
 {
    return _memCompress(memByteCount, mem, compressMemByteCount, compressMem);
@@ -74,7 +97,7 @@ MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
 /******************************************************************************
 func: _MemDecompress
 ******************************************************************************/
-MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const compressMem, 
+MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const compressMem,
    MiffN4 * const memByteCount, void ** const mem)
 {
    return _memDecompress(compressMemByteCount, compressMem, memByteCount, mem);
@@ -83,8 +106,8 @@ MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const 
 /******************************************************************************
 func: _MemStart
 ******************************************************************************/
-void _MemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc, 
-   MiffMemCompressBound const memCcompressBoundFunc, MiffMemCompress const memCompressFunc, 
+void _MemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc,
+   MiffMemCompressBound const memCcompressBoundFunc, MiffMemCompress const memCompressFunc,
    MiffMemDecompress const memDecompressFunc)
 {
    _memCreate        = memCreateFunc;

@@ -1,7 +1,7 @@
 /******************************************************************************
 file:       MiffLib
 author:     Robbert de Groot
-company:    
+company:
 copyright:  2021, Robbert de Groot
 
 description:
@@ -63,7 +63,7 @@ function:
 /******************************************************************************
 func: miffCreateReader
 ******************************************************************************/
-Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, 
+Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc,
    void * const dataRepo)
 {
    Miff *miff;
@@ -88,7 +88,7 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
 /******************************************************************************
 func: miffCreateReaderContent
 ******************************************************************************/
-MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping, 
+MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping,
    MiffGetBuffer getBufferFunc, void * const dataRepo)
 {
    MiffN1 ntemp;
@@ -137,8 +137,8 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
 /******************************************************************************
 func: miffCreateWriter
 ******************************************************************************/
-Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, 
-   MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, 
+Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc,
+   MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion,
    void * const dataRepo)
 {
    Miff *miff;
@@ -151,12 +151,12 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
 
    // Initialize the structure
    if (!miffCreateWriterContent(
-         miff, 
-         isByteSwaping, 
-         setBufferFunc, 
-         mode, 
-         subFormatName, 
-         subFormatVersion, 
+         miff,
+         isByteSwaping,
+         setBufferFunc,
+         mode,
+         subFormatName,
+         subFormatVersion,
          dataRepo))
    {
       _MemDestroy(miff);
@@ -170,8 +170,8 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
 /******************************************************************************
 func: miffCreateWriterContent
 ******************************************************************************/
-MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping, 
-   MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, 
+MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping,
+   MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName,
    MiffN8 const subFormatVersion, void * const dataRepo)
 {
    MiffN4 count;
@@ -191,7 +191,7 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    miff->isByteSwapping       = isByteSwaping;
    miff->setBuffer            = setBufferFunc;
    miff->subFormatVersion     = subFormatVersion;
-   
+
    count = min(255, _C2GetCount(subFormatName));
    _MemCopyTypeArray(count, MiffC2, miff->subFormatNameC2, subFormatName);
 
@@ -242,6 +242,60 @@ void miffDestroyContent(Miff * const miff)
    //memDestroy(miff->mem);
    //memDestroy(miff->compressMem);
    _MemDestroy(miff);
+}
+
+/******************************************************************************
+func: miffRecordGetBegin
+
+key needs to be a buffer of size miffKeySIZE.
+******************************************************************************/
+MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * const key,
+   MiffN4 * const count, MiffBool * const isCompressed, MiffN4 * const compressedChunkByteCount)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Reset the record reading.
+   miff->readRecordIsDone = miffBoolFALSE;
+
+   *type                     = miffTypeNONE;
+   *count                    = 0;
+   *isCompressed             = miffBoolFALSE;
+   *compressedChunkByteCount = 0;
+
+   // Clear the key.
+   _MemClearTypeArray(miffKeySIZE, MiffC2, key);
+
+   // Read in the type.
+   returnFalseIf(_ReadTxtRecordType(miff, type));
+
+   // Special case,
+   if (*type == miffTypeKEY_VALUE_BLOCK_STOP)
+   {
+      return miff->readRecordIsDone;
+   }
+
+   // Read in the name of the record
+   returnFalseIf(_ReadTxt)
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffRecordGetEnd
+******************************************************************************/
+MiffBool miffRecordGetEnd(Miff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   returnTrueIf(miff->readRecordIsDone);
+
+   returnFalseIf(!_ReadTxtLineSkip(miff));
+
+   miff->readRecordIsDone = miffBoolTRUE;
 }
 
 /******************************************************************************
@@ -312,7 +366,7 @@ MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const
    miff->currentRecord.arrayCount               = count;
    miff->currentRecord.isCompressed             = isCompressed;
    miff->currentRecord.compressedChunkByteCount = compressedChunkByteCount;
-   _MemClearTypeArray(257,              MiffC2, miff->currentRecord.nameC2);
+   _MemClearTypeArray(miffKeySIZE,      MiffC2, miff->currentRecord.nameC2);
    _MemCopyTypeArray( _C2GetCount(key), MiffC2, miff->currentRecord.nameC2, key);
 
    // We are starting a new key value block.
@@ -411,7 +465,7 @@ MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDe
 {
    returnTrueIf(_isStarted);
 
-   // We can live without compress.  (sometimes) 
+   // We can live without compress.  (sometimes)
    // we can't live without dynamic memory.
    returnFalseIf(
       !memCreateFunc ||
@@ -2344,9 +2398,9 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
         miff->currentRecord.type == miffTypeVARIABLE));
 
    c1 = (MiffC1 *) (value ? "T" : "F");
-   
+
    returnFalseIf(!_WriteTxtC1(miff, c1));
-  
+
    returnTrue;
 }
 
@@ -2820,7 +2874,7 @@ MiffBool miffGetFileVersion(Miff const * const miff, MiffN8 * const version)
 /******************************************************************************
 func: miffGetFileVersionSubFormat
 ******************************************************************************/
-MiffBool miffGetFileVersionSubFormat(Miff const * const miff, MiffC2 const ** const subFormatName, 
+MiffBool miffGetFileVersionSubFormat(Miff const * const miff, MiffC2 const ** const subFormatName,
    MiffN8 * const subFormatVersion)
 {
    returnFalseIf(
@@ -2868,8 +2922,8 @@ MiffBool miffGetNextRecord(Miff * const miff)
 /******************************************************************************
 func: miffGetValueHeader
 ******************************************************************************/
-MiffBool miffGetValueHeader(Miff const * const miff, MiffType * const type, 
-   MiffArrayFlag * const arrayFlag, MiffN4 * const arrayCount, 
+MiffBool miffGetValueHeader(Miff const * const miff, MiffType * const type,
+   MiffArrayFlag * const arrayFlag, MiffN4 * const arrayCount,
    MiffCompressFlag * const compressFlag, MiffN4 * const chunkByteCount)
 {
    returnFalseIf(
@@ -2914,7 +2968,7 @@ Miff1 miffGetValue1(Miff const * const miff)
       value);
 
    _ReadValue1(miff, miff->mode, miff->valueType, &value);
-      
+
    return value;
 }
 
@@ -3256,7 +3310,7 @@ MiffType miffUserTypeStart(Miff * const miff, MiffC2 const * const name)
          }
 
          miff->userTypeList[miff->userTypeCurr].varCount  = 0;
-         miff->userTypeList[miff->userTypeCurr].varStart  = 
+         miff->userTypeList[miff->userTypeCurr].varStart  =
             miff->userTypeList[miff->userTypeCurr].varEnd = NULL;
 
          return miff->userTypeCurr;
@@ -3299,7 +3353,7 @@ static MiffN1 _ReadFirstLetter(Miff const * const miff)
       breakIf(!miff->getBuffer(miff->dataRepo, 1, (Miff1 *) &letter));
       breakIf(
          !(letter == ' '  ||
-           letter == '\t' || 
+           letter == '\t' ||
            letter == '\n'));
    }
 
@@ -3368,7 +3422,7 @@ static MiffBool _ReadPart(Miff const * const miff, MiffN4 const maxByteCount, Mi
    byteCount = 0;
    loop
    {
-      // If the buffer isn't larger enough for the part we read up to the maxByteCount and then 
+      // If the buffer isn't larger enough for the part we read up to the maxByteCount and then
       // ignore the rest.  This should never happen.  If it does we have a mal-formed MIFF.
       if (byteCount != maxByteCount)
       {
@@ -3538,7 +3592,7 @@ static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
       else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "r64"))    miff->valueType = miffTypeR64;
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "r128"))   miff->valueType = miffTypeR128;
       else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "r256"))   miff->valueType = miffTypeR256;
-      else 
+      else
       {
          // User type
          //miff->valueType = _FindUserType(typeByteCount, type);
@@ -3572,12 +3626,12 @@ static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
 /******************************************************************************
 func: _ReadValue1
 ******************************************************************************/
-static MiffBool _ReadValue1(Miff const * const miff, MiffMode const mode, 
+static MiffBool _ReadValue1(Miff const * const miff, MiffMode const mode,
    MiffType const type, Miff1 * const value)
 {
    MiffN4 partByteCount;
    MiffC1 part[64];
-   
+
    if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, value));
@@ -3594,7 +3648,7 @@ static MiffBool _ReadValue1(Miff const * const miff, MiffMode const mode,
       returnTrue;
    }
 
-   value->n = (MiffN1) _MiffC1ToN(partByteCount, part); 
+   value->n = (MiffN1) _MiffC1ToN(partByteCount, part);
    memDestroy(part);
 
    returnTrue;
@@ -3603,12 +3657,12 @@ static MiffBool _ReadValue1(Miff const * const miff, MiffMode const mode,
 /******************************************************************************
 func: _ReadValue2
 ******************************************************************************/
-static MiffBool _ReadValue2(Miff const * const miff, MiffMode const mode, 
+static MiffBool _ReadValue2(Miff const * const miff, MiffMode const mode,
    MiffType const type, Miff2 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
-   
+
    if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer(miff->dataRepo, 2, (Miff1 *) value));
@@ -3644,7 +3698,7 @@ static MiffBool _ReadValue2(Miff const * const miff, MiffMode const mode,
       returnTrue;
    }
 
-   value->n = (MiffN2) _MiffC1ToN(partByteCount, part); 
+   value->n = (MiffN2) _MiffC1ToN(partByteCount, part);
    memDestroy(part);
 
    returnTrue;
@@ -3653,12 +3707,12 @@ static MiffBool _ReadValue2(Miff const * const miff, MiffMode const mode,
 /******************************************************************************
 func: _ReadValue4
 ******************************************************************************/
-static MiffBool _ReadValue4(Miff const * const miff, MiffMode const mode, 
+static MiffBool _ReadValue4(Miff const * const miff, MiffMode const mode,
    MiffType const type, Miff4 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
-   
+
    // Binary read value.
    if (mode == miffModeBINARY)
    {
@@ -3706,7 +3760,7 @@ static MiffBool _ReadValue4(Miff const * const miff, MiffMode const mode,
       returnTrue;
    }
 
-   value->n = (MiffN4) _MiffC1ToN(partByteCount, part); 
+   value->n = (MiffN4) _MiffC1ToN(partByteCount, part);
    memDestroy(part);
 
    returnTrue;
@@ -3715,12 +3769,12 @@ static MiffBool _ReadValue4(Miff const * const miff, MiffMode const mode,
 /******************************************************************************
 func: _ReadValue8
 ******************************************************************************/
-static MiffBool _ReadValue8(Miff const * const miff, MiffMode const mode, 
+static MiffBool _ReadValue8(Miff const * const miff, MiffMode const mode,
    MiffType const type, Miff8 * const value)
 {
    MiffN4 partByteCount;
    MiffN1 part[64];
-   
+
    if (mode == miffModeBINARY)
    {
       returnFalseIf(!miff->getBuffer8(miff->dataRepo, 1, value));
@@ -3768,7 +3822,7 @@ static MiffBool _ReadValue8(Miff const * const miff, MiffMode const mode,
       returnTrue;
    }
 
-   value->n = (MiffN8) _MiffC1ToN(partByteCount, part); 
+   value->n = (MiffN8) _MiffC1ToN(partByteCount, part);
    memDestroy(part);
 
    returnTrue;

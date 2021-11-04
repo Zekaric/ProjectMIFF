@@ -802,6 +802,11 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
          break;
       }
 
+      for (;;)
+      {
+         miffRecordGetBegin()
+      }
+
       result = miffBoolTRUE;
       break;
    }

@@ -110,7 +110,7 @@ MiffBool _WriteTxtRecordCompressFlag(Miff const * const miff, MiffBool const isC
    {
       return _WriteTxtC1(miff, (MiffC1 *) "-");
    }
-    
+
    return _WriteTxtC1(miff, (MiffC1 *) ":");
 }
 
@@ -157,74 +157,7 @@ func: _WriteTxtType
 ******************************************************************************/
 MiffBool _WriteTxtType(Miff const * const miff, MiffType const value)
 {
-   switch (value)
-   {
-   case miffTypeKEY_VALUE_BLOCK_START:  return _WriteTxtC1(miff, (MiffC1 *) "{"       );
-   case miffTypeKEY_VALUE_BLOCK_STOP:   return _WriteTxtC1(miff, (MiffC1 *) "}"       );
-   case miffTypeTYPE:                   return _WriteTxtC1(miff, (MiffC1 *) "type"    );
-   case miffTypeSTRING:                 return _WriteTxtC1(miff, (MiffC1 *) "\""      );
-   case miffTypeVARIABLE:               return _WriteTxtC1(miff, (MiffC1 *) "v"       );
-   case miffTypeBOOLEAN:                return _WriteTxtC1(miff, (MiffC1 *) "b"       );
-   case miffTypeI1:                     return _WriteTxtC1(miff, (MiffC1 *) "i1"      );
-   case miffTypeI2:                     return _WriteTxtC1(miff, (MiffC1 *) "i2"      );
-   case miffTypeI4:                     return _WriteTxtC1(miff, (MiffC1 *) "i4"      );
-   case miffTypeI8:                     return _WriteTxtC1(miff, (MiffC1 *) "i8"      );
-   case miffTypeI16:                    return _WriteTxtC1(miff, (MiffC1 *) "i16"     );
-   case miffTypeI32:                    return _WriteTxtC1(miff, (MiffC1 *) "i32"     );
-   case miffTypeI64:                    return _WriteTxtC1(miff, (MiffC1 *) "i64"     );
-   case miffTypeI128:                   return _WriteTxtC1(miff, (MiffC1 *) "i128"    );
-   case miffTypeI256:                   return _WriteTxtC1(miff, (MiffC1 *) "i256"    );
-   case miffTypeN1:                     return _WriteTxtC1(miff, (MiffC1 *) "n1"      );
-   case miffTypeN2:                     return _WriteTxtC1(miff, (MiffC1 *) "n2"      );
-   case miffTypeN4:                     return _WriteTxtC1(miff, (MiffC1 *) "n4"      );
-   case miffTypeN8:                     return _WriteTxtC1(miff, (MiffC1 *) "n8"      );
-   case miffTypeN16:                    return _WriteTxtC1(miff, (MiffC1 *) "n16"     );
-   case miffTypeN32:                    return _WriteTxtC1(miff, (MiffC1 *) "n32"     );
-   case miffTypeN64:                    return _WriteTxtC1(miff, (MiffC1 *) "n64"     );
-   case miffTypeN128:                   return _WriteTxtC1(miff, (MiffC1 *) "n128"    );
-   case miffTypeN256:                   return _WriteTxtC1(miff, (MiffC1 *) "n256"    );
-   case miffTypeR4:                     return _WriteTxtC1(miff, (MiffC1 *) "r4"      );
-   case miffTypeR8:                     return _WriteTxtC1(miff, (MiffC1 *) "r8"      );
-   case miffTypeABI1:                   return _WriteTxtC1(miff, (MiffC1 *) "abi1"    );
-   case miffTypeABI2:                   return _WriteTxtC1(miff, (MiffC1 *) "abi2"    );
-   case miffTypeABI4:                   return _WriteTxtC1(miff, (MiffC1 *) "abi4"    );
-   case miffTypeABI8:                   return _WriteTxtC1(miff, (MiffC1 *) "abi8"    );
-   case miffTypeABN1:                   return _WriteTxtC1(miff, (MiffC1 *) "abn1"    );
-   case miffTypeABN2:                   return _WriteTxtC1(miff, (MiffC1 *) "abn2"    );
-   case miffTypeABN4:                   return _WriteTxtC1(miff, (MiffC1 *) "abn4"    );
-   case miffTypeABN8:                   return _WriteTxtC1(miff, (MiffC1 *) "abn8"    );
-   case miffTypeABR4:                   return _WriteTxtC1(miff, (MiffC1 *) "abr4"    );
-   case miffTypeABR8:                   return _WriteTxtC1(miff, (MiffC1 *) "abr8"    );
-   case miffTypeABCI1:                  return _WriteTxtC1(miff, (MiffC1 *) "abci1"   );
-   case miffTypeABCI2:                  return _WriteTxtC1(miff, (MiffC1 *) "abci2"   );
-   case miffTypeABCI4:                  return _WriteTxtC1(miff, (MiffC1 *) "abci4"   );
-   case miffTypeABCI8:                  return _WriteTxtC1(miff, (MiffC1 *) "abci8"   );
-   case miffTypeABCN1:                  return _WriteTxtC1(miff, (MiffC1 *) "abcn1"   );
-   case miffTypeABCN2:                  return _WriteTxtC1(miff, (MiffC1 *) "abcn2"   );
-   case miffTypeABCN4:                  return _WriteTxtC1(miff, (MiffC1 *) "abcn4"   );
-   case miffTypeABCN8:                  return _WriteTxtC1(miff, (MiffC1 *) "abcn8"   );
-   case miffTypeABCR4:                  return _WriteTxtC1(miff, (MiffC1 *) "abcr4"   );
-   case miffTypeABCR8:                  return _WriteTxtC1(miff, (MiffC1 *) "abcr8"   );
-   case miffTypeABCDI1:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdi1"  );
-   case miffTypeABCDI2:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdi2"  );
-   case miffTypeABCDI4:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdi4"  );
-   case miffTypeABCDI8:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdi8"  );
-   case miffTypeABCDN1:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdn1"  );
-   case miffTypeABCDN2:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdn2"  );
-   case miffTypeABCDN4:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdn4"  );
-   case miffTypeABCDN8:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdn8"  );
-   case miffTypeABCDR4:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdr4"  );
-   case miffTypeABCDR8:                 return _WriteTxtC1(miff, (MiffC1 *) "abcdr8"  );
-   case miffTypeMATRIX2X2R4:            return _WriteTxtC1(miff, (MiffC1 *) "mat2x2r4");
-   case miffTypeMATRIX2X2R8:            return _WriteTxtC1(miff, (MiffC1 *) "mat2x2r8");
-   case miffTypeMATRIX3X3R4:            return _WriteTxtC1(miff, (MiffC1 *) "mat3x3r4");
-   case miffTypeMATRIX3X3R8:            return _WriteTxtC1(miff, (MiffC1 *) "mat3x3r8");
-   case miffTypeMATRIX4X4R4:            return _WriteTxtC1(miff, (MiffC1 *) "mat4x4r4");
-   case miffTypeMATRIX4X4R8:            return _WriteTxtC1(miff, (MiffC1 *) "mat4x4r8");
-      
-   }
-
-   returnFalse;
+   return _WriteTxtC1(miff, _TypeGetNameC1(value));
 }
 
 /******************************************************************************
@@ -429,7 +362,7 @@ MiffBool _WriteValue1(Miff * const miff, MiffType const type, Miff1 value)
       returnFalseIf(!_WriteTxtValue1(miff, type, value));
       returnTrue;
    }
-    
+
    // Populate the internal buffer before compression.
    returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
    returnTrue;
@@ -453,7 +386,7 @@ MiffBool _WriteValue2(Miff * const miff, MiffType const type, Miff2 value)
 
    // Ensure proper byte order.
    _ByteSwap2(miff, &value);
-   
+
    // Populate the internal buffer before compression.
    returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
    returnFalseIf(!_WriteCompressByte(miff, value.byte[1]));

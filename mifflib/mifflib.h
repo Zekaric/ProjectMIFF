@@ -43,6 +43,9 @@ include:
 local:
 constant:
 ******************************************************************************/
+#define miffKeyBYTE_COUNT                 256
+#define miffKeySIZE                       257
+
 typedef enum
 {
    miffBoolFALSE,
@@ -264,7 +267,7 @@ typedef union
    MiffN1             byte[12];
 } Miff12;
 
-typedef struct       
+typedef struct
 {
    MiffABR8           abr;
    MiffABCDI4         abcdi;
@@ -329,7 +332,7 @@ typedef MiffBool (*MiffSetBuffer)(        void * const dataRepo, MiffN4 const by
 
 typedef struct
 {
-   MiffC2                      nameC2[257];
+   MiffC2                      nameC2[miffKeySIZE];
    MiffType                    type;
    MiffN4                      arrayCount;
    MiffBool                    isCompressed;
@@ -344,7 +347,7 @@ typedef struct
    MiffMethod                  method;
    MiffBool                    isByteSwapping;
 
-   MiffC2                      subFormatNameC2[257];
+   MiffC2                      subFormatNameC2[miffKeySIZE];
    MiffN8                      subFormatVersion;
 
    // The list of types, all types even the predefined base types.
@@ -370,6 +373,7 @@ typedef struct
    MiffN1                     *compressMemByteData;
 
    // Temporary storage for reading
+   MiffBool                    readRecordIsDone;
    MiffN4                      readByteCountActual;
    MiffN4                      readByteCount;
    MiffN1                     *readByteData;
@@ -408,11 +412,13 @@ void            miffDestroyContent(                Miff       * const miff);
 // Miff128         miffGetValue128(                   Miff const * const miff);
 // Miff256         miffGetValue256(                   Miff const * const miff);
 
+MiffBool        miffRecordGetBegin(                Miff       * const miff, MiffType * const type, MiffC2       * const key, MiffN4 * const count, MiffBool * const isCompressed, MiffN4 * const compressedChunkByteCount);
+MiffBool        miffRecordGetEnd(                  Miff       * const miff);
 MiffN8          miffRecordGetCount(                Miff       * const miff);
 MiffC2         *miffRecordGetName(                 Miff       * const miff);
 MiffType        miffRecordGetType(                 Miff       * const miff);
 
-MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType const type, MiffC2 const * const key, MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount);
+MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType   const type, MiffC2 const * const key, MiffN4   const count, MiffBool   const isCompressed, MiffN4   const compressedChunkByteCount);
 MiffBool        miffRecordSetEnd(                  Miff       * const miff);
 MiffBool        miffRecordSetNextArrayItem(        Miff       * const miff, MiffN8 const index, MiffN8 const count);
 

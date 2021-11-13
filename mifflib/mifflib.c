@@ -64,7 +64,7 @@ function:
 func: miffCreateReader
 ******************************************************************************/
 Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc,
-   void * const dataRepo)
+   MiffC2 * const subFormatName, MiffN8 * const subFormatVersion, void * const dataRepo)
 {
    Miff *miff;
 
@@ -75,7 +75,13 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
    returnNullIf(!miff);
 
    // Initialize the miff structure.
-   if (!miffCreateReaderContent(miff, isByteSwaping, getBufferFunc, dataRepo))
+   if (!miffCreateReaderContent(
+         miff,
+         isByteSwaping,
+         getBufferFunc,
+         subFormatName,
+         subFormatVersion,
+         dataRepo))
    {
       _MemDestroy(miff);
       returnNull;
@@ -89,7 +95,8 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
 func: miffCreateReaderContent
 ******************************************************************************/
 MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping,
-   MiffGetBuffer getBufferFunc, void * const dataRepo)
+   MiffGetBuffer getBufferFunc, MiffC2 * const subFormatName, MiffN8 * const subFormatVersion,
+   void * const dataRepo)
 {
    MiffN1 ntemp;
 
@@ -109,11 +116,13 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    returnFalseIf(!miff->readByteData);
 
    // Read the header.
-   _ReadTxtLine(miff);
+   returnFalseIf(!_ReadTxtLine(miff));
    returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 4, (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
-   _ReadTxtLine(miff);
+   returnFalseIf(!_ReadTxtLine(miff));
+   miff->version = _C1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
+
    returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 1, (MiffN1 *) MIFF_HEADER_VERSION_STR));
-   _ReadTxtLine(miff);
+   returnFalseIf(!_ReadTxtLine(miff));
    if      (_MemIsEqual(miff->readByteCount, miff->readByteData, 3, (MiffN1 *) MIFF_HEADER_TXT_STR))
    {
       miff->mode = miffModeTEXT;
@@ -126,10 +135,12 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    {
       returnFalse;
    }
-   _ReadTxtLine(miff);
+   returnFalseIf(!_ReadTxtLine(miff));
    _C1ToC2Key(  miff->readByteCount, (MiffC1 *) miff->readByteData, &ntemp, miff->subFormatNameC2);
-   _ReadTxtLine(miff);
-   miff->subFormatVersion = _C1ToN(miff->readByteCount, miff->readByteData);
+   _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, subFormatName, miff->subFormatNameC2);
+   returnFalseIf(!_ReadTxtLine(miff));
+   miff->subFormatVersion =
+      *subFormatVersion   = _C1ToN(miff->readByteCount, miff->readByteData);
 
    returnTrue;
 }
@@ -268,7 +279,8 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    _MemClearTypeArray(miffKeySIZE, MiffC2, key);
 
    // Read in the type.
-   returnFalseIf(_ReadTxtRecordType(miff, type));
+   returnFalseIf(_ReadTxtRecordType(miff, &miff->currentRecord.type));
+   *type = miff->currentRecord.type;
 
    // Special case,
    if (*type == miffTypeKEY_VALUE_BLOCK_STOP)
@@ -277,7 +289,30 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    }
 
    // Read in the name of the record
-   returnFalseIf(_ReadTxt)
+   returnFalseIf(_ReadTxtRecordKeyC2(miff, miff->currentRecord.nameC2));
+   _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, key, miff->currentRecord.nameC2);
+
+   // Special case,
+   if (*type == miffTypeKEY_VALUE_BLOCK_START)
+   {
+      return miff->readRecordIsDone;
+   }
+
+   // Read in the array count
+   returnFalseIf(_ReadTxtRecordArrayCount(miff, &miff->currentRecord.arrayCount));
+   *count = miff->currentRecord.arrayCount;
+
+   // Read in the compression flag
+   returnFalseIf(_ReadTxtRecordCompressFlag(miff, &miff->currentRecord.isCompressed));
+   *isCompressed = miff->currentRecord.isCompressed;
+
+   // if Compressed...
+   if (miff->currentRecord.isCompressed)
+   {
+      // Read in the compression chunk size.
+      returnFalseIf(_ReadTxtRecordChunkSize(miff, &miff->currentRecord.compressedChunkByteCount));
+      *compressedChunkByteCount = miff->currentRecord.compressedChunkByteCount;
+   }
 
    returnTrue;
 }
@@ -296,6 +331,8 @@ MiffBool miffRecordGetEnd(Miff * const miff)
    returnFalseIf(!_ReadTxtLineSkip(miff));
 
    miff->readRecordIsDone = miffBoolTRUE;
+
+   returnTrue;
 }
 
 /******************************************************************************

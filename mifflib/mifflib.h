@@ -386,10 +386,10 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-Miff           *miffCreateReader(                                           MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
-MiffBool        miffCreateReaderContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc, void * const dataRepo);
-Miff           *miffCreateWriter(                                           MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
-MiffBool        miffCreateWriterContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo);
+Miff           *miffCreateReader(                                           MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc,                      MiffC2       * const subFormatName, MiffN8  * const subFormatVersion, void * const dataRepo);
+MiffBool        miffCreateReaderContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc,                      MiffC2       * const subFormatName, MiffN8  * const subFormatVersion, void * const dataRepo);
+Miff           *miffCreateWriter(                                           MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8    const subFormatVersion, void * const dataRepo);
+MiffBool        miffCreateWriterContent(           Miff       * const miff, MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName, MiffN8    const subFormatVersion, void * const dataRepo);
 
 void            miffDestroy(                       Miff       * const miff);
 void            miffDestroyContent(                Miff       * const miff);

@@ -49,6 +49,8 @@ MiffBool _ReadTxtLine(Miff * const miff)
    MiffN1  byte;
    MiffN1 *bufTemp;
 
+   returnFalseIf(!miff);
+
    index = 0;
    loop
    {
@@ -92,6 +94,8 @@ MiffBool _ReadTxtLineSkip(Miff * const miff)
 {
    MiffN1 byte;
 
+   returnFalseIf(!miff);
+
    // Ignoring everything till the next record or eof.
    loop
    {
@@ -112,7 +116,9 @@ MiffBool _ReadTxtPart(Miff * const miff)
    MiffN1 *bufTemp;
 
    // Nothing left to read for this record.
-   returnFalseIf(miff->readRecordIsDone);
+   returnFalseIf(
+      !miff ||
+      miff->readRecordIsDone);
 
    index = 0;
    loop
@@ -157,12 +163,123 @@ MiffBool _ReadTxtPart(Miff * const miff)
 }
 
 /******************************************************************************
+func: _ReadTxtRecordArrayCount
+******************************************************************************/
+MiffBool _ReadTxtRecordArrayCount(Miff * const miff, MiffN4 * const count)
+{
+   returnFalseIf(!count);
+
+   *count = 0;
+
+   returnFalseIf(!miff);
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   if (miff->readByteData[0] == L'*')
+   {
+      miff->currentRecord.arrayCount = miffArrayCountUNKNOWN;
+      returnTrue;
+   }
+
+   miff->currentRecord.arrayCount = (MiffN4) _C1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
+
+   *count = miff->currentRecord.arrayCount;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _ReadTxtRecordChunkSize
+******************************************************************************/
+MiffBool _ReadTxtRecordChunkSize(Miff * const miff, MiffN4 * const chunkSize)
+{
+   returnFalseIf(!chunkSize);
+
+   *chunkSize = 0;
+
+   returnFalseIf(!miff);
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   miff->currentRecord.compressedChunkByteCount = _C1ToN(
+      miff->readByteCount,
+      (MiffC1 *) miff->readByteData);
+
+   *chunkSize = miff->currentRecord.compressedChunkByteCount;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _ReadTxtRecordCompressFlag
+******************************************************************************/
+MiffBool _ReadTxtRecordCompressFlag(Miff * const miff, MiffBool * const isCompressed)
+{
+   returnFalseIf(!isCompressed);
+
+   *isCompressed = miffBoolFALSE;
+
+   returnFalseIf(!miff);
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   if (miff->readByteData[0] == L'-')
+   {
+      miff->currentRecord.isCompressed =
+         *isCompressed                 = miffBoolFALSE;
+      returnTrue;
+   }
+
+   if (miff->readByteData[0] == L':')
+   {
+      miff->currentRecord.isCompressed =
+         *isCompressed                 = miffBoolTRUE;
+      returnTrue;
+   }
+
+   returnFalse;
+}
+
+/******************************************************************************
+func: _ReadTxtRecordKeyC2
+******************************************************************************/
+MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
+{
+   MiffN1 keySize;
+
+   returnFalseIf(!key);
+
+   _MemClearTypeArray(miffKeySIZE, miffC2, key);
+
+   returnFalseIf(!miff);
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   _MemClearTypeArray(miffKeySIZE, MiffC2, miff->currentRecord.nameC2);
+   _C1ToC2Key(
+      miff->readByteCount,
+      (MiffC1 *) miff->readByteData,
+      &keySize,
+      miff->currentRecord.nameC2);
+
+   _MemCopyTypeArray(miffKeySIZE, MiffC2, key, miff->currentRecord.nameC2);
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _ReadTxtRecordType
 ******************************************************************************/
 MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
 {
    MiffN4 index;
    MiffC2 c2Type[miffTypeSTR_SIZE_MAX];
+
+   returnFalseIf(!type);
+
+   *type = miffTypeNONE;
+
+   returnFalseIf(!miff);
 
    returnFalseIf(!_ReadTxtPart(miff));
 

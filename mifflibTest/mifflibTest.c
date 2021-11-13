@@ -783,6 +783,13 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
    FILE           *file;
    Miff           *miff;
    MiffBool        result;
+   MiffC2          subFormatNameC2[miffKeySIZE];
+   MiffN8          subFormatVersion;
+   MiffType        type;
+   MiffC2          key[miffKeySIZE];
+   MiffBool        isCompressed;
+   MiffN4          arrayCount,
+                   compressedChunkByteCount;
 
    file   = NULL;
    miff   = NULL;
@@ -796,15 +803,48 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
       }
 
       // Set Miff up for reading.
-      miff = miffCreateReader(miffBoolTRUE, _GetBuffer, (void *) file);
+      miff = miffCreateReader(
+         miffBoolTRUE,
+         _GetBuffer,
+         subFormatNameC2,
+         &subFormatVersion,
+         (void *) file);
       if (!miff)
       {
          break;
       }
 
+      // Read in the header information.
+      wprintf(
+         L"%s\t%d\n",
+         subFormatNameC2,
+         (int) subFormatVersion);
+
       for (;;)
       {
-         miffRecordGetBegin()
+         if (!miffRecordGetBegin(
+               miff,
+               &type,
+               key,
+               &arrayCount,
+               &isCompressed,
+               &compressedChunkByteCount))
+         {
+            break;
+         }
+
+         wprintf(
+            L"%d\t%s\t%d\t%c\t%d\n",
+            type,
+            key,
+            arrayCount,
+            isCompressed,
+            compressedChunkByteCount);
+
+         if (!miffRecordGetEnd(miff))
+         {
+            break;
+         }
       }
 
       result = miffBoolTRUE;

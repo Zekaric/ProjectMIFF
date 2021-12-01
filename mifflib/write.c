@@ -40,23 +40,6 @@ include:
 global:
 function
 ******************************************************************************/
-MiffBool _WriteCompressByte(Miff * const miff, MiffN1 const byte)
-{
-   miff->compressMemByteData[miff->compressMemByteIndex++] = byte;
-
-   if (miff->compressMemByteIndex == miff->compressMemByteCount)
-   {
-      returnFalseIf(!_CompressWrite(          miff, miff->compressMemByteCount, miff->compressMemByteData));
-      returnFalseIf(!_WriteTxtRecordSeparator(miff));
-
-      // Reset the buffer.
-      miff->compressMemByteIndex = 0;
-      _MemClearTypeArray(miff->compressMemByteCount, MiffN1, miff->compressMemByteData);
-   }
-
-   returnTrue;
-}
-
 /******************************************************************************
 func: _WriteTxtC1
 ******************************************************************************/
@@ -356,15 +339,8 @@ MiffBool _WriteValue1(Miff * const miff, MiffType const type, Miff1 value)
       !(miff->currentRecord.type == type ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   if (!miff->isCompressed)
-   {
-      // Write out the value.
-      returnFalseIf(!_WriteTxtValue1(miff, type, value));
-      returnTrue;
-   }
-
-   // Populate the internal buffer before compression.
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
+   // Write out the value.
+   returnFalseIf(!_WriteTxtValue1(miff, type, value));
    returnTrue;
 }
 
@@ -377,19 +353,8 @@ MiffBool _WriteValue2(Miff * const miff, MiffType const type, Miff2 value)
       !(miff->currentRecord.type == type ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   if (!miff->isCompressed)
-   {
-      // Write out the value
-      returnFalseIf(!_WriteTxtValue2(miff, type, value));
-      returnTrue;
-   }
-
-   // Ensure proper byte order.
-   _ByteSwap2(miff, &value);
-
-   // Populate the internal buffer before compression.
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[1]));
+   // Write out the value
+   returnFalseIf(!_WriteTxtValue2(miff, type, value));
    returnTrue;
 }
 
@@ -402,22 +367,8 @@ MiffBool _WriteValue4(Miff * const miff, MiffType const type, Miff4 value)
       !(miff->currentRecord.type == type ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   if (!miff->isCompressed)
-   {
-      // Write out the value
-      returnFalseIf(!_WriteTxtValue4(miff, type, value));
-      returnTrue;
-   }
-
-   // Ensure proper byte order.
-   _ByteSwap4(miff, &value);
-
-   // Populate the internal buffer before compression.
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[1]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[2]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[3]));
-
+   // Write out the value
+   returnFalseIf(!_WriteTxtValue4(miff, type, value));
    returnTrue;
 }
 
@@ -430,25 +381,7 @@ MiffBool _WriteValue8(Miff * const miff, MiffType const type, Miff8 value)
       !(miff->currentRecord.type == type ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   if (!miff->isCompressed)
-   {
-      // Write out the value
-      returnFalseIf(!_WriteTxtValue8(miff, type, value));
-      returnTrue;
-   }
-
-   // Ensure proper byte order.
-   _ByteSwap8(miff, &value);
-
-   // Populate the internal buffer before compression.
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[0]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[1]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[2]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[3]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[4]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[5]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[6]));
-   returnFalseIf(!_WriteCompressByte(miff, value.byte[7]));
-
+   // Write out the value
+   returnFalseIf(!_WriteTxtValue8(miff, type, value));
    returnTrue;
 }

@@ -51,30 +51,18 @@ hh	|chapter| - Disclosure
 
 h	|chapter| - Format: Base
 
-	There are two representations of the format.  A Text file representation and a Binary file representation.  They will both contain exactly the same data and be exactly the same in feature set.  The Binary file may have the advantage of possibly being slightly more compact and slightly faster in reading and writing.
-	A MIFF format is essentially a collection of key value pairs.  Values are typed.  Nesting and user types are allowed.
-	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This is meant to be a transfer file format to move data from one program to another.
-	Common to both Text and Binary formats, any byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 like encoding.
+	A MIFF File is a UTF8 text file where items inside are tab delimited and each record is terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.  Values are typed.  Nesting is allowed.
+	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a transfer file format to move data from one program to another.
+	Any byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 encoding.
 
 
 hh	|chapter| - File Header
 
-	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.
+	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
 .[
 |>| MIFF|<--|
 |>| 1|<--|
-|>| TXT|<--|
-|>| [Sub-Format Name string]|<--|
-|>| [Sub-Format Version string]|<--|
-]
-
-	or
-
-.[
-|>| MIFF|<--|
-|>| 1|<--|
-|>| BIN|<--|
 |>| [Sub-Format Name string]|<--|
 |>| [Sub-Format Version string]|<--|
 ]
@@ -84,12 +72,10 @@ hh	|chapter| - File Header
 :[
 -	|b |Line 1| b| - Format of the file.  MIFF.
 -	|b |Line 2| b| - Version of the file.  Version 1.
--	|b |Line 3| b| - Representation of the file.  TXT for text, or BIN for binary. 
 -	|b |Line 4| b| - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.
 -	|b |Line 5| b| - Sub-Format version identifier.
 ]
 
-	If the representation is Binary then right after the |<--| of the fifth line, the binary format will begin.
 	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain |-->|s or |<--|s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
 
 
@@ -97,26 +83,20 @@ hh	|chapter| - Content
 
 	Before going into the specifics of the format we will cover some things at a high level.
 
-hhh	|chapter| - Binary Syte Sequences
-	
-	Everything within |" ||<|| "| and |" ||>|| "| is a byte sequence of a known byte count.  Each byte seqence is immediately followed by the next byte sequence.  Nothing extra is added between sequences.
-	A byte sequence is represented by |" ||<|| "| [byte count] |" |:| "| [name of this byte sequence] |" ||>|| "|, where byte count is a number indicating the number of bytes this sequence uses.  This byte count can be represented by a value defined in an earlier byte sequence.
-
 hhh	|chapter| - Numbers
 
 	|b |Natural numbers| b| (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
-	|b |Integer numbers| b| are numbers are positive and negative whole numbers.
+	|b |Integer numbers| b| are whole numbers ranging from some negative max value to some positive max value.
 	|b |Real numbers| b|    (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
 
 hhh	|chapter| - Record Composition
 
 	A record basically defines a key - value pair.  However the composition of that record is composed of a few parts.
 	
-	|b |[key]| b|              will be a string that will somewhat uniquely identify the value.  
-	|b |[type code]| b|        will be a code (BIN) or sequence of characters (TXT) that will dictate what the value will look like as well as a compression setting and array count setting.
+	|b |[key]| b|              will be a sequence of characters that will somewhat uniquely identify the value.
+	|b |[type code]| b|        will be a sequence of characters that will dictate what the value will look like.
 	|b |[array count]| b|      will be a number or special character to indicate the number of values of a particular type is associated with the key.
-	|b |[compression flag]| b| will be a setting on how the value is compressed, if at all.
-	|b |[value]| b|            will depend on the the other parts so it can vary in appearance.
+	|b |[value]| b|            will depend on the the above; it will vary in appearance.
 
 hhhh	|chapter| - Key
 
@@ -135,20 +115,17 @@ This is also a valid key with internal spaces
 hhhh	|chapter| - Type Code
 
 t[
-thx	Binary Type Code
-thx	Text Type Code
+thx	Type Code
 th*	Description
 
 t-
 tcx	|line||b |Block Types| b||line|
 
 t-
-tcx	1
 tcx	{
 tc	Key-Value block begins.
 
 t-
-tcx	0
 tcx	}
 tc	Key-Value block ends.
 
@@ -156,92 +133,74 @@ t-
 tcx	|line||b |Basic Value Types| b||line|
 
 t-
-tcx	2
 tcx	type
-tc	Type value.  One of these type codes or a user type code.
+tc	Type value.  One of these type codes.
 
 t-
-tcx	5
 tcx	"
 tc	String (UTF8) data, can be of any length.
 
 t-
-tcx	8
 tcx	b
 tc	Boolean value.
 
 t-
-tcx	10 11 12 13 14 15 16 17 18 19 
 tcx	i1 i2 i3 i4 i8 i16 i32 i64 i128 i256
 tc	An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-tcx	20 21 22 23 24 25 26 27 28 29
 tcx	n1 n2 n3 n4 n8 n16 n32 n64 n128 n256
 tc	A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.
 
 t-
-tcx	33 34
 tcx	r4 r8
 tc	A real value.  
 
 t-
-tcx	40 41 42 43
 tcx	abi1 abi2 abi4 abi8
 tc	A 2D point using integers.
 
 t-
-tcx	50 51 52 53
 tcx	abn1 abn2 abn4 abn8
 tc	A 2D point using naturals.
 
 t-
-tcx	62 63
 tcx	abr4 abr8
 tc	A 2D point using reals.
 
 t-
-tcx	70 71 72 73
 tcx	abci1 abci2 abci4 abci8
 tc	A 3D point using integers.
 
 t-
-tcx	80 81 82 83
 tcx	abcn1 abcn2 abcn4 abcn8
 tc	A 3D point using naturals.
 
 t-
-tcx	92 93
 tcx	abcr4 abcr8
 tc	A 3D point using reals.
 
 t-
-tcx	100 101 102 103
 tcx	abcdi1 abcdi2 abcdi4 abcdi8
 tc	A 4D point using integers.
 
 t-
-tcx	110 111 112 113
 tcx	abcdn1 abcdn2 abcdn4 abcdn8
 tc	A 4D point using naturals.
 
 t-
-tcx	122 123
 tcx	abcdr4 abcdr8
 tc	A 4D point using reals.
 
 t-
-tcx	132 133
 tcx	mat2x2r4 mat2x2r8
 tc	A 2x2 r4 or r8 matrix
 
 t-
-tcx	142 143
 tcx	mat3x3r4 mat3x3r8
 tc	A 3x3 r4 or r8 matrix
 
 t-
-tcx	152 153
 tcx	mat4x4r4 mat4x4r8
 tc	A 4x4 r4 or r8 matrix
 
@@ -249,7 +208,6 @@ t-
 tcx	|line||b | Variable Value Type| b||line|
 
 t-
-tcx	7
 tcx	v
 tc	Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used.
 
@@ -259,44 +217,20 @@ tc	Variable data follows.  Could be and combination of any Value type.  What fol
 hhhh	|chapter| - Array Count
 
 t[
-thx	Encoding Code (Binary bits(aaa))
-thx	Encoding Code (Text)
+thx	Encoding Code
 th*	Description
 
 t-
-tc	000
 tc	1
 tc	A single value follows.  In binary, no array count present.
 
 t-
-tc	001 010 011 100 101 110
 tc	[number of items]
 tc	An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.
 
 t-
-tc	111
 tc	*
-tc	An unknown count array of values follows or used when defining a user type.  See User types.
-]
-
-
-hhhh	|chapter| - Compression Flag
-
-t[
-thx	Encoding Code (Binary bit(c))
-thx	Encoding Code (Text)
-th*	Description
-
-t-
-tc	0
-tc	-
-tc	Values are inlined raw with no compression.
-
-t-
-tc	1
-tc	:
-tc	Values are broken down into smaller chunks and then each chunk compressed with zlib.
-
+tc	An unknown count array of values follows.
 ]
 
 
@@ -305,10 +239,10 @@ hhhh	|chapter| - Value
 	See the types respective sections for details.
 
 
-hh	|chapter| - Text Format
+hh	|chapter| - Format
 
-	The text format is a UTF8 text file.
-	The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.  To a certain degree you should be able to debug the binary version as well since it will not be too different than the text version.
+	The format is a UTF8 text file.
+	The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.
 	The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.
 	All lines are terminated with a single |<--| (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.
 
@@ -337,69 +271,19 @@ hhh	|chapter| - Real Number Representation
 
 hhh	|chapter| - Record Composition
 
-.	|>| [type code]|-->|[key]|-->|[array count]|-->|[compression flag]|-->|[value]|<--|
+.	|>| [type code]|-->|[key]|-->|[array count]|-->|[value]|<--|
 
 	Any space found in the key that is not a |-->| will be part of the key.  They will be significant.  Do not strip or reduce them.
 	There has to be one |-->| separator between each part.
 	How the value appears will depend on the definition here.
-	
+
 	To be clear...
-	
+
 	|b |Invalid:| b| Absolutely no |<--| anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra |-->| anywhere in the format.
 
-.	|>| [type code]|-->||-->|[key]|<--|[array count] [compression flag]|-->|[value]|<--|
+.	|>| [type code]|-->||-->|[key]|<--|[array count] [value]|<--|
 
 	What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
-
-
-hh	|chapter| - Binary
-
-	The Binary file byte sequence is not too different than the text file organization.  The infromation stored will not be much different.
-	
-hhh	|chapter| - Key Value Format
-
-.[
-|<|n2                 :value header(aaa c tttt tttt tttt)|>|
-|<|n1                 :key byte count|>|
-|<|key byte count + 1 :key|>|
-|<|n1/n2/n4/n8/n16/n32:array count (if aaa above is not 000)|>|
-|<|n4                 :chunk byte count (if c above is 1)|>|
-|<|*                  :value|>|
-]
-
-
-hhhh	|chapter| - Key
-
-	|<|n1:key byte count|>| defines how long the key is in bytes.  Keys are 1 to 256 bytes and the bytes define a UTF8 string.
-	|<|key byte count + 1:key|>| defines the key of the key value pair.  The length of which was defined by |<|key byte count|>| above.  No null terminator is included in the key.
-
-
-hhhh	|chapter| - Value Header
-
-	|<|n2:value header|>| Value header is a 2 byte value.  
-	The high three bits (aaa) defines how the array count value is stored.  See section 2.2.3.3.
-	The 4th high bit (c) defines is chunked compression is being used.  See section 2.2.3.4.
-	The remaining bits define the type of the key value.  0-63 type values are reserved, see section 2.2.3.2.  User types are values 64 - 4095.
-
-
-hhhh	|chapter| - Array Count
-
-	|<|n1/n2/n4/n8/n16/n32:array count|>| byte sequence is only present when storing an array of values.  It can be an n1 to n32 value in size depending on what is set in the value header for (aaa).
-
-
-hhhh	|chapter| - Chunk Byte Count
-
-	|<|n4:chunk byte count|>| Chunk Byte Count will only be present if compression is being used as indicated by the (c) flag in the value header.
-
-
-hhhh	|chapter| - Value
-	
-	|<|*:value|>| field will vary wildly depending on the |<|value header|>|.  See section 3 for how the values are represented.
-
-
-hhhh	|chapter| - Special Case
-
-	Key Value Block End will just have the value header and nothing else follows.  (aaa) will be 000, (c) will be 0, and (tttttttttttt) will be 0.
 
 
 h	|chapter| - Format: Value Specifics
@@ -408,10 +292,6 @@ h	|chapter| - Format: Value Specifics
 hh	|chapter| - Key-Value Block Begin and End.
 
 	Key-Value blocks are special.  They are needed to allow nesting of key values.  
-	In a text file, the last line of a Key-Value Block needs to be a comletely empty line with nothing on it but a \n to indicate that the block is terminated.
-	In a binary file you will have a key byte count of 0 to indicate the end of a Key-Value block.
-
-	|b |Text| b|
 
 .[
 |>| {|-->|[key]|<--|
@@ -419,20 +299,10 @@ hh	|chapter| - Key-Value Block Begin and End.
 |>| }|<--|
 ]
 
-	|b |Binary| b|
+	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.
+	Array Count is never used with this value type and there is not value that follows.
 
-.[
-|<|n2            :value header (000 0 1)|>|
-|<|n1            :key byte count|>|
-|<|key byte count:key|>|
-...
-|<|n2            :value header (000 0 0)|>|
-]
-
-	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.
-	Array Count and Compression flags are never used with this value type.
-
-	|b |Example 1:|line|Text| b|
+	|b |Example 1:| b|
 
 .[
 |>| {|-->|docInfo|<--|
@@ -440,15 +310,7 @@ hh	|chapter| - Key-Value Block Begin and End.
 |>| }|<--|
 ]
 
-	|b |Binary| b|
-
-.[
-|<|n2 :000 0 1|>||<|n1 :7|>||<|7 :docInfo|>|
-...
-|<|n2 :000 0 0|>||line|
-]
-
-	|b |Example 2:|line|Text| b|
+	|b |Example 2:| b|
 
 .[
 |>| {|-->|level1|<--|
@@ -469,264 +331,73 @@ hh	|chapter| - Key-Value Block Begin and End.
 |>| }|<--||line|
 ]
 
-	|b |Binary| b|
-
-.[
-|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level1|>|
-|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level2|>|
-|<|n2 :000 0 1|>||<|n1 :6|>||<|6 :level3|>|
-...
-|<|n2 :000 0 0|>|
-|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel3|>|
-...
-|<|n2 :000 0 0|>|
-|<|n2 :000 0 0|>|
-|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel2|>|
-...
-|<|n2 :000 0 0|>|
-|<|n2 :000 0 0|>|
-|<|n2 :000 0 1|>||<|n1 :13|>||<|13 :anotherlevel1|>|
-...
-|<|n2 :000 0 0|>|
-]
-
 hh	|chapter| - Basic Values
 
 	Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
 
-	|b |Text| b|
-
 .[
-|>| [text type code]|-->|[key]|-->|1|-->|-|-->|[type value]|<--|
-|>| [text type code]|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-|>| [text type code]|-->|[key]|-->|[array count]|-->|-(|-->|[type value])*|<--|
-|>| [text type code]|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| [text type code]|-->|[key]|-->|1|-->|[type value]|<--|
+|>| [text type code]|-->|[key]|-->|[array count](|-->|[type value])*|<--|
 ]
-
-	|b |Binary| b|
-
-.[
-|<|n2               :value header (000 0 [type code])|>|
-|<|n1               :key byte count|>|
-|<|key byte count   :key|>|
-|<|[type byte count]:[type data]|>|
-
-|<|n2               :value header (000 1 [type code])|>|
-|<|n1               :key byte count|>|
-|<|key byte count   :key|>|
-|<|n4               :chunk byte count|>|
-(|<|n4                   :compressed byte count|>|
- |<|compressed byte count:binary compressed data|>|)*
-
-|<|n2               :value header (aaa 0 [type code])|>|
-|<|n1               :key byte count|>|
-|<|key byte count   :key|>|
-|<|n??              :array count|>|
-|<|[type byte count] * array count:[type data]|>|
-
-|<|n2               :value header (aaa 1 [type code])|>|
-|<|n1               :key byte count|>|
-|<|key byte count   :key|>|
-|<|n??              :array count|>|
-|<|n4               :chunk byte count|>|
-(|<|n4                   :compressed byte count|>|
- |<|compressed byte count:binary compressed data|>|)*
-]
-
-	type byte counts for the simple types will be one of...
-
-t[
-thx	Type
-th*	byte Count
-
-t-
-tcx	b, i1, n1
-tc	1
-
-t-
-tcx	type, i2, n2, abi1, abn1
-tc	2
-
-t-
-tcx	abci1, abcn1
-tc	3
-
-t-
-tcx	i4, n4, r4, abi2, abn2, abcdi1, abcdn2
-tc	4
-
-t-
-tcx	abci1, abcn1
-tc	6
-
-t-
-tcx	i8, n8, r8, abi4, abn4, abr4, abcdi2, abcdn2
-tc	8
-
-t-
-tcx	abci4, abcn4, abcr4
-tc	12
-
-t-
-tcx	i16, n16, abi8, abn8, abr8, abcdi4, abcdn4, abcdr4, mat2x2r4r
-tc	16
-
-t-
-tcx	abci8, abcn8, abcr8
-tc	24
-
-t-
-tcx	i32, n32, abcdi8, abcdn8, abcdr8, mat2x2r8
-tc	32
-
-t-
-tcx	mat3x3r4
-tc	36
-
-t-
-tcx	i64, n64, mat4x4r4
-tc	64
-
-t-
-tcx	mat3x3r8
-tc	72
-
-t-
-tcx	i128, n128, mat4x4r8
-tc	128
-
-t-
-tcx	i256, n256
-tc	256
-]
-
 
 	Text representation for a value will be...
 
 t[
 thx	Type Code
-thx	Text Representation
-th*	Binary Representation
+thx	Representation
 
 t-
 tcx	type
 tcx	text string for the type.
-tc  	2 byte binary value.
 
 t-
 tcx	b
 tcx	'T' or 'F'.
-tc 	1 byte per value. 1 or 0
 
 t-
 tcx	i*, n*
 tcx	1 value in regular digits.
-tc	Byte count of type.  Big endian order.
 
 t-
 tcx	r*
 tcx	1 Base64 stream of the 1 value.  Big endian order.
-tcx	Byte count of type.  Big endian order.
 ]
 
-	If using an array flag the above is repeated as many times as there are array elements.  Each array element will be separated by one |-->| in text mode.
+	If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one |-->|.
 
-	|b |Example 1:|line|Text| b|
-.	|>| type|-->|type1|-->|1|-->|-|-->|b|<--|
-	|b |Binary| b|
-.	|<|n2 :000 0 2|>||<|n1 :5|>||<|5 :type1|>||<|n2 :8|>|
+	|b |Example 1:| b|
+.	|>| type|-->|type1|-->|1|-->|b|<--|
 
-	|b |Example 2:|line|Text| b|
-.	|>| type|-->|type2|-->|2|-->|-|-->|b|-->|n4|<--|
-	|b |Binary| b|
-.	|<|n2 :001 0 5|>||<|n1 :5|>||<|5 :type2|>||<|n1 :2|>||<|n2 * 2 :8 23|>|
+	|b |Example 2:| b|
+.	|>| type|-->|type2|-->|2|-->|b|-->|n4|<--|
 
-	|b |Example 3:|line|Text| b|
-.[
-type|-->|type3|-->|100000|-->|:|-->|10000|-->|
-  2342|-->|[Base64 stream]|-->|
-  4546|-->|[Base64 stream]|<--|
-]
-	|b |Binary| b|
-.[
-|<|n2 :011 1 5|>||<|n1 :5|>||<|5 :type3|>||<|n4 :100000|>||<|n4 :10000|>|
-  |<|n4 :2342|>||<|2342 :binary compressed data|>|
-  |<|n4 :4546|>||<|4546 :binary compressed data|>|
-]
+	|b |Example 4:| b|
+.	|>| b|-->|Bool1|-->|1|-->|T|<--|
 
-	|b |Example 4:|line|Text| b|
-.	|>| b|-->|Bool1|-->|1|-->|-|-->|T|<--|
-	|b |Binary| b|
-.	|<|n2 :000 0 8|>||<|n1 :5|>||<|5 :Bool1|>||<|n1 :1|>|
+	|b |Example 5:| b|
+.	|>| b|-->|Bool2|-->|10|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
 
-	|b |Example 5:|line|Text| b|
-.	|>| b|-->|Bool2|-->|10|-->|-|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
-	|b |Binary| b|
-.	|<|n2 :001 0 8|>||<|n1 :5|>||<|5 :Bool5|>||<|n1 :10|>||<|n1 * 10 :1 1 1 1 1 0 0 0 0 0|>|
+	|b |Example 6:| b|
+.	|>| i4|-->|1Int|-->|1|-->|1024|<--|
 
-	|b |Example 6:|line|Text| b|
-.	|>| i4|-->|1Int|-->|1|-->|-|-->|1024|<--|
-	|b |Binary| b|
-.	|<|n2 :000 0 13|>||<|n1 :4|>||<|4 :1Int|>||<|n4 :1024|>|
+	|b |Example 7:| b|
+.	|>| n4|-->|*Nat|-->|8|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
 
-	|b |Example 7:|line|Text| b|
-.	|>| n4|-->|*Nat|-->|8|-->|-|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
-	|b |Binary| b|
-.	|<|n2 :001 0 23|>||<|n1 :4|>||<|4 :*Nat|>||<|n1 :8|>||<|n4 * 8 :1 2 4 8 16 32 64 128|>|
+	|b |Example 8:| b|
+.	|>| r4|-->|1Real|-->|1|-->|[Base64 encoded value]|<--|
 
-	|b |Example 8:|line|Text| b|
-.	|>| r4|-->|1Real|-->|1|-->|-|-->|[Base64 encoded value]|<--|
-	|b |Binary| b|
-.	|<|n2 :000 0 33|>||<|n1 :5|>||<|5 :1Real|>||<|r4 :[binary r4 value]|>|
+	|b |Example 9:| b|
+.	|>| r8|-->|*Real|-->|3|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
 
-	|b |Example 9:|line|Text| b|
-.	|>| r8|-->|*Real|-->|3|-->|-|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
-	|b |Binary| b|
-.	|<|n2 :001 0 34|>||<|n1 :5|>||<|5 :*Real|>||<|n1 :3|>||<|n8 * 3 :[binary r8 value] * 3|>|
 
 hh	|chapter| - String values
 
-	|b |Text| b|
-
 .[
-|>| "|-->|[key]|-->|1|-->|-|-->|[string value]|<--|
-|>| "|-->|[key]|-->|1|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-|>| "|-->|[key]|-->|[array count]|-->|-(|-->|[string value])*|<--|
-|>| "|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count](|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| "|-->|[key]|-->|1|-->|[string value]|<--|
+|>| "|-->|[key]|-->|[array count](|-->|[string value])*|<--|
 ]
 
-	|b |Binary| b|
-
-.[
-|<|n2             :value header (000 0 5)|>|
-|<|n1             :key byte count|>|
-|<|key byte count :key|>|
-|<|(n1)*          :[string value]|<--||>|
-
-|<|n2             :value header (000 1 5)|>|
-|<|n1             :key byte count|>|
-|<|key byte count :key|>|
-|<|n4             :chunk byte count|>|
-(|<|n4                   :compressed byte count|>|
-|<|compressed byte count:binary compressed data|>|)*
-
-|<|n2             :value header (aaa 0 5)|>|
-|<|n1             :key byte count|>|
-|<|key byte count :key|>|
-|<|n??            :array count|>|
-|<|(n1)*          :[string value](|-->|[string value])*|<--||>|
-
-|<|n2             :value header (aaa 1 5)|>|
-|<|n1             :key byte count|>|
-|<|key byte count :key|>|
-|<|n??            :array count|>|
-|<|n4             :chunk byte count|>|
-(|<|n4                   :compressed byte count|>|
-|<|compressed byte count:binary compressed data|>|)*
-]
-
-	In both text and binary cases the string is preprocessed before storing.  All tabs and new line characters are escaped.  This way when you see an actual tab or new line in the record, these are used to separate strings in an array of strings or to terminate the record.
-	In a compressed byte array, the tabs in the stream will separate the strings like they do in the uncompressed text record.  The new line character will indicate the end of the string.
+	The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
 
 .[
 \t - tab            - 0x09
@@ -734,77 +405,19 @@ hh	|chapter| - String values
 \\ - \
 ]
 
-	|b |Example 1:|line|Text| b|
-.	|>| "|-->|string1|-->|1|-->|-|-->|This is line1.\nThis is line 2.|<--|
-	|b |Binary| b|
-.	|<|n2 :000 0 5|>||<|n1 :7|>||<|7 :string1|>||<|(n1)* :This is line1.\nThis is line 2.|<--||>|
+	|b |Example 1:| b|
+.	|>| "|-->|string1|-->|1|-->|This is line1.\nThis is line 2.|<--|
 
-	|b |Example 2:|line|Text| b|
-.	|>| "|-->|string2|-->|1|-->|:|-->|1000000|-->|23424|-->|[Base64 stream]|-->|45894|-->|[Base64 stream]|<--|
-	|b |Binary| b|
-.[
-|<|n2 :001 1 5|>||<|n1 :7|>||<|7 :string2|>||<|n4 :1000000|>|
-|<|n4 :23424|>||<|23424 :binary compressed data|>|
-|<|n4 :45894|>||<|45894 :binary compressed data|>|
-]
-
-	|b |Example 3:|line|Text| b|
-.	|>| "|-->|stringList1|-->|3|-->|-|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
-	|b |Binary| b|
-.[
-|<|n2 :001 0 5|>||<|n1 :11|>||<|11 :stringList1|>||<|n1 :3|>|
-|<|(n1)* :This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--||>|
-]
-
-	|b |Example 4:|line|Text| b|
-.	|>| "|-->|stringList2|-->|3|-->|:|-->|1000|-->|252|-->|[Base64 stream]|-->|543|-->|[Base64 stream]|<--|
-	|b |Binary| b|
-.[
-|<|n2 :001 1 5|>||<|n1 :11|>||<|11 :stringList2|>||<|n1 :3|>||<|n4 :1000|>|
-|<|n4 :252|>||<|252 :binary compressed data|>|
-|<|n4 :543|>||<|543 :binary compressed data|>|
-]
+	|b |Example 2:| b|
+.	|>| "|-->|stringList1|-->|3|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
 
 hh	|chapter| - Variable values
 
 	Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
 
-	|b |Text| b|
-
 .[
-|>| v|-->|[key]|-->|1|-->|-|-->|[tab delimited values]|<--|
-|>| v|-->|[key]|-->|1|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
-|>| v|-->|[key]|-->|[array count]|-->|-|-->|[tab delimited values]|<--|
-|>| v|-->|[key]|-->|[array count]|-->|:|-->|[chunk byte count]|-->|(|-->|[compressed byte count]|-->|[Base64 stream])*|<--|
+|>| v|-->|[key]|-->|1|-->|[tab delimited values]|<--|
+|>| v|-->|[key]|-->|[array count]|-->|[tab delimited values]|<--|
 ]
 
-	|b |Binary| b|
-
-.[
-|<|n2            :value header (000 0 7)|>|
-|<|n1            :key byte count|>|
-|<|key byte count:key|>|
-([refer to the other types on how values are stored])*
-
-|<|n2            :value header (000 1 7)|>|
-|<|n1            :key byte count|>|
-|<|key byte count:key|>|
-|<|n4            :chunk byte count|>|
-(|<|n4                   :compressed byte count|>|
- |<|compressed byte count:binary compressed data|>|)*
-
-|<|n2            :value header (aaa 0 7)|>|
-|<|n1            :key byte count|>|
-|<|key byte count:key|>|
-|<|n??           :array count|>|
-([refer to the other types on how values are stored])*
-
-|<|n2            :value header (aaa 1 7)|>|
-|<|n1            :key byte count|>|
-|<|key byte count:key|>|
-|<|n??           :array count|>|
-(|<|n4                   :chunk byte count|>|
- |<|compressed byte count:binary compressed data|>|)*
-]
-
-	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has not idea what one value means.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control on what goes into the variable type.
+	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.

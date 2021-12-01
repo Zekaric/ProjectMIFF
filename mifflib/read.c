@@ -189,58 +189,6 @@ MiffBool _ReadTxtRecordArrayCount(Miff * const miff, MiffN4 * const count)
 }
 
 /******************************************************************************
-func: _ReadTxtRecordChunkSize
-******************************************************************************/
-MiffBool _ReadTxtRecordChunkSize(Miff * const miff, MiffN4 * const chunkSize)
-{
-   returnFalseIf(!chunkSize);
-
-   *chunkSize = 0;
-
-   returnFalseIf(!miff);
-
-   returnFalseIf(!_ReadTxtPart(miff));
-
-   miff->currentRecord.compressedChunkByteCount = _C1ToN(
-      miff->readByteCount,
-      (MiffC1 *) miff->readByteData);
-
-   *chunkSize = miff->currentRecord.compressedChunkByteCount;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadTxtRecordCompressFlag
-******************************************************************************/
-MiffBool _ReadTxtRecordCompressFlag(Miff * const miff, MiffBool * const isCompressed)
-{
-   returnFalseIf(!isCompressed);
-
-   *isCompressed = miffBoolFALSE;
-
-   returnFalseIf(!miff);
-
-   returnFalseIf(!_ReadTxtPart(miff));
-
-   if (miff->readByteData[0] == L'-')
-   {
-      miff->currentRecord.isCompressed =
-         *isCompressed                 = miffBoolFALSE;
-      returnTrue;
-   }
-
-   if (miff->readByteData[0] == L':')
-   {
-      miff->currentRecord.isCompressed =
-         *isCompressed                 = miffBoolTRUE;
-      returnTrue;
-   }
-
-   returnFalse;
-}
-
-/******************************************************************************
 func: _ReadTxtRecordKeyC2
 ******************************************************************************/
 MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
@@ -249,7 +197,7 @@ MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
 
    returnFalseIf(!key);
 
-   _MemClearTypeArray(miffKeySIZE, miffC2, key);
+   _MemClearTypeArray(miffKeySIZE, MiffC2, key);
 
    returnFalseIf(!miff);
 
@@ -273,7 +221,6 @@ func: _ReadTxtRecordType
 MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
 {
    MiffN4 index;
-   MiffC2 c2Type[miffTypeSTR_SIZE_MAX];
 
    returnFalseIf(!type);
 
@@ -282,11 +229,6 @@ MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
    returnFalseIf(!miff);
 
    returnFalseIf(!_ReadTxtPart(miff));
-
-   forCount(index, miffTypeSTR_SIZE_MAX)
-   {
-      c2Type[index] = (MiffC2) miff->readByteData[index];
-   }
 
    forCount (index, miffTypeCOUNT)
    {

@@ -24,11 +24,8 @@ type:
 /******************************************************************************
 variable:
 ******************************************************************************/
-static MiffMemCreate        _memCreate          = NULL;
-static MiffMemDestroy       _memDestroy         = NULL;
-static MiffMemCompressBound _memCompressBound   = NULL;
-static MiffMemCompress      _memCompress        = NULL;
-static MiffMemDecompress    _memDecompress      = NULL;
+static MiffMemCreate    _memCreate  = NULL;
+static MiffMemDestroy   _memDestroy = NULL;
 
 /******************************************************************************
 prototype:
@@ -78,43 +75,12 @@ MiffI4 _MemCompare(MiffN4 const byteCount, void const * const buffA, void const 
 }
 
 /******************************************************************************
-func: _MemCompressBound
-******************************************************************************/
-MiffN4 _MemCompressBound(MiffN4 const memByteCount)
-{
-   return _memCompressBound(memByteCount);
-}
-
-/******************************************************************************
-func: _MemCompress
-******************************************************************************/
-MiffBool _MemCompress(MiffN4 const memByteCount, void const * const mem,
-   MiffN4 * const compressMemByteCount, void * const compressMem)
-{
-   return _memCompress(memByteCount, mem, compressMemByteCount, compressMem);
-}
-
-/******************************************************************************
-func: _MemDecompress
-******************************************************************************/
-MiffBool _MemDecompress(MiffN4 const compressMemByteCount, MiffN1 const * const compressMem,
-   MiffN4 * const memByteCount, void ** const mem)
-{
-   return _memDecompress(compressMemByteCount, compressMem, memByteCount, mem);
-}
-
-/******************************************************************************
 func: _MemStart
 ******************************************************************************/
-void _MemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc,
-   MiffMemCompressBound const memCcompressBoundFunc, MiffMemCompress const memCompressFunc,
-   MiffMemDecompress const memDecompressFunc)
+void _MemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
 {
    _memCreate        = memCreateFunc;
    _memDestroy       = memDestroyFunc;
-   _memCompressBound = memCcompressBoundFunc;
-   _memCompress      = memCompressFunc;
-   _memDecompress    = memDecompressFunc;
 }
 
 /******************************************************************************
@@ -124,7 +90,4 @@ void _MemStop(void)
 {
    _memCreate        = NULL;
    _memDestroy       = NULL;
-   _memCompressBound = NULL;
-   _memCompress      = NULL;
-   _memDecompress    = NULL;
 }

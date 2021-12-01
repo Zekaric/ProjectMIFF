@@ -118,23 +118,11 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    // Read the header.
    returnFalseIf(!_ReadTxtLine(miff));
    returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 4, (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
+
    returnFalseIf(!_ReadTxtLine(miff));
    miff->version = _C1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
-
    returnFalseIf(!_MemIsEqual(miff->readByteCount, miff->readByteData, 1, (MiffN1 *) MIFF_HEADER_VERSION_STR));
-   returnFalseIf(!_ReadTxtLine(miff));
-   if      (_MemIsEqual(miff->readByteCount, miff->readByteData, 3, (MiffN1 *) MIFF_HEADER_TXT_STR))
-   {
-      miff->mode = miffModeTEXT;
-   }
-   else if (_MemIsEqual(miff->readByteCount, miff->readByteData, 3, (MiffN1 *) MIFF_HEADER_BIN_STR))
-   {
-      miff->mode = miffModeBINARY;
-   }
-   else
-   {
-      returnFalse;
-   }
+
    returnFalseIf(!_ReadTxtLine(miff));
    _C1ToC2Key(  miff->readByteCount, (MiffC1 *) miff->readByteData, &ntemp, miff->subFormatNameC2);
    _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, subFormatName, miff->subFormatNameC2);
@@ -149,8 +137,7 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
 func: miffCreateWriter
 ******************************************************************************/
 Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc,
-   MiffMode const mode, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion,
-   void * const dataRepo)
+   MiffC2 const * const subFormatName, MiffN8 const subFormatVersion, void * const dataRepo)
 {
    Miff *miff;
 
@@ -165,7 +152,6 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
          miff,
          isByteSwaping,
          setBufferFunc,
-         mode,
          subFormatName,
          subFormatVersion,
          dataRepo))
@@ -182,8 +168,8 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
 func: miffCreateWriterContent
 ******************************************************************************/
 MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping,
-   MiffSetBuffer setBufferFunc, MiffMode const mode, MiffC2 const * const subFormatName,
-   MiffN8 const subFormatVersion, void * const dataRepo)
+   MiffSetBuffer setBufferFunc, MiffC2 const * const subFormatName, MiffN8 const subFormatVersion,
+   void * const dataRepo)
 {
    MiffN4 count;
 
@@ -197,7 +183,6 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    _MemClearType(Miff, miff);
    miff->version              = 1;
    miff->method               = miffMethodWRITING;
-   miff->mode                 = mode;
    miff->dataRepo             = dataRepo;
    miff->isByteSwapping       = isByteSwaping;
    miff->setBuffer            = setBufferFunc;
@@ -210,15 +195,6 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    _WriteTxtC1(         miff, (MiffC1 *) MIFF_HEADER_FILETYPE_STR);
    _WriteTxtRecordEnder(miff);
    _WriteTxtC1(         miff, (MiffC1 *) MIFF_HEADER_VERSION_STR);
-   _WriteTxtRecordEnder(miff);
-   if (mode == miffModeBINARY)
-   {
-      _WriteTxtC1(      miff, (MiffC1 *) MIFF_HEADER_BIN_STR);
-   }
-   else
-   {
-      _WriteTxtC1(      miff, (MiffC1 *) MIFF_HEADER_TXT_STR);
-   }
    _WriteTxtRecordEnder(miff);
 
    _WriteTxtC2(         miff, miff->subFormatNameC2);
@@ -256,12 +232,36 @@ void miffDestroyContent(Miff * const miff)
 }
 
 /******************************************************************************
+func: miffGetValueBoolean
+******************************************************************************/
+MiffBool miffGetValueBoolean(Miff * const miff, MiffBool * const value)
+{
+   MiffC1 *c1;
+
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffTypeBOOLEAN ||
+        miff->currentRecord.type == miffTypeVARIABLE));
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   *value = miffBoolFALSE;
+   if (miff->readByteData[0] == 'T')
+   {
+      *value = miffBoolTRUE;
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffRecordGetBegin
 
 key needs to be a buffer of size miffKeySIZE.
 ******************************************************************************/
 MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * const key,
-   MiffN4 * const count, MiffBool * const isCompressed, MiffN4 * const compressedChunkByteCount)
+   MiffN4 * const count)
 {
    returnFalseIf(
       !_isStarted ||
@@ -272,14 +272,12 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
 
    *type                     = miffTypeNONE;
    *count                    = 0;
-   *isCompressed             = miffBoolFALSE;
-   *compressedChunkByteCount = 0;
 
    // Clear the key.
    _MemClearTypeArray(miffKeySIZE, MiffC2, key);
 
    // Read in the type.
-   returnFalseIf(_ReadTxtRecordType(miff, &miff->currentRecord.type));
+   returnFalseIf(!_ReadTxtRecordType(miff, &miff->currentRecord.type));
    *type = miff->currentRecord.type;
 
    // Special case,
@@ -289,7 +287,7 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    }
 
    // Read in the name of the record
-   returnFalseIf(_ReadTxtRecordKeyC2(miff, miff->currentRecord.nameC2));
+   returnFalseIf(!_ReadTxtRecordKeyC2(miff, miff->currentRecord.nameC2));
    _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, key, miff->currentRecord.nameC2);
 
    // Special case,
@@ -299,20 +297,8 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    }
 
    // Read in the array count
-   returnFalseIf(_ReadTxtRecordArrayCount(miff, &miff->currentRecord.arrayCount));
+   returnFalseIf(!_ReadTxtRecordArrayCount(miff, &miff->currentRecord.arrayCount));
    *count = miff->currentRecord.arrayCount;
-
-   // Read in the compression flag
-   returnFalseIf(_ReadTxtRecordCompressFlag(miff, &miff->currentRecord.isCompressed));
-   *isCompressed = miff->currentRecord.isCompressed;
-
-   // if Compressed...
-   if (miff->currentRecord.isCompressed)
-   {
-      // Read in the compression chunk size.
-      returnFalseIf(_ReadTxtRecordChunkSize(miff, &miff->currentRecord.compressedChunkByteCount));
-      *compressedChunkByteCount = miff->currentRecord.compressedChunkByteCount;
-   }
 
    returnTrue;
 }
@@ -378,7 +364,7 @@ MiffType miffRecordGetType(Miff * const miff)
 func: miffRecordSetBegin
 ******************************************************************************/
 MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const * const key,
-   MiffN4 const count, MiffBool const isCompressed, MiffN4 const compressedChunkByteCount)
+   MiffN4 const count)
 {
    returnFalseIf(
       !_isStarted ||
@@ -401,41 +387,22 @@ MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const
    miff->currentArrayIndex                      = 0;
    miff->currentRecord.type                     = type;
    miff->currentRecord.arrayCount               = count;
-   miff->currentRecord.isCompressed             = isCompressed;
-   miff->currentRecord.compressedChunkByteCount = compressedChunkByteCount;
    _MemClearTypeArray(miffKeySIZE,      MiffC2, miff->currentRecord.nameC2);
    _MemCopyTypeArray( _C2GetCount(key), MiffC2, miff->currentRecord.nameC2, key);
 
+   returnFalseIf(!_WriteTxtRecordSeparator(miff));
+   returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->currentRecord.nameC2));
    // We are starting a new key value block.
    if (type == miffTypeKEY_VALUE_BLOCK_START)
    {
       // TODO key value block stack push.
-      returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      returnFalseIf(!_WriteTxtRecordKeyC2(    miff, miff->currentRecord.nameC2));
-
       return _WriteTxtRecordEnder(miff);
    }
 
    // Write out the record.
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordKeyC2(       miff, miff->currentRecord.nameC2));
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
    returnFalseIf(!_WriteTxtRecordArrayCount(  miff, count));
    returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   returnFalseIf(!_WriteTxtRecordCompressFlag(miff, isCompressed));
-   returnFalseIf(!_WriteTxtRecordSeparator(   miff));
-   if (isCompressed)
-   {
-      returnFalseIf(!_WriteTxtRecordChunkSize(miff, compressedChunkByteCount));
-      returnFalseIf(!_WriteTxtRecordSeparator(miff));
-   }
-
-   // If compression is used, prep the internal buffer
-   if (isCompressed)
-   {
-      // Prepare the compression buffer.
-      _CompressStart(miff, compressedChunkByteCount);
-   }
 
    returnTrue;
 }
@@ -448,13 +415,6 @@ MiffBool miffRecordSetEnd(Miff * const miff)
    returnFalseIf(
       !_isStarted ||
       !miff);
-
-   // Finish the last chunk.
-   if (miff->isCompressed)
-   {
-      returnFalseIf(!_CompressWrite(miff, miff->compressMemByteIndex, miff->compressMemByteData));
-      _CompressStop(miff);
-   }
 
    // Write the record ender
    returnFalseIf(!_WriteTxtRecordEnder(miff));
@@ -484,10 +444,7 @@ MiffBool miffRecordSetNextArrayItem(Miff * const miff, MiffN8 const index, MiffN
    // Are we still writing out elements?
    if (index != count - 1)
    {
-      if (!miff->isCompressed)
-      {
-         returnFalseIf(!_WriteTxtRecordSeparator(miff));
-      }
+      returnFalseIf(!_WriteTxtRecordSeparator(miff));
    }
 
    returnTrue;
@@ -496,9 +453,7 @@ MiffBool miffRecordSetNextArrayItem(Miff * const miff, MiffN8 const index, MiffN
 /******************************************************************************
 func: miffStart
 ******************************************************************************/
-MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc,
-   MiffMemCompressBound const memCompressBoundFunc, MiffMemCompress const memCompressFunc,
-   MiffMemDecompress const memDecompressFunc)
+MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
 {
    returnTrueIf(_isStarted);
 
@@ -508,7 +463,7 @@ MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDe
       !memCreateFunc ||
       !memDestroyFunc)
 
-   _MemStart(memCreateFunc, memDestroyFunc, memCompressBoundFunc, memCompressFunc, memDecompressFunc);
+   _MemStart(memCreateFunc, memDestroyFunc);
 
    _isStarted     = miffBoolTRUE;
 
@@ -534,7 +489,7 @@ func: miffSetBlockStart
 ******************************************************************************/
 MiffBool miffSetBlockStart(Miff * const miff, MiffC2 const * const key)
 {
-   return miffRecordSetBegin(miff, miffTypeKEY_VALUE_BLOCK_START, key, miffArrayCountUNKNOWN, miffBoolFALSE, 0);
+   return miffRecordSetBegin(miff, miffTypeKEY_VALUE_BLOCK_START, key, miffArrayCountUNKNOWN);
 }
 
 /******************************************************************************
@@ -542,7 +497,7 @@ func: miffSetBlockStop
 ******************************************************************************/
 MiffBool miffSetBlockStop(Miff * const miff)
 {
-   return miffRecordSetBegin(miff, miffTypeKEY_VALUE_BLOCK_STOP, NULL, miffArrayCountUNKNOWN, miffBoolFALSE, 0);
+   return miffRecordSetBegin(miff, miffTypeKEY_VALUE_BLOCK_STOP, NULL, miffArrayCountUNKNOWN);
 }
 
 /******************************************************************************
@@ -550,7 +505,7 @@ func: miffSet1ABI1
 ******************************************************************************/
 MiffBool miffSet1ABI1(Miff * const miff, MiffC2 const * const key, MiffABI1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI1, key, 1));
    returnFalseIf(!miffSetValueABI1(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -561,7 +516,7 @@ func: miffSet1ABI2
 ******************************************************************************/
 MiffBool miffSet1ABI2(Miff * const miff, MiffC2 const * const key, MiffABI2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI2, key, 1));
    returnFalseIf(!miffSetValueABI2(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -572,7 +527,7 @@ func: miffSet1ABI4
 ******************************************************************************/
 MiffBool miffSet1ABI4(Miff * const miff, MiffC2 const * const key, MiffABI4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABI4, key, 1));
    returnFalseIf(!miffSetValueABI4(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -583,7 +538,7 @@ func: miffSet1ABN1
 ******************************************************************************/
 MiffBool miffSet1ABN1(Miff * const miff, MiffC2 const * const key, MiffABN1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN1, key, 1));
    returnFalseIf(!miffSetValueABN1(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -594,7 +549,7 @@ func: miffSet1ABN2
 ******************************************************************************/
 MiffBool miffSet1ABN2(Miff * const miff, MiffC2 const * const key, MiffABN2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN2, key, 1));
    returnFalseIf(!miffSetValueABN2(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -605,7 +560,7 @@ func: miffSet1ABN4
 ******************************************************************************/
 MiffBool miffSet1ABN4(Miff * const miff, MiffC2 const * const key, MiffABN4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABN4, key, 1));
    returnFalseIf(!miffSetValueABN4(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -616,7 +571,7 @@ func: miffSet1ABR4
 ******************************************************************************/
 MiffBool miffSet1ABR4(Miff * const miff, MiffC2 const * const key, MiffABR4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR4, key, 1));
    returnFalseIf(!miffSetValueABR4(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -627,7 +582,7 @@ func: miffSet1ABR8
 ******************************************************************************/
 MiffBool miffSet1ABR8(Miff * const miff, MiffC2 const * const key, MiffABR8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABR8, key, 1));
    returnFalseIf(!miffSetValueABR8(   miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -638,7 +593,7 @@ func: miffSet1ABCI1
 ******************************************************************************/
 MiffBool miffSet1ABCI1(Miff * const miff, MiffC2 const * const key, MiffABCI1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI1, key, 1));
    returnFalseIf(!miffSetValueABCI1(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -649,7 +604,7 @@ func: miffSet1ABCI2
 ******************************************************************************/
 MiffBool miffSet1ABCI2(Miff * const miff, MiffC2 const * const key, MiffABCI2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI2, key, 1));
    returnFalseIf(!miffSetValueABCI2(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -660,7 +615,7 @@ func: miffSet1ABCI4
 ******************************************************************************/
 MiffBool miffSet1ABCI4(Miff * const miff, MiffC2 const * const key, MiffABCI4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCI4, key, 1));
    returnFalseIf(!miffSetValueABCI4(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -671,7 +626,7 @@ func: miffSet1ABCN1
 ******************************************************************************/
 MiffBool miffSet1ABCN1(Miff * const miff, MiffC2 const * const key, MiffABCN1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN1, key, 1));
    returnFalseIf(!miffSetValueABCN1(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -682,7 +637,7 @@ func: miffSet1ABCN2
 ******************************************************************************/
 MiffBool miffSet1ABCN2(Miff * const miff, MiffC2 const * const key, MiffABCN2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN2, key, 1));
    returnFalseIf(!miffSetValueABCN2(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -693,7 +648,7 @@ func: miffSet1ABCN4
 ******************************************************************************/
 MiffBool miffSet1ABCN4(Miff * const miff, MiffC2 const * const key, MiffABCN4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCN4, key, 1));
    returnFalseIf(!miffSetValueABCN4(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -704,7 +659,7 @@ func: miffSet1ABCR4
 ******************************************************************************/
 MiffBool miffSet1ABCR4(Miff * const miff, MiffC2 const * const key, MiffABCR4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR4, key, 1));
    returnFalseIf(!miffSetValueABCR4(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -715,7 +670,7 @@ func: miffSet1ABCR8
 ******************************************************************************/
 MiffBool miffSet1ABCR8(Miff * const miff, MiffC2 const * const key, MiffABCR8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCR8, key, 1));
    returnFalseIf(!miffSetValueABCR8(  miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -726,7 +681,7 @@ func: miffSet1ABCDI1
 ******************************************************************************/
 MiffBool miffSet1ABCDI1(Miff * const miff, MiffC2 const * const key, MiffABCDI1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI1, key, 1));
    returnFalseIf(!miffSetValueABCDI1( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -737,7 +692,7 @@ func: miffSet1ABCDI2
 ******************************************************************************/
 MiffBool miffSet1ABCDI2(Miff * const miff, MiffC2 const * const key, MiffABCDI2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI2, key, 1));
    returnFalseIf(!miffSetValueABCDI2( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -748,7 +703,7 @@ func: miffSet1ABCDI4
 ******************************************************************************/
 MiffBool miffSet1ABCDI4(Miff * const miff, MiffC2 const * const key, MiffABCDI4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDI4, key, 1));
    returnFalseIf(!miffSetValueABCDI4( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -759,7 +714,7 @@ func: miffSet1ABCDN1
 ******************************************************************************/
 MiffBool miffSet1ABCDN1(Miff * const miff, MiffC2 const * const key, MiffABCDN1 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN1, key, 1));
    returnFalseIf(!miffSetValueABCDN1( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -770,7 +725,7 @@ func: miffSet1ABCDN2
 ******************************************************************************/
 MiffBool miffSet1ABCDN2(Miff * const miff, MiffC2 const * const key, MiffABCDN2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN2, key, 1));
    returnFalseIf(!miffSetValueABCDN2( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -781,7 +736,7 @@ func: miffSet1ABCDN4
 ******************************************************************************/
 MiffBool miffSet1ABCDN4(Miff * const miff, MiffC2 const * const key, MiffABCDN4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDN4, key, 1));
    returnFalseIf(!miffSetValueABCDN4( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -792,7 +747,7 @@ func: miffSet1ABCDR4
 ******************************************************************************/
 MiffBool miffSet1ABCDR4(Miff * const miff, MiffC2 const * const key, MiffABCDR4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR4, key, 1));
    returnFalseIf(!miffSetValueABCDR4( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -803,7 +758,7 @@ func: miffSet1ABCDR8
 ******************************************************************************/
 MiffBool miffSet1ABCDR8(Miff * const miff, MiffC2 const * const key, MiffABCDR8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeABCDR8, key, 1));
    returnFalseIf(!miffSetValueABCDR8( miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -814,7 +769,7 @@ func: miffSet1Boolean
 ******************************************************************************/
 MiffBool miffSet1Boolean(Miff * const miff, MiffC2 const * const key, MiffBool const value)
 {
-   returnFalseIf(!miffRecordSetBegin( miff, miffTypeBOOLEAN, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin( miff, miffTypeBOOLEAN, key, 1));
    returnFalseIf(!miffSetValueBoolean(miff, value));
    returnFalseIf(!miffRecordSetEnd(   miff));
    returnTrue;
@@ -825,7 +780,7 @@ func: miffSet1I1
 ******************************************************************************/
 MiffBool miffSet1I1(Miff * const miff, MiffC2 const * const key, MiffI1 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI1, key, 1));
    returnFalseIf(!miffSetValueI1(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -836,7 +791,7 @@ func: miffSet1I2
 ******************************************************************************/
 MiffBool miffSet1I2(Miff * const miff, MiffC2 const * const key, MiffI2 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI2, key, 1));
    returnFalseIf(!miffSetValueI2(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -847,7 +802,7 @@ func: miffSet1I4
 ******************************************************************************/
 MiffBool miffSet1I4(Miff * const miff, MiffC2 const * const key, MiffI4 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI4, key, 1));
    returnFalseIf(!miffSetValueI4(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -858,7 +813,7 @@ func: miffSet1I8
 ******************************************************************************/
 MiffBool miffSet1I8(Miff * const miff, MiffC2 const * const key, MiffI8 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, 1));
    returnFalseIf(!miffSetValueI8(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -869,7 +824,7 @@ func: miffSet1Matrix2x2R4
 ******************************************************************************/
 MiffBool miffSet1Matrix2x2R4(Miff * const miff, MiffC2 const * const key, MiffMatrix2x2R4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R4, key, 1));
    returnFalseIf(!miffSetValueMatrix2x2R4(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -880,7 +835,7 @@ func: miffSet1Matrix2x2R8
 ******************************************************************************/
 MiffBool miffSet1Matrix2x2R8(Miff * const miff, MiffC2 const * const key, MiffMatrix2x2R8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX2X2R8, key, 1));
    returnFalseIf(!miffSetValueMatrix2x2R8(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -891,7 +846,7 @@ func: miffSet1Matrix3x3R4
 ******************************************************************************/
 MiffBool miffSet1Matrix3x3R4(Miff * const miff, MiffC2 const * const key, MiffMatrix3x3R4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R4, key, 1));
    returnFalseIf(!miffSetValueMatrix3x3R4(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -902,7 +857,7 @@ func: miffSet1Matrix3x3R8
 ******************************************************************************/
 MiffBool miffSet1Matrix3x3R8(Miff * const miff, MiffC2 const * const key, MiffMatrix3x3R8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX3X3R8, key, 1));
    returnFalseIf(!miffSetValueMatrix3x3R8(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -913,7 +868,7 @@ func: miffSet1Matrix4x4R4
 ******************************************************************************/
 MiffBool miffSet1Matrix4x4R4(Miff * const miff, MiffC2 const * const key, MiffMatrix4x4R4 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R4, key, 1));
    returnFalseIf(!miffSetValueMatrix4x4R4(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -924,7 +879,7 @@ func: miffSet1Matrix4x4R8
 ******************************************************************************/
 MiffBool miffSet1Matrix4x4R8(Miff * const miff, MiffC2 const * const key, MiffMatrix4x4R8 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(     miff, miffTypeMATRIX4X4R8, key, 1));
    returnFalseIf(!miffSetValueMatrix4x4R8(miff, value));
    returnFalseIf(!miffRecordSetEnd(       miff));
    returnTrue;
@@ -935,7 +890,7 @@ func: miffSet1N1
 ******************************************************************************/
 MiffBool miffSet1N1(Miff * const miff, MiffC2 const * const key, MiffN1 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN1, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN1, key, 1));
    returnFalseIf(!miffSetValueN1(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -946,7 +901,7 @@ func: miffSet1N2
 ******************************************************************************/
 MiffBool miffSet1N2(Miff * const miff, MiffC2 const * const key, MiffN2 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN2, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN2, key, 1));
    returnFalseIf(!miffSetValueN2(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -957,7 +912,7 @@ func: miffSet1N4
 ******************************************************************************/
 MiffBool miffSet1N4(Miff * const miff, MiffC2 const * const key, MiffN4 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN4, key, 1));
    returnFalseIf(!miffSetValueN4(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -968,7 +923,7 @@ func: miffSet1N8
 ******************************************************************************/
 MiffBool miffSet1N8(Miff * const miff, MiffC2 const * const key, MiffN8 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN8, key, 1));
    returnFalseIf(!miffSetValueN8(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -979,7 +934,7 @@ func: miffSet1R4
 ******************************************************************************/
 MiffBool miffSet1R4(Miff * const miff, MiffC2 const * const key, MiffR4 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR4, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR4, key, 1));
    returnFalseIf(!miffSetValueR4(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -990,7 +945,7 @@ func: miffSet1R8
 ******************************************************************************/
 MiffBool miffSet1R8(Miff * const miff, MiffC2 const * const key, MiffR8 const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR8, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR8, key, 1));
    returnFalseIf(!miffSetValueR8(    miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -1001,7 +956,7 @@ func: miffSet1Type
 ******************************************************************************/
 MiffBool miffSet1Type(Miff * const miff, MiffC2 const * const key, MiffType const value)
 {
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeTYPE, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeTYPE, key, 1));
    returnFalseIf(!miffSetValueType(  miff, value));
    returnFalseIf(!miffRecordSetEnd(  miff));
    returnTrue;
@@ -1012,7 +967,7 @@ func: miffSet1StringC2
 ******************************************************************************/
 MiffBool miffSet1StringC2(Miff * const miff, MiffC2 const * const key, MiffC2 const * const value)
 {
-   returnFalseIf(!miffRecordSetBegin(  miff, miffTypeSTRING, key, 1, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(  miff, miffTypeSTRING, key, 1));
    returnFalseIf(!miffSetValueStringC2(miff, value));
    returnFalseIf(!miffRecordSetEnd(    miff));
    returnTrue;
@@ -1025,7 +980,7 @@ MiffBool miffSetNABI1(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABI1(          miff, &value[index]));
@@ -1042,7 +997,7 @@ MiffBool miffSetNABI2(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABI2(          miff, &value[index]));
@@ -1059,7 +1014,7 @@ MiffBool miffSetNABI4(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABI4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABI4(          miff, &value[index]));
@@ -1076,7 +1031,7 @@ MiffBool miffSetNABN1(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABN1(          miff, &value[index]));
@@ -1093,7 +1048,7 @@ MiffBool miffSetNABN2(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABN2(          miff, &value[index]));
@@ -1110,7 +1065,7 @@ MiffBool miffSetNABN4(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABN4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABN4(          miff, &value[index]));
@@ -1127,7 +1082,7 @@ MiffBool miffSetNABR4(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABR4(          miff, &value[index]));
@@ -1144,7 +1099,7 @@ MiffBool miffSetNABR8(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABR8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABR8(          miff, &value[index]));
@@ -1161,7 +1116,7 @@ MiffBool miffSetNABCI1(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCI1(         miff, &value[index]));
@@ -1178,7 +1133,7 @@ MiffBool miffSetNABCI2(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCI2(         miff, &value[index]));
@@ -1195,7 +1150,7 @@ MiffBool miffSetNABCI4(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCI4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCI4(         miff, &value[index]));
@@ -1212,7 +1167,7 @@ MiffBool miffSetNABCN1(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCN1(         miff, &value[index]));
@@ -1229,7 +1184,7 @@ MiffBool miffSetNABCN2(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCN2(         miff, &value[index]));
@@ -1246,7 +1201,7 @@ MiffBool miffSetNABCN4(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCN4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCN4(         miff, &value[index]));
@@ -1263,7 +1218,7 @@ MiffBool miffSetNABCR4(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCR4(         miff, &value[index]));
@@ -1280,7 +1235,7 @@ MiffBool miffSetNABCR8(Miff * const miff, MiffC2 const * const key, MiffN4 const
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCR8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCR8(         miff, &value[index]));
@@ -1297,7 +1252,7 @@ MiffBool miffSetNABCDI1(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDI1(        miff, &value[index]));
@@ -1314,7 +1269,7 @@ MiffBool miffSetNABCDI2(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDI2(        miff, &value[index]));
@@ -1331,7 +1286,7 @@ MiffBool miffSetNABCDI4(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDI4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDI4(        miff, &value[index]));
@@ -1348,7 +1303,7 @@ MiffBool miffSetNABCDN1(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDN1(        miff, &value[index]));
@@ -1365,7 +1320,7 @@ MiffBool miffSetNABCDN2(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDN2(        miff, &value[index]));
@@ -1382,7 +1337,7 @@ MiffBool miffSetNABCDN4(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDN4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDN4(        miff, &value[index]));
@@ -1399,7 +1354,7 @@ MiffBool miffSetNABCDR4(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDR4(        miff, &value[index]));
@@ -1416,7 +1371,7 @@ MiffBool miffSetNABCDR8(Miff * const miff, MiffC2 const * const key, MiffN4 cons
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeABCDR8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueABCDR8(        miff, &value[index]));
@@ -1433,7 +1388,7 @@ MiffBool miffSetNBoolean(Miff * const miff, MiffC2 const * const key, MiffN4 con
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeBOOLEAN, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeBOOLEAN, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueBoolean(       miff, value[index]));
@@ -1450,7 +1405,7 @@ MiffBool miffSetNI1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI1(            miff, value[index]));
@@ -1467,7 +1422,7 @@ MiffBool miffSetNI2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI2(            miff, value[index]));
@@ -1484,7 +1439,7 @@ MiffBool miffSetNI4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI4(            miff, value[index]));
@@ -1501,7 +1456,7 @@ MiffBool miffSetNI8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeI8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueI8(            miff, value[index]));
@@ -1518,7 +1473,7 @@ MiffBool miffSetNMatrix2x2R4(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix2x2R4(   miff, &value[index]));
@@ -1535,7 +1490,7 @@ MiffBool miffSetNMatrix2x2R8(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX2X2R8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix2x2R8(   miff, &value[index]));
@@ -1552,7 +1507,7 @@ MiffBool miffSetNMatrix3x3R4(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix3x3R4(   miff, &value[index]));
@@ -1569,7 +1524,7 @@ MiffBool miffSetNMatrix3x3R8(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX3X3R8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix3x3R8(   miff, &value[index]));
@@ -1586,7 +1541,7 @@ MiffBool miffSetNMatrix4x4R4(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix4x4R4(   miff, &value[index]));
@@ -1603,7 +1558,7 @@ MiffBool miffSetNMatrix4x4R8(Miff * const miff, MiffC2 const * const key, MiffN4
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeMATRIX4X4R8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueMatrix4x4R8(   miff, &value[index]));
@@ -1620,7 +1575,7 @@ MiffBool miffSetNN1(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN1, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN1, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN1(            miff, value[index]));
@@ -1637,7 +1592,7 @@ MiffBool miffSetNN2(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN2, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN2, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN2(            miff, value[index]));
@@ -1654,7 +1609,7 @@ MiffBool miffSetNN4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN4(            miff, value[index]));
@@ -1671,7 +1626,7 @@ MiffBool miffSetNN8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeN8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueN8(            miff, value[index]));
@@ -1688,7 +1643,7 @@ MiffBool miffSetNR4(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR4, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR4, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueR4(            miff, value[index]));
@@ -1705,7 +1660,7 @@ MiffBool miffSetNR8(Miff * const miff, MiffC2 const * const key, MiffN4 const co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR8, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeR8, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueR8(            miff, value[index]));
@@ -1722,7 +1677,7 @@ MiffBool miffSetNType(Miff * const miff, MiffC2 const * const key, MiffN4 const 
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeTYPE, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeTYPE, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueType(          miff, value[index]));
@@ -1739,7 +1694,7 @@ MiffBool miffSetNStringC2(Miff * const miff, MiffC2 const * const key, MiffN4 co
 {
    MiffN4 index;
 
-   returnFalseIf(!miffRecordSetBegin(miff, miffTypeSTRING, key, count, miffBoolFALSE, 0));
+   returnFalseIf(!miffRecordSetBegin(miff, miffTypeSTRING, key, count));
    forCount(index, count)
    {
       returnFalseIf(!miffSetValueStringC2(      miff, value[index]));
@@ -2877,1086 +2832,18 @@ MiffBool miffSetValueType(Miff * const miff, MiffType const value)
    returnTrue;
 }
 
-#if 0
 /******************************************************************************
-func: miffGetFileFlagIsBinary
+func: miffTypeGetC1
 ******************************************************************************/
-MiffBool miffGetFileFlagIsBinary(Miff const * const miff, MiffBool * const mode)
+MiffC1 const *miffTypeGetC1(MiffType const type)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !mode);
-
-   *mode = (miff->mode == miffModeBINARY);
-
-   returnTrue;
+   return _TypeGetNameC1(type);
 }
 
 /******************************************************************************
-func: miffGetFileVersion
+func: miffTypeGetC2
 ******************************************************************************/
-MiffBool miffGetFileVersion(Miff const * const miff, MiffN8 * const version)
+MiffC2 const *miffTypeGetC2(MiffType const type)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !version);
-
-   *version = miff->version;
-
-   returnTrue;
+   return _TypeGetNameC2(type);
 }
-
-/******************************************************************************
-func: miffGetFileVersionSubFormat
-******************************************************************************/
-MiffBool miffGetFileVersionSubFormat(Miff const * const miff, MiffC2 const ** const subFormatName,
-   MiffN8 * const subFormatVersion)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !miff          ||
-      !subFormatName ||
-      !subFormatVersion);
-
-   *subFormatName    = miff->subFormatNameC2;
-   *subFormatVersion = miff->subFormatVersion;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffGetKey
-******************************************************************************/
-MiffBool miffGetKey(Miff const * const miff, MiffC2 const ** const key)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !key);
-
-   *key = miff->keyC2;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffGetNextRecord
-******************************************************************************/
-MiffBool miffGetNextRecord(Miff * const miff)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   returnFalseIf(!_ReadKey(        miff, miff->mode));
-   returnFalseIf(!_ReadValueHeader(miff, miff->mode));
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffGetValueHeader
-******************************************************************************/
-MiffBool miffGetValueHeader(Miff const * const miff, MiffType * const type,
-   MiffArrayFlag * const arrayFlag, MiffN4 * const arrayCount,
-   MiffCompressFlag * const compressFlag, MiffN4 * const chunkByteCount)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff       ||
-      !type       ||
-      !arrayFlag);
-
-   *type             = miff->valueType;
-   *arrayFlag        = miff->arrayFlag;
-   *arrayCount       = miff->arrayCount;
-   *compressFlag     = miff->compressFlag;
-   *chunkByteCount   = miff->compressChunkByteCount;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffGetArrayCount
-******************************************************************************/
-MiffN4 miffGetArrayCount(Miff const * const miff)
-{
-   return0If(
-      !_isStarted ||
-      !miff);
-
-   return miff->arrayCount;
-}
-
-/******************************************************************************
-func: miffGetValue1
-******************************************************************************/
-Miff1 miffGetValue1(Miff const * const miff)
-{
-   Miff1 value;
-
-   value.n = 0;
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, miff->valueType, &value);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue2
-******************************************************************************/
-Miff2 miffGetValue2(Miff const * const miff)
-{
-   Miff2 value;
-
-   value.n = 0;
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue2(miff, miff->mode, miff->valueType, &value);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue3
-******************************************************************************/
-Miff3 miffGetValue3(Miff const * const miff)
-{
-   Miff3 value;
-
-   memClearType(Miff3, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 3, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue4
-******************************************************************************/
-Miff4 miffGetValue4(Miff const * const miff)
-{
-   Miff4 value;
-
-   value.n = 0;
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue4(miff, miff->mode, miff->valueType, &value);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue8
-******************************************************************************/
-Miff8 miffGetValue8(Miff const * const miff)
-{
-   Miff8 value;
-
-   value.n = 0;
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue8(miff, miff->mode, miff->valueType, &value);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue16
-******************************************************************************/
-Miff16 miffGetValue16(Miff const * const miff)
-{
-   Miff16 value;
-
-   memClearType(Miff16, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 16, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue32
-******************************************************************************/
-Miff32 miffGetValue32(Miff const * const miff)
-{
-   Miff32 value;
-
-   memClearType(Miff32, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 32, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue64
-******************************************************************************/
-Miff64 miffGetValue64(Miff const * const miff)
-{
-   Miff64 value;
-
-   memClearType(Miff64, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 64, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue128
-******************************************************************************/
-Miff128 miffGetValue128(Miff const * const miff)
-{
-   Miff128 value;
-
-   memClearType(Miff128, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 128, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValue256
-******************************************************************************/
-Miff256 miffGetValue256(Miff const * const miff)
-{
-   Miff256 value;
-
-   memClearType(Miff256, &value);
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   _ReadValue1(miff, miff->mode, 256, (Miff1 *) &value.byte);
-
-   return value;
-}
-
-
-/******************************************************************************
-func: miffSetValue1
-******************************************************************************/
-MiffBool miffSetValue1(Miff * const miff, Miff1 * const value)
-{
-   return _WriteValue1(miff, miff->mode, miff->valueType, value);
-}
-
-/******************************************************************************
-func: miffSetValue2
-******************************************************************************/
-MiffBool miffSetValue2(Miff * const miff, Miff2 * const value)
-{
-   return _WriteValue2(miff, miff->mode, miff->valueType, value);
-}
-
-/******************************************************************************
-func: miffSetValue3
-******************************************************************************/
-MiffBool miffSetValue3(Miff * const miff, Miff3 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffSetValue4
-******************************************************************************/
-MiffBool miffSetValue4(Miff * const miff, Miff4 * const value)
-{
-   return _WriteValue4(miff, miff->mode, miff->valueType, value);
-}
-
-/******************************************************************************
-func: miffSetValue8
-******************************************************************************/
-MiffBool miffSetValue8(Miff * const miff, Miff8 * const value)
-{
-   return _WriteValue8(miff, miff->mode, miff->valueType, value);
-}
-
-/******************************************************************************
-func: miffSetValue16
-******************************************************************************/
-MiffBool miffSetValue16(Miff * const miff, Miff16 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffSetValue32
-******************************************************************************/
-MiffBool miffSetValue32(Miff * const miff, Miff32 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffSetValue64
-******************************************************************************/
-MiffBool miffSetValue64(Miff * const miff, Miff64 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffSetValue128
-******************************************************************************/
-MiffBool miffSetValue128(Miff * const miff, Miff128 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffSetValue256
-******************************************************************************/
-MiffBool miffSetValue256(Miff * const miff, Miff256 * const value)
-{
-   miff; value;
-   returnFalse;
-}
-
-/******************************************************************************
-func: miffUserTypeAddVar
-******************************************************************************/
-MiffBool miffUserTypeAddVar(Miff * const miff, MiffC2 const * const name, MiffType const type, MiffN4 const arrayCount)
-{
-   MiffRecord *newType;
-
-   returnFalseIf(
-      !_isStarted                 ||
-      !name                       ||
-      !miff                       ||
-      !miff->userTypeCurr == 0 ||
-      type < 0 || miff->userTypeCount + miffTypeFIRST_USER_TYPE < type);
-
-   newType = memCreateType(MiffRecord);
-   returnFalseIf(!newType);
-
-   memCopyTypeArray(255, MiffC2, newType->nameC2, name);
-   newType->nameC2Count = (MiffN1) wcsnlen_s(newType->nameC2, 255);
-   _MiffC2ToC1Key(newType->nameC2Count, newType->nameC2, &newType->nameC1Count, newType->nameC1);
-
-   newType->type       = type;
-   newType->arrayCount = arrayCount;
-
-   miff->userTypeList[miff->userTypeCurr].varCount++;
-
-   // Add the new type to the user type.
-   if (miff->userTypeList[miff->userTypeCurr].varStart == NULL)
-   {
-      miff->userTypeList[miff->userTypeCurr].varStart  =
-         miff->userTypeList[miff->userTypeCurr].varEnd = newType;
-   }
-   else
-   {
-      miff->userTypeList[miff->userTypeCurr].varEnd->next = newType;
-      miff->userTypeList[miff->userTypeCurr].varEnd       = newType;
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: miffUserTypeStart
-******************************************************************************/
-MiffType miffUserTypeStart(Miff * const miff, MiffC2 const * const name)
-{
-   int             index;
-   MiffRecord *currType,
-                  *nextType;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !name,
-      (MiffType) 0);
-
-   // Find if the user type already exists.
-   forCount(index, miff->userTypeCount)
-   {
-      // Check if a user type exists.
-      if (_MemIsEqual(
-            miff->userTypeList[index + miffTypeFIRST_USER_TYPE].nameC2Count * sizeof(MiffC2),
-            (MiffN1 *) miff->userTypeList[index + miffTypeFIRST_USER_TYPE].nameC2,
-            (MiffN4) (wcsnlen_s(name, 255)                                       * sizeof(MiffC2)),
-            (MiffN1 *) name))
-      {
-         // We are resetting that user type.
-         miff->userTypeCurr = (MiffN2) (index + miffTypeFIRST_USER_TYPE);
-
-         // Clean out the current type values.
-         currType = miff->userTypeList[miff->userTypeCurr].varStart;
-         nextType = currType->next;
-         while (currType)
-         {
-            _memDestroy(currType);
-            currType = nextType;
-            nextType = currType->next;
-         }
-
-         miff->userTypeList[miff->userTypeCurr].varCount  = 0;
-         miff->userTypeList[miff->userTypeCurr].varStart  =
-            miff->userTypeList[miff->userTypeCurr].varEnd = NULL;
-
-         return miff->userTypeCurr;
-      }
-   }
-
-   // Add a new user type to the user types.
-   miff->userTypeCurr = miff->userTypeCount++;
-   return miff->userTypeCurr;
-}
-
-/******************************************************************************
-func: miffUserTypeStop
-******************************************************************************/
-void miffUserTypeStop(Miff * const miff)
-{
-   returnVoidIf(
-      !_isStarted ||
-      !miff);
-
-   miff->userTypeCurr = 0;
-}
-
-/******************************************************************************
-local:
-function:
-******************************************************************************/
-/******************************************************************************
-func: _ReadFirstLetter
-
-Skip white space to get the first letter.
-******************************************************************************/
-static MiffN1 _ReadFirstLetter(Miff const * const miff)
-{
-   MiffN1 letter;
-
-   letter = 0;
-   loop
-   {
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Miff1 *) &letter));
-      breakIf(
-         !(letter == ' '  ||
-           letter == '\t' ||
-           letter == '\n'));
-   }
-
-   return letter;
-}
-
-/******************************************************************************
-func: _ReadKey
-******************************************************************************/
-static MiffBool _ReadKey(Miff * const miff, MiffMode const mode)
-{
-   MiffN4 ntemp;
-
-   miff->keyC1Count = 0;
-   miff->keyC2Count = 0;
-   miff->keyC1[0]   = 0;
-   miff->keyC2[0]   = 0;
-
-   if (mode == miffModeTEXT)
-   {
-      returnFalseIf(!_ReadPart(miff, 255, &ntemp, miff->keyC1));
-      miff->keyC1Count = (MiffN1) ntemp;
-   }
-   else
-   {
-      MiffN1 n1;
-
-      // Get the key byte count.
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, (Miff1 *) &n1));
-      returnFalseIf(n1 == 0);
-
-      // Get the key.
-      miff->keyC1Count = n1;
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, miff->keyC1Count, (Miff1 *) miff->keyC1));
-   }
-
-   // Convert the key to MiffC2
-   _MiffC1ToC2Key(miff->keyC1Count, miff->keyC1, &miff->keyC2Count, miff->keyC2);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadPart
-
-Read a stream of non-space characters.
-******************************************************************************/
-static MiffBool _ReadPart(Miff const * const miff, MiffN4 const maxByteCount, MiffN4 * const partByteCount, MiffN1 * const part)
-{
-   MiffN4    byteCount;
-   MiffN1    letter;
-
-   *partByteCount = 0;
-   part[0]        = 0;
-
-   // Skip over space.
-   letter = _ReadFirstLetter(miff);
-
-   // End of file and no letters anymore.
-   returnFalseIf(
-      letter == ' '  ||
-      letter == '\t' ||
-      letter == '\n');
-
-   // Read in the stream of letters to the next space.
-   byteCount = 0;
-   loop
-   {
-      // If the buffer isn't larger enough for the part we read up to the maxByteCount and then
-      // ignore the rest.  This should never happen.  If it does we have a mal-formed MIFF.
-      if (byteCount != maxByteCount)
-      {
-         part[byteCount++] = letter;
-      }
-      else
-      {
-         assert(0 && "This should not happen.  If you are here, dar be dragons!");
-      }
-
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Miff1 *) &letter));
-      breakIf(
-         letter == ' '  ||
-         letter == '\t' ||
-         letter == '\n');
-   }
-
-   *partByteCount = byteCount;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadPartDynamic
-
-Read a stream of non-space characters.
-******************************************************************************/
-static MiffBool _ReadPartDynamic(Miff const * const miff, MiffN4 * const partByteCount, MiffN1 ** const part)
-{
-   MiffN4    byteCount,
-             byteCountMax;
-   MiffN1   *buffer,
-            *btemp,
-             letter;
-
-   *partByteCount = 0;
-   *part          = NULL;
-
-   byteCountMax = 16;
-   buffer       = memCreateTypeArray(byteCountMax, MiffN1);
-   returnFalseIf(!buffer);
-
-   // Skip over space.
-   letter = _ReadFirstLetter(miff);
-
-   // End of file and no letters anymore.
-   returnFalseIf(
-      letter == ' '  ||
-      letter == '\t' ||
-      letter == '\n');
-
-   // Read in the stream of letters to the next space.
-   byteCount = 0;
-   loop
-   {
-      buffer[byteCount++] = letter;
-
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Miff1 *) &letter));
-      breakIf(
-         letter == ' '  ||
-         letter == '\t' ||
-         letter == '\n');
-
-      // Resize the buffer when we hit the limit.
-      if (byteCount == byteCountMax)
-      {
-         byteCountMax += byteCountMax / 2;
-         btemp = memCreateTypeArray(byteCountMax, MiffN1);
-         if (!btemp)
-         {
-            // Clean up on failure.
-            memDestroy(buffer);
-            returnFalse;
-         }
-
-         memCopyTypeArray(byteCount, MiffN1, buffer, btemp);
-         memDestroy(buffer);
-         buffer = btemp;
-      }
-   }
-
-   *partByteCount = byteCount;
-   *part          = buffer;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadValueHeader
-******************************************************************************/
-static MiffBool _ReadValueHeader(Miff * const miff, MiffMode const mode)
-{
-   if (mode == miffModeTEXT)
-   {
-      MiffN4 typeByteCount;
-      MiffN1 type[264];
-
-      memClearTypeArray(264, MiffN1, type);
-      returnFalseIf(!_ReadPart(miff, 255, &typeByteCount, type));
-
-      typeByteCount--;
-      switch (type[typeByteCount])
-      {
-      default:
-      case '-':
-      case 'z':
-      case 'c':
-         miff->arrayFlag = miffArrayFlagIS_SINGLE;
-         break;
-
-      case '=':
-      case 'Z':
-      case 'C':
-         miff->arrayFlag = miffArrayFlagIS_ARRAY;
-         break;
-      }
-
-      switch (type[typeByteCount])
-      {
-      default:
-      case '-':
-      case '=':
-         miff->compressFlag = miffCompressFlagIS_UNCOMPRESSED;
-         break;
-
-      case 'z':
-      case 'Z':
-         miff->compressFlag = miffCompressFlagIS_COMPRESSED;
-         break;
-
-      case 'c':
-      case 'C':
-         miff->compressFlag = miffCompressFlagIS_CHUNKED_AND_COMPRESSED;
-         break;
-      }
-
-      type[typeByteCount] = 0;
-      if      (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "{"))      miff->valueType = miffTypeKEY_VALUE_BLOCK;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "type"))   miff->valueType = miffTypeTYPE;
-      else if (_MemIsEqual(typeByteCount, type, 8, (MiffN1 *) "define")) miff->valueType = miffTypeDEFINE;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "\""))     miff->valueType = miffTypeSTRING;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "bool"))   miff->valueType = miffTypeBOOLEAN;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i1"))     miff->valueType = miffTypeI1;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i2"))     miff->valueType = miffTypeI2;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i3"))     miff->valueType = miffTypeI3;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i4"))     miff->valueType = miffTypeI4;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "i8"))     miff->valueType = miffTypeI8;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "i16"))    miff->valueType = miffTypeI16;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "i32"))    miff->valueType = miffTypeI32;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "i64"))    miff->valueType = miffTypeI64;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "i128"))   miff->valueType = miffTypeI128;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "i256"))   miff->valueType = miffTypeI256;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "n1"))     miff->valueType = miffTypeN1;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "n2"))     miff->valueType = miffTypeN2;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "n3"))     miff->valueType = miffTypeN3;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "n4"))     miff->valueType = miffTypeN4;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "n8"))     miff->valueType = miffTypeN8;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "n16"))    miff->valueType = miffTypeN16;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "n32"))    miff->valueType = miffTypeN32;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "n64"))    miff->valueType = miffTypeN64;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "n128"))   miff->valueType = miffTypeN128;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "n256"))   miff->valueType = miffTypeN256;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "r4"))     miff->valueType = miffTypeR4;
-      else if (_MemIsEqual(typeByteCount, type, 2, (MiffN1 *) "r8"))     miff->valueType = miffTypeR8;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "r16"))    miff->valueType = miffTypeR16;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "r32"))    miff->valueType = miffTypeR32;
-      else if (_MemIsEqual(typeByteCount, type, 3, (MiffN1 *) "r64"))    miff->valueType = miffTypeR64;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "r128"))   miff->valueType = miffTypeR128;
-      else if (_MemIsEqual(typeByteCount, type, 4, (MiffN1 *) "r256"))   miff->valueType = miffTypeR256;
-      else
-      {
-         // User type
-         //miff->valueType = _FindUserType(typeByteCount, type);
-      }
-
-      // Read in the array count
-      if (miff->arrayFlag == miffArrayFlagIS_ARRAY)
-      {
-         returnFalseIf(!_ReadValue4(miff, mode, miffTypeN4, (Miff4 *) &miff->arrayCount));
-      }
-   }
-   else
-   {
-      Miff2 value2;
-
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 2, (Miff1 *) &value2));
-      miff->compressFlag = (value2.n >> 14) & 0x0003;
-      miff->arrayFlag    = (value2.n >> 12) & 0x0003;
-      miff->valueType    =  value2.n        & 0x0FFF;
-
-      // Read in the array count
-      if (miff->arrayFlag == miffArrayFlagIS_ARRAY)
-      {
-         returnFalseIf(!miff->getBuffer(miff->dataRepo, 4, (Miff1 *) &miff->arrayCount));
-      }
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadValue1
-******************************************************************************/
-static MiffBool _ReadValue1(Miff const * const miff, MiffMode const mode,
-   MiffType const type, Miff1 * const value)
-{
-   MiffN4 partByteCount;
-   MiffC1 part[64];
-
-   if (mode == miffModeBINARY)
-   {
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, value));
-   }
-
-   memClearTypeArray(64, MiffN1, part);
-   returnFalseIf(_ReadPart(miff, 64, &partByteCount, part));
-
-   if (type == miffTypeI1)
-   {
-      value->i = (MiffI1) _MiffC1ToI(partByteCount, part);
-      memDestroy(part);
-
-      returnTrue;
-   }
-
-   value->n = (MiffN1) _MiffC1ToN(partByteCount, part);
-   memDestroy(part);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadValue2
-******************************************************************************/
-static MiffBool _ReadValue2(Miff const * const miff, MiffMode const mode,
-   MiffType const type, Miff2 * const value)
-{
-   MiffN4 partByteCount;
-   MiffN1 part[64];
-
-   if (mode == miffModeBINARY)
-   {
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 2, (Miff1 *) value));
-      _ByteSwap2(miff, value);
-   }
-
-   if (type == miffTypeR2)
-   {
-      if (miff->isByteSwapping)
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
-      }
-      else
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]));
-      }
-
-      returnTrue;
-   }
-
-   memClearTypeArray(64, MiffN1, part);
-   returnFalseIf(_ReadPart(miff, 64, &partByteCount, part));
-
-   if (type == miffTypeI2)
-   {
-      value->i = (MiffI2) _MiffC1ToI(partByteCount, part);
-      memDestroy(part);
-
-      returnTrue;
-   }
-
-   value->n = (MiffN2) _MiffC1ToN(partByteCount, part);
-   memDestroy(part);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadValue4
-******************************************************************************/
-static MiffBool _ReadValue4(Miff const * const miff, MiffMode const mode,
-   MiffType const type, Miff4 * const value)
-{
-   MiffN4 partByteCount;
-   MiffN1 part[64];
-
-   // Binary read value.
-   if (mode == miffModeBINARY)
-   {
-      returnFalseIf(!miff->getBuffer4(miff->dataRepo, 1, value));
-      _ByteSwap4(miff, value);
-
-      returnTrue;
-   }
-
-   // Text read.
-
-   // Type requires a base64 representation.
-   if (type == miffTypeR4)
-   {
-      if (miff->isByteSwapping)
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
-      }
-      else
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[3]));
-      }
-
-      returnTrue;
-   }
-
-   // read the value part.
-   memClearTypeArray(64, MiffN1, part);
-   returnFalseIf(_ReadPart(miff, 64, &partByteCount, part));
-
-   // Convert the value part to I or N.
-   if (type == miffTypeI4)
-   {
-      value->i = (MiffI4) _MiffC1ToI(partByteCount, part);
-      memDestroy(part);
-
-      returnTrue;
-   }
-
-   value->n = (MiffN4) _MiffC1ToN(partByteCount, part);
-   memDestroy(part);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _ReadValue8
-******************************************************************************/
-static MiffBool _ReadValue8(Miff const * const miff, MiffMode const mode,
-   MiffType const type, Miff8 * const value)
-{
-   MiffN4 partByteCount;
-   MiffN1 part[64];
-
-   if (mode == miffModeBINARY)
-   {
-      returnFalseIf(!miff->getBuffer8(miff->dataRepo, 1, value));
-      _ByteSwap8(miff, value);
-   }
-
-   if (type == miffTypeR4)
-   {
-      if (miff->isByteSwapping)
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[7]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[6]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[5]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[4]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]));
-      }
-      else
-      {
-         returnFalseIf(
-            !_Base64Get(miff, (Miff1 *) &value->byte[0]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[1]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[2]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[3]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[4]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[5]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[6]) ||
-            !_Base64Get(miff, (Miff1 *) &value->byte[7]));
-      }
-
-      returnTrue;
-   }
-
-   memClearTypeArray(64, MiffN1, part);
-   returnFalseIf(_ReadPart(miff, 64, &partByteCount, part));
-
-   if (type == miffTypeI8)
-   {
-      value->i = (MiffI8) _MiffC1ToI(partByteCount, part);
-      memDestroy(part);
-
-      returnTrue;
-   }
-
-   value->n = (MiffN8) _MiffC1ToN(partByteCount, part);
-   memDestroy(part);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteKey
-******************************************************************************/
-static MiffBool _WriteKey(Miff * const miff, MiffMode const mode)
-{
-   if (mode == miffModeTEXT)
-   {
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, miff->keyByteCount, (Miff1 *) miff->key));
-   }
-   else
-   {
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1,                  (Miff1 *) &miff->keyByteCount));
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, miff->keyByteCount, (Miff1 *) miff->key));
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteRecordSeparator
-******************************************************************************/
-static MiffBool _WriteRecordSeparator(Miff * const miff, MiffMode const mode)
-{
-   if (mode == miffModeTEXT)
-   {
-      return _WriteTxtRecordDivider(miff);
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteRecordStop
-******************************************************************************/
-static MiffBool _WriteRecordStop(Miff * const miff, MiffMode const mode)
-{
-   if (mode == miffModeTEXT)
-   {
-      return _WriteTxtRecordEnder(miff);
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteValue2
-******************************************************************************/
-static MiffBool _WriteValue2(Miff * const miff, MiffMode const mode, MiffType const type, Miff2 * const value)
-{
-   // dump the 8 byte value.
-   if (mode == miffModeBINARY)
-   {
-      // Swap if necessary
-      _ByteSwap2(miff, value);
-
-      return miff->setBuffer(miff->dataRepo, 2, value->byte);
-   }
-
-   return _WriteTxtValue2(miff, type, value);
-}
-
-/******************************************************************************
-func: _WriteValue4
-******************************************************************************/
-static MiffBool _WriteValue4(Miff * const miff, MiffMode const mode, MiffType const type, Miff4 * const value)
-{
-   // dump the 8 byte value.
-   if (mode == miffModeBINARY)
-   {
-      // Swap if necessary
-      _ByteSwap4(miff, value);
-
-      return miff->setBuffer(miff->dataRepo, 4, value->byte);
-   }
-
-   return _WriteTxtValue4(miff, type, value);
-}
-
-/******************************************************************************
-func: _WriteValue8
-******************************************************************************/
-static MiffBool _WriteValue8(Miff * const miff, MiffMode const mode, MiffType const type, Miff8 * const value)
-{
-   // dump the 8 byte value.
-   if (mode == miffModeBINARY)
-   {
-      // Swap if necessary
-      _ByteSwap8(miff, value);
-
-      return miff->setBuffer(miff->dataRepo, 8, value->byte);
-   }
-
-   return _WriteTxtValue8(miff, type, value);
-}
-#endif

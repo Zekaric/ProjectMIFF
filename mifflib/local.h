@@ -222,7 +222,9 @@ MiffBool  _Base64Set(                  Miff const * const miff, MiffN1   const b
 MiffBool  _Base64SetEnd(               Miff const * const miff);
 void      _Base64Start(                void);
 
+#if 0 // Currently not used
 void      _ByteSwap2(                  Miff const * const miff, Miff2 * const value);
+#endif
 void      _ByteSwap4(                  Miff const * const miff, Miff4 * const value);
 void      _ByteSwap8(                  Miff const * const miff, Miff8 * const value);
 
@@ -239,9 +241,6 @@ MiffN4    _C1LetterToC4Letter(         MiffC1 const * const c1, MiffC4 * const c
 MiffN4    _C2LetterToC4Letter(         MiffC2 const * const c2, MiffC4 * const c4);
 MiffN4    _C4LetterToC1Letter(         MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
 MiffN4    _C4LetterToC2Letter(         MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
-MiffBool  _CompressStart(              Miff * const miff, MiffN4 const compressedChunkByteCount);
-void      _CompressStop(               Miff * const miff);
-MiffBool  _CompressWrite(              Miff * const miff, MiffN4 const byteCount, void const * const byteData);
 
 #define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
 #define   _C2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))
@@ -253,7 +252,7 @@ MiffN4    _MemCompressBound(           MiffN4 const memByteCount);
 MiffBool  _MemCompress(                MiffN4 const memByteCount,         void const * const mem,         MiffN4 * const compressMemByteCount, void * const compressMem);
 MiffBool  _MemDecompress(              MiffN4 const compressMemByteCount, void const * const compressMem, MiffN4 * const memByteCount,         void * const mem);
 MiffBool  _MemIsEqual(                 MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB, MiffN1 const * const memB);
-void      _MemStart(                   MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc, MiffMemCompressBound const memCompressBoundFunc, MiffMemCompress const memCompressFunc, MiffMemDecompress const memDecompressFunc);
+void      _MemStart(                   MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
 void      _MemStop(                    void);
 
 #define   _MemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
@@ -266,8 +265,6 @@ MiffBool  _ReadTxtLine(                Miff       * const miff);
 MiffBool  _ReadTxtLineSkip(            Miff       * const miff);
 MiffBool  _ReadTxtPart(                Miff       * const miff);
 MiffBool  _ReadTxtRecordArrayCount(    Miff       * const miff, MiffN4 * const count);
-MiffBool  _ReadTxtRecordChunkSize(     Miff       * const miff, MiffN4 * const chunkSize);
-MiffBool  _ReadTxtRecordCompressFlag(  Miff       * const miff, MiffBool * const isCompressed);
 MiffBool  _ReadTxtRecordKeyC2(         Miff       * const miff, MiffC2 * const key);
 MiffBool  _ReadTxtRecordType(          Miff       * const miff, MiffType *type);
 
@@ -276,7 +273,6 @@ MiffC1   *_TypeGetNameC1(              MiffType const type);
 MiffN4    _TypeGetNameSize(            MiffType const type);
 MiffN4    _TypeGetSize(                Miff const * const miff, MiffType const type);
 
-MiffBool  _WriteCompressByte(          Miff       * const miff, MiffN1 const byte);
 MiffBool  _WriteTxtC1(                 Miff const * const miff, MiffC1 const * const value);
 MiffBool  _WriteTxtC2(                 Miff const * const miff, MiffC2 const * const value);
 MiffBool  _WriteTxtRecordArrayCount(   Miff const * const miff, MiffN4 const count);

@@ -1,7 +1,7 @@
 /******************************************************************************
 file:       byteSwap
 author:     Robbert de Groot
-copyright:  2021, 
+copyright:  2021,
 
 description:
 Functions to swap bytes from little endian to big endian and vice versa.
@@ -57,6 +57,7 @@ prototype:
 global:
 function:
 ******************************************************************************/
+#if 0 // Currently not used
 /******************************************************************************
 func: _ByteSwap2
 ******************************************************************************/
@@ -69,6 +70,7 @@ void _ByteSwap2(Miff const * const miff, Miff2 * const value)
       value->byte[0] ^= value->byte[1];
    }
 }
+#endif
 
 /******************************************************************************
 func: _ByteSwap4

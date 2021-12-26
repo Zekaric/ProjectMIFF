@@ -236,8 +236,6 @@ func: miffGetValueBoolean
 ******************************************************************************/
 MiffBool miffGetValueBoolean(Miff * const miff, MiffBool * const value)
 {
-   MiffC1 *c1;
-
    returnFalseIf(
       !_isStarted ||
       !miff       ||
@@ -252,6 +250,53 @@ MiffBool miffGetValueBoolean(Miff * const miff, MiffBool * const value)
       *value = miffBoolTRUE;
    }
 
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetValueI
+******************************************************************************/
+MiffBool miffGetValueI(Miff * const miff, MiffI8 * const value)
+{
+   char *endPtr;
+
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffTypeI1 ||
+        miff->currentRecord.type == miffTypeI2 ||
+        miff->currentRecord.type == miffTypeI4 ||
+        miff->currentRecord.type == miffTypeI8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   *value = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
+   
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: miffGetValueN
+******************************************************************************/
+MiffBool miffGetValueN(Miff * const miff, MiffN8 * const value)
+{
+   char *endPtr;
+
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffTypeN1 ||
+        miff->currentRecord.type == miffTypeN2 ||
+        miff->currentRecord.type == miffTypeN4 ||
+        miff->currentRecord.type == miffTypeN8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   *value = (MiffN8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
+   
    returnTrue;
 }
 

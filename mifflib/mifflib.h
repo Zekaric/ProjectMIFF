@@ -374,6 +374,8 @@ void            miffDestroy(                       Miff       * const miff);
 void            miffDestroyContent(                Miff       * const miff);
 
 MiffBool        miffGetValueBoolean(               Miff       * const miff, MiffBool * const value);
+MiffBool        miffGetValueI(                     Miff       * const miff, MiffI8 * const value);
+MiffBool        miffGetValueN(                     Miff       * const miff, MiffN8 * const value);
 
 MiffBool        miffRecordGetBegin(                Miff       * const miff, MiffType * const type, MiffC2       * const key, MiffN4 * const count);
 MiffBool        miffRecordGetEnd(                  Miff       * const miff);

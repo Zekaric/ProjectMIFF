@@ -698,8 +698,11 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
    MiffN8          subFormatVersion;
    MiffType        type;
    MiffC2          key[miffKeySIZE];
+   MiffN4          arrayIndex;
    MiffN4          arrayCount;
    MiffBool        valueBool;
+   MiffI8          valueI;
+   MiffN8          valueN;
 
    file   = NULL;
    miff   = NULL;
@@ -738,11 +741,11 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
 
          if      (type == miffTypeKEY_VALUE_BLOCK_STOP)
          {
-            wprintf(L"}\n");
+            wprintf(L"\n");
          }
          else if (type == miffTypeKEY_VALUE_BLOCK_START)
          {
-            wprintf(L"{\n");
+            wprintf(L"\n");
          }
          else if (type == miffTypeTYPE)
          {
@@ -758,28 +761,31 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
          }
          else if (type == miffTypeBOOLEAN)
          {
-            if (!miffGetValueBoolean(miff, &valueBool))
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               wprintf(L"ERROR\n");
-               break;
+               if (!miffGetValueBoolean(miff, &valueBool))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%c ", (valueBool == miffBoolTRUE) ? L'T' : L'F');
             }
-            wprintf(L"%c", (valueBool == miffBoolTRUE) ? L'T' : L'F');
             wprintf(L"\n");
          }
-         else if (type == miffTypeI1)
+         else if (type == miffTypeI1 ||
+                  type == miffTypeI2 ||
+                  type == miffTypeI4 ||
+                  type == miffTypeI8)
          {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI2)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI8)
-         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueI(miff, &valueI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d ", valueI);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeI16)
@@ -802,20 +808,20 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
          {
             wprintf(L"\n");
          }
-         else if (type == miffTypeN1)
+         else if (type == miffTypeN1 ||
+                  type == miffTypeN2 ||
+                  type == miffTypeN4 ||
+                  type == miffTypeN8)
          {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN2)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN8)
-         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueN(miff, &valueN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u ", valueN);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeN16)

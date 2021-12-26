@@ -40,6 +40,7 @@ include:
 #include <assert.h>
 #include <memory.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "mifflib.h"
 
@@ -56,8 +57,10 @@ constant:
 #define continueIf(EXP)                            if (EXP) { continue; }
 #define gotoIf(EXP, LABEL)                         if (EXP) { goto LABEL; }
 
+#if !defined(min)
 #define min(A, B)                                  (((A) < (B)) ? (A) : (B))
 #define max(A, B)                                  (((A) < (B)) ? (B) : (A))
+#endif
 
 #define returnFalse                                return miffBoolFALSE
 #define returnNull                                 return NULL

@@ -301,6 +301,38 @@ MiffBool miffGetValueN(Miff * const miff, MiffN8 * const value)
 }
 
 /******************************************************************************
+func: miffGetValueR4
+******************************************************************************/
+MiffBool miffGetValueR4(Miff * const miff, MiffR4 * const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffTypeR4 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
+
+   returnFalseIf(!_ReadTxtValueR4(miff, value))
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: miffGetValueR8
+******************************************************************************/
+MiffBool miffGetValueR8(Miff * const miff, MiffR8 * const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      !(miff->currentRecord.type == miffTypeR8 ||
+        miff->currentRecord.type == miffTypeVARIABLE));
+
+   returnFalseIf(!_ReadTxtValueR8(miff, value));
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: miffRecordGetBegin
 
 key needs to be a buffer of size miffKeySIZE.

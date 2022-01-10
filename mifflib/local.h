@@ -270,6 +270,8 @@ MiffBool  _ReadTxtPart(                Miff       * const miff);
 MiffBool  _ReadTxtRecordArrayCount(    Miff       * const miff, MiffN4 * const count);
 MiffBool  _ReadTxtRecordKeyC2(         Miff       * const miff, MiffC2 * const key);
 MiffBool  _ReadTxtRecordType(          Miff       * const miff, MiffType *type);
+MiffBool  _ReadTxtValueR4(             Miff       * const miff, MiffR4 * const value);
+MiffBool  _ReadTxtValueR8(             Miff       * const miff, MiffR8 * const value);
 
 MiffC2   *_TypeGetNameC2(              MiffType const type);
 MiffC1   *_TypeGetNameC1(              MiffType const type);

@@ -191,10 +191,10 @@ MiffBool _WriteTxtValue4(Miff const * const miff, MiffType const type, Miff4 con
       vtemp = value;
       _ByteSwap4(miff, &vtemp);
 
-      returnFalseIf(!_Base64Set(miff, value.byte[0]));
-      returnFalseIf(!_Base64Set(miff, value.byte[1]));
-      returnFalseIf(!_Base64Set(miff, value.byte[2]));
-      returnFalseIf(!_Base64Set(miff, value.byte[3]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
 
       return _Base64SetEnd(miff);
    }
@@ -219,14 +219,14 @@ MiffBool _WriteTxtValue8(Miff const * const miff, MiffType const type, Miff8 con
       vtemp = value;
       _ByteSwap8(miff, &vtemp);
 
-      returnFalseIf(!_Base64Set(miff, value.byte[0]));
-      returnFalseIf(!_Base64Set(miff, value.byte[1]));
-      returnFalseIf(!_Base64Set(miff, value.byte[2]));
-      returnFalseIf(!_Base64Set(miff, value.byte[3]));
-      returnFalseIf(!_Base64Set(miff, value.byte[4]));
-      returnFalseIf(!_Base64Set(miff, value.byte[5]));
-      returnFalseIf(!_Base64Set(miff, value.byte[6]));
-      returnFalseIf(!_Base64Set(miff, value.byte[7]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[4]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[5]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[6]));
+      returnFalseIf(!_Base64Set(miff, vtemp.byte[7]));
 
       return _Base64SetEnd(miff);
    }

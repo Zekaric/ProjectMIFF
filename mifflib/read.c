@@ -246,3 +246,51 @@ MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
 
    return miffBoolFALSE;
 }
+
+/******************************************************************************
+func: _ReadTxtValueR4
+******************************************************************************/
+MiffBool _ReadTxtValueR4(Miff * const miff, MiffR4 * const value)
+{
+   Miff4 vtemp;
+
+   _Base64Restart();
+
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[0]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[1]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[2]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[3]));
+
+   returnFalseIf(!_ReadTxtPart(miff));
+
+   _ByteSwap4(miff, &vtemp);
+
+   *value = vtemp.r;
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _ReadTxtValueR8
+******************************************************************************/
+MiffBool _ReadTxtValueR8(Miff * const miff, MiffR8 * const value)
+{
+   Miff8 vtemp;
+
+   _Base64Restart();
+
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[0]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[1]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[2]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[3]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[4]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[5]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[6]));
+   returnFalseIf(!_Base64Get(miff, &vtemp.byte[7]));
+
+   _ByteSwap8(miff, &vtemp);
+
+   *value = vtemp.r;
+
+   returnTrue;
+}

@@ -700,11 +700,32 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
    MiffC2          key[miffKeySIZE];
    MiffN4          arrayIndex;
    MiffN4          arrayCount;
+   MiffN4          row,
+                   col;
    MiffBool        valueBool;
    MiffI8          valueI;
    MiffN8          valueN;
    MiffR4          valueR4;
    MiffR8          valueR8;
+   MiffC2         *valueStr;
+   MiffABI8        valueABI;
+   MiffABN8        valueABN;
+   MiffABR4        valueABR4;
+   MiffABR8        valueABR8;
+   MiffABCI8       valueABCI;
+   MiffABCN8       valueABCN;
+   MiffABCR4       valueABCR4;
+   MiffABCR8       valueABCR8;
+   MiffABCDI8      valueABCDI;
+   MiffABCDN8      valueABCDN;
+   MiffABCDR4      valueABCDR4;
+   MiffABCDR8      valueABCDR8;
+   MiffMatrix2x2R4 valueMatrix2x2R4;
+   MiffMatrix3x3R4 valueMatrix3x3R4;
+   MiffMatrix4x4R4 valueMatrix4x4R4;
+   MiffMatrix2x2R8 valueMatrix2x2R8;
+   MiffMatrix3x3R8 valueMatrix3x3R8;
+   MiffMatrix4x4R8 valueMatrix4x4R8;
 
    file   = NULL;
    miff   = NULL;
@@ -741,11 +762,8 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
 
          wprintf(L"%s\t%s\t%d\t", miffTypeGetC2(type), key, arrayCount);
 
-         if      (type == miffTypeKEY_VALUE_BLOCK_STOP)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeKEY_VALUE_BLOCK_START)
+         if      (type == miffTypeKEY_VALUE_BLOCK_STOP ||
+                  type == miffTypeKEY_VALUE_BLOCK_START)
          {
             wprintf(L"\n");
          }
@@ -755,6 +773,21 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
          }
          else if (type == miffTypeSTRING)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               // Separate strings.
+               if (arrayIndex)
+               {
+                  wprintf(L"\n---");
+               }
+
+               if (!miffGetValueStringC2(miff, &valueStr))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"\n%s ", valueStr);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeVARIABLE)
@@ -790,23 +823,11 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeI16)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI32)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI64)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI128)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeI256)
+         else if (type == miffTypeI16 ||
+                  type == miffTypeI32 ||
+                  type == miffTypeI64 ||
+                  type == miffTypeI128 ||
+                  type == miffTypeI256)
          {
             wprintf(L"\n");
          }
@@ -826,23 +847,11 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeN16)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN32)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN64)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN128)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeN256)
+         else if (type == miffTypeN16 ||
+                  type == miffTypeN32 ||
+                  type == miffTypeN64 ||
+                  type == miffTypeN128 ||
+                  type == miffTypeN256)
          {
             wprintf(L"\n");
          }
@@ -872,148 +881,303 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABI1)
+         else if (type == miffTypeABI1 ||
+                  type == miffTypeABI2 ||
+                  type == miffTypeABI4 ||
+                  type == miffTypeABI8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABI(miff, &valueABI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d ", valueABI.a, valueABI.b);
+            }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABI2)
+         else if (type == miffTypeABN1 ||
+                  type == miffTypeABN2 ||
+                  type == miffTypeABN4 ||
+                  type == miffTypeABN8)
          {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABI4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABI8)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABN1)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABN2)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABN4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABN8)
-         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABN(miff, &valueABN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u ", valueABN.a, valueABN.b);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABR4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABR4(miff, &valueABR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABR8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABR8(miff, &valueABR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
+            }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABCI1)
+         else if (type == miffTypeABCI1 ||
+                  type == miffTypeABCI2 ||
+                  type == miffTypeABCI4 ||
+                  type == miffTypeABCI8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCI(miff, &valueABCI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d %I64d ", valueABCI.a, valueABCI.b, valueABCI.c);
+            }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABCI2)
+         else if (type == miffTypeABCN1 ||
+                  type == miffTypeABCN2 ||
+                  type == miffTypeABCN4 ||
+                  type == miffTypeABCN8)
          {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCI4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCI8)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCN1)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCN2)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCN4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCN8)
-         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCN(miff, &valueABCN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u %I64u ", valueABCN.a, valueABCN.b, valueABCN.c);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABCR4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCR4(miff, &valueABCR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABCR8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCR8(miff, &valueABCR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
+            }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABCDI1)
+         else if (type == miffTypeABCDI1 ||
+                  type == miffTypeABCDI2 ||
+                  type == miffTypeABCDI4 ||
+                  type == miffTypeABCDI8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDI(miff, &valueABCDI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d %I64d %I64d ", valueABCDI.a, valueABCDI.b, valueABCDI.c, valueABCDI.d);
+            }
             wprintf(L"\n");
          }
-         else if (type == miffTypeABCDI2)
+         else if (type == miffTypeABCDN1 ||
+                  type == miffTypeABCDN2 ||
+                  type == miffTypeABCDN4 ||
+                  type == miffTypeABCDN8)
          {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDI4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDI8)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDN1)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDN2)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDN4)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDN8)
-         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDN(miff, &valueABCDN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u %I64u %I64u ", valueABCDN.a, valueABCDN.b, valueABCDN.c, valueABCDN.d);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABCDR4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDR4(miff, &valueABCDR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeABCDR8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDR8(miff, &valueABCDR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX2X2R4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix2x2R4(miff, &valueMatrix2x2R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
+                  }
+               }
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX2X2R8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix2x2R8(miff, &valueMatrix2x2R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
+                  }
+               }
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX3X3R4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix3x3R4(miff, &valueMatrix3x3R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
+                  }
+               }
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX3X3R8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix3x3R8(miff, &valueMatrix3x3R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
+                  }
+               }
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX4X4R4)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix4x4R4(miff, &valueMatrix4x4R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
+                  }
+               }
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeMATRIX4X4R8)
          {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix4x4R8(miff, &valueMatrix4x4R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeVARIABLE)
+         {
+            // TODO: variable types
             wprintf(L"\n");
          }
          else

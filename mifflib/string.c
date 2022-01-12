@@ -35,18 +35,68 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
+func: _C1EncodedToC1
+
+Unescape certain characters
+
+\n - new line
+\t - tab
+\\ - \
+******************************************************************************/
+MiffBool _C1EncodedToC1(MiffN4 * const c1Count, MiffC1 * const c1)
+{
+   MiffN4    index,
+             eindex,
+             charCount;
+
+   // Count the number of characters that need escaping.
+   charCount = 0;
+   index     = 0;
+   forCount (eindex, *c1Count)
+   {
+      if (c1[eindex] == '\\' &&
+          eindex + 1 <  *c1Count)
+      {
+         // Unescaping a \ character
+         if      (c1[eindex + 1] == '\\')
+         {
+            eindex++;
+         }
+         // Unescaping a tab character
+         else if (c1[eindex + 1] == 't')
+         {
+            c1[eindex + 1] = '\t';
+            eindex++;
+         }
+         // Unescaping a new line character
+         else if (c1[eindex + 1] == 'n')
+         {
+            c1[eindex + 1] = '\n';
+            eindex++;
+         }
+      }
+
+      // adjust the string
+      if (index != eindex)
+      {
+         c1[index] = c1[eindex];
+      }
+      index++;
+   }
+
+   // Update the string length.
+   *c1Count = index;
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _C1ToC1Encoded
 
 Escape certain characters
 
-\a - bell
-\b - backspace
-\e - escape
-\f - form feed
 \n - new line
-\r - cursor return
 \t - tab
-\v - vertical tab
 \\ - \
 ******************************************************************************/
 MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1, 
@@ -65,14 +115,8 @@ MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1,
    charCount = 0;
    forCount (index, c1Count)
    {
-      if (//c1[index] == 0x07 || // bell
-          //c1[index] == 0x08 || // backspace
-          c1[index] == 0x09 || // tab
+      if (c1[index] == 0x09 || // tab
           c1[index] == 0x0a || // new line
-          //c1[index] == 0x0b || // vertical tab
-          //c1[index] == 0x0c || // form feed
-          //c1[index] == 0x0d || // cursor return
-          //c1[index] == 0x1b || // escape
           c1[index] == '\\')
       {
          charCount++;
@@ -88,16 +132,10 @@ MiffBool _C1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1,
    {
       switch (c1[index])
       {
-//      case 0x07: etemp[eindex--] = 'a';  etemp[eindex--] = '\\'; break;
-//      case 0x08: etemp[eindex--] = 'b';  etemp[eindex--] = '\\'; break;
       case 0x09: etemp[eindex--] = 't';  etemp[eindex--] = '\\'; break;
       case 0x0a: etemp[eindex--] = 'n';  etemp[eindex--] = '\\'; break;
-//      case 0x0b: etemp[eindex--] = 'v';  etemp[eindex--] = '\\'; break;
-//      case 0x0c: etemp[eindex--] = 'f';  etemp[eindex--] = '\\'; break;
-//      case 0x0d: etemp[eindex--] = 'r';  etemp[eindex--] = '\\'; break;
-//      case 0x1b: etemp[eindex--] = 'b';  etemp[eindex--] = '\\'; break;
       case '\\': etemp[eindex--] = '\\'; etemp[eindex--] = '\\'; break;
-      default:   etemp[eindex--] = c1[index];                   break;
+      default:   etemp[eindex--] = c1[index];                    break;
       }
 
       breakIf(index == 0);

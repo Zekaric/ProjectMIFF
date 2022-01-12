@@ -356,6 +356,10 @@ typedef struct
    MiffN4                      readByteCountActual;
    MiffN4                      readByteCount;
    MiffN1                     *readByteData;
+
+   MiffN4                      readStrCountActual;
+   MiffN4                      readStrCount;
+   MiffC2                     *readStrData;
 } Miff;
 
 /******************************************************************************
@@ -373,11 +377,30 @@ MiffBool        miffCreateWriterContent(           Miff       * const miff, Miff
 void            miffDestroy(                       Miff       * const miff);
 void            miffDestroyContent(                Miff       * const miff);
 
-MiffBool        miffGetValueBoolean(               Miff       * const miff, MiffBool * const value);
-MiffBool        miffGetValueI(                     Miff       * const miff, MiffI8 * const value);
-MiffBool        miffGetValueN(                     Miff       * const miff, MiffN8 * const value);
-MiffBool        miffGetValueR4(                    Miff       * const miff, MiffR4 * const value);
-MiffBool        miffGetValueR8(                    Miff       * const miff, MiffR8 * const value);
+MiffBool        miffGetValueBoolean(               Miff       * const miff, MiffBool   * const value);
+MiffBool        miffGetValueABI(                   Miff       * const miff, MiffABI8   * const value);
+MiffBool        miffGetValueABN(                   Miff       * const miff, MiffABN8   * const value);
+MiffBool        miffGetValueABR4(                  Miff       * const miff, MiffABR4   * const value);
+MiffBool        miffGetValueABR8(                  Miff       * const miff, MiffABR8   * const value);
+MiffBool        miffGetValueABCI(                  Miff       * const miff, MiffABCI8  * const value);
+MiffBool        miffGetValueABCN(                  Miff       * const miff, MiffABCN8  * const value);
+MiffBool        miffGetValueABCR4(                 Miff       * const miff, MiffABCR4  * const value);
+MiffBool        miffGetValueABCR8(                 Miff       * const miff, MiffABCR8  * const value);
+MiffBool        miffGetValueABCDI(                 Miff       * const miff, MiffABCDI8 * const value);
+MiffBool        miffGetValueABCDN(                 Miff       * const miff, MiffABCDN8 * const value);
+MiffBool        miffGetValueABCDR4(                Miff       * const miff, MiffABCDR4 * const value);
+MiffBool        miffGetValueABCDR8(                Miff       * const miff, MiffABCDR8 * const value);
+MiffBool        miffGetValueI(                     Miff       * const miff, MiffI8     * const value);
+MiffBool        miffGetValueMatrix2x2R4(           Miff       * const miff, MiffMatrix2x2R4 * const value);
+MiffBool        miffGetValueMatrix2x2R8(           Miff       * const miff, MiffMatrix2x2R8 * const value);
+MiffBool        miffGetValueMatrix3x3R4(           Miff       * const miff, MiffMatrix3x3R4 * const value);
+MiffBool        miffGetValueMatrix3x3R8(           Miff       * const miff, MiffMatrix3x3R8 * const value);
+MiffBool        miffGetValueMatrix4x4R4(           Miff       * const miff, MiffMatrix4x4R4 * const value);
+MiffBool        miffGetValueMatrix4x4R8(           Miff       * const miff, MiffMatrix4x4R8 * const value);
+MiffBool        miffGetValueN(                     Miff       * const miff, MiffN8     * const value);
+MiffBool        miffGetValueR4(                    Miff       * const miff, MiffR4     * const value);
+MiffBool        miffGetValueR8(                    Miff       * const miff, MiffR8     * const value);
+MiffBool        miffGetValueStringC2(              Miff       * const miff, MiffC2    ** const value);
 
 MiffBool        miffRecordGetBegin(                Miff       * const miff, MiffType * const type, MiffC2       * const key, MiffN4 * const count);
 MiffBool        miffRecordGetEnd(                  Miff       * const miff);

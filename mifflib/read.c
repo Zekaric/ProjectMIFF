@@ -288,6 +288,8 @@ MiffBool _ReadTxtValueR8(Miff * const miff, MiffR8 * const value)
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[6]));
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[7]));
 
+   returnFalseIf(!_ReadTxtPart(miff));
+
    _ByteSwap8(miff, &vtemp);
 
    *value = vtemp.r;

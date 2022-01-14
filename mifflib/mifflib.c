@@ -322,8 +322,8 @@ MiffBool miffGetValueABR4(  Miff * const miff, MiffABR4   * const value)
       !(miff->currentRecord.type == miffTypeABR4 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->b))
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->b));
 
    returnTrue;
 }
@@ -339,8 +339,8 @@ MiffBool miffGetValueABR8(  Miff * const miff, MiffABR8   * const value)
       !(miff->currentRecord.type == miffTypeABR8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->b))
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->b));
 
    returnTrue;
 }
@@ -418,9 +418,9 @@ MiffBool miffGetValueABCR4( Miff * const miff, MiffABCR4  * const value)
       !(miff->currentRecord.type == miffTypeABCR4 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->b))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->c))
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->b));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->c));
 
    returnTrue;
 }
@@ -436,9 +436,9 @@ MiffBool miffGetValueABCR8( Miff * const miff, MiffABCR8  * const value)
       !(miff->currentRecord.type == miffTypeABCR8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->b))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->c))
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->b));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->c));
 
    returnTrue;
 }
@@ -453,10 +453,10 @@ MiffBool miffGetValueABCDI( Miff * const miff, MiffABCDI8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABI1 ||
-        miff->currentRecord.type == miffTypeABI2 ||
-        miff->currentRecord.type == miffTypeABI4 ||
-        miff->currentRecord.type == miffTypeABI8 ||
+      !(miff->currentRecord.type == miffTypeABCDI1 ||
+        miff->currentRecord.type == miffTypeABCDI2 ||
+        miff->currentRecord.type == miffTypeABCDI4 ||
+        miff->currentRecord.type == miffTypeABCDI8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
    returnFalseIf(!_ReadTxtPart(miff));
@@ -524,10 +524,10 @@ MiffBool miffGetValueABCDR4(Miff * const miff, MiffABCDR4 * const value)
       !(miff->currentRecord.type == miffTypeABCDR4 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->b))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->c))
-   returnFalseIf(!_ReadTxtValueR4(miff, &value->d))
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->b));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->c));
+   returnFalseIf(!_ReadTxtValueR4(miff, &value->d));
 
    returnTrue;
 }
@@ -543,10 +543,10 @@ MiffBool miffGetValueABCDR8(Miff * const miff, MiffABCDR8 * const value)
       !(miff->currentRecord.type == miffTypeABCDR8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->a))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->b))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->c))
-   returnFalseIf(!_ReadTxtValueR8(miff, &value->d))
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->a));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->b));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->c));
+   returnFalseIf(!_ReadTxtValueR8(miff, &value->d));
 
    returnTrue;
 }
@@ -3067,7 +3067,7 @@ MiffBool miffSetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 const * cons
       !(miff->currentRecord.type == miffTypeMATRIX2X2R8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   _MemCopyTypeArray(1, MiffMatrix2x2R4, &vtemp.matrix2x2r, value);
+   _MemCopyTypeArray(1, MiffMatrix2x2R8, &vtemp.matrix2x2r, value);
 
    miff->currentRecord.type = miffTypeR8;
    returnFalseIf(!_WriteValue8(miff, miffTypeR8, (vtemps.r = vtemp.matrix2x2r.cell[0][0], vtemps)));
@@ -3227,7 +3227,7 @@ MiffBool miffSetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 const * cons
       !(miff->currentRecord.type == miffTypeMATRIX4X4R8 ||
         miff->currentRecord.type == miffTypeVARIABLE));
 
-   _MemCopyTypeArray(1, MiffMatrix4x4R4, &vtemp.matrix4x4r, value);
+   _MemCopyTypeArray(1, MiffMatrix4x4R8, &vtemp.matrix4x4r, value);
 
    miff->currentRecord.type = miffTypeR8;
    returnFalseIf(!_WriteValue8(miff, miffTypeR8, (vtemps.r = vtemp.matrix4x4r.cell[0][0], vtemps)));

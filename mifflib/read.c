@@ -10,7 +10,7 @@ Write functions local to the library.
 /******************************************************************************
 MIT License
 
-Copyright (c) !!!!YEAR!!!!, Robbert de Groot
+Copyright (c) 2021, Robbert de Groot
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _ReadTxtLine
+func: _ReadLine
 ******************************************************************************/
-MiffBool _ReadTxtLine(Miff * const miff)
+MiffBool _ReadLine(Miff * const miff)
 {
    MiffN4  index;
    MiffN1  byte;
@@ -88,9 +88,9 @@ MiffBool _ReadTxtLine(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadTxtLineSkip
+func: _ReadLineSkip
 ******************************************************************************/
-MiffBool _ReadTxtLineSkip(Miff * const miff)
+MiffBool _ReadLineSkip(Miff * const miff)
 {
    MiffN1 byte;
 
@@ -107,9 +107,9 @@ MiffBool _ReadTxtLineSkip(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadTxtPart
+func: _ReadPart
 ******************************************************************************/
-MiffBool _ReadTxtPart(Miff * const miff)
+MiffBool _ReadPart(Miff * const miff)
 {
    MiffN4  index;
    MiffN1  byte;
@@ -163,9 +163,9 @@ MiffBool _ReadTxtPart(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadTxtRecordArrayCount
+func: _ReadArrayCount
 ******************************************************************************/
-MiffBool _ReadTxtRecordArrayCount(Miff * const miff, MiffN4 * const count)
+MiffBool _ReadArrayCount(Miff * const miff, MiffN4 * const count)
 {
    returnFalseIf(!count);
 
@@ -173,7 +173,7 @@ MiffBool _ReadTxtRecordArrayCount(Miff * const miff, MiffN4 * const count)
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadTxtPart(miff));
+   returnFalseIf(!_ReadPart(miff));
 
    if (miff->readByteData[0] == L'*')
    {
@@ -189,9 +189,9 @@ MiffBool _ReadTxtRecordArrayCount(Miff * const miff, MiffN4 * const count)
 }
 
 /******************************************************************************
-func: _ReadTxtRecordKeyC2
+func: _ReadC2Key
 ******************************************************************************/
-MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
+MiffBool _ReadC2Key(Miff * const miff, MiffC2 * const key)
 {
    MiffN1 keySize;
 
@@ -201,7 +201,7 @@ MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadTxtPart(miff));
+   returnFalseIf(!_ReadPart(miff));
 
    _MemClearTypeArray(miffKeySIZE, MiffC2, miff->currentRecord.nameC2);
    _C1ToC2Key(
@@ -216,9 +216,9 @@ MiffBool _ReadTxtRecordKeyC2(Miff * const miff, MiffC2 * const key)
 }
 
 /******************************************************************************
-func: _ReadTxtRecordType
+func: _ReadType
 ******************************************************************************/
-MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
+MiffBool _ReadType(Miff * const miff, MiffType *type)
 {
    MiffN4 index;
 
@@ -228,7 +228,7 @@ MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadTxtPart(miff));
+   returnFalseIf(!_ReadPart(miff));
 
    forCount (index, miffTypeCOUNT)
    {
@@ -240,17 +240,17 @@ MiffBool _ReadTxtRecordType(Miff * const miff, MiffType *type)
       {
          *type = index;
 
-         return miffBoolTRUE;
+         returnTrue;
       }
    }
 
-   return miffBoolFALSE;
+   returnFalse;
 }
 
 /******************************************************************************
-func: _ReadTxtValueR4
+func: _ReadR4
 ******************************************************************************/
-MiffBool _ReadTxtValueR4(Miff * const miff, MiffR4 * const value)
+MiffBool _ReadR4(Miff * const miff, MiffR4 * const value)
 {
    Miff4 vtemp;
 
@@ -261,7 +261,7 @@ MiffBool _ReadTxtValueR4(Miff * const miff, MiffR4 * const value)
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[2]));
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[3]));
 
-   returnFalseIf(!_ReadTxtPart(miff));
+   returnFalseIf(!_ReadPart(miff));
 
    _ByteSwap4(miff, &vtemp);
 
@@ -271,9 +271,9 @@ MiffBool _ReadTxtValueR4(Miff * const miff, MiffR4 * const value)
 }
 
 /******************************************************************************
-func: _ReadTxtValueR8
+func: _ReadR8
 ******************************************************************************/
-MiffBool _ReadTxtValueR8(Miff * const miff, MiffR8 * const value)
+MiffBool _ReadR8(Miff * const miff, MiffR8 * const value)
 {
    Miff8 vtemp;
 
@@ -288,7 +288,7 @@ MiffBool _ReadTxtValueR8(Miff * const miff, MiffR8 * const value)
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[6]));
    returnFalseIf(!_Base64Get(miff, &vtemp.byte[7]));
 
-   returnFalseIf(!_ReadTxtPart(miff));
+   returnFalseIf(!_ReadPart(miff));
 
    _ByteSwap8(miff, &vtemp);
 

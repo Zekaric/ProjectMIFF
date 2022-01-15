@@ -9,6 +9,30 @@ Test program for MiffLib
 ******************************************************************************/
 
 /******************************************************************************
+MIT License
+
+Copyright (c) 2021, Robbert de Groot
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+******************************************************************************/
+
+/******************************************************************************
 include:
 ******************************************************************************/
 #include <stdlib.h>
@@ -22,14 +46,6 @@ include:
 
 /******************************************************************************
 local:
-constant:
-******************************************************************************/
-
-/******************************************************************************
-type:
-******************************************************************************/
-
-/******************************************************************************
 variable:
 ******************************************************************************/
 static MiffN1               _binary[] =
@@ -792,6 +808,33 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
          }
          else if (type == miffTypeVARIABLE)
          {
+            if (miffGetValueI(miff, &valueI) &&
+                valueI == 42)
+            {
+               wprintf(L"P1 ok, ");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
+            if (miffGetValueStringC2(miff, &valueStr) &&
+                memcmp(valueStr, L"Yes, but what is the question?", wcslen(L"Yes, but what is the question?")) == 0)
+            {
+               wprintf(L"P2 ok, ");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
+            if (miffGetValueR8(miff, &valueR8) &&
+                valueR8 == 3.1415926535897932)
+            {
+               wprintf(L"P3 ok");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
             wprintf(L"\n");
          }
          else if (type == miffTypeBOOLEAN)
@@ -1206,15 +1249,15 @@ func: _TestWrite
 ******************************************************************************/
 static MiffBool _TestWrite(MiffC2 const * const fileName)
 {
-   FILE           *file;
-   Miff           *miff;
-   MiffBool        result;
+   FILE     *file;
+   Miff     *miff;
+   MiffBool  result;
 
    file   = NULL;
    miff   = NULL;
    result = miffBoolFALSE;
 
-   for(;;)
+   for (;;)
    {
       if (_wfopen_s(&file, (wchar_t *) fileName, L"wb") != 0)
       {
@@ -1228,165 +1271,165 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
          break;
       }
 
-      miffSet1Boolean(      miff, L"True",     miffBoolTRUE);
-      miffSet1Boolean(      miff, L"False",    miffBoolFALSE);
+      miffSet1Boolean(       miff, L"True",     miffBoolTRUE);
+      miffSet1Boolean(       miff, L"False",    miffBoolFALSE);
+                             
+      miffSet1I1(            miff, L"I1_0",     0);
+      miffSet1I1(            miff, L"I1_1",     1);
+      miffSet1I1(            miff, L"I1_-1",    -1);
+      miffSet1I1(            miff, L"I1_127",   127);
+      miffSet1I1(            miff, L"I1_-128",  -128);
+                             
+      miffSet1N1(            miff, L"N1_0",     0);
+      miffSet1N1(            miff, L"N1_1",     1);
+      miffSet1N1(            miff, L"N1_255",   255);
+                             
+      miffSet1I2(            miff, L"I2_0",     0);
+      miffSet1I2(            miff, L"I2_1",     1);
+      miffSet1I2(            miff, L"I2_-1",    -1);
+                             
+      miffSet1N2(            miff, L"N2_0",     0);
+      miffSet1N2(            miff, L"N2_1",     1);
+                             
+      miffSet1I4(            miff, L"I4_0",     0);
+      miffSet1I4(            miff, L"I4_1",     1);
+      miffSet1I4(            miff, L"I4_-1",    -1);
+                             
+      miffSet1N4(            miff, L"N4_0",     0);
+      miffSet1N4(            miff, L"N4_1",     1);
+                             
+      miffSet1R4(            miff, L"R4_0",     0.0);
+      miffSet1R4(            miff, L"R4_1",     1.0);
+      miffSet1R4(            miff, L"R4_-1",    -1.0);
+      miffSet1R4(            miff, L"R4_PI",    3.1415926535897932f);
+                             
+      miffSet1I8(            miff, L"I8_0",     0);
+      miffSet1I8(            miff, L"I8_1",     1);
+      miffSet1I8(            miff, L"I8_-1",    -1);
+                             
+      miffSet1N8(            miff, L"N8_0",     0);
+      miffSet1N8(            miff, L"N8_1",     1);
+                             
+      miffSet1R8(            miff, L"R8_0",     0.0);
+      miffSet1R8(            miff, L"R8_1",     1.0);
+      miffSet1R8(            miff, L"R8_-1",    -1.0);
+      miffSet1R8(            miff, L"R8_PI",    3.1415926535897932);
+                             
+      miffSet1Type(          miff, L"TypeBool", miffTypeBOOLEAN);
+      miffSet1Type(          miff, L"TypeKey",  miffTypeTYPE);
+                             
+      miffSet1StringC2(      miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      miffSet1I1(           miff, L"I1_0",     0);
-      miffSet1I1(           miff, L"I1_1",     1);
-      miffSet1I1(           miff, L"I1_-1",    -1);
-      miffSet1I1(           miff, L"I1_127",   127);
-      miffSet1I1(           miff, L"I1_-128",  -128);
+      miffSet1ABI1(          miff, L"ABI1",   &_abi1       );
+      miffSet1ABI2(          miff, L"ABI2",   &_abi2       );
+      miffSet1ABI4(          miff, L"ABI4",   &_abi4       );
+      miffSet1ABN1(          miff, L"ABN1",   &_abn1       );
+      miffSet1ABN2(          miff, L"ABN2",   &_abn2       );
+      miffSet1ABN4(          miff, L"ABN4",   &_abn4       );
+      miffSet1ABR4(          miff, L"ABR4",   &_abr4       );
+      miffSet1ABR8(          miff, L"ABR8",   &_abr8       );
+      miffSet1ABCI1(         miff, L"ABCI1",  &_abci1      );
+      miffSet1ABCI2(         miff, L"ABCI2",  &_abci2      );
+      miffSet1ABCI4(         miff, L"ABCI4",  &_abci4      );
+      miffSet1ABCN1(         miff, L"ABCN1",  &_abcn1      );
+      miffSet1ABCN2(         miff, L"ABCN2",  &_abcn2      );
+      miffSet1ABCN4(         miff, L"ABCN4",  &_abcn4      );
+      miffSet1ABCR4(         miff, L"ABCR4",  &_abcr4      );
+      miffSet1ABCR8(         miff, L"ABCR8",  &_abcr8      );
+      miffSet1ABCDI1(        miff, L"ABCDI1", &_abcdi1     );
+      miffSet1ABCDI2(        miff, L"ABCDI2", &_abcdi2     );
+      miffSet1ABCDI4(        miff, L"ABCDI4", &_abcdi4     );
+      miffSet1ABCDN1(        miff, L"ABCDN1", &_abcdn1     );
+      miffSet1ABCDN2(        miff, L"ABCDN2", &_abcdn2     );
+      miffSet1ABCDN4(        miff, L"ABCDN4", &_abcdn4     );
+      miffSet1ABCDR4(        miff, L"ABCDR4", &_abcdr4     );
+      miffSet1ABCDR8(        miff, L"ABCDR8", &_abcdr8     );
+      miffSet1Matrix2x2R4(   miff, L"mat224", &_matrix2x2r4);
+      miffSet1Matrix2x2R8(   miff, L"mat228", &_matrix2x2r8);
+      miffSet1Matrix3x3R4(   miff, L"mat334", &_matrix3x3r4);
+      miffSet1Matrix3x3R8(   miff, L"mat338", &_matrix3x3r8);
+      miffSet1Matrix4x4R4(   miff, L"mat444", &_matrix4x4r4);
+      miffSet1Matrix4x4R8(   miff, L"mat448", &_matrix4x4r8);
 
-      miffSet1N1(           miff, L"N1_0",     0);
-      miffSet1N1(           miff, L"N1_1",     1);
-      miffSet1N1(           miff, L"N1_255",   255);
+      miffRecordSetBegin(    miff, miffTypeVARIABLE, L"variableIntStrReal", 1);
+      miffSetValueI(         miff, 42);
+      miffRecordSetSeparator(miff);
+      miffSetValueStringC2(  miff, L"Yes, but what is the question?");
+      miffRecordSetSeparator(miff);
+      miffSetValueR8(        miff, 3.1415926535897932);
+      miffRecordSetEnd(      miff);
 
-      miffSet1I2(           miff, L"I2_0",     0);
-      miffSet1I2(           miff, L"I2_1",     1);
-      miffSet1I2(           miff, L"I2_-1",    -1);
+      miffSetNI1(            miff, L"I1_Array",     256,     (MiffI1 *) _n1array);
+      miffSetNN1(            miff, L"N1_Array",     256,     _n1array);
+                             
+      miffSetNI2(            miff, L"I2_Array",     256,     (MiffI2 *) _n2array);
+      miffSetNN2(            miff, L"N2_Array",     256,     _n2array);
+                             
+      miffSetNI4(            miff, L"I4_Array",     256,     (MiffI4 *) _n4array);
+      miffSetNN4(            miff, L"N4_Array",     256,     _n4array);
+                             
+      miffSetNI8(            miff, L"I8_Array",     256,     (MiffI8 *) _n8array);
+      miffSetNN8(            miff, L"N8_Array",     256,     _n8array);
+                             
+      miffSetNR4(            miff, L"R4_Array",     300,     _reals4);
+      miffSetNR8(            miff, L"R8_Array",     300,     _reals8);
+                             
+      miffSetNStringC2(      miff, L"String_Array", 10,   _strings);
+                             
+      miffSetNBoolean(       miff, L"Bool_Array",   100,  _bools);
 
-      miffSet1N2(           miff, L"N2_0",     0);
-      miffSet1N2(           miff, L"N2_1",     1);
-
-      miffSet1I4(           miff, L"I4_0",     0);
-      miffSet1I4(           miff, L"I4_1",     1);
-      miffSet1I4(           miff, L"I4_-1",    -1);
-
-      miffSet1N4(           miff, L"N4_0",     0);
-      miffSet1N4(           miff, L"N4_1",     1);
-
-      miffSet1R4(           miff, L"R4_0",     0.0);
-      miffSet1R4(           miff, L"R4_1",     1.0);
-      miffSet1R4(           miff, L"R4_-1",    -1.0);
-      miffSet1R4(           miff, L"R4_PI",    3.1415926535897932f);
-
-      miffSet1I8(           miff, L"I8_0",     0);
-      miffSet1I8(           miff, L"I8_1",     1);
-      miffSet1I8(           miff, L"I8_-1",    -1);
-
-      miffSet1N8(           miff, L"N8_0",     0);
-      miffSet1N8(           miff, L"N8_1",     1);
-
-      miffSet1R8(           miff, L"R8_0",     0.0);
-      miffSet1R8(           miff, L"R8_1",     1.0);
-      miffSet1R8(           miff, L"R8_-1",    -1.0);
-      miffSet1R8(           miff, L"R8_PI",    3.1415926535897932);
-
-      miffSet1Type(         miff, L"TypeBool", miffTypeBOOLEAN);
-      miffSet1Type(         miff, L"TypeKey",  miffTypeTYPE);
-
-      miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-      miffSet1ABI1(       miff, L"ABI1",   &_abi1       );
-      miffSet1ABI2(       miff, L"ABI2",   &_abi2       );
-      miffSet1ABI4(       miff, L"ABI4",   &_abi4       );
-      miffSet1ABN1(       miff, L"ABN1",   &_abn1       );
-      miffSet1ABN2(       miff, L"ABN2",   &_abn2       );
-      miffSet1ABN4(       miff, L"ABN4",   &_abn4       );
-      miffSet1ABR4(       miff, L"ABR4",   &_abr4       );
-      miffSet1ABR8(       miff, L"ABR8",   &_abr8       );
-      miffSet1ABCI1(      miff, L"ABCI1",  &_abci1      );
-      miffSet1ABCI2(      miff, L"ABCI2",  &_abci2      );
-      miffSet1ABCI4(      miff, L"ABCI4",  &_abci4      );
-      miffSet1ABCN1(      miff, L"ABCN1",  &_abcn1      );
-      miffSet1ABCN2(      miff, L"ABCN2",  &_abcn2      );
-      miffSet1ABCN4(      miff, L"ABCN4",  &_abcn4      );
-      miffSet1ABCR4(      miff, L"ABCR4",  &_abcr4      );
-      miffSet1ABCR8(      miff, L"ABCR8",  &_abcr8      );
-      miffSet1ABCDI1(     miff, L"ABCDI1", &_abcdi1     );
-      miffSet1ABCDI2(     miff, L"ABCDI2", &_abcdi2     );
-      miffSet1ABCDI4(     miff, L"ABCDI4", &_abcdi4     );
-      miffSet1ABCDN1(     miff, L"ABCDN1", &_abcdn1     );
-      miffSet1ABCDN2(     miff, L"ABCDN2", &_abcdn2     );
-      miffSet1ABCDN4(     miff, L"ABCDN4", &_abcdn4     );
-      miffSet1ABCDR4(     miff, L"ABCDR4", &_abcdr4     );
-      miffSet1ABCDR8(     miff, L"ABCDR8", &_abcdr8     );
-      miffSet1Matrix2x2R4(miff, L"mat224", &_matrix2x2r4);
-      miffSet1Matrix2x2R8(miff, L"mat228", &_matrix2x2r8);
-      miffSet1Matrix3x3R4(miff, L"mat334", &_matrix3x3r4);
-      miffSet1Matrix3x3R8(miff, L"mat338", &_matrix3x3r8);
-      miffSet1Matrix4x4R4(miff, L"mat444", &_matrix4x4r4);
-      miffSet1Matrix4x4R8(miff, L"mat448", &_matrix4x4r8);
-
-      miffRecordSetBegin(miff, miffTypeVARIABLE, L"variableIntStrReal", 1);
-      miffSetValueI4(miff, 42);
-      miffRecordSetNextArrayItem(miff, 0, 0);
-      miffSetValueStringC2(miff, L"Yes, but what is the question?");
-      miffRecordSetNextArrayItem(miff, 0, 0);
-      miffSetValueR8(miff, 3.1415926535897932);
-      miffRecordSetEnd(miff);
-
-      miffSetNI1(           miff, L"I1_Array",     256,     (MiffI1 *) _n1array);
-      miffSetNN1(           miff, L"N1_Array",     256,     _n1array);
-
-      miffSetNI2(           miff, L"I2_Array",     256,     (MiffI2 *) _n2array);
-      miffSetNN2(           miff, L"N2_Array",     256,     _n2array);
-
-      miffSetNI4(           miff, L"I4_Array",     256,     (MiffI4 *) _n4array);
-      miffSetNN4(           miff, L"N4_Array",     256,     _n4array);
-
-      miffSetNI8(           miff, L"I8_Array",     256,     (MiffI8 *) _n8array);
-      miffSetNN8(           miff, L"N8_Array",     256,     _n8array);
-
-      miffSetNR4(           miff, L"R4_Array",     300,     _reals4);
-      miffSetNR8(           miff, L"R8_Array",     300,     _reals8);
-
-      miffSetNStringC2(     miff, L"String_Array", 10,   _strings);
-
-      miffSetNBoolean(      miff, L"Bool_Array",   100,  _bools);
-
-      miffSetBlockStart(miff, L"KeyValueBlock");
+      miffSetBlockStart(     miff, L"KeyValueBlock");
       {
-         miffSet1Boolean(      miff, L"True",     miffBoolTRUE);
-         miffSet1Boolean(      miff, L"False",    miffBoolFALSE);
+         miffSet1Boolean( miff, L"True",     miffBoolTRUE);
+         miffSet1Boolean( miff, L"False",    miffBoolFALSE);
 
-         miffSet1I1(           miff, L"I1_0",     0);
-         miffSet1I1(           miff, L"I1_1",     1);
-         miffSet1I1(           miff, L"I1_-1",    -1);
-         miffSet1I1(           miff, L"I1_127",   127);
-         miffSet1I1(           miff, L"I1_-128",  -128);
+         miffSet1I1(      miff, L"I1_0",     0);
+         miffSet1I1(      miff, L"I1_1",     1);
+         miffSet1I1(      miff, L"I1_-1",    -1);
+         miffSet1I1(      miff, L"I1_127",   127);
+         miffSet1I1(      miff, L"I1_-128",  -128);
 
-         miffSet1N1(           miff, L"N1_0",     0);
-         miffSet1N1(           miff, L"N1_1",     1);
-         miffSet1N1(           miff, L"N1_255",   255);
+         miffSet1N1(      miff, L"N1_0",     0);
+         miffSet1N1(      miff, L"N1_1",     1);
+         miffSet1N1(      miff, L"N1_255",   255);
 
-         miffSet1I2(           miff, L"I2_0",     0);
-         miffSet1I2(           miff, L"I2_1",     1);
-         miffSet1I2(           miff, L"I2_-1",    -1);
+         miffSet1I2(      miff, L"I2_0",     0);
+         miffSet1I2(      miff, L"I2_1",     1);
+         miffSet1I2(      miff, L"I2_-1",    -1);
 
-         miffSet1N2(           miff, L"N2_0",     0);
-         miffSet1N2(           miff, L"N2_1",     1);
+         miffSet1N2(      miff, L"N2_0",     0);
+         miffSet1N2(      miff, L"N2_1",     1);
 
-         miffSet1I4(           miff, L"I4_0",     0);
-         miffSet1I4(           miff, L"I4_1",     1);
-         miffSet1I4(           miff, L"I4_-1",    -1);
+         miffSet1I4(      miff, L"I4_0",     0);
+         miffSet1I4(      miff, L"I4_1",     1);
+         miffSet1I4(      miff, L"I4_-1",    -1);
 
-         miffSet1N4(           miff, L"N4_0",     0);
-         miffSet1N4(           miff, L"N4_1",     1);
+         miffSet1N4(      miff, L"N4_0",     0);
+         miffSet1N4(      miff, L"N4_1",     1);
 
-         miffSet1R4(           miff, L"R4_0",     0.0);
-         miffSet1R4(           miff, L"R4_1",     1.0);
-         miffSet1R4(           miff, L"R4_-1",    -1.0);
-         miffSet1R4(           miff, L"R4_PI",    3.1415926535897932f);
+         miffSet1R4(      miff, L"R4_0",     0.0);
+         miffSet1R4(      miff, L"R4_1",     1.0);
+         miffSet1R4(      miff, L"R4_-1",    -1.0);
+         miffSet1R4(      miff, L"R4_PI",    3.1415926535897932f);
 
-         miffSet1I8(           miff, L"I8_0",     0);
-         miffSet1I8(           miff, L"I8_1",     1);
-         miffSet1I8(           miff, L"I8_-1",    -1);
+         miffSet1I8(      miff, L"I8_0",     0);
+         miffSet1I8(      miff, L"I8_1",     1);
+         miffSet1I8(      miff, L"I8_-1",    -1);
 
-         miffSet1N8(           miff, L"N8_0",     0);
-         miffSet1N8(           miff, L"N8_1",     1);
+         miffSet1N8(      miff, L"N8_0",     0);
+         miffSet1N8(      miff, L"N8_1",     1);
 
-         miffSet1R8(           miff, L"R8_0",     0.0);
-         miffSet1R8(           miff, L"R8_1",     1.0);
-         miffSet1R8(           miff, L"R8_-1",    -1.0);
-         miffSet1R8(           miff, L"R8_PI",    3.1415926535897932);
+         miffSet1R8(      miff, L"R8_0",     0.0);
+         miffSet1R8(      miff, L"R8_1",     1.0);
+         miffSet1R8(      miff, L"R8_-1",    -1.0);
+         miffSet1R8(      miff, L"R8_PI",    3.1415926535897932);
 
-         miffSet1Type(         miff, L"TypeBool", miffTypeBOOLEAN);
-         miffSet1Type(         miff, L"TypeType", miffTypeTYPE);
+         miffSet1Type(    miff, L"TypeBool", miffTypeBOOLEAN);
+         miffSet1Type(    miff, L"TypeType", miffTypeTYPE);
 
-         miffSet1StringC2(     miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+         miffSet1StringC2(miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-         miffSetNStringC2(     miff, L"String_Array", 10,      _strings);
+         miffSetNStringC2(miff, L"String_Array", 10,      _strings);
       }
       miffSetBlockStop(miff);
 

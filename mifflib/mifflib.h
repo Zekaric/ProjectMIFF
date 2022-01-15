@@ -1,7 +1,7 @@
 /******************************************************************************
 file:       MiffLib
 author:     Robbert de Groot
-copyright:  Robbert de Groot, 2021
+copyright:  2021, Robbert de Groot
 
 description:
 Library for dealing with raw MIFF files.
@@ -410,7 +410,7 @@ MiffType        miffRecordGetType(                 Miff       * const miff);
 
 MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType   const type, MiffC2 const * const key, MiffN4   const count);
 MiffBool        miffRecordSetEnd(                  Miff       * const miff);
-MiffBool        miffRecordSetNextArrayItem(        Miff       * const miff, MiffN8 const index, MiffN8 const count);
+MiffBool        miffRecordSetSeparator(            Miff       * const miff);
 
 MiffBool        miffSetBlockStart(                 Miff       * const miff, MiffC2 const * const key);
 MiffBool        miffSetBlockStop(                  Miff       * const miff);
@@ -525,20 +525,14 @@ MiffBool        miffSetValueABCDN4(                Miff       * const miff, Miff
 MiffBool        miffSetValueABCDR4(                Miff       * const miff, MiffABCDR4      const * const value);
 MiffBool        miffSetValueABCDR8(                Miff       * const miff, MiffABCDR8      const * const value);
 MiffBool        miffSetValueBoolean(               Miff       * const miff, MiffBool                const value);
-MiffBool        miffSetValueI1(                    Miff       * const miff, MiffI1                  const value);
-MiffBool        miffSetValueI2(                    Miff       * const miff, MiffI2                  const value);
-MiffBool        miffSetValueI4(                    Miff       * const miff, MiffI4                  const value);
-MiffBool        miffSetValueI8(                    Miff       * const miff, MiffI8                  const value);
+MiffBool        miffSetValueI(                     Miff       * const miff, MiffI8                  const value);
 MiffBool        miffSetValueMatrix2x2R4(           Miff       * const miff, MiffMatrix2x2R4 const * const value);
 MiffBool        miffSetValueMatrix2x2R8(           Miff       * const miff, MiffMatrix2x2R8 const * const value);
 MiffBool        miffSetValueMatrix3x3R4(           Miff       * const miff, MiffMatrix3x3R4 const * const value);
 MiffBool        miffSetValueMatrix3x3R8(           Miff       * const miff, MiffMatrix3x3R8 const * const value);
 MiffBool        miffSetValueMatrix4x4R4(           Miff       * const miff, MiffMatrix4x4R4 const * const value);
 MiffBool        miffSetValueMatrix4x4R8(           Miff       * const miff, MiffMatrix4x4R8 const * const value);
-MiffBool        miffSetValueN1(                    Miff       * const miff, MiffN1                  const value);
-MiffBool        miffSetValueN2(                    Miff       * const miff, MiffN2                  const value);
-MiffBool        miffSetValueN4(                    Miff       * const miff, MiffN4                  const value);
-MiffBool        miffSetValueN8(                    Miff       * const miff, MiffN8                  const value);
+MiffBool        miffSetValueN(                     Miff       * const miff, MiffN8                  const value);
 MiffBool        miffSetValueR4(                    Miff       * const miff, MiffR4                  const value);
 MiffBool        miffSetValueR8(                    Miff       * const miff, MiffR8                  const value);
 MiffBool        miffSetValueStringC2(              Miff       * const miff, MiffC2          const * const value);

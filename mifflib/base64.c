@@ -1,7 +1,7 @@
 /******************************************************************************
 file:       base64
 author:     Robbert de Groot
-copyright:  2021, 
+copyright:  2021, Robbert de Groot
 
 description:
 functions to convert binary data into a base64 string.
@@ -10,7 +10,7 @@ functions to convert binary data into a base64 string.
 /******************************************************************************
 MIT License
 
-Copyright (c) !!!!YEAR!!!!, Robbert de Groot
+Copyright (c) 2021, Robbert de Groot
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,24 +38,12 @@ include:
 
 /******************************************************************************
 local:
-constant:
-******************************************************************************/
-
-/******************************************************************************
-type:
-******************************************************************************/
-
-/******************************************************************************
 variable:
 ******************************************************************************/
 static MiffN4  _base64State               = 0;
 static MiffN1  _base64Byte                = 0;
 static MiffN1  _base64LetterToValue[128];
 static MiffN1  _base64ValueToLetter[64];
-
-/******************************************************************************
-prototype:
-******************************************************************************/
 
 /******************************************************************************
 global:

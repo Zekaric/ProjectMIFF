@@ -10,7 +10,7 @@ Write functions local to the library.
 /******************************************************************************
 MIT License
 
-Copyright (c) !!!!YEAR!!!!, Robbert de Groot
+Copyright (c) 2021, Robbert de Groot
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,17 +41,17 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _WriteTxtC1
+func: _WriteC1
 ******************************************************************************/
-MiffBool _WriteTxtC1(Miff const * const miff, MiffC1 const * const value)
+MiffBool _WriteC1(Miff const * const miff, MiffC1 const * const value)
 {
    return miff->setBuffer(miff->dataRepo, _C1GetCount(value), value);
 }
 
 /******************************************************************************
-func: _WriteTxtC2
+func: _WriteC2
 ******************************************************************************/
-MiffBool _WriteTxtC2(Miff const * const miff, MiffC2 const * const c2)
+MiffBool _WriteC2(Miff const * const miff, MiffC2 const * const c2)
 {
    MiffN4  c1Count;
    MiffC1 *c1;
@@ -61,7 +61,7 @@ MiffBool _WriteTxtC2(Miff const * const miff, MiffC2 const * const c2)
       returnFalse;
    }
 
-   _WriteTxtC1(miff, c1);
+   _WriteC1(miff, c1);
 
    _MemDestroy(c1);
 
@@ -69,46 +69,9 @@ MiffBool _WriteTxtC2(Miff const * const miff, MiffC2 const * const c2)
 }
 
 /******************************************************************************
-func: _WriteTxtRecordArrayCount
+func: _WriteC2Key
 ******************************************************************************/
-MiffBool _WriteTxtRecordArrayCount(Miff const * const miff, MiffN4 const count)
-{
-   return _WriteTxtValue4(miff, miffTypeN4, *((Miff4 *) &count));
-}
-
-/******************************************************************************
-func: _WriteTxtRecordCompressChunkSize
-******************************************************************************/
-MiffBool _WriteTxtRecordChunkSize(Miff const * const miff, MiffN4 const chunkSize)
-{
-   return _WriteTxtValue4(miff, miffTypeN4, *((Miff4 *) &chunkSize));
-}
-
-/******************************************************************************
-func: _WriteTxtRecordCompressFlag
-******************************************************************************/
-MiffBool _WriteTxtRecordCompressFlag(Miff const * const miff, MiffBool const isCompressed)
-{
-   if (!isCompressed)
-   {
-      return _WriteTxtC1(miff, (MiffC1 *) "-");
-   }
-
-   return _WriteTxtC1(miff, (MiffC1 *) ":");
-}
-
-/******************************************************************************
-func: _WriteTxtRecordEnder
-******************************************************************************/
-MiffBool _WriteTxtRecordEnder(Miff const * const miff)
-{
-   return _WriteTxtC1(miff, (MiffC1 *) "\n");
-}
-
-/******************************************************************************
-func: _WriteTxtRecordKeyC2
-******************************************************************************/
-MiffBool _WriteTxtRecordKeyC2(Miff const * const miff, MiffC2 const * const key)
+MiffBool _WriteC2Key(Miff const * const miff, MiffC2 const * const key)
 {
    MiffC1 c1Key[256];
    MiffN1 c1Count;
@@ -116,133 +79,13 @@ MiffBool _WriteTxtRecordKeyC2(Miff const * const miff, MiffC2 const * const key)
    _MemClearTypeArray(256, MiffC1, c1Key);
 
    returnFalseIf(!_C2ToC1Key(_C2GetCount(key), key, &c1Count, c1Key));
-   return _WriteTxtC1(miff, c1Key);
+   return _WriteC1(miff, c1Key);
 }
 
 /******************************************************************************
-func: _WriteTxtRecordSeparator
+func: _WriteI
 ******************************************************************************/
-MiffBool _WriteTxtRecordSeparator(Miff const * const miff)
-{
-   return _WriteTxtC1(miff, (MiffC1 *) "\t");
-}
-
-/******************************************************************************
-func: _WriteTxtRecordType
-******************************************************************************/
-MiffBool _WriteTxtRecordType(Miff const * const miff, MiffType const type)
-{
-   return _WriteTxtType(miff, type);
-}
-
-/******************************************************************************
-func: _WriteTxtType
-******************************************************************************/
-MiffBool _WriteTxtType(Miff const * const miff, MiffType const value)
-{
-   return _WriteTxtC1(miff, _TypeGetNameC1(value));
-}
-
-/******************************************************************************
-func: _WriteTxtValue1
-******************************************************************************/
-MiffBool _WriteTxtValue1(Miff const * const miff, MiffType const type, Miff1 const value)
-{
-   if (type == miffTypeBOOLEAN)
-   {
-      if (value.n)
-      {
-         return _WriteTxtC1(miff, (MiffC1 *) "T");
-      }
-
-      return _WriteTxtC1(miff, (MiffC1 *) "F");
-   }
-
-   if (type == miffTypeI1)
-   {
-      return _WriteTxtValueI(miff, (MiffI8) value.i);
-   }
-
-   return _WriteTxtValueN(miff, (MiffN8) value.n);
-}
-
-/******************************************************************************
-func: _WriteTxtValue2
-******************************************************************************/
-MiffBool _WriteTxtValue2(Miff const * const miff, MiffType const type, Miff2 const value)
-{
-   if (type == miffTypeI2)
-   {
-      return _WriteTxtValueI(miff, (MiffI8) value.i);
-   }
-
-   return _WriteTxtValueN(miff, (MiffN8) value.n);
-}
-
-/******************************************************************************
-func: _WriteTxtValue4
-******************************************************************************/
-MiffBool _WriteTxtValue4(Miff const * const miff, MiffType const type, Miff4 const value)
-{
-   if (type == miffTypeR4)
-   {
-      Miff4 vtemp;
-
-      vtemp = value;
-      _ByteSwap4(miff, &vtemp);
-
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
-
-      return _Base64SetEnd(miff);
-   }
-
-   if (type == miffTypeI4)
-   {
-      return _WriteTxtValueI(miff, (MiffI8) value.i);
-   }
-
-   return _WriteTxtValueN(miff, (MiffN8) value.n);
-}
-
-/******************************************************************************
-func: _WriteTxtValue8
-******************************************************************************/
-MiffBool _WriteTxtValue8(Miff const * const miff, MiffType const type, Miff8 const value)
-{
-   if (type == miffTypeR8)
-   {
-      Miff8 vtemp;
-
-      vtemp = value;
-      _ByteSwap8(miff, &vtemp);
-
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[4]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[5]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[6]));
-      returnFalseIf(!_Base64Set(miff, vtemp.byte[7]));
-
-      return _Base64SetEnd(miff);
-   }
-
-   if (type == miffTypeI8)
-   {
-      return _WriteTxtValueI(miff, value.i);
-   }
-
-   return _WriteTxtValueN(miff, value.n);
-}
-
-/******************************************************************************
-func: _WriteTxtValueI
-******************************************************************************/
-MiffBool _WriteTxtValueI(Miff const * const miff, MiffI8 const value)
+MiffBool _WriteI(Miff * const miff, MiffI8 const value)
 {
    MiffN8 ntemp;
 
@@ -257,13 +100,13 @@ MiffBool _WriteTxtValueI(Miff const * const miff, MiffI8 const value)
       ntemp =  value;
    }
 
-   return _WriteTxtValueN(miff, ntemp);
+   return _WriteN(miff, ntemp);
 }
 
 /******************************************************************************
-func: _WriteTxtValueN
+func: _WriteN
 ******************************************************************************/
-MiffBool _WriteTxtValueN(Miff const * const miff, MiffN8 const value)
+MiffBool _WriteN(Miff * const miff, MiffN8 const value)
 {
    int    index,
           count,
@@ -292,96 +135,41 @@ MiffBool _WriteTxtValueN(Miff const * const miff, MiffN8 const value)
 }
 
 /******************************************************************************
-func: _WriteTxtValueType
+func: _WriteR4
 ******************************************************************************/
-MiffBool _WriteTxtValueType(Miff const * const miff, MiffType const value)
+MiffBool _WriteR4(Miff * const miff, MiffR4 const value)
 {
-   return _WriteTxtType(miff, value);
+   Miff4 vtemp;
+
+   vtemp.r = value;
+   _ByteSwap4(miff, &vtemp);
+
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
+
+   return _Base64SetEnd(miff);
 }
 
 /******************************************************************************
-func: _WriteTxtValueC2
+func: _WriteR8
 ******************************************************************************/
-MiffBool _WriteTxtValueC2(Miff const * const miff, MiffC2 const * const value)
+MiffBool _WriteR8(Miff * const miff, MiffR8 const value)
 {
-   MiffC1   *c1,
-            *c1e;
-   MiffN4    c1Count,
-             c1eCount;
-   MiffBool  result;
+   Miff8 vtemp;
 
-   c1     =
-      c1e = NULL;
-   result = miffBoolFALSE;
-   once
-   {
-      breakIf(!_C2ToC1(_C2GetCount(value), value, &c1Count, &c1));
+   vtemp.r = value;
+   _ByteSwap8(miff, &vtemp);
 
-      breakIf(!_C1ToC1Encoded(_C1GetCount(c1), c1, &c1eCount, &c1e));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[4]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[5]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[6]));
+   returnFalseIf(!_Base64Set(miff, vtemp.byte[7]));
 
-      breakIf(!_WriteTxtC1(miff, c1e));
-
-      result = miffBoolTRUE;
-   }
-
-   _MemDestroy(c1e);
-   _MemDestroy(c1);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteValue1
-******************************************************************************/
-MiffBool _WriteValue1(Miff * const miff, MiffType const type, Miff1 value)
-{
-   returnFalseIf(
-      !(miff->currentRecord.type == type ||
-        miff->currentRecord.type == miffTypeVARIABLE));
-
-   // Write out the value.
-   returnFalseIf(!_WriteTxtValue1(miff, type, value));
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteValue2
-******************************************************************************/
-MiffBool _WriteValue2(Miff * const miff, MiffType const type, Miff2 value)
-{
-   returnFalseIf(
-      !(miff->currentRecord.type == type ||
-        miff->currentRecord.type == miffTypeVARIABLE));
-
-   // Write out the value
-   returnFalseIf(!_WriteTxtValue2(miff, type, value));
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteValue4
-******************************************************************************/
-MiffBool _WriteValue4(Miff * const miff, MiffType const type, Miff4 value)
-{
-   returnFalseIf(
-      !(miff->currentRecord.type == type ||
-        miff->currentRecord.type == miffTypeVARIABLE));
-
-   // Write out the value
-   returnFalseIf(!_WriteTxtValue4(miff, type, value));
-   returnTrue;
-}
-
-/******************************************************************************
-func: _WriteValue8
-******************************************************************************/
-MiffBool _WriteValue8(Miff * const miff, MiffType const type, Miff8 value)
-{
-   returnFalseIf(
-      !(miff->currentRecord.type == type ||
-        miff->currentRecord.type == miffTypeVARIABLE));
-
-   // Write out the value
-   returnFalseIf(!_WriteTxtValue8(miff, type, value));
-   returnTrue;
+   return _Base64SetEnd(miff);
 }

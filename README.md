@@ -1,6 +1,6 @@
 # ProjectMIFF
-Mining Interchange File Format (MIFF).  
+Mixed Information File Format (MIFF).  
 
-Basically my musing on what one would look like.  
+Basically a format for storing any sort of information.  Mainly for passing data from one system to another and not intended to be used as a fast native format for any system.
 
-Currently not sponsored or sanctioned by any industry players or governing bodies.  See the document for further details.
+Currently not sponsored or sanctioned by anyone.  See the document for further details.

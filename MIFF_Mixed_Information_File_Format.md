@@ -365,7 +365,7 @@ If using an array flag, the above is repeated as many times as there are array e
 **Example 7:**
 
 ```
-- n4[tb]&#42;Nat[tb]8[tb]1[tb]2[tb]4[tb]8[tb]16[tb]32[tb]64[tb]128[nl]
+- n4[tb]NNat[tb]8[tb]1[tb]2[tb]4[tb]8[tb]16[tb]32[tb]64[tb]128[nl]
 ```
 
 **Example 8:**
@@ -377,7 +377,7 @@ If using an array flag, the above is repeated as many times as there are array e
 **Example 9:**
 
 ```
-- r8[tb]&#42;Real[tb]3[tb][Base64 encoded value][tb][Base64 encoded value][tb][Base64 encoded value][nl]
+- r8[tb]NReal[tb]3[tb][Base64 encoded value][tb][Base64 encoded value][tb][Base64 encoded value][nl]
 ```
 
 ## 3.3 - String values

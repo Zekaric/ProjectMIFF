@@ -98,8 +98,11 @@ Any byte data that is encode or stored as a binary byte sequence will be in big 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
 &gt; MIFF![image](nl.png)
+
 &gt; 1![image](nl.png)
+
 &gt; [Sub-Format Name string]![image](nl.png)
+
 &gt; [Sub-Format Version string]![image](nl.png)
 
 ![image](tab.png) means a tab character.  ![image](nl.png) means a new line character.  The &gt; is not part of the line, is it denoting the start of the line.

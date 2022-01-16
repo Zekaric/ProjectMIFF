@@ -98,13 +98,13 @@ Any byte data that is encode or stored as a binary byte sequence will be in big 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
 ```
-&gt; MIFF[nl]
-&gt; 1[nl]
-&gt; [Sub-Format Name string][nl]
-&gt; [Sub-Format Version string][nl]
+- MIFF[nl]
+- 1[nl]
+- [Sub-Format Name string][nl]
+- [Sub-Format Version string][nl]
 ```
 
-[-&gt;] means a tab character.  [nl] means a new line character.  The &gt; is not part of the line, is it denoting the start of the line.
+[tb] means a tab character.  [nl] means a new line character.  The '-' is not part of the line, is it denoting the start of the line.
 
 
 * **Line 1** - Format of the file.  MIFF.
@@ -115,7 +115,7 @@ There will always be a file header so that you can be sure the file you recieved
 
 * **Line 5** - Sub-Format version identifier.
 
-If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [-&gt;]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
+If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
 
 ## 2.2 - Content
 
@@ -147,11 +147,11 @@ A record basically defines a key - value pair.  However the composition of that 
 #### 2.2.2.1 - Key
 
 
-Keys are always a single string of any character in UTF8 encoding as long as none are [-&gt;] and [nl].  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
+Keys are always a single string of any character in UTF8 encoding as long as none are [tb] and [nl].  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
 
 ```
 12345
-;':][.,&lt;&gt;]&#96;
+;':][.,<>]&#96;
 a_b_c
 $cost
 été
@@ -223,7 +223,7 @@ A whitespace character is any character that does not make a blemish on a piece 
 ### 2.3.2 - Separator Characters
 
 
-MIFF only uses [-&gt;] as a separater character.  And only one [-&gt;] between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
+MIFF only uses [tb] as a separater character.  And only one [tb] between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
 
 ### 2.3.3 - Printable Characters
 
@@ -244,21 +244,21 @@ All real numbers are stored as a Base64 string.  No exceptions.  This is to ensu
 
 
 ```
-&gt; [type code][-&gt;][key][-&gt;][array count][-&gt;][value][nl]
+- [type code][tb][key][tb][array count][tb][value][nl]
 ```
 
-Any space found in the key that is not a [-&gt;] will be part of the key.  They will be significant.  Do not strip or reduce them.
+Any space found in the key that is not a [tb] will be part of the key.  They will be significant.  Do not strip or reduce them.
 
-There has to be one [-&gt;] separator between each part.
+There has to be one [tb] separator between each part.
 
 How the value appears will depend on the definition here.
 
 To be clear...
 
-**Invalid:** Absolutely no [nl] anywhere before or within the key value line&#42;.  Absolutely no blank lines.  Absolutely no extra [-&gt;] anywhere in the format.
+**Invalid:** Absolutely no [nl] anywhere before or within the key value line&#42;.  Absolutely no blank lines.  Absolutely no extra [tb] anywhere in the format.
 
 ```
-&gt; [type code][-&gt;][-&gt;][key][nl][array count] [value][nl]
+- [type code][tb][tb][key][nl][array count] [value][nl]
 ```
 
 What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
@@ -272,9 +272,9 @@ What [value] will look like will depend on what is being stored for the record. 
 Key-Value blocks are special.  They are needed to allow nesting of key values.
 
 ```
-&gt; {[-&gt;][key][nl]
-&gt; ...
-&gt; }[nl]
+- {[tb][key][nl]
+- ...
+- }[nl]
 ```
 
 A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.
@@ -284,30 +284,30 @@ Array Count is never used with this value type and there is not value that follo
 **Example 1:**
 
 ```
-&gt; {[-&gt;]docInfo[nl]
-&gt; ...
-&gt; }[nl]
+- {[tb]docInfo[nl]
+- ...
+- }[nl]
 ```
 
 **Example 2:**
 
 ```
-&gt; {[-&gt;]level1[nl]
-&gt; {[-&gt;]level2[nl]
-&gt; {[-&gt;]level3[nl]
-&gt; ...
-&gt; }[nl]
-&gt; {[-&gt;]anotherLevel3[nl]
-&gt; ...
-&gt; }[nl]
-&gt; }[nl]
-&gt; {[-&gt;]anotherLevel2[nl]
-&gt; ...
-&gt; }[nl]
-&gt; }[nl]
-&gt; {[-&gt;]anotherLevel1[nl]
-&gt; ...
-&gt; }[nl]<br />
+- {[tb]level1[nl]
+- {[tb]level2[nl]
+- {[tb]level3[nl]
+- ...
+- }[nl]
+- {[tb]anotherLevel3[nl]
+- ...
+- }[nl]
+- }[nl]
+- {[tb]anotherLevel2[nl]
+- ...
+- }[nl]
+- }[nl]
+- {[tb]anotherLevel1[nl]
+- ...
+- }[nl]<br />
 ```
 
 ## 3.2 - Basic Values
@@ -316,8 +316,8 @@ Array Count is never used with this value type and there is not value that follo
 Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
 
 ```
-&gt; [text type code][-&gt;][key][-&gt;]1[-&gt;][type value][nl]
-&gt; [text type code][-&gt;][key][-&gt;][array count]([-&gt;][type value])&#42;[nl]
+- [text type code][tb][key][tb]1[tb][type value][nl]
+- [text type code][tb][key][tb][array count]([tb][type value])&#42;[nl]
 ```
 
 Text representation for a value will be...
@@ -330,65 +330,65 @@ Text representation for a value will be...
 | r&#42; | 1 Base64 stream of the 1 value.  Big endian order. |
 
 
-If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one [-&gt;].
+If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one [tb].
 
 **Example 1:**
 
 ```
-&gt; type[-&gt;]type1[-&gt;]1[-&gt;]b[nl]
+- type[tb]type1[tb]1[tb]b[nl]
 ```
 
 **Example 2:**
 
 ```
-&gt; type[-&gt;]type2[-&gt;]2[-&gt;]b[-&gt;]n4[nl]
+- type[tb]type2[tb]2[tb]b[tb]n4[nl]
 ```
 
 **Example 4:**
 
 ```
-&gt; b[-&gt;]Bool1[-&gt;]1[-&gt;]T[nl]
+- b[tb]Bool1[tb]1[tb]T[nl]
 ```
 
 **Example 5:**
 
 ```
-&gt; b[-&gt;]Bool2[-&gt;]10[-&gt;]T[-&gt;]T[-&gt;]T[-&gt;]T[-&gt;]T[-&gt;]F[-&gt;]F[-&gt;]F[-&gt;]F[-&gt;]F[nl]
+- b[tb]Bool2[tb]10[tb]T[tb]T[tb]T[tb]T[tb]T[tb]F[tb]F[tb]F[tb]F[tb]F[nl]
 ```
 
 **Example 6:**
 
 ```
-&gt; i4[-&gt;]1Int[-&gt;]1[-&gt;]1024[nl]
+- i4[tb]1Int[tb]1[tb]1024[nl]
 ```
 
 **Example 7:**
 
 ```
-&gt; n4[-&gt;]&#42;Nat[-&gt;]8[-&gt;]1[-&gt;]2[-&gt;]4[-&gt;]8[-&gt;]16[-&gt;]32[-&gt;]64[-&gt;]128[nl]
+- n4[tb]&#42;Nat[tb]8[tb]1[tb]2[tb]4[tb]8[tb]16[tb]32[tb]64[tb]128[nl]
 ```
 
 **Example 8:**
 
 ```
-&gt; r4[-&gt;]1Real[-&gt;]1[-&gt;][Base64 encoded value][nl]
+- r4[tb]1Real[tb]1[tb][Base64 encoded value][nl]
 ```
 
 **Example 9:**
 
 ```
-&gt; r8[-&gt;]&#42;Real[-&gt;]3[-&gt;][Base64 encoded value][-&gt;][Base64 encoded value][-&gt;][Base64 encoded value][nl]
+- r8[tb]&#42;Real[tb]3[tb][Base64 encoded value][tb][Base64 encoded value][tb][Base64 encoded value][nl]
 ```
 
 ## 3.3 - String values
 
 
 ```
-&gt; "[-&gt;][key][-&gt;]1[-&gt;][string value][nl]
-&gt; "[-&gt;][key][-&gt;][array count]([-&gt;][string value])&#42;[nl]
+- "[tb][key][tb]1[tb][string value][nl]
+- "[tb][key][tb][array count]([tb][string value])&#42;[nl]
 ```
 
-The string is preprocessed before storing.  All [-&gt;], [nl], and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
+The string is preprocessed before storing.  All [tb], [nl], and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
 
 ```
 \t - tab            - 0x09
@@ -399,13 +399,13 @@ The string is preprocessed before storing.  All [-&gt;], [nl], and \ characters 
 **Example 1:**
 
 ```
-&gt; "[-&gt;]string1[-&gt;]1[-&gt;]This is line1.\nThis is line 2.[nl]
+- "[tb]string1[tb]1[tb]This is line1.\nThis is line 2.[nl]
 ```
 
 **Example 2:**
 
 ```
-&gt; "[-&gt;]stringList1[-&gt;]3[-&gt;]This is string 1, line 1.\nThis is string1, line 2.\n[-&gt;]This is string 2.[-&gt;]This is string 3.[nl]
+- "[tb]stringList1[tb]3[tb]This is string 1, line 1.\nThis is string1, line 2.\n[tb]This is string 2.[tb]This is string 3.[nl]
 ```
 
 ## 3.4 - Variable values
@@ -414,8 +414,8 @@ The string is preprocessed before storing.  All [-&gt;], [nl], and \ characters 
 Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
 
 ```
-&gt; v[-&gt;][key][-&gt;]1[-&gt;][tab delimited values][nl]
-&gt; v[-&gt;][key][-&gt;][array count][-&gt;][tab delimited values][nl]
+- v[tb][key][tb]1[tb][tab delimited values][nl]
+- v[tb][key][tb][array count][tb][tab delimited values][nl]
 ```
 
 A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.

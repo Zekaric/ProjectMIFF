@@ -1,7 +1,7 @@
-v	__>	|img |indent1.png| img|
-v	___	|img |indent.png| img|
-v	-->	|img |tab.png| img|
-v	<--	|img |nl.png| img|
+v	__>	|_||_|-
+v	___	|_||_||_|
+v	-->	[tb]
+v	<--	[nl]
 
 H	M.I.F.F.: Mixed Information File Format
 
@@ -61,13 +61,13 @@ hh	|chapter| - File Header
 	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
 .[
-|>| MIFF|<--|
-|>| 1|<--|
-|>| [Sub-Format Name string]|<--|
-|>| [Sub-Format Version string]|<--|
+- MIFF|<--|
+- 1|<--|
+- [Sub-Format Name string]|<--|
+- [Sub-Format Version string]|<--|
 ]
 
-	|-->| means a tab character.  |<--| means a new line character.  The |>| is not part of the line, is it denoting the start of the line.
+	|-->| means a tab character.  |<--| means a new line character.  The '-' is not part of the line, is it denoting the start of the line.
 
 :[
 -	|b |Line 1| b| - Format of the file.  MIFF.
@@ -104,7 +104,7 @@ hhhh	|chapter| - Key
 
 .[
 12345
-;':][.,|<||>|]`
+;':][.,<>]
 a_b_c
 $cost
 été
@@ -205,7 +205,7 @@ tcx	mat4x4r4 mat4x4r8
 tc	A 4x4 r4 or r8 matrix
 
 t-
-tcx	|line||b | Variable Value Type| b||line|
+tcx	|line||b |Variable Value Type| b||line|
 
 t-
 tcx	v
@@ -271,7 +271,7 @@ hhh	|chapter| - Real Number Representation
 
 hhh	|chapter| - Record Composition
 
-.	|>| [type code]|-->|[key]|-->|[array count]|-->|[value]|<--|
+.	- [type code]|-->|[key]|-->|[array count]|-->|[value]|<--|
 
 	Any space found in the key that is not a |-->| will be part of the key.  They will be significant.  Do not strip or reduce them.
 	There has to be one |-->| separator between each part.
@@ -281,7 +281,7 @@ hhh	|chapter| - Record Composition
 
 	|b |Invalid:| b| Absolutely no |<--| anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra |-->| anywhere in the format.
 
-.	|>| [type code]|-->||-->|[key]|<--|[array count] [value]|<--|
+.	- [type code]|-->||-->|[key]|<--|[array count] [value]|<--|
 
 	What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
 
@@ -294,9 +294,9 @@ hh	|chapter| - Key-Value Block Begin and End.
 	Key-Value blocks are special.  They are needed to allow nesting of key values.  
 
 .[
-|>| {|-->|[key]|<--|
-|>| ...
-|>| }|<--|
+- {|-->|[key]|<--|
+- ...
+- }|<--|
 ]
 
 	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.
@@ -305,30 +305,30 @@ hh	|chapter| - Key-Value Block Begin and End.
 	|b |Example 1:| b|
 
 .[
-|>| {|-->|docInfo|<--|
-|>| ...
-|>| }|<--|
+- {|-->|docInfo|<--|
+- ...
+- }|<--|
 ]
 
 	|b |Example 2:| b|
 
 .[
-|>| {|-->|level1|<--|
-|>| {|-->|level2|<--|
-|>| {|-->|level3|<--|
-|>| ...
-|>| }|<--|
-|>| {|-->|anotherLevel3|<--|
-|>| ...
-|>| }|<--|
-|>| }|<--|
-|>| {|-->|anotherLevel2|<--|
-|>| ...
-|>| }|<--|
-|>| }|<--|
-|>| {|-->|anotherLevel1|<--|
-|>| ...
-|>| }|<--||line|
+- {|-->|level1|<--|
+- {|-->|level2|<--|
+- {|-->|level3|<--|
+- ...
+- }|<--|
+- {|-->|anotherLevel3|<--|
+- ...
+- }|<--|
+- }|<--|
+- {|-->|anotherLevel2|<--|
+- ...
+- }|<--|
+- }|<--|
+- {|-->|anotherLevel1|<--|
+- ...
+- }|<--|
 ]
 
 hh	|chapter| - Basic Values
@@ -336,8 +336,8 @@ hh	|chapter| - Basic Values
 	Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
 
 .[
-|>| [text type code]|-->|[key]|-->|1|-->|[type value]|<--|
-|>| [text type code]|-->|[key]|-->|[array count](|-->|[type value])*|<--|
+- [text type code]|-->|[key]|-->|1|-->|[type value]|<--|
+- [text type code]|-->|[key]|-->|[array count](|-->|[type value])*|<--|
 ]
 
 	Text representation for a value will be...
@@ -366,35 +366,35 @@ tcx	1 Base64 stream of the 1 value.  Big endian order.
 	If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one |-->|.
 
 	|b |Example 1:| b|
-.	|>| type|-->|type1|-->|1|-->|b|<--|
+.	- type|-->|type1|-->|1|-->|b|<--|
 
 	|b |Example 2:| b|
-.	|>| type|-->|type2|-->|2|-->|b|-->|n4|<--|
+.	- type|-->|type2|-->|2|-->|b|-->|n4|<--|
 
 	|b |Example 4:| b|
-.	|>| b|-->|Bool1|-->|1|-->|T|<--|
+.	- b|-->|Bool1|-->|1|-->|T|<--|
 
 	|b |Example 5:| b|
-.	|>| b|-->|Bool2|-->|10|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
+.	- b|-->|Bool2|-->|10|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
 
 	|b |Example 6:| b|
-.	|>| i4|-->|1Int|-->|1|-->|1024|<--|
+.	- i4|-->|1Int|-->|1|-->|1024|<--|
 
 	|b |Example 7:| b|
-.	|>| n4|-->|*Nat|-->|8|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
+.	- n4|-->|NNat|-->|8|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
 
 	|b |Example 8:| b|
-.	|>| r4|-->|1Real|-->|1|-->|[Base64 encoded value]|<--|
+.	- r4|-->|1Real|-->|1|-->|[Base64 encoded value]|<--|
 
 	|b |Example 9:| b|
-.	|>| r8|-->|*Real|-->|3|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
+.	- r8|-->|NReal|-->|3|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
 
 
 hh	|chapter| - String values
 
 .[
-|>| "|-->|[key]|-->|1|-->|[string value]|<--|
-|>| "|-->|[key]|-->|[array count](|-->|[string value])*|<--|
+- "|-->|[key]|-->|1|-->|[string value]|<--|
+- "|-->|[key]|-->|[array count](|-->|[string value])*|<--|
 ]
 
 	The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
@@ -406,18 +406,18 @@ hh	|chapter| - String values
 ]
 
 	|b |Example 1:| b|
-.	|>| "|-->|string1|-->|1|-->|This is line1.\nThis is line 2.|<--|
+.	- "|-->|string1|-->|1|-->|This is line1.\nThis is line 2.|<--|
 
 	|b |Example 2:| b|
-.	|>| "|-->|stringList1|-->|3|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
+.	- "|-->|stringList1|-->|3|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
 
 hh	|chapter| - Variable values
 
 	Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
 
 .[
-|>| v|-->|[key]|-->|1|-->|[tab delimited values]|<--|
-|>| v|-->|[key]|-->|[array count]|-->|[tab delimited values]|<--|
+- v|-->|[key]|-->|1|-->|[tab delimited values]|<--|
+- v|-->|[key]|-->|[array count]|-->|[tab delimited values]|<--|
 ]
 
 	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.

@@ -34,6 +34,8 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
+#include <stdio.h>
+
 #include "local.h"
 
 /******************************************************************************
@@ -139,17 +141,34 @@ func: _WriteR4
 ******************************************************************************/
 MiffBool _WriteR4(Miff * const miff, MiffR4 const value)
 {
-   Miff4 vtemp;
+   Miff4      vtemp;
+   Base64Data data;
+   MiffN1     buffer[16];
 
    vtemp.r = value;
    _ByteSwap4(miff, &vtemp);
 
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
+   data = _Base64Restart(buffer);
 
-   return _Base64SetEnd(miff);
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_Base64SetEnd(&data));
+
+   return _WriteC1(miff, buffer);
+}
+
+/******************************************************************************
+func: _WriteR4S
+******************************************************************************/
+MiffBool _WriteR4S(Miff * const miff, MiffR4 const value)
+{
+   MiffC1 ctemp[80];
+
+   sprintf_s((char *) ctemp, 80, "%.6g", value);
+   
+   return _WriteC1(miff, ctemp);
 }
 
 /******************************************************************************
@@ -157,19 +176,36 @@ func: _WriteR8
 ******************************************************************************/
 MiffBool _WriteR8(Miff * const miff, MiffR8 const value)
 {
-   Miff8 vtemp;
+   Miff8      vtemp;
+   Base64Data data;
+   MiffN1     buffer[16];
 
    vtemp.r = value;
    _ByteSwap8(miff, &vtemp);
 
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[0]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[1]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[2]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[3]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[4]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[5]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[6]));
-   returnFalseIf(!_Base64Set(miff, vtemp.byte[7]));
+   data = _Base64Restart(buffer);
 
-   return _Base64SetEnd(miff);
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[4]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[5]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[6]));
+   returnFalseIf(!_Base64Set(   &data, vtemp.byte[7]));
+   returnFalseIf(!_Base64SetEnd(&data));
+
+   return _WriteC1(miff, buffer);
+}
+
+/******************************************************************************
+func: _WriteR8S
+******************************************************************************/
+MiffBool _WriteR8S(Miff * const miff, MiffR8 const value)
+{
+   MiffC1 ctemp[80];
+
+   sprintf_s((char *) ctemp, 80, "%.15g", value);
+
+   return _WriteC1(miff, ctemp);
 }

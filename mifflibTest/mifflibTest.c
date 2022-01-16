@@ -911,11 +911,37 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueR4S(miff, &valueR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g ", (double) valueR4);
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeR8)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueR8(miff, &valueR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g ", valueR8);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueR8S(miff, &valueR8))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -969,11 +995,37 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeABR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABR4S(miff, &valueABR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeABR8)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueABR8(miff, &valueABR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeABR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABR8S(miff, &valueABR8))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1027,11 +1079,37 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeABCR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCR4S(miff, &valueABCR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeABCR8)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueABCR8(miff, &valueABCR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeABCR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCR8S(miff, &valueABCR8))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1085,6 +1163,19 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeABCDR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDR4S(miff, &valueABCDR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeABCDR8)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
@@ -1098,11 +1189,44 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeABCDR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueABCDR8S(miff, &valueABCDR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeMATRIX2X2R4)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueMatrix2x2R4(miff, &valueMatrix2x2R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeMATRIX2X2R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix2x2R4S(miff, &valueMatrix2x2R4))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1138,11 +1262,51 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeMATRIX2X2R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix2x2R8S(miff, &valueMatrix2x2R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeMATRIX3X3R4)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueMatrix3x3R4(miff, &valueMatrix3x3R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeMATRIX3X3R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix3x3R4S(miff, &valueMatrix3x3R4))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1178,6 +1342,26 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeMATRIX3X3R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix3x3R8S(miff, &valueMatrix3x3R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeMATRIX4X4R4)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
@@ -1198,11 +1382,51 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
+         else if (type == miffTypeMATRIX4X4R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix4x4R4S(miff, &valueMatrix4x4R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
          else if (type == miffTypeMATRIX4X4R8)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                if (!miffGetValueMatrix4x4R8(miff, &valueMatrix4x4R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == miffTypeMATRIX4X4R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!miffGetValueMatrix4x4R8S(miff, &valueMatrix4x4R8))
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1303,6 +1527,11 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
       miffSet1R4(            miff, L"R4_-1",    -1.0);
       miffSet1R4(            miff, L"R4_PI",    3.1415926535897932f);
                              
+      miffSet1R4S(           miff, L"R4S_0",     0.0);
+      miffSet1R4S(           miff, L"R4S_1",     1.0);
+      miffSet1R4S(           miff, L"R4S_-1",    -1.0);
+      miffSet1R4S(           miff, L"R4S_PI",    3.1415926535897932f);
+                             
       miffSet1I8(            miff, L"I8_0",     0);
       miffSet1I8(            miff, L"I8_1",     1);
       miffSet1I8(            miff, L"I8_-1",    -1);
@@ -1315,41 +1544,58 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
       miffSet1R8(            miff, L"R8_-1",    -1.0);
       miffSet1R8(            miff, L"R8_PI",    3.1415926535897932);
                              
+      miffSet1R8S(           miff, L"R8S_0",     0.0);
+      miffSet1R8S(           miff, L"R8S_1",     1.0);
+      miffSet1R8S(           miff, L"R8S_-1",    -1.0);
+      miffSet1R8S(           miff, L"R8S_PI",    3.1415926535897932);
+                             
       miffSet1Type(          miff, L"TypeBool", miffTypeBOOLEAN);
       miffSet1Type(          miff, L"TypeKey",  miffTypeTYPE);
                              
       miffSet1StringC2(      miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      miffSet1ABI1(          miff, L"ABI1",   &_abi1       );
-      miffSet1ABI2(          miff, L"ABI2",   &_abi2       );
-      miffSet1ABI4(          miff, L"ABI4",   &_abi4       );
-      miffSet1ABN1(          miff, L"ABN1",   &_abn1       );
-      miffSet1ABN2(          miff, L"ABN2",   &_abn2       );
-      miffSet1ABN4(          miff, L"ABN4",   &_abn4       );
-      miffSet1ABR4(          miff, L"ABR4",   &_abr4       );
-      miffSet1ABR8(          miff, L"ABR8",   &_abr8       );
-      miffSet1ABCI1(         miff, L"ABCI1",  &_abci1      );
-      miffSet1ABCI2(         miff, L"ABCI2",  &_abci2      );
-      miffSet1ABCI4(         miff, L"ABCI4",  &_abci4      );
-      miffSet1ABCN1(         miff, L"ABCN1",  &_abcn1      );
-      miffSet1ABCN2(         miff, L"ABCN2",  &_abcn2      );
-      miffSet1ABCN4(         miff, L"ABCN4",  &_abcn4      );
-      miffSet1ABCR4(         miff, L"ABCR4",  &_abcr4      );
-      miffSet1ABCR8(         miff, L"ABCR8",  &_abcr8      );
-      miffSet1ABCDI1(        miff, L"ABCDI1", &_abcdi1     );
-      miffSet1ABCDI2(        miff, L"ABCDI2", &_abcdi2     );
-      miffSet1ABCDI4(        miff, L"ABCDI4", &_abcdi4     );
-      miffSet1ABCDN1(        miff, L"ABCDN1", &_abcdn1     );
-      miffSet1ABCDN2(        miff, L"ABCDN2", &_abcdn2     );
-      miffSet1ABCDN4(        miff, L"ABCDN4", &_abcdn4     );
-      miffSet1ABCDR4(        miff, L"ABCDR4", &_abcdr4     );
-      miffSet1ABCDR8(        miff, L"ABCDR8", &_abcdr8     );
-      miffSet1Matrix2x2R4(   miff, L"mat224", &_matrix2x2r4);
-      miffSet1Matrix2x2R8(   miff, L"mat228", &_matrix2x2r8);
-      miffSet1Matrix3x3R4(   miff, L"mat334", &_matrix3x3r4);
-      miffSet1Matrix3x3R8(   miff, L"mat338", &_matrix3x3r8);
-      miffSet1Matrix4x4R4(   miff, L"mat444", &_matrix4x4r4);
-      miffSet1Matrix4x4R8(   miff, L"mat448", &_matrix4x4r8);
+      miffSet1ABI1(          miff, L"ABI1",     &_abi1       );
+      miffSet1ABI2(          miff, L"ABI2",     &_abi2       );
+      miffSet1ABI4(          miff, L"ABI4",     &_abi4       );
+      miffSet1ABN1(          miff, L"ABN1",     &_abn1       );
+      miffSet1ABN2(          miff, L"ABN2",     &_abn2       );
+      miffSet1ABN4(          miff, L"ABN4",     &_abn4       );
+      miffSet1ABR4(          miff, L"ABR4",     &_abr4       );
+      miffSet1ABR8(          miff, L"ABR8",     &_abr8       );
+      miffSet1ABR4S(         miff, L"ABR4S",    &_abr4       );
+      miffSet1ABR8S(         miff, L"ABR8S",    &_abr8       );
+      miffSet1ABCI1(         miff, L"ABCI1",    &_abci1      );
+      miffSet1ABCI2(         miff, L"ABCI2",    &_abci2      );
+      miffSet1ABCI4(         miff, L"ABCI4",    &_abci4      );
+      miffSet1ABCN1(         miff, L"ABCN1",    &_abcn1      );
+      miffSet1ABCN2(         miff, L"ABCN2",    &_abcn2      );
+      miffSet1ABCN4(         miff, L"ABCN4",    &_abcn4      );
+      miffSet1ABCR4(         miff, L"ABCR4",    &_abcr4      );
+      miffSet1ABCR8(         miff, L"ABCR8",    &_abcr8      );
+      miffSet1ABCR4S(        miff, L"ABCR4S",   &_abcr4      );
+      miffSet1ABCR8S(        miff, L"ABCR8S",   &_abcr8      );
+      miffSet1ABCDI1(        miff, L"ABCDI1",   &_abcdi1     );
+      miffSet1ABCDI2(        miff, L"ABCDI2",   &_abcdi2     );
+      miffSet1ABCDI4(        miff, L"ABCDI4",   &_abcdi4     );
+      miffSet1ABCDN1(        miff, L"ABCDN1",   &_abcdn1     );
+      miffSet1ABCDN2(        miff, L"ABCDN2",   &_abcdn2     );
+      miffSet1ABCDN4(        miff, L"ABCDN4",   &_abcdn4     );
+      miffSet1ABCDR4(        miff, L"ABCDR4",   &_abcdr4     );
+      miffSet1ABCDR8(        miff, L"ABCDR8",   &_abcdr8     );
+      miffSet1ABCDR4S(       miff, L"ABCDR4S",  &_abcdr4     );
+      miffSet1ABCDR8S(       miff, L"ABCDR8S",  &_abcdr8     );
+      miffSet1Matrix2x2R4(   miff, L"mat224",   &_matrix2x2r4);
+      miffSet1Matrix2x2R8(   miff, L"mat228",   &_matrix2x2r8);
+      miffSet1Matrix3x3R4(   miff, L"mat334",   &_matrix3x3r4);
+      miffSet1Matrix3x3R8(   miff, L"mat338",   &_matrix3x3r8);
+      miffSet1Matrix4x4R4(   miff, L"mat444",   &_matrix4x4r4);
+      miffSet1Matrix4x4R8(   miff, L"mat448",   &_matrix4x4r8);
+      miffSet1Matrix2x2R4S(  miff, L"mat224S",  &_matrix2x2r4);
+      miffSet1Matrix2x2R8S(  miff, L"mat228S",  &_matrix2x2r8);
+      miffSet1Matrix3x3R4S(  miff, L"mat334S",  &_matrix3x3r4);
+      miffSet1Matrix3x3R8S(  miff, L"mat338S",  &_matrix3x3r8);
+      miffSet1Matrix4x4R4S(  miff, L"mat444S",  &_matrix4x4r4);
+      miffSet1Matrix4x4R8S(  miff, L"mat448S",  &_matrix4x4r8);
 
       miffRecordSetBegin(    miff, miffTypeVARIABLE, L"variableIntStrReal", 1);
       miffSetValueI(         miff, 42);
@@ -1373,6 +1619,8 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
                              
       miffSetNR4(            miff, L"R4_Array",     300,     _reals4);
       miffSetNR8(            miff, L"R8_Array",     300,     _reals8);
+      miffSetNR4S(           miff, L"R4S_Array",    300,     _reals4);
+      miffSetNR8S(           miff, L"R8S_Array",    300,     _reals8);
                              
       miffSetNStringC2(      miff, L"String_Array", 10,   _strings);
                              

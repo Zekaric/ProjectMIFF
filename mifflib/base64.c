@@ -40,8 +40,6 @@ include:
 local:
 variable:
 ******************************************************************************/
-static MiffN4  _base64State               = 0;
-static MiffN1  _base64Byte                = 0;
 static MiffN1  _base64LetterToValue[128];
 static MiffN1  _base64ValueToLetter[64];
 
@@ -52,37 +50,42 @@ function:
 /******************************************************************************
 func: _Base64Restart
 ******************************************************************************/
-void _Base64Restart(void)
+Base64Data _Base64Restart(MiffN1 * const value)
 {
-   _base64State = 0;
-   _base64Byte  = 0;
+   Base64Data data;
+
+   data.state  = 0;
+   data.byte   = 0;
+   data.index  = 0;
+   data.buffer = value;
+   
+   return data;
 }
 
 /******************************************************************************
 func: _Base64Get
-******************************************************************************/
-MiffBool _Base64Get(Miff * const miff, MiffN1 * const byte)
+Base64Buffer * const buffer, ******************************************************************************/
+MiffBool _Base64Get(Base64Data * const data, MiffN1 * const byte)
 {
    *byte = 0;
    
-   switch (_base64State)
+   switch (data->state)
    {
    case 0:
       // byte to fill      Incoming base64 byte
       // [........]        [......]
-
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &_base64Byte));
+      data->byte = data->buffer[data->index++];
 
       // [111111..]        [111111]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte] << 2);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte] << 2);
 
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &_base64Byte));
+      data->byte = data->buffer[data->index++];
 
       // [11111122]        [22....]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 4);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte] >> 4);
 
       // Remainder [..2222]
-      _base64State = 1;
+      data->state = 1;
       break;
 
    case 1:
@@ -90,15 +93,15 @@ MiffBool _Base64Get(Miff * const miff, MiffN1 * const byte)
       // [........]        [..xxxx]
 
       // [xxxx....]        [..xxxx]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte] << 4);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte] << 4);
 
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &_base64Byte));
+      data->byte = data->buffer[data->index++];
 
       // [xxxx1111]        [1111..]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte] >> 2);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte] >> 2);
 
       // Remainder [....22]
-      _base64State = 2;
+      data->state = 2;
       break;
 
    case 2:
@@ -106,15 +109,15 @@ MiffBool _Base64Get(Miff * const miff, MiffN1 * const byte)
       // [........]        [....xx]
 
       // [xx......]        [....xx]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte] << 6);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte] << 6);
 
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &_base64Byte));
+      data->byte = data->buffer[data->index++];
 
       // [xx111111]        [111111]
-      *byte |= (MiffN1) (_base64LetterToValue[_base64Byte]);
+      *byte |= (MiffN1) (_base64LetterToValue[data->byte]);
 
       // Remainder [......]
-      _base64State = 0;
+      data->state = 0;
       break;
    }
 
@@ -124,14 +127,14 @@ MiffBool _Base64Get(Miff * const miff, MiffN1 * const byte)
 /******************************************************************************
 func: _Base64Set
 ******************************************************************************/
-MiffBool _Base64Set(Miff const * const miff, MiffN1 const byte)
+MiffBool _Base64Set(Base64Data * const data, MiffN1 const byte)
 {
    MiffN1 btemp;
    MiffN1 sixbit;
 
    btemp = byte;
 
-   switch (_base64State)
+   switch (data->state)
    {
    case 0:
       // sixbit      Remainder byte  Incoming byte
@@ -139,11 +142,11 @@ MiffBool _Base64Set(Miff const * const miff, MiffN1 const byte)
       
       // [xxxxxx] <----------------- [xxxxxx..]
       sixbit = ((btemp >> 2) & 0x3F);
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &_base64ValueToLetter[sixbit]));
+      data->buffer[data->index++] = _base64ValueToLetter[sixbit];
 
       // [xxxxxx]    [..yy....] <--- [......yy]
-      _base64Byte  = (btemp & 0x03) << 4;
-      _base64State = 1;
+      data->byte  = (btemp & 0x03) << 4;
+      data->state = 1;
       break;
 
    case 1:
@@ -152,12 +155,12 @@ MiffBool _Base64Set(Miff const * const miff, MiffN1 const byte)
 
       // [rr....] <- [..rr....]
       // [rrxxxx] <----------------- [xxxx....]
-      sixbit = _base64Byte | ((btemp >> 4) & 0x0F);
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &_base64ValueToLetter[sixbit]));
+      sixbit = data->byte | ((btemp >> 4) & 0x0F);
+      data->buffer[data->index++] = _base64ValueToLetter[sixbit];
 
       // [rrxxxx]    [..yyyy..] <--- [....yyyy]
-      _base64Byte  = ((btemp & 0x0F) << 2);
-      _base64State = 2;
+      data->byte  = ((btemp & 0x0F) << 2);
+      data->state = 2;
       break;
 
    case 2:
@@ -166,18 +169,20 @@ MiffBool _Base64Set(Miff const * const miff, MiffN1 const byte)
 
       // [rrrr..] <- [..rrrr..]
       // [rrrrxx] <----------------- [xx......]
-      sixbit = _base64Byte | ((btemp >> 6)  & 0x03);
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &_base64ValueToLetter[sixbit]));
+      sixbit = data->byte | ((btemp >> 6)  & 0x03);
+      data->buffer[data->index++] = _base64ValueToLetter[sixbit];
 
       // [yyyyyy] <----------------- [..yyyyyy]
       sixbit = btemp & 0x3F;
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &_base64ValueToLetter[sixbit]));
+      data->buffer[data->index++] = _base64ValueToLetter[sixbit];
 
       // [rrrrxx]    [........]      [........]
-      _base64Byte  = 0;
-      _base64State = 0;
+      data->byte  = 0;
+      data->state = 0;
       break;
    }
+
+   data->buffer[data->index] = 0;
 
    returnTrue;
 }
@@ -187,11 +192,11 @@ func: _Base64SetEnd
 
 Send out the remainder bits.
 ******************************************************************************/
-MiffBool _Base64SetEnd(Miff const * const miff)
+MiffBool _Base64SetEnd(Base64Data * const data)
 {
    MiffN1 sixbit;
 
-   switch (_base64State)
+   switch (data->state)
    {
    case 0:
       // Remainder byte
@@ -206,13 +211,14 @@ MiffBool _Base64SetEnd(Miff const * const miff)
       // [..xx....]
       // [..xxxx..]
 
-      sixbit = _base64Byte;
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &_base64ValueToLetter[sixbit]));
+      sixbit = data->byte;
+      data->buffer[data->index++] = _base64ValueToLetter[sixbit];
       break;
    }
 
-   _base64Byte  = 0;
-   _base64State = 0;
+   data->byte                = 0;
+   data->state               = 0;
+   data->buffer[data->index] = 0;
 
    returnTrue;
 }

@@ -80,19 +80,19 @@
 
 <h2 class="zword"><a name="2.1">2.1 - File Header</a></h2>
 <p class="zword">There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.</p>
-<p class="zwordPre">&gt; MIFF<img src="nl.png" />
-&gt; 1<img src="nl.png" />
-&gt; [Sub-Format Name string]<img src="nl.png" />
-&gt; [Sub-Format Version string]<img src="nl.png" />
+<p class="zwordPre">- MIFF[nl]
+- 1[nl]
+- [Sub-Format Name string][nl]
+- [Sub-Format Version string][nl]
 </p>
-<p class="zword"><img src="tab.png" /> means a tab character.  <img src="nl.png" /> means a new line character.  The &gt; is not part of the line, is it denoting the start of the line.</p>
+<p class="zword">[tb] means a tab character.  [nl] means a new line character.  The '-' is not part of the line, is it denoting the start of the line.</p>
 <ul class="zword">
 <li class="zword"><strong>Line 1</strong> - Format of the file.  MIFF.</li>
 <li class="zword"><strong>Line 2</strong> - Version of the file.  Version 1.</li>
 <li class="zword"><strong>Line 4</strong> - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.</li>
 <li class="zword"><strong>Line 5</strong> - Sub-Format version identifier.</li>
 </ul>
-<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain <img src="tab.png" />s or <img src="nl.png" />s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.</p>
+<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.</p>
 
 <h2 class="zword"><a name="2.2">2.2 - Content</a></h2>
 <p class="zword">Before going into the specifics of the format we will cover some things at a high level.</p>
@@ -110,9 +110,9 @@
 <p class="zword"><strong>[value]</strong>            will depend on the the above; it will vary in appearance.</p>
 
 <h4 class="zword"><a name="2.2.2.1">2.2.2.1 - Key</a></h4>
-<p class="zword">Keys are always a single string of any character in UTF8 encoding as long as none are <img src="tab.png" /> and <img src="nl.png" />.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.</p>
+<p class="zword">Keys are always a single string of any character in UTF8 encoding as long as none are [tb] and [nl].  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.</p>
 <p class="zwordPre">12345
-;':][.,&lt;&gt;]`
+;':][.,<>]
 a_b_c
 $cost
 été
@@ -212,7 +212,7 @@ This is also a valid key with internal spaces
 <td class="zword">A 4x4 r4 or r8 matrix</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr><br /><strong> Variable Value Type</strong><br /></td>
+<td class="zword"><nobr><br /><strong>Variable Value Type</strong><br /></td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>v</td>
@@ -247,13 +247,13 @@ This is also a valid key with internal spaces
 <p class="zword">The format is a UTF8 text file.</p>
 <p class="zword">The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.</p>
 <p class="zword">The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.</p>
-<p class="zword">All lines are terminated with a single <img src="nl.png" /> (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.</p>
+<p class="zword">All lines are terminated with a single [nl] (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.</p>
 
 <h3 class="zword"><a name="2.3.1">2.3.1 - Whitespace Characters</a></h3>
 <p class="zword">A whitespace character is any character that does not make a blemish on a piece of paper if printed out; this includes control characters like bell, NULL, form feed, etc.</p>
 
 <h3 class="zword"><a name="2.3.2">2.3.2 - Separator Characters</a></h3>
-<p class="zword">MIFF only uses <img src="tab.png" /> as a separater character.  And only one <img src="tab.png" /> between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.</p>
+<p class="zword">MIFF only uses [tb] as a separater character.  And only one [tb] between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.</p>
 
 <h3 class="zword"><a name="2.3.3">2.3.3 - Printable Characters</a></h3>
 <p class="zword">Just to be clear what a printable character is.  If you had a blank piece of paper with just one character on it, if the character causes ink to be placed on the paper, it is printable.  If it does not make a mark, it is not printable (like spaces, control characters, etc.)</p>
@@ -265,14 +265,14 @@ This is also a valid key with internal spaces
 <p class="zword">All real numbers are stored as a Base64 string.  No exceptions.  This is to ensure that when read back into memory from file, the number is exactly as it was when it was stored in the file.  The real value in the MIFF file will be in Big Endian order.</p>
 
 <h3 class="zword"><a name="2.3.6">2.3.6 - Record Composition</a></h3>
-<p class="zwordPre">&gt; [type code]<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />[value]<img src="nl.png" />
+<p class="zwordPre">- [type code][tb][key][tb][array count][tb][value][nl]
 </p>
-<p class="zword">Any space found in the key that is not a <img src="tab.png" /> will be part of the key.  They will be significant.  Do not strip or reduce them.</p>
-<p class="zword">There has to be one <img src="tab.png" /> separator between each part.</p>
+<p class="zword">Any space found in the key that is not a [tb] will be part of the key.  They will be significant.  Do not strip or reduce them.</p>
+<p class="zword">There has to be one [tb] separator between each part.</p>
 <p class="zword">How the value appears will depend on the definition here.</p>
 <p class="zword">To be clear...</p>
-<p class="zword"><strong>Invalid:</strong> Absolutely no <img src="nl.png" /> anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra <img src="tab.png" /> anywhere in the format.</p>
-<p class="zwordPre">&gt; [type code]<img src="tab.png" /><img src="tab.png" />[key]<img src="nl.png" />[array count] [value]<img src="nl.png" />
+<p class="zword"><strong>Invalid:</strong> Absolutely no [nl] anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra [tb] anywhere in the format.</p>
+<p class="zwordPre">- [type code][tb][tb][key][nl][array count] [value][nl]
 </p>
 <p class="zword">What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.</p>
 
@@ -281,40 +281,40 @@ This is also a valid key with internal spaces
 
 <h2 class="zword"><a name="3.1">3.1 - Key-Value Block Begin and End.</a></h2>
 <p class="zword">Key-Value blocks are special.  They are needed to allow nesting of key values.</p>
-<p class="zwordPre">&gt; {<img src="tab.png" />[key]<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" />
+<p class="zwordPre">- {[tb][key][nl]
+- ...
+- }[nl]
 </p>
 <p class="zword">A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.</p>
 <p class="zword">Array Count is never used with this value type and there is not value that follows.</p>
 <p class="zword"><strong>Example 1:</strong></p>
-<p class="zwordPre">&gt; {<img src="tab.png" />docInfo<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" />
+<p class="zwordPre">- {[tb]docInfo[nl]
+- ...
+- }[nl]
 </p>
 <p class="zword"><strong>Example 2:</strong></p>
-<p class="zwordPre">&gt; {<img src="tab.png" />level1<img src="nl.png" />
-&gt; {<img src="tab.png" />level2<img src="nl.png" />
-&gt; {<img src="tab.png" />level3<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" />
-&gt; {<img src="tab.png" />anotherLevel3<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" />
-&gt; }<img src="nl.png" />
-&gt; {<img src="tab.png" />anotherLevel2<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" />
-&gt; }<img src="nl.png" />
-&gt; {<img src="tab.png" />anotherLevel1<img src="nl.png" />
-&gt; ...
-&gt; }<img src="nl.png" /><br />
+<p class="zwordPre">- {[tb]level1[nl]
+- {[tb]level2[nl]
+- {[tb]level3[nl]
+- ...
+- }[nl]
+- {[tb]anotherLevel3[nl]
+- ...
+- }[nl]
+- }[nl]
+- {[tb]anotherLevel2[nl]
+- ...
+- }[nl]
+- }[nl]
+- {[tb]anotherLevel1[nl]
+- ...
+- }[nl]
 </p>
 
 <h2 class="zword"><a name="3.2">3.2 - Basic Values</a></h2>
 <p class="zword">Basic value encoding.  Based on what is being stored the byte streams only look slighly different.</p>
-<p class="zwordPre">&gt; [text type code]<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />[type value]<img src="nl.png" />
-&gt; [text type code]<img src="tab.png" />[key]<img src="tab.png" />[array count](<img src="tab.png" />[type value])*<img src="nl.png" />
+<p class="zwordPre">- [text type code][tb][key][tb]1[tb][type value][nl]
+- [text type code][tb][key][tb][array count]([tb][type value])*[nl]
 </p>
 <p class="zword">Text representation for a value will be...</p>
 <table class="zword"><tbody class="zword">
@@ -339,52 +339,52 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr>1 Base64 stream of the 1 value.  Big endian order.</td>
 </tr>
 </tbody></table>
-<p class="zword">If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one <img src="tab.png" />.</p>
+<p class="zword">If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one [tb].</p>
 <p class="zword"><strong>Example 1:</strong></p>
-<p class="zwordPre">&gt; type<img src="tab.png" />type1<img src="tab.png" />1<img src="tab.png" />b<img src="nl.png" />
+<p class="zwordPre">- type[tb]type1[tb]1[tb]b[nl]
 </p>
 <p class="zword"><strong>Example 2:</strong></p>
-<p class="zwordPre">&gt; type<img src="tab.png" />type2<img src="tab.png" />2<img src="tab.png" />b<img src="tab.png" />n4<img src="nl.png" />
+<p class="zwordPre">- type[tb]type2[tb]2[tb]b[tb]n4[nl]
 </p>
 <p class="zword"><strong>Example 4:</strong></p>
-<p class="zwordPre">&gt; b<img src="tab.png" />Bool1<img src="tab.png" />1<img src="tab.png" />T<img src="nl.png" />
+<p class="zwordPre">- b[tb]Bool1[tb]1[tb]T[nl]
 </p>
 <p class="zword"><strong>Example 5:</strong></p>
-<p class="zwordPre">&gt; b<img src="tab.png" />Bool2<img src="tab.png" />10<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />T<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="tab.png" />F<img src="nl.png" />
+<p class="zwordPre">- b[tb]Bool2[tb]10[tb]T[tb]T[tb]T[tb]T[tb]T[tb]F[tb]F[tb]F[tb]F[tb]F[nl]
 </p>
 <p class="zword"><strong>Example 6:</strong></p>
-<p class="zwordPre">&gt; i4<img src="tab.png" />1Int<img src="tab.png" />1<img src="tab.png" />1024<img src="nl.png" />
+<p class="zwordPre">- i4[tb]1Int[tb]1[tb]1024[nl]
 </p>
 <p class="zword"><strong>Example 7:</strong></p>
-<p class="zwordPre">&gt; n4<img src="tab.png" />*Nat<img src="tab.png" />8<img src="tab.png" />1<img src="tab.png" />2<img src="tab.png" />4<img src="tab.png" />8<img src="tab.png" />16<img src="tab.png" />32<img src="tab.png" />64<img src="tab.png" />128<img src="nl.png" />
+<p class="zwordPre">- n4[tb]NNat[tb]8[tb]1[tb]2[tb]4[tb]8[tb]16[tb]32[tb]64[tb]128[nl]
 </p>
 <p class="zword"><strong>Example 8:</strong></p>
-<p class="zwordPre">&gt; r4<img src="tab.png" />1Real<img src="tab.png" />1<img src="tab.png" />[Base64 encoded value]<img src="nl.png" />
+<p class="zwordPre">- r4[tb]1Real[tb]1[tb][Base64 encoded value][nl]
 </p>
 <p class="zword"><strong>Example 9:</strong></p>
-<p class="zwordPre">&gt; r8<img src="tab.png" />*Real<img src="tab.png" />3<img src="tab.png" />[Base64 encoded value]<img src="tab.png" />[Base64 encoded value]<img src="tab.png" />[Base64 encoded value]<img src="nl.png" />
+<p class="zwordPre">- r8[tb]NReal[tb]3[tb][Base64 encoded value][tb][Base64 encoded value][tb][Base64 encoded value][nl]
 </p>
 
 <h2 class="zword"><a name="3.3">3.3 - String values</a></h2>
-<p class="zwordPre">&gt; "<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />[string value]<img src="nl.png" />
-&gt; "<img src="tab.png" />[key]<img src="tab.png" />[array count](<img src="tab.png" />[string value])*<img src="nl.png" />
+<p class="zwordPre">- "[tb][key][tb]1[tb][string value][nl]
+- "[tb][key][tb][array count]([tb][string value])*[nl]
 </p>
-<p class="zword">The string is preprocessed before storing.  All <img src="tab.png" />, <img src="nl.png" />, and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.</p>
+<p class="zword">The string is preprocessed before storing.  All [tb], [nl], and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.</p>
 <p class="zwordPre">\t - tab            - 0x09
 \n - new line       - 0x0a
 \\ - \
 </p>
 <p class="zword"><strong>Example 1:</strong></p>
-<p class="zwordPre">&gt; "<img src="tab.png" />string1<img src="tab.png" />1<img src="tab.png" />This is line1.\nThis is line 2.<img src="nl.png" />
+<p class="zwordPre">- "[tb]string1[tb]1[tb]This is line1.\nThis is line 2.[nl]
 </p>
 <p class="zword"><strong>Example 2:</strong></p>
-<p class="zwordPre">&gt; "<img src="tab.png" />stringList1<img src="tab.png" />3<img src="tab.png" />This is string 1, line 1.\nThis is string1, line 2.\n<img src="tab.png" />This is string 2.<img src="tab.png" />This is string 3.<img src="nl.png" />
+<p class="zwordPre">- "[tb]stringList1[tb]3[tb]This is string 1, line 1.\nThis is string1, line 2.\n[tb]This is string 2.[tb]This is string 3.[nl]
 </p>
 
 <h2 class="zword"><a name="3.4">3.4 - Variable values</a></h2>
 <p class="zword">Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.</p>
-<p class="zwordPre">&gt; v<img src="tab.png" />[key]<img src="tab.png" />1<img src="tab.png" />[tab delimited values]<img src="nl.png" />
-&gt; v<img src="tab.png" />[key]<img src="tab.png" />[array count]<img src="tab.png" />[tab delimited values]<img src="nl.png" />
+<p class="zwordPre">- v[tb][key][tb]1[tb][tab delimited values][nl]
+- v[tb][key][tb][array count][tb][tab delimited values][nl]
 </p>
 <p class="zword">A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.</p>
  </body>

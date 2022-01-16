@@ -86,7 +86,9 @@ MiffC2 *_TypeGetNameC2(MiffType const type)
    case miffTypeN128:                   return U_LITERAL(miffTypeN128_STR);
    case miffTypeN256:                   return U_LITERAL(miffTypeN256_STR);
    case miffTypeR4:                     return U_LITERAL(miffTypeR4_STR);
+   case miffTypeR4S:                    return U_LITERAL(miffTypeR4S_STR);
    case miffTypeR8:                     return U_LITERAL(miffTypeR8_STR);
+   case miffTypeR8S:                    return U_LITERAL(miffTypeR8S_STR);
    case miffTypeABI1:                   return U_LITERAL(miffTypeABI1_STR);
    case miffTypeABI2:                   return U_LITERAL(miffTypeABI2_STR);
    case miffTypeABI4:                   return U_LITERAL(miffTypeABI4_STR);
@@ -96,7 +98,9 @@ MiffC2 *_TypeGetNameC2(MiffType const type)
    case miffTypeABN4:                   return U_LITERAL(miffTypeABN4_STR);
    case miffTypeABN8:                   return U_LITERAL(miffTypeABN8_STR);
    case miffTypeABR4:                   return U_LITERAL(miffTypeABR4_STR);
+   case miffTypeABR4S:                  return U_LITERAL(miffTypeABR4S_STR);
    case miffTypeABR8:                   return U_LITERAL(miffTypeABR8_STR);
+   case miffTypeABR8S:                  return U_LITERAL(miffTypeABR8S_STR);
    case miffTypeABCI1:                  return U_LITERAL(miffTypeABCI1_STR);
    case miffTypeABCI2:                  return U_LITERAL(miffTypeABCI2_STR);
    case miffTypeABCI4:                  return U_LITERAL(miffTypeABCI4_STR);
@@ -106,7 +110,9 @@ MiffC2 *_TypeGetNameC2(MiffType const type)
    case miffTypeABCN4:                  return U_LITERAL(miffTypeABCN4_STR);
    case miffTypeABCN8:                  return U_LITERAL(miffTypeABCN8_STR);
    case miffTypeABCR4:                  return U_LITERAL(miffTypeABCR4_STR);
+   case miffTypeABCR4S:                 return U_LITERAL(miffTypeABCR4S_STR);
    case miffTypeABCR8:                  return U_LITERAL(miffTypeABCR8_STR);
+   case miffTypeABCR8S:                 return U_LITERAL(miffTypeABCR8S_STR);
    case miffTypeABCDI1:                 return U_LITERAL(miffTypeABCDI1_STR);
    case miffTypeABCDI2:                 return U_LITERAL(miffTypeABCDI2_STR);
    case miffTypeABCDI4:                 return U_LITERAL(miffTypeABCDI4_STR);
@@ -116,13 +122,21 @@ MiffC2 *_TypeGetNameC2(MiffType const type)
    case miffTypeABCDN4:                 return U_LITERAL(miffTypeABCDN4_STR);
    case miffTypeABCDN8:                 return U_LITERAL(miffTypeABCDN8_STR);
    case miffTypeABCDR4:                 return U_LITERAL(miffTypeABCDR4_STR);
+   case miffTypeABCDR4S:                return U_LITERAL(miffTypeABCDR4S_STR);
    case miffTypeABCDR8:                 return U_LITERAL(miffTypeABCDR8_STR);
+   case miffTypeABCDR8S:                return U_LITERAL(miffTypeABCDR8S_STR);
    case miffTypeMATRIX2X2R4:            return U_LITERAL(miffTypeMATRIX2X2R4_STR);
+   case miffTypeMATRIX2X2R4S:           return U_LITERAL(miffTypeMATRIX2X2R4S_STR);
    case miffTypeMATRIX2X2R8:            return U_LITERAL(miffTypeMATRIX2X2R8_STR);
+   case miffTypeMATRIX2X2R8S:           return U_LITERAL(miffTypeMATRIX2X2R8S_STR);
    case miffTypeMATRIX3X3R4:            return U_LITERAL(miffTypeMATRIX3X3R4_STR);
+   case miffTypeMATRIX3X3R4S:           return U_LITERAL(miffTypeMATRIX3X3R4S_STR);
    case miffTypeMATRIX3X3R8:            return U_LITERAL(miffTypeMATRIX3X3R8_STR);
+   case miffTypeMATRIX3X3R8S:           return U_LITERAL(miffTypeMATRIX3X3R8S_STR);
    case miffTypeMATRIX4X4R4:            return U_LITERAL(miffTypeMATRIX4X4R4_STR);
+   case miffTypeMATRIX4X4R4S:           return U_LITERAL(miffTypeMATRIX4X4R4S_STR);
    case miffTypeMATRIX4X4R8:            return U_LITERAL(miffTypeMATRIX4X4R8_STR);
+   case miffTypeMATRIX4X4R8S:           return U_LITERAL(miffTypeMATRIX4X4R8S_STR);
    }
 
    return L"";
@@ -160,7 +174,9 @@ MiffC1 *_TypeGetNameC1(MiffType const type)
    case miffTypeN128:                   return (MiffC1 *) miffTypeN128_STR;
    case miffTypeN256:                   return (MiffC1 *) miffTypeN256_STR;
    case miffTypeR4:                     return (MiffC1 *) miffTypeR4_STR;
+   case miffTypeR4S:                    return (MiffC1 *) miffTypeR4S_STR;
    case miffTypeR8:                     return (MiffC1 *) miffTypeR8_STR;
+   case miffTypeR8S:                    return (MiffC1 *) miffTypeR8S_STR;
    case miffTypeABI1:                   return (MiffC1 *) miffTypeABI1_STR;
    case miffTypeABI2:                   return (MiffC1 *) miffTypeABI2_STR;
    case miffTypeABI4:                   return (MiffC1 *) miffTypeABI4_STR;
@@ -170,7 +186,9 @@ MiffC1 *_TypeGetNameC1(MiffType const type)
    case miffTypeABN4:                   return (MiffC1 *) miffTypeABN4_STR;
    case miffTypeABN8:                   return (MiffC1 *) miffTypeABN8_STR;
    case miffTypeABR4:                   return (MiffC1 *) miffTypeABR4_STR;
+   case miffTypeABR4S:                  return (MiffC1 *) miffTypeABR4S_STR;
    case miffTypeABR8:                   return (MiffC1 *) miffTypeABR8_STR;
+   case miffTypeABR8S:                  return (MiffC1 *) miffTypeABR8S_STR;
    case miffTypeABCI1:                  return (MiffC1 *) miffTypeABCI1_STR;
    case miffTypeABCI2:                  return (MiffC1 *) miffTypeABCI2_STR;
    case miffTypeABCI4:                  return (MiffC1 *) miffTypeABCI4_STR;
@@ -180,7 +198,9 @@ MiffC1 *_TypeGetNameC1(MiffType const type)
    case miffTypeABCN4:                  return (MiffC1 *) miffTypeABCN4_STR;
    case miffTypeABCN8:                  return (MiffC1 *) miffTypeABCN8_STR;
    case miffTypeABCR4:                  return (MiffC1 *) miffTypeABCR4_STR;
+   case miffTypeABCR4S:                 return (MiffC1 *) miffTypeABCR4S_STR;
    case miffTypeABCR8:                  return (MiffC1 *) miffTypeABCR8_STR;
+   case miffTypeABCR8S:                 return (MiffC1 *) miffTypeABCR8S_STR;
    case miffTypeABCDI1:                 return (MiffC1 *) miffTypeABCDI1_STR;
    case miffTypeABCDI2:                 return (MiffC1 *) miffTypeABCDI2_STR;
    case miffTypeABCDI4:                 return (MiffC1 *) miffTypeABCDI4_STR;
@@ -190,13 +210,21 @@ MiffC1 *_TypeGetNameC1(MiffType const type)
    case miffTypeABCDN4:                 return (MiffC1 *) miffTypeABCDN4_STR;
    case miffTypeABCDN8:                 return (MiffC1 *) miffTypeABCDN8_STR;
    case miffTypeABCDR4:                 return (MiffC1 *) miffTypeABCDR4_STR;
+   case miffTypeABCDR4S:                return (MiffC1 *) miffTypeABCDR4S_STR;
    case miffTypeABCDR8:                 return (MiffC1 *) miffTypeABCDR8_STR;
+   case miffTypeABCDR8S:                return (MiffC1 *) miffTypeABCDR8S_STR;
    case miffTypeMATRIX2X2R4:            return (MiffC1 *) miffTypeMATRIX2X2R4_STR;
+   case miffTypeMATRIX2X2R4S:           return (MiffC1 *) miffTypeMATRIX2X2R4S_STR;
    case miffTypeMATRIX2X2R8:            return (MiffC1 *) miffTypeMATRIX2X2R8_STR;
+   case miffTypeMATRIX2X2R8S:           return (MiffC1 *) miffTypeMATRIX2X2R8S_STR;
    case miffTypeMATRIX3X3R4:            return (MiffC1 *) miffTypeMATRIX3X3R4_STR;
+   case miffTypeMATRIX3X3R4S:           return (MiffC1 *) miffTypeMATRIX3X3R4S_STR;
    case miffTypeMATRIX3X3R8:            return (MiffC1 *) miffTypeMATRIX3X3R8_STR;
+   case miffTypeMATRIX3X3R8S:           return (MiffC1 *) miffTypeMATRIX3X3R8S_STR;
    case miffTypeMATRIX4X4R4:            return (MiffC1 *) miffTypeMATRIX4X4R4_STR;
+   case miffTypeMATRIX4X4R4S:           return (MiffC1 *) miffTypeMATRIX4X4R4S_STR;
    case miffTypeMATRIX4X4R8:            return (MiffC1 *) miffTypeMATRIX4X4R8_STR;
+   case miffTypeMATRIX4X4R8S:           return (MiffC1 *) miffTypeMATRIX4X4R8S_STR;
    }
 
    return (MiffC1 *) "";
@@ -234,7 +262,9 @@ MiffN4 _TypeGetNameSize(MiffType const type)
    case miffTypeN128:                   return miffTypeN128_STR_SIZE;
    case miffTypeN256:                   return miffTypeN256_STR_SIZE;
    case miffTypeR4:                     return miffTypeR4_STR_SIZE;
+   case miffTypeR4S:                    return miffTypeR4S_STR_SIZE;
    case miffTypeR8:                     return miffTypeR8_STR_SIZE;
+   case miffTypeR8S:                    return miffTypeR8S_STR_SIZE;
    case miffTypeABI1:                   return miffTypeABI1_STR_SIZE;
    case miffTypeABI2:                   return miffTypeABI2_STR_SIZE;
    case miffTypeABI4:                   return miffTypeABI4_STR_SIZE;
@@ -244,7 +274,9 @@ MiffN4 _TypeGetNameSize(MiffType const type)
    case miffTypeABN4:                   return miffTypeABN4_STR_SIZE;
    case miffTypeABN8:                   return miffTypeABN8_STR_SIZE;
    case miffTypeABR4:                   return miffTypeABR4_STR_SIZE;
+   case miffTypeABR4S:                  return miffTypeABR4S_STR_SIZE;
    case miffTypeABR8:                   return miffTypeABR8_STR_SIZE;
+   case miffTypeABR8S:                  return miffTypeABR8S_STR_SIZE;
    case miffTypeABCI1:                  return miffTypeABCI1_STR_SIZE;
    case miffTypeABCI2:                  return miffTypeABCI2_STR_SIZE;
    case miffTypeABCI4:                  return miffTypeABCI4_STR_SIZE;
@@ -254,7 +286,9 @@ MiffN4 _TypeGetNameSize(MiffType const type)
    case miffTypeABCN4:                  return miffTypeABCN4_STR_SIZE;
    case miffTypeABCN8:                  return miffTypeABCN8_STR_SIZE;
    case miffTypeABCR4:                  return miffTypeABCR4_STR_SIZE;
+   case miffTypeABCR4S:                 return miffTypeABCR4S_STR_SIZE;
    case miffTypeABCR8:                  return miffTypeABCR8_STR_SIZE;
+   case miffTypeABCR8S:                 return miffTypeABCR8S_STR_SIZE;
    case miffTypeABCDI1:                 return miffTypeABCDI1_STR_SIZE;
    case miffTypeABCDI2:                 return miffTypeABCDI2_STR_SIZE;
    case miffTypeABCDI4:                 return miffTypeABCDI4_STR_SIZE;
@@ -264,13 +298,21 @@ MiffN4 _TypeGetNameSize(MiffType const type)
    case miffTypeABCDN4:                 return miffTypeABCDN4_STR_SIZE;
    case miffTypeABCDN8:                 return miffTypeABCDN8_STR_SIZE;
    case miffTypeABCDR4:                 return miffTypeABCDR4_STR_SIZE;
+   case miffTypeABCDR4S:                return miffTypeABCDR4S_STR_SIZE;
    case miffTypeABCDR8:                 return miffTypeABCDR8_STR_SIZE;
+   case miffTypeABCDR8S:                return miffTypeABCDR8S_STR_SIZE;
    case miffTypeMATRIX2X2R4:            return miffTypeMATRIX2X2R4_STR_SIZE;
+   case miffTypeMATRIX2X2R4S:           return miffTypeMATRIX2X2R4S_STR_SIZE;
    case miffTypeMATRIX2X2R8:            return miffTypeMATRIX2X2R8_STR_SIZE;
+   case miffTypeMATRIX2X2R8S:           return miffTypeMATRIX2X2R8S_STR_SIZE;
    case miffTypeMATRIX3X3R4:            return miffTypeMATRIX3X3R4_STR_SIZE;
+   case miffTypeMATRIX3X3R4S:           return miffTypeMATRIX3X3R4S_STR_SIZE;
    case miffTypeMATRIX3X3R8:            return miffTypeMATRIX3X3R8_STR_SIZE;
+   case miffTypeMATRIX3X3R8S:           return miffTypeMATRIX3X3R8S_STR_SIZE;
    case miffTypeMATRIX4X4R4:            return miffTypeMATRIX4X4R4_STR_SIZE;
+   case miffTypeMATRIX4X4R4S:           return miffTypeMATRIX4X4R4S_STR_SIZE;
    case miffTypeMATRIX4X4R8:            return miffTypeMATRIX4X4R8_STR_SIZE;
+   case miffTypeMATRIX4X4R8S:           return miffTypeMATRIX4X4R8S_STR_SIZE;
    }
 
    return 0;

@@ -151,7 +151,7 @@ Keys are always a single string of any character in UTF8 encoding as long as non
 
 ```
 12345
-;':][.,<>]&#96;
+;':][.,<>]
 a_b_c
 $cost
 été
@@ -185,7 +185,7 @@ This is also a valid key with internal spaces
 | mat2x2r4 mat2x2r8 | A 2x2 r4 or r8 matrix |
 | mat3x3r4 mat3x3r8 | A 3x3 r4 or r8 matrix |
 | mat4x4r4 mat4x4r8 | A 4x4 r4 or r8 matrix |
-| <br />** Variable Value Type**<br /> |
+| <br />**Variable Value Type**<br /> |
 | v | Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used. |
 
 
@@ -307,7 +307,7 @@ Array Count is never used with this value type and there is not value that follo
 - }[nl]
 - {[tb]anotherLevel1[nl]
 - ...
-- }[nl]<br />
+- }[nl]
 ```
 
 ## 3.2 - Basic Values

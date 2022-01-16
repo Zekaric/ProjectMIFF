@@ -97,12 +97,10 @@ Any byte data that is encode or stored as a binary byte sequence will be in big 
 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
-```
 &gt; MIFF![image](nl.png)
 &gt; 1![image](nl.png)
 &gt; [Sub-Format Name string]![image](nl.png)
 &gt; [Sub-Format Version string]![image](nl.png)
-```
 
 ![image](tab.png) means a tab character.  ![image](nl.png) means a new line character.  The &gt; is not part of the line, is it denoting the start of the line.
 
@@ -149,14 +147,12 @@ A record basically defines a key - value pair.  However the composition of that 
 
 Keys are always a single string of any character in UTF8 encoding as long as none are ![image](tab.png) and ![image](nl.png).  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
 
-```
 12345
 ;':][.,&lt;&gt;]&#96;
 a_b_c
 $cost
 été
 This is also a valid key with internal spaces
-```
 
 #### 2.2.2.2 - Type Code
 
@@ -243,9 +239,7 @@ All real numbers are stored as a Base64 string.  No exceptions.  This is to ensu
 ### 2.3.6 - Record Composition
 
 
-```
 &gt; [type code]![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[value]![image](nl.png)
-```
 
 Any space found in the key that is not a ![image](tab.png) will be part of the key.  They will be significant.  Do not strip or reduce them.
 
@@ -257,9 +251,7 @@ To be clear...
 
 **Invalid:** Absolutely no ![image](nl.png) anywhere before or within the key value line&#42;.  Absolutely no blank lines.  Absolutely no extra ![image](tab.png) anywhere in the format.
 
-```
 &gt; [type code]![image](tab.png)![image](tab.png)[key]![image](nl.png)[array count] [value]![image](nl.png)
-```
 
 What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
 
@@ -271,11 +263,9 @@ What [value] will look like will depend on what is being stored for the record. 
 
 Key-Value blocks are special.  They are needed to allow nesting of key values.
 
-```
 &gt; {![image](tab.png)[key]![image](nl.png)
 &gt; ...
 &gt; }![image](nl.png)
-```
 
 A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.
 
@@ -283,15 +273,12 @@ Array Count is never used with this value type and there is not value that follo
 
 **Example 1:**
 
-```
 &gt; {![image](tab.png)docInfo![image](nl.png)
 &gt; ...
 &gt; }![image](nl.png)
-```
 
 **Example 2:**
 
-```
 &gt; {![image](tab.png)level1![image](nl.png)
 &gt; {![image](tab.png)level2![image](nl.png)
 &gt; {![image](tab.png)level3![image](nl.png)
@@ -308,17 +295,14 @@ Array Count is never used with this value type and there is not value that follo
 &gt; {![image](tab.png)anotherLevel1![image](nl.png)
 &gt; ...
 &gt; }![image](nl.png)<br />
-```
 
 ## 3.2 - Basic Values
 
 
 Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
 
-```
 &gt; [text type code]![image](tab.png)[key]![image](tab.png)1![image](tab.png)[type value]![image](nl.png)
 &gt; [text type code]![image](tab.png)[key]![image](tab.png)[array count](![image](tab.png)[type value])&#42;![image](nl.png)
-```
 
 Text representation for a value will be...
 
@@ -334,88 +318,62 @@ If using an array flag, the above is repeated as many times as there are array e
 
 **Example 1:**
 
-```
 &gt; type![image](tab.png)type1![image](tab.png)1![image](tab.png)b![image](nl.png)
-```
 
 **Example 2:**
 
-```
 &gt; type![image](tab.png)type2![image](tab.png)2![image](tab.png)b![image](tab.png)n4![image](nl.png)
-```
 
 **Example 4:**
 
-```
 &gt; b![image](tab.png)Bool1![image](tab.png)1![image](tab.png)T![image](nl.png)
-```
 
 **Example 5:**
 
-```
 &gt; b![image](tab.png)Bool2![image](tab.png)10![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)T![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](tab.png)F![image](nl.png)
-```
 
 **Example 6:**
 
-```
 &gt; i4![image](tab.png)1Int![image](tab.png)1![image](tab.png)1024![image](nl.png)
-```
 
 **Example 7:**
 
-```
 &gt; n4![image](tab.png)&#42;Nat![image](tab.png)8![image](tab.png)1![image](tab.png)2![image](tab.png)4![image](tab.png)8![image](tab.png)16![image](tab.png)32![image](tab.png)64![image](tab.png)128![image](nl.png)
-```
 
 **Example 8:**
 
-```
 &gt; r4![image](tab.png)1Real![image](tab.png)1![image](tab.png)[Base64 encoded value]![image](nl.png)
-```
 
 **Example 9:**
 
-```
 &gt; r8![image](tab.png)&#42;Real![image](tab.png)3![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](tab.png)[Base64 encoded value]![image](nl.png)
-```
 
 ## 3.3 - String values
 
 
-```
 &gt; "![image](tab.png)[key]![image](tab.png)1![image](tab.png)[string value]![image](nl.png)
 &gt; "![image](tab.png)[key]![image](tab.png)[array count](![image](tab.png)[string value])&#42;![image](nl.png)
-```
 
 The string is preprocessed before storing.  All ![image](tab.png), ![image](nl.png), and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
 
-```
 \t - tab            - 0x09
 \n - new line       - 0x0a
 \\ - \
-```
 
 **Example 1:**
 
-```
 &gt; "![image](tab.png)string1![image](tab.png)1![image](tab.png)This is line1.\nThis is line 2.![image](nl.png)
-```
 
 **Example 2:**
 
-```
 &gt; "![image](tab.png)stringList1![image](tab.png)3![image](tab.png)This is string 1, line 1.\nThis is string1, line 2.\n![image](tab.png)This is string 2.![image](tab.png)This is string 3.![image](nl.png)
-```
 
 ## 3.4 - Variable values
 
 
 Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
 
-```
 &gt; v![image](tab.png)[key]![image](tab.png)1![image](tab.png)[tab delimited values]![image](nl.png)
 &gt; v![image](tab.png)[key]![image](tab.png)[array count]![image](tab.png)[tab delimited values]![image](nl.png)
-```
 
 A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.

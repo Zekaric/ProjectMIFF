@@ -25,16 +25,17 @@
 <p class="zword_toc2"><a href="#1.3">1.3 - Disclosure</a></p>
 <p class="zword_toc1"><a href="#2">2 - MI-MIFF Format</a></p>
 <p class="zword_toc2"><a href="#2.1">2.1 - Header</a></p>
-<p class="zword_toc1"><a href="#3">3 - Mine Information Block (MIB) - mine</a></p>
-<p class="zword_toc2"><a href="#3.1">3.1 - Information Block - info</a></p>
+<p class="zword_toc1"><a href="#3">3 - Mine Information Block (MIB)</a></p>
+<p class="zword_toc2"><a href="#3.1">3.1 - Information Block</a></p>
 <p class="zword_toc2"><a href="#3.2">3.2 - Type List Block</a></p>
+<p class="zword_toc3"><a href="#3.2.1">3.2.1 - Type Block</a></p>
 <p class="zword_toc2"><a href="#3.3">3.3 - Item List Block</a></p>
-<p class="zword_toc3"><a href="#3.3.1">3.3.1 - Item Data</a></p>
+<p class="zword_toc3"><a href="#3.3.1">3.3.1 - Item Block</a></p>
 <p class="zword_toc2"><a href="#3.4">3.4 - Image List Block</a></p>
-<p class="zword_toc3"><a href="#3.4.1">3.4.1 - Image</a></p>
-<p class="zword_toc2"><a href="#3.5">3.5 - Drillhole Data</a></p>
-<p class="zword_toc2"><a href="#3.6">3.6 - Geometry List Data</a></p>
-<p class="zword_toc3"><a href="#3.6.1">3.6.1 - Geometry Data</a></p>
+<p class="zword_toc3"><a href="#3.4.1">3.4.1 - Image Block</a></p>
+<p class="zword_toc2"><a href="#3.5">3.5 - Drillhole Block</a></p>
+<p class="zword_toc2"><a href="#3.6">3.6 - Geometry List Block</a></p>
+<p class="zword_toc3"><a href="#3.6.1">3.6.1 - Geometry Block</a></p>
 <p class="zword_toc2"><a href="#3.7">3.7 - Model Data</a></p>
 <p class="zword_toc3"><a href="#3.7.1">3.7.1 - Model Information</a></p>
 <p class="zword_toc2"><a href="#3.8">3.8 - Model Block:</a></p>
@@ -150,7 +151,7 @@
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>Sub-Fromat Name</td>
-<td class="zword">MiningInformation</td>
+<td class="zword">Mining Information</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>Sub-Format Version</td>
@@ -159,7 +160,7 @@
 </tbody></table>
 
 
-<h1 class="zword"><a name="3">3 - Mine Information Block (MIB) - mine</a></h1>
+<h1 class="zword"><a name="3">3 - Mine Information Block (MIB)</a></h1>
 <p class="zword">An MI-MIFF file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.</p>
 <p class="zwordPre">{	mine
 ...
@@ -176,7 +177,7 @@
 <li class="zword"><strong>Model Block</strong> to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.</li>
 </ul>
 
-<h2 class="zword"><a name="3.1">3.1 - Information Block - info</a></h2>
+<h2 class="zword"><a name="3.1">3.1 - Information Block</a></h2>
 <p class="zword">Common to all MI-MIFF files for any of the types above, there will be an information block providing general, project wide information.</p>
 <p class="zword">This information block will be the very first key value in the file right after the MIFF header.</p>
 <p class="zword">Inside the information block we have the following possible key values.  Not all are required.</p>
@@ -190,7 +191,7 @@
 "	comment	1	[comments]
 "	projectSystem	1	[coordinate system the project is in]
 "	projectName	1	[name of project area]
-acbr8	projectMin	1	[minimum project area point]
+abcr8	projectMin	1	[minimum project area point]
 abcr8	projectMax	1	[maximum project area point]
 }
 </p>
@@ -222,18 +223,24 @@ abcr8	projectMax	1	[maximum project area point]
 <p class="zword"><strong>[projectMin]</strong> and <strong>[projectMax]</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.</p>
 
 <h2 class="zword"><a name="3.2">3.2 - Type List Block</a></h2>
-<p class="zword">This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.</p>
-<p class="zwordPre">{	typeList
-{	type
+<p class="zword">This block is optional.  Types could be defined anywhere in the file as long as the type is defined before it is used.  It is better to have them all located in one place and near the beginning of the file.</p>
+<p class="zwordPre">{	type list
+...
+}
+</p>
+<p class="zword">The type list will have 1 or more <strong>type</strong> blocks inside of it.</p>
+
+<h3 class="zword"><a name="3.2.1">3.2.1 - Type Block</a></h3>
+<p class="zwordPre">{	type
 "	name	1	[name of user type]
 v	[name of variable]	[array count of variable]	[type of variable]
 v	[name of enumeration]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])*
 }
-}
 </p>
-<p class="zword">[type of variable] is one of the built in types or any type that was previously defined.  [array count of variable] can be 1, some positive value, or "*" if the array count is defined by something else.</p>
-<p class="zword">There can be any number of v records after the type's name.  The second line above is showing the case of an enumeration variable.</p>
-<p class="zwordPre">{	typeList
+<p class="zword"><strong>name</strong> appears first in the block.  It will be the name of the type.</p>
+<p class="zword">There will be 1 or more of the following two lines.  Each line indicates a member of the type.  The second line indicates an enumeration where after the [type of variable] will be a series of code and string pairs.</p>
+<p class="zword">When data is provided for the type, the order of the members will be the order of the values.</p>
+<p class="zwordPre">{	type list
 {	type
 " 	name 	1	id
 v	value	1	n4
@@ -334,7 +341,7 @@ v	value	1	n1	0	no options	1	node coloring	2	line coloring	10	texture coloring
 "	name	1	polyline
 v	pointCount	1	n4
 v	pointList	*	abcr8
-v	polyOption  1	enumPolyOption
+v	polyOption	1	enumPolyOption
 v	colorList	*	abcn1
 v	textureUV	*	abr4
 v	texture	1	imageId
@@ -380,33 +387,31 @@ v	value	1	"
 v	text	1	"
 }
 </p>
-<p class="zword">All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.</p>
+<p class="zword">All MI-MIFF files will have the above types defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.</p>
 <p class="zword">For polyline, surface, and mesh, if the options don't require the presence of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.</p>
 
 <h2 class="zword"><a name="3.3">3.3 - Item List Block</a></h2>
 <p class="zword">Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.</p>
-<p class="zwordPre">itemList []= [item list count]
- ...
+<p class="zwordPre">{	item list
+...
+}
 </p>
-<p class="zword">An item list is just a collection of items.  It should be known how many items are being tracked so this list is often using the array flag with the key-value block.</p>
 
-<h3 class="zword"><a name="3.3.1">3.3.1 - Item Data</a></h3>
-<p class="zword">Within the itemList you will only find Item Key-Value blocks.</p>
-<p class="zword">Item data will describe the value that will be stored in the various places where the item is being tracked.</p>
-<p class="zwordPre">item []-
- id          id-          [item id]
- nameLong    ""-          [item name]
- nameShort   ""-          [item name short]
- type        type-        [item type]
- min         [item type]- [item min value]
- max         [item type]- [item max value]
- precision   [item type]- [item precision]
- default     [item type]- [default value for this item, missing value otherwise.]
- calculation ""-          [calculation field value]
- ...
-\n
+<h3 class="zword"><a name="3.3.1">3.3.1 - Item Block</a></h3>
+<p class="zword">Item will describe the value that will be stored in the various places where the item is being tracked.</p>
+<p class="zwordPre">{	item
+id	id	1	[id of item]
+"	nameLong	1	[item name]
+"	nameShort	1	[item name short]
+type	type	1	[item type]
+[item type]	min	1	[item min value]
+[item type]	max	1	[item max value]
+[item type]	precision	1	[item precision]
+[item type]	default	1	[default value for this item, missing value otherwise.]
+"	calculation	1	[calculation field value]
+}
 </p>
-<p class="zword">Each item will have a unique <strong>id</strong>.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.</p>
+<p class="zword">Each item will have a unique <strong>id</strong>.  This id may or may not be provided by the software.  This id is used by the other places in this MI-MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.</p>
 <p class="zword"><strong>nameLong</strong> and <strong>nameShort</strong> are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.</p>
 <p class="zword"><strong>type</strong> will define the value being stored for this item.  Type is one of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)</p>
 <p class="zword"><strong>min</strong>, <strong>max</strong> define the limits for an item.  Only applicable if item type is a r*, n*, or i*.  If these are missing then the range is the full range as defined by the type.</p>
@@ -414,6 +419,7 @@ v	text	1	"
 <p class="zword"><strong>default</strong> will define the default value for this item if block is skipped.  If this is missing then the default value is 'missing'.</p>
 <p class="zword"><strong>calculation</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item id]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.</p>
 <p class="zword">When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'missing value' as well.  If this is all the values that need to be recorded then we don't really need to use a full r4 or r8 to store it.  We will be storing instead an n* value such that the n value, multiplied by the precision and added to the min value will recover the r value which is being stored.  In this case, 102 values only requires an n1 to encode all the values in the range.</p>
+<p class="zword">If there is an enumeration item value then define the enumeration as a type in the type list and use that type for the item's type.</p>
 <p class="zwordPre">Calculation example:
 (@ore%@ * @cu@) - @i_am_making_something_up@
 </p>
@@ -456,418 +462,50 @@ v	text	1	"
 </tr>
 </tbody></table>
 <p class="zword">Examples:</p>
-<p class="zwordPre">item []-\n
- id        id-\n
-`cu\n
- nameLong  ""-   `Copper\n
- nameShort ""-   `cu\n
- type      type- r4\n
- min       r4-   [base64 0]\n
- max       r4-   [base64 5]\n
- precision r4-   [base64 0.01]\n
- default   r4-   [base64 missing value]\n
-\n
-
-
-enumCodeRockType  userType-\n
- enumCode  n1-\n
-\n
-enumValueRockType userType-\n
- enumCode  enumCodeRockType-\n
- enumValue ""-\n
-\n
-enumListRockType enumValueRockType= 3\n
- 0\n
- `Granite\n
- 1\n
- `Sandstone\n
- 2\n
- `Shale\n
-\n
-item []-\n
- id        id-\n
-`rt\n
- nameLong  ""-              `Rock Type\n
- nameShort ""-              `rock\n
- type      type-            enumCodeRockType\n
- default   enumCodeRockType -\n
-\n
+<p class="zwordPre">{	type list
+...
+{	type
+"	name	1	rock type	15	Granite	17	Sandstone	19	Shale
+}
+...
+}
+{	item list
+...
+{	item
+id	id	1	0
+"	nameLong	1	Copper
+"	nameShort	1	cu
+type	type	1	r4
+r4	min	1	[base64 0]
+r4	max	1	[base64 5]
+r4	precision	1	[base64 0.01]
+r4	default	1	[base64 missing value]
+}
+...
+{	item
+id	id	1	1
+"	nameLong	1	Rock Type
+"	nameShort	1	rock
+type	type	1	rock type
+rock type	default	1	0
+}
+...
+}
 </p>
-<p class="zword">An enumeration requires the enumeration usertypes defined before the item is defined.  Usually in the Type List and not here.</p>
+<p class="zword">An enumeration requires the types defined before the item is defined.  Place the enumeration in the type list.  Note, the enumeration has values 15-Granite, 17-Sandstone, and 19-Shale.  Yet the default for Rock Type item is 0.  This is because it is the index of the value and not the code value.  0 being Granite, 1 being Sandstone, and 2 being Shale in this case.</p>
 
 <h2 class="zword"><a name="3.4">3.4 - Image List Block</a></h2>
 <p class="zword">Defining the images used by surfaces and such.</p>
-<p class="zwordPre">imageList []= [image list count]
+<p class="zwordPre">{	image list
 ...
+}
 </p>
 
-<h3 class="zword"><a name="3.4.1">3.4.1 - Image</a></h3>
+<h3 class="zword"><a name="3.4.1">3.4.1 - Image Block</a></h3>
 <p class="zword">Defining an image.</p>
-<p class="zwordPre">image []-\n
- id     id- [image id]\n
- width  n4- [width of image]\n
- height n4- [height of image]\n
- pixels [color|colorA][=|Z|C] [pixel count]\n
-...
-\n
-image []-\n
- id     id- [image id]\n
- file   file[-|z|c]...
-\n
-image []-\n
- id     id- [image id]\n
- path   path- ...
-\n
+<p class="zwordPre">{	image
+id	id	1	[image id]
+n4	width	1	[width of image]
+n4	height	1	[height of image]
+[color|colorA]	pixels	[pixel count]
 </p>
-<p class="zword">The first image defines the image raw, inline.</p>
-<p class="zword">The second image defines the image embedded as a verbatum copy of the file contents.</p>
-<p class="zword">The third image refers to an image file external to the MIFF file.</p>
-<p class="zword">The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.</p>
-
-<h2 class="zword"><a name="3.5">3.5 - Drillhole Data</a></h2>
-<p class="zword">Drillhole data holds information about drillholes.</p>
-
-<h2 class="zword"><a name="3.6">3.6 - Geometry List Data</a></h2>
-<p class="zword">Geometry List will hold geometric data like points, polylines, polygons, surfaces, text, that live in the project space.</p>
-<p class="zwordPre">geometryList []-\n
-...
-\n
-</p>
-
-<h3 class="zword"><a name="3.6.1">3.6.1 - Geometry Data</a></h3>
-<p class="zword">Within the geometryList you will only find geometry Key-Value blocks.</p>
-<p class="zwordPre">attrList id= [item Count]\n
-...
-pointAttrList id= [item count]\n
-...
-lineAttrList id= [item count]\n
-...
-
-
-geom []-\n
- id       id-          [geom id]\n
- type     type-        [geom type]\n
- data     [geom type]-
-  ...
- attr [geom attr list user type]-\n
-  ...
- pointAttr [point attr list user type]= [pointCount]\n
-  ...
- lineAttr [line attr list user type]= [pointCount]\n
-  ...
-</p>
-<p class="zword">Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.</p>
-<p class="zword">Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.</p>
-<p class="zword">attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.</p>
-<p class="zword">In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.</p>
-<p class="zword">Each geom has a unique id.</p>
-<p class="zword">Each geom will have a type.  One of point, pointGroup, polyline, surface, mesh, grid, or text.</p>
-<p class="zword">Each geom will have data of the given type.</p>
-<p class="zword">Each geom may have an optional geomAttr key value block.</p>
-<p class="zword">If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.</p>
-
-<h2 class="zword"><a name="3.7">3.7 - Model Data</a></h2>
-<p class="zword">Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.</p>
-<p class="zword"><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">Block Model Knowledge For Mining Engineers - An Introduction</a></p>
-<p class="zword">There are 3 basic model formats that are in use as Hexagon.</p>
-<ul class="zword">
-<li class="zword">Block Model</li>
-<li class="zword">Seam Model</li>
-<li class="zword">Surface Model</li>
-</ul>
-<p class="zword"><strong>Block Model</strong> is a regular collection of, usually, uniform blocks.  Each block will have values for items that are being tracked by the client.</p>
-<p class="zword"><strong>Seam Model</strong> is a bit fancier Block Model.  This model is subdivided uniformly in the row and column directions of the model but instead of levels, seams are described.  Each block in a seam will have an elevation top and bottom to indicate the seam's limits, as well as any other values that are found within that seam block just like a normal block model.</p>
-<p class="zword"><strong>Surface Model</strong> is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.</p>
-<p class="zword">Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
-
-<h3 class="zword"><a name="3.7.1">3.7.1 - Model Information</a></h3>
-<p class="zword">After the general information block the next block will be the Model Information block.</p>
-<p class="zwordPre">infoModel []-
- type             ""-   [model type]
- isSubblocked     bool  [true if subblocked]
- subblockType     ""-   [subblock type]
- subblockOption   v3n4- [subblock fixed resolution]
- subblockOption   v2n4- [subblock row col resolution]
- subblockOption   n1-   [subblock octtree level count]
- origin           v3r8- [origin point]
- colVec           v3r4- [column vector, length if vector is the length of the block]
- rowVec           v3r4- [row vector, length of the vector is the length of the block]
- levVec           v3r4- [level vector, length of the vector id the length of the block]
- blockCount       v3n4- [number of column, row, level blocks]
- isLevVariable    bool- [true if variable level heights]
- levList          r4=   [number of levels] [length] [length] ...
-\n
-</p>
-<p class="zword"><strong>[model type]</strong> will be one of...</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Value</th>
-<th class="zword_fill">Description</th>
-</tr>
-<tr class="zword">
-<td class="zword">block</td>
-<td class="zword">For a block model.</td>
-</tr>
-<tr class="zword">
-<td class="zword">seam</td>
-<td class="zword">For a seam model.</td>
-</tr>
-<tr class="zword">
-<td class="zword">surface</td>
-<td class="zword">For a surface model.</td>
-</tr>
-</tbody></table>
-<p class="zword"><strong>[subblock type]</strong> will be one of...</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Value</th>
-<th class="zword_fill">Description</th>
-</tr>
-<tr class="zword">
-<td class="zword">fixed</td>
-<td class="zword"><p class="zword">For a regular division of the block in the east, north, and z directions of the block.</p>
-<p class="zwordPre">Using just a cross section.
-Level +--+--+--+--+
-  |   |  |  |  |  | <--- Each sub-block of the parent block is of uniform size.
-  |   +--+--+--+--+
-  |   |  |  |  |  |
-  |   +--+--+--+--+
-  |   |  |  |  |  |
-  V   +--+--+--+--+
-      Row or Column --->
-</p>
-</td>
-</tr>
-<tr class="zword">
-<td class="zword">semi</td>
-<td class="zword"><p class="zword">For a regular division of a block in the east and north directions but an infinitely variable z value for block height.</p>
-<p class="zwordPre">+--+--+--+--+
-|  +--+  |  |
-|  |  +--+  |
-|  +--+  |  | Infinitely variable in the level direction.
-+--+  |  |  |
-+--+--+--+--+
-Uniform divisions in the row and column directions.
-</p>
-</td>
-</tr>
-<tr class="zword">
-<td class="zword">octree</td>
-<td class="zword"><p class="zword">For an oct-tree subvision of a block.</p>
-<p class="zwordPre">+-----+-----+
-|     |     |
-+--+--+-----+  Recursive bisecting the blocks until a limit.
-+--+--+     |
-+--+--+-----+
-</p>
-</td>
-</tr>
-<tr class="zword">
-<td class="zword">free</td>
-<td class="zword"><p class="zword">For a free subdivision of a block where each subblock is individually defined as being some subvolume of the parent.</p>
-<p class="zwordPre">+-----------+
-|    +----+ |
-|    |    | |
-|    +----+ | Bad diagram but essentially possible with this option.  This is a catchall case for
-+--+        | those types of subblocking I have not addressed.
-|  |        |
-+--+--------+
-</p>
-</td>
-</tr>
-</tbody></table>
-<p class="zword">Depending on what is set for [subblock type] there will be one of 3 [subblockOption] values.</p>
-<ul class="zword">
-<li class="zword">fixed subblocking requires a v3n4 to define the number of divisions in the east, north and z directions.</li>
-<li class="zword">semiFixed subblocking requires a v2n4 to define the number of divisions in the east and north directions.</li>
-<li class="zword">octree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.</li>
-<li class="zword">free subblocking does not require an option.</li>
-</ul>
-<p class="zwordPre">       \   /
-        \ /
-         +  Column 1
-        / \
- Row 1 /   \   /
-      /     \ /
-     /Lev 0  +
-\   / Row 0 /|
- \ /  Col 0/ |
-  +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
-  |\     /   |/
-  | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
-\ |  \ /    /|
- \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
-  +   |   /
-  |\  | <--------- levVec (Length can be block size or unit, depends see below. Direction is direction of increasing level index.)
-  | \ | /
-     \|/
-      +
-      | Level 1
-      |
-</p>
-<p class="zword"><strong>origin</strong> - The extreme most point of the first column, first row, and first level block of the model.</p>
-<p class="zword"><strong>colVec, rowVec, levVec</strong> - The direction vectors of increasing block index for the column, row, and level directions.  The length of this vector is the size of the block in the column, row and level directions.  levVec does not need to be sized if the level height is variable.  It should at least be unit length.  All vectors need not be perpendicular to each other but usually this is the case in most software.  I believe there is one software where colVec and rowVec are not 90 degrees to the levVec.  Essentially creating non-square/cuboid blocks.</p>
-<p class="zword"><strong>blockCount</strong> - The number of column, row, and level blocks.</p>
-<p class="zword"><strong>isLevVariable</strong> - Flag to indicate the level heights are not uniform.  This does not need to be present if the levels are a fixed height.</p>
-<p class="zword"><strong>levList</strong> - A list of level heights starting from first level.  Only required if isLevVariable is true.</p>
-
-<h2 class="zword"><a name="3.8">3.8 - Model Block:</a></h2>
-<p class="zword">This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.</p>
-<p class="zwordPre">model [...]-
-</p>
-<p class="zword">The model data will be enclosed in a value stream chunk.  The contents are broken down in key, or key and value pairs.</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Key&nbsp;(1&nbsp;Byte)</th>
-<th class="zword_fill">Value</th>
-</tr>
-<tr class="zword">
-<td class="zword">B</td>
-<td class="zword">n2 value follows immediately.  Jump to current level index + N.  Reset current row, current column, and current item to 0</td>
-</tr>
-<tr class="zword">
-<td class="zword">b</td>
-<td class="zword">No value.  Jump to next level.  Reset current row, current column, and current item to 0</td>
-</tr>
-<tr class="zword">
-<td class="zword">R</td>
-<td class="zword">n2 value follows immediately.  Jump to current row index + N.  Reset currrent column and current item to 0</td>
-</tr>
-<tr class="zword">
-<td class="zword">r</td>
-<td class="zword">No value.  Jump to next row.  Reset current column and current item to 0.</td>
-</tr>
-<tr class="zword">
-<td class="zword">C</td>
-<td class="zword">n2 value follows immediately.  Jump to current column index + N.  Reset current item to 0</td>
-</tr>
-<tr class="zword">
-<td class="zword">c</td>
-<td class="zword">No value.  Jump to next column.  Reset current item to 0</td>
-</tr>
-<tr class="zword">
-<td class="zword">s</td>
-<td class="zword">Defining subblock but parent block as values.  Provide parent block item values before subblock values.  'c' follows immediately if parent block has no values.</td>
-</tr>
-<tr class="zword">
-<td class="zword">I</td>
-<td class="zword">n1 value follows immediately.  Jump to item index + N.  Skipped over items get default values.</td>
-</tr>
-<tr class="zword">
-<td class="zword">i</td>
-<td class="zword">Jump to next item.  Skipped over item gets default value.</td>
-</tr>
-<tr class="zword">
-<td class="zword">V</td>
-<td class="zword">n1 value follows.  Provide the values for the next n1 items.</td>
-</tr>
-<tr class="zword">
-<td class="zword">v</td>
-<td class="zword">Provide the values for the rest of the block or subblock.</td>
-</tr>
-<tr class="zword">
-<td class="zword">D</td>
-<td class="zword">n1 value follows immediately. Duplicate the next n1 values from the last block or subblock.</td>
-</tr>
-<tr class="zword">
-<td class="zword">d</td>
-<td class="zword">Duplicate the remaining values from the last block or subblock.</td>
-</tr>
-<tr class="zword">
-<td class="zword">X</td>
-<td class="zword">n1 value follows immediately.  Clone last block n1 times.  This is for all the item values.</td>
-</tr>
-<tr class="zword">
-<td class="zword">.</td>
-<td class="zword">No value.  Indicates end of the item date or subblock data.</td>
-</tr>
-<tr class="zword">
-<td class="zword">\n (text), 0 (binary)</td>
-<td class="zword">No value.  Indicates end value stream.</td>
-</tr>
-</tbody></table>
-<p class="zword">The above may not make that much sense yet so here is an example of a 5x5 block model where we have 3 i4 values per block.</p>
-<p class="zwordPre">File                   What is happening
---------------------   -----------------
-model [...]-\n         Start of the model data value stream.
-                       Current block is 0 (first) level, 0 (first) row, 0 (column)
-B2                     Add 2 to the level index.
-                       Current block jumps to 2, 0, 0.
-                       All blocks on levels 0 and 1 have default values.
-R2                     Add 2 to the row index.
-                       Curent block jumps to 2, 2, 0.
-                       All blocks on level 2, rows 0 and 1 have default values.
-C2                     Add 2 to the column index.
-                       Current block jumps to 2, 2, 2.
-                       Block 2, 2, 0, and Block 2, 2, 1 have default values.
-v1 2 3                 Block 2, 2, 2 has values 1, 2, 3.
-                       Current block jumps to 2, 2, 3.
-c                      Block 2, 2, 3 get default value.
-                       Current block after this line is 2, 2, 4.
-c                      Block 2, 2, 4 get default value.
-                       Current block after this line is 2, 3, 0.
-                       We jumped to the next row
-\n                     This indicates that the rest of the model is set to default values.
-</p>
-<p class="zword">Note that there are no \n after every key value pairs.  This is to keep the text representation as compact as possible.  So in actual text file this will look like...</p>
-<p class="zwordPre">model [...]-
-B2R2C2v1 2 3cc.\n
-</p>
-<p class="zword">Note, if you can removed a separator without losing then that should be done.</p>
-<p class="zword">In binary the above will look like...</p>
-<p class="zwordPre">[n1:5][5 :model][n2:2]
-[1 :B][n2:2]
-[1 :R][n2:2]
-[1 :C][n2:2]
-[1 :v][i4:1][i4:2][i4:3]
-[1 :c]
-[1 :c]
-[n1:0]
-</p>
-
-<h3 class="zword"><a name="3.8.1">3.8.1 - SubBlock: Fixed</a></h3>
-<p class="zword">In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.</p>
-
-<h3 class="zword"><a name="3.8.2">3.8.2 - SubBlock: Semi</a></h3>
-<p class="zword">In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...</p>
-<p class="zword">In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level subblocks will depend on how many times H is used for the same column.</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Key</th>
-<th class="zword_fill">Value</th>
-</tr>
-<tr class="zword">
-<td class="zword">H</td>
-<td class="zword">r4 value immediately follows.  The r4 value is a percent of the block height.  This record needs to preceed a v record.</td>
-</tr>
-<tr class="zword">
-<td class="zword">h</td>
-<td class="zword">No value.  The rest of the subblock cylinder is used.</td>
-</tr>
-</tbody></table>
-<p class="zword">If H or h follows an H or h then the previous block will be holding default values, and the current block will be incremented to the next subblock.  The following H or h will determin the height of the new current block.</p>
-<p class="zword">If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.</p>
-
-<h3 class="zword"><a name="3.8.3">3.8.3 - SubBlock: Octree</a></h3>
-<p class="zword">In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.</p>
-<p class="zword">The 's' key need to preceed the v record.</p>
-
-<h3 class="zword"><a name="3.8.4">3.8.4 - SubBlock: Free</a></h3>
-<p class="zword">In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Key</th>
-<th class="zword_fill">Value</th>
-</tr>
-<tr class="zword">
-<td class="zword">c</td>
-<td class="zword">6 x r4 values follow.  First 3 r4 values are percents for the min point and the second 3 r4 values are percents for the max point of the subblock.</td>
-</tr>
-<tr class="zword">
-<td class="zword">.</td>
-<td class="zword">Indicates we are done with the subblocking and to process to the next parent block.</td>
-</tr>
-</tbody></table>
- </body>
-
-</html>

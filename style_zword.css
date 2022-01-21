@@ -21,7 +21,7 @@ SOFTWARE.
 ******************************************************************************/
 
 body.zword        { margin: 0.0em; }
-table.zword       { margin-left: 2.0rem; margin-right: 2.0rem; }
+table.zword       { margin-left: 2.0rem; margin-right: 2.0rem; margin-bottom: 0.5rem; }
 tr.shade          { background-color: whitesmoke; }
 td.zword          { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: left; }
 td.zword_num      { padding-right: 0.5rem; padding-bottom: 0.1rem; text-align: right; font-family: monospace;}

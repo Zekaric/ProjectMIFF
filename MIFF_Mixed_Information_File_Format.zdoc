@@ -133,8 +133,12 @@ t-
 tcx	|line||b |Basic Value Types| b||line|
 
 t-
+tcx	-
+tc	Comment line.
+
+t-
 tcx	type
-tc	Type value.  One of these type codes.
+tc	Type value.  One of these type codes.  Or potentially a user defined type as dictated by a sub-format or documenation.
 
 t-
 tcx	"
@@ -210,6 +214,10 @@ tcx	|line||b |Variable Value Type| b||line|
 t-
 tcx	v
 tc	Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used.
+
+t-
+tcx	[any other value]
+tc	If the type code is any other string other that than defined above, it is treated in exactly the same way as a |b |v| b|, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format.
 
 ]
 
@@ -421,3 +429,7 @@ hh	|chapter| - Variable values
 ]
 
 	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.
+	
+hh	|chapter| - Unknown values
+
+	

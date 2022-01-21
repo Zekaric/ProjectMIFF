@@ -40,6 +40,7 @@
     3.2 - Basic Values<br />
     3.3 - String values<br />
     3.4 - Variable values<br />
+    3.5 - Unknown values<br />
 
 # 1 - M.I.F.F.
 
@@ -167,7 +168,8 @@ This is also a valid key with internal spaces
 | { | Key-Value block begins. |
 | } | Key-Value block ends. |
 | <br />**Basic Value Types**<br /> |
-| type | Type value.  One of these type codes. |
+| - | Comment line. |
+| type | Type value.  One of these type codes.  Or potentially a user defined type as dictated by a sub-format or documenation. |
 | " | String (UTF8) data, can be of any length. |
 | b | Boolean value. |
 | i1 i2 i3 i4 i8 i16 i32 i64 i128 i256 | An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases. |
@@ -187,6 +189,7 @@ This is also a valid key with internal spaces
 | mat4x4r4 mat4x4r8 | A 4x4 r4 or r8 matrix |
 | <br />**Variable Value Type**<br /> |
 | v | Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used. |
+| [any other value] | If the type code is any other string other that than defined above, it is treated in exactly the same way as a **v**, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format. |
 
 
 #### 2.2.2.3 - Array Count
@@ -419,3 +422,6 @@ Variable records should be used sparingly or when using the basic types would ma
 ```
 
 A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.
+
+## 3.5 - Unknown values
+

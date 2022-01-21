@@ -132,7 +132,7 @@ th*	Value
 
 t-
 tcx	Sub-Fromat Name
-tc	MiningInformation
+tc	Mining Information
 
 t-
 tcx	Sub-Format Version
@@ -140,7 +140,7 @@ tc	1
 ]
 
 
-h	|chapter| - Mine Information Block (MIB) - mine
+h	|chapter| - Mine Information Block (MIB)
 
 	An MI-MIFF file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.
 
@@ -164,7 +164,7 @@ h	|chapter| - Mine Information Block (MIB) - mine
 
 
 
-hh	|chapter| - Information Block - info
+hh	|chapter| - Information Block
 
 	Common to all MI-MIFF files for any of the types above, there will be an information block providing general, project wide information.
 	This information block will be the very first key value in the file right after the MIFF header.
@@ -183,7 +183,7 @@ hh	|chapter| - Information Block - info
 "	comment	1	[comments]
 "	projectSystem	1	[coordinate system the project is in]
 "	projectName	1	[name of project area]
-acbr8	projectMin	1	[minimum project area point]
+abcr8	projectMin	1	[minimum project area point]
 abcr8	projectMax	1	[maximum project area point]
 }
 ]
@@ -220,24 +220,32 @@ tc	Only holds model data.
 
 hh	|chapter| - Type List Block
 
-	This block is optional.  Types could be anywhere as long as the types are defined before they are used.  It's just nice to have them all located in one place.
+	This block is optional.  Types could be defined anywhere in the file as long as the type is defined before it is used.  It is better to have them all located in one place and near the beginning of the file.
 
 .[
-{	typeList
+{	type list
+...
+}
+]
+
+	The type list will have 1 or more |b |type| b| blocks inside of it.
+
+hhh	|chapter| - Type Block
+
+.[
 {	type
 "	name	1	[name of user type]
 v	[name of variable]	[array count of variable]	[type of variable]
 v	[name of enumeration]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])*
 }
-}
 ]
 
-	There can be multiple { type } blocks within the typeList.
-	[type of variable] is one of the built in types or any type that was previously defined.  [array count of variable] can be 1, some positive value, or "*" if the array count is defined by something else.
-	There can be any number of v records after the type's name.  The second line above is showing the case of an enumeration variable.  
+	|b |name| b| appears first in the block.  It will be the name of the type.
+	There will be 1 or more of the following two lines.  Each line indicates a member of the type.  The second line indicates an enumeration where after the [type of variable] will be a series of code and string pairs.
+	When data is provided for the type, the order of the members will be the order of the values.
 
 .[
-{	typeList
+{	type list
 {	type
 " 	name 	1	id
 v	value	1	n4
@@ -338,7 +346,7 @@ v	value	1	n1	0	no options	1	node coloring	2	line coloring	10	texture coloring
 "	name	1	polyline
 v	pointCount	1	n4
 v	pointList	*	abcr8
-v	polyOption  1	enumPolyOption
+v	polyOption	1	enumPolyOption
 v	colorList	*	abcn1
 v	textureUV	*	abr4
 v	texture	1	imageId
@@ -385,9 +393,8 @@ v	text	1	"
 }
 ]
 
-	All MI-MIFF files will have the above userTypes defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.
+	All MI-MIFF files will have the above types defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.
 	For polyline, surface, and mesh, if the options don't require the presence of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.
-
 
 
 hh	|chapter| - Item List Block
@@ -395,34 +402,31 @@ hh	|chapter| - Item List Block
 	Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.
 
 .[
-{	itemList
+{	item list
 ...
 }
 ]
 
-	An item list is just a collection of items.  It should be known how many items are being tracked so this list is often using the array flag with the key-value block.
 
-hhh	|chapter| - Item Data
+hhh	|chapter| - Item Block
 
-	Within the itemList you will only find Item Key-Value blocks.  
-	Item data will describe the value that will be stored in the various places where the item is being tracked.
+	Item will describe the value that will be stored in the various places where the item is being tracked.
 
 .[
-item []- 
- id          id-          [item id]
- nameLong    ""-          [item name]
- nameShort   ""-          [item name short]
- type        type-        [item type]
- min         [item type]- [item min value]
- max         [item type]- [item max value]
- precision   [item type]- [item precision]
- default     [item type]- [default value for this item, missing value otherwise.]
- calculation ""-          [calculation field value]
- ...
-\n
+{	item
+id	id	1	[id of item]
+"	nameLong	1	[item name]
+"	nameShort	1	[item name short]
+type	type	1	[item type]
+[item type]	min	1	[item min value]
+[item type]	max	1	[item max value]
+[item type]	precision	1	[item precision]
+[item type]	default	1	[default value for this item, missing value otherwise.]
+"	calculation	1	[calculation field value]
+}
 ]
 
-	Each item will have a unique |b |id| b|.  This id may or may not be provided by the software.  This id is used by the other places in this MI MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.
+	Each item will have a unique |b |id| b|.  This id may or may not be provided by the software.  This id is used by the other places in this MI-MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.
 	|b |nameLong| b| and |b |nameShort| b| are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.
 	|b |type| b| will define the value being stored for this item.  Type is one of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.) 
 	|b |min| b|, |b |max| b| define the limits for an item.  Only applicable if item type is a r*, n*, or i*.  If these are missing then the range is the full range as defined by the type.
@@ -431,6 +435,8 @@ item []-
 	|b |calculation| b| is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item id]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.
 
 	When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'missing value' as well.  If this is all the values that need to be recorded then we don't really need to use a full r4 or r8 to store it.  We will be storing instead an n* value such that the n value, multiplied by the precision and added to the min value will recover the r value which is being stored.  In this case, 102 values only requires an n1 to encode all the values in the range.
+	
+	If there is an enumeration item value then define the enumeration as a type in the type list and use that type for the item's type.
 
 .[
 Calculation example:
@@ -478,44 +484,38 @@ tc	0 string length.  An actual 0 string will have 1 character and that character
 	Examples:
 
 .[
-item []-\n
- id        id-\n
-`cu\n
- nameLong  ""-   `Copper\n
- nameShort ""-   `cu\n
- type      type- r4\n
- min       r4-   [base64 0]\n
- max       r4-   [base64 5]\n
- precision r4-   [base64 0.01]\n
- default   r4-   [base64 missing value]\n
-\n
-
-enumCodeRockType  userType-\n
- enumCode  n1-\n
-\n
-enumValueRockType userType-\n
- enumCode  enumCodeRockType-\n
- enumValue ""-\n
-\n
-enumListRockType enumValueRockType= 3\n
- 0\n
- `Granite\n
- 1\n
- `Sandstone\n
- 2\n
- `Shale\n
-\n
-item []-\n
- id        id-\n
-`rt\n
- nameLong  ""-              `Rock Type\n
- nameShort ""-              `rock\n
- type      type-            enumCodeRockType\n
- default   enumCodeRockType -\n
-\n
+{	type list
+...
+{	type
+"	name	1	rock type	15	Granite	17	Sandstone	19	Shale
+}
+...
+}
+{	item list
+...
+{	item
+id	id	1	0
+"	nameLong	1	Copper
+"	nameShort	1	cu
+type	type	1	r4
+r4	min	1	[base64 0]
+r4	max	1	[base64 5]
+r4	precision	1	[base64 0.01]
+r4	default	1	[base64 missing value]
+}
+...
+{	item
+id	id	1	1
+"	nameLong	1	Rock Type
+"	nameShort	1	rock
+type	type	1	rock type
+rock type	default	1	0
+}
+...
+}
 ]
 
-	An enumeration requires the enumeration usertypes defined before the item is defined.  Usually in the Type List and not here.
+	An enumeration requires the types defined before the item is defined.  Place the enumeration in the type list.  Note, the enumeration has values 15-Granite, 17-Sandstone, and 19-Shale.  Yet the default for Rock Type item is 0.  This is because it is the index of the value and not the code value.  0 being Granite, 1 being Sandstone, and 2 being Shale in this case.
 
 
 
@@ -524,30 +524,31 @@ hh	|chapter| - Image List Block
 	Defining the images used by surfaces and such.
 
 .[
-imageList []= [image list count]
+{	image list
 ...
+}
 ]
 
-hhh	|chapter| - Image
+hhh	|chapter| - Image Block
 
 	Defining an image.
 
 .[
-image []-\n
- id     id- [image id]\n
- width  n4- [width of image]\n
- height n4- [height of image]\n
- pixels [color|colorA][=|Z|C] [pixel count]\n
-...
-\n
-image []-\n
- id     id- [image id]\n
- file   file[-|z|c]...
-\n
-image []-\n
- id     id- [image id]\n
- path   path- ...
-\n
+{	image
+id	id	1	[image id]
+n4	width	1	[width of image]
+n4	height	1	[height of image]
+[color|colorA]	pixels	[pixel count]
+]
+{	image
+id	id	1	[image id]
+"	file	1	[file name]
+n1	data	[file byte count]	[file data]
+}
+{	image
+id	id	1	[image id]
+"	path	1	[path to image file]
+}
 ]
 
 	The first image defines the image raw, inline.  
@@ -556,43 +557,36 @@ image []-\n
 	The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.
 
 
-hh	|chapter| - Drillhole Data
+hh	|chapter| - Drillhole Block
 
 	Drillhole data holds information about drillholes.
 
-hh	|chapter| - Geometry List Data
+hh	|chapter| - Geometry List Block
 
 	Geometry List will hold geometric data like points, polylines, polygons, surfaces, text, that live in the project space.  
 
 .[
-geometryList []-\n
+{	geometry list
 ...
-\n
+}
 ]
 
-hhh	|chapter| - Geometry Data
+hhh	|chapter| - Geometry Block
 
-	Within the geometryList you will only find geometry Key-Value blocks.
+	Within the geometry list you will only find geometry blocks.
 
 .[
-attrList id= [item Count]\n
-...
-pointAttrList id= [item count]\n
-...
-lineAttrList id= [item count]\n
-...
-
-geom []-\n
- id       id-          [geom id]\n
- type     type-        [geom type]\n
- data     [geom type]-
-  ...
- attr [geom attr list user type]-\n
-  ...
- pointAttr [point attr list user type]= [pointCount]\n
-  ...
- lineAttr [line attr list user type]= [pointCount]\n
-  ...
+id	attr list geom	[item Count]	[id of item]*
+id	attr list point	[item count]	[id of item]*
+id	attr list line	[item count]	[id of item]*
+{	geom
+id	id	1	[geom id]
+type	type	1	[geom type]
+[geom type]	data	1	[data of geom type]
+attr	geom	1	[geom attr list]
+attr	point	[point count]	[point attr list]
+attr	line	[point count]	[line attr list]
+}
 ]
 
 	Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.
@@ -628,21 +622,21 @@ hhh	|chapter| - Model Information
 	After the general information block the next block will be the Model Information block.
 
 .[
-infoModel []-
- type             ""-   [model type]
- isSubblocked     bool  [true if subblocked]
- subblockType     ""-   [subblock type]
- subblockOption   v3n4- [subblock fixed resolution]
- subblockOption   v2n4- [subblock row col resolution]
- subblockOption   n1-   [subblock octtree level count]
- origin           v3r8- [origin point]
- colVec           v3r4- [column vector, length if vector is the length of the block] 
- rowVec           v3r4- [row vector, length of the vector is the length of the block]
- levVec           v3r4- [level vector, length of the vector id the length of the block] 
- blockCount       v3n4- [number of column, row, level blocks]
- isLevVariable    bool- [true if variable level heights]
- levList          r4=   [number of levels] [length] [length] ...
-\n
+{	infoModel
+"	type	1	[model type]
+b	is subblocked	1	[true if subblocked]
+"	subblock type	1	[subblock type]
+abcn4	subblock option	1	[subblock fixed resolution]
+abn4	subblock option	1	[subblock row col resolution]
+n1	subblock option	1	[subblock octtree level count]
+abcr8	origin	1	[origin point]
+abcr8	column vector	1	[column vector, length if vector is the length of the block] 
+abcr4	row vector	1	[row vector, length of the vector is the length of the block]
+abcr4	level vector	1	[level vector, length of the vector id the length of the block] 
+abcn4	block count	1	[number of column, row, level blocks]
+b	is level size variable	1	[true if variable level heights]
+r4	level list	[number of levels] [length]*
+}
 ]
 
 	|b |[model type]| b| will be one of...
@@ -780,7 +774,7 @@ hh	|chapter| - Model Block:
 
 	This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.
 
-.	model [...]-
+.	{	model
 
 	The model data will be enclosed in a value stream chunk.  The contents are broken down in key, or key and value pairs.
 
@@ -882,7 +876,7 @@ c                      Block 2, 2, 4 get default value.
 	Note that there are no \n after every key value pairs.  This is to keep the text representation as compact as possible.  So in actual text file this will look like...
 
 .[
-model [...]-
+{	model
 B2R2C2v1 2 3cc.\n
 ]
 

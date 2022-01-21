@@ -45,6 +45,7 @@
 <p class="zword_toc2"><a href="#3.2">3.2 - Basic Values</a></p>
 <p class="zword_toc2"><a href="#3.3">3.3 - String values</a></p>
 <p class="zword_toc2"><a href="#3.4">3.4 - Variable values</a></p>
+<p class="zword_toc2"><a href="#3.5">3.5 - Unknown values</a></p>
 
 
 <h1 class="zword"><a name="1">1 - M.I.F.F.</a></h1>
@@ -140,8 +141,12 @@ This is also a valid key with internal spaces
 <td class="zword"><nobr><br /><strong>Basic Value Types</strong><br /></td>
 </tr>
 <tr class="zword">
+<td class="zword"><nobr>-</td>
+<td class="zword">Comment line.</td>
+</tr>
+<tr class="zword">
 <td class="zword"><nobr>type</td>
-<td class="zword">Type value.  One of these type codes.</td>
+<td class="zword">Type value.  One of these type codes.  Or potentially a user defined type as dictated by a sub-format or documenation.</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>"</td>
@@ -217,6 +222,10 @@ This is also a valid key with internal spaces
 <tr class="zword">
 <td class="zword"><nobr>v</td>
 <td class="zword">Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>[any other value]</td>
+<td class="zword">If the type code is any other string other that than defined above, it is treated in exactly the same way as a <strong>v</strong>, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format.</td>
 </tr>
 </tbody></table>
 
@@ -387,6 +396,8 @@ This is also a valid key with internal spaces
 - v[tb][key][tb][array count][tb][tab delimited values][nl]
 </p>
 <p class="zword">A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.</p>
+
+<h2 class="zword"><a name="3.5">3.5 - Unknown values</a></h2>
  </body>
 
 </html>

@@ -218,25 +218,13 @@ tc	Only holds model data.
 
 
 
-hh	|chapter| - Type List Block
-
-	This block is optional.  Types could be defined anywhere in the file as long as the type is defined before it is used.  It is better to have them all located in one place and near the beginning of the file.
-
-.[
-{	type list
-...
-}
-]
-
-	The type list will have 1 or more |b |type| b| blocks inside of it.
-
-hhh	|chapter| - Type Block
+hh	|chapter| - Type Block
 
 .[
 {	type
-"	name	1	[name of user type]
+"	name	1	[name of type]
 v	[name of variable]	[array count of variable]	[type of variable]
-v	[name of enumeration]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])*
+v	[name of enumeration variable]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])*
 }
 ]
 
@@ -245,7 +233,6 @@ v	[name of enumeration]	[array count of variable]	[type of variable]	([int code 
 	When data is provided for the type, the order of the members will be the order of the values.
 
 .[
-{	type list
 {	type
 " 	name 	1	id
 v	value	1	n4
@@ -397,26 +384,13 @@ v	text	1	"
 	For polyline, surface, and mesh, if the options don't require the presence of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.
 
 
-hh	|chapter| - Item List Block
-
-	Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.
-
-.[
-{	item list
-...
-}
-]
-
-
-hhh	|chapter| - Item Block
+hh	|chapter| - Item Block
 
 	Item will describe the value that will be stored in the various places where the item is being tracked.
 
 .[
 {	item
-id	id	1	[id of item]
-"	nameLong	1	[item name]
-"	nameShort	1	[item name short]
+"	name	1	[item name]
 type	type	1	[item type]
 [item type]	min	1	[item min value]
 [item type]	max	1	[item max value]
@@ -484,34 +458,22 @@ tc	0 string length.  An actual 0 string will have 1 character and that character
 	Examples:
 
 .[
-{	type list
-...
 {	type
-"	name	1	rock type	15	Granite	17	Sandstone	19	Shale
+"	name	1	rock type
+v	value	1	n1	15	Granite	17	Sandstone	19	Shale
 }
-...
-}
-{	item list
-...
 {	item
-id	id	1	0
-"	nameLong	1	Copper
-"	nameShort	1	cu
+"	name	1	Copper
 type	type	1	r4
 r4	min	1	[base64 0]
 r4	max	1	[base64 5]
 r4	precision	1	[base64 0.01]
 r4	default	1	[base64 missing value]
 }
-...
 {	item
-id	id	1	1
-"	nameLong	1	Rock Type
-"	nameShort	1	rock
+"	name	1	Rock Type
 type	type	1	rock type
 rock type	default	1	0
-}
-...
 }
 ]
 
@@ -519,34 +481,24 @@ rock type	default	1	0
 
 
 
-hh	|chapter| - Image List Block
-
-	Defining the images used by surfaces and such.
-
-.[
-{	image list
-...
-}
-]
-
-hhh	|chapter| - Image Block
+hh	|chapter| - Image Block
 
 	Defining an image.
 
 .[
 {	image
-id	id	1	[image id]
+"	name	1	[image name]
 n4	width	1	[width of image]
 n4	height	1	[height of image]
 [color|colorA]	pixels	[pixel count]
-]
+}
 {	image
-id	id	1	[image id]
+"	name	1	[image name]
 "	file	1	[file name]
 n1	data	[file byte count]	[file data]
 }
 {	image
-id	id	1	[image id]
+"	name	1	[image name]
 "	path	1	[path to image file]
 }
 ]
@@ -561,26 +513,16 @@ hh	|chapter| - Drillhole Block
 
 	Drillhole data holds information about drillholes.
 
-hh	|chapter| - Geometry List Block
-
-	Geometry List will hold geometric data like points, polylines, polygons, surfaces, text, that live in the project space.  
-
-.[
-{	geometry list
-...
-}
-]
-
-hhh	|chapter| - Geometry Block
+hh	|chapter| - Geometry Block
 
 	Within the geometry list you will only find geometry blocks.
 
 .[
-id	attr list geom	[item Count]	[id of item]*
-id	attr list point	[item count]	[id of item]*
-id	attr list line	[item count]	[id of item]*
 {	geom
-id	id	1	[geom id]
+"	name	1	[geom name]
+"	item list geom	[item Count]	[name of item]*
+"	item list point	[item count]	[name of item]*
+"	item list line	[item count]	[name of item]*
 type	type	1	[geom type]
 [geom type]	data	1	[data of geom type]
 attr	geom	1	[geom attr list]
@@ -617,12 +559,12 @@ hh	|chapter| - Model Data
 	Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.
 
 
-hhh	|chapter| - Model Information
+hhh	|chapter| - Model Block
 
 	After the general information block the next block will be the Model Information block.
 
 .[
-{	infoModel
+{	model
 "	type	1	[model type]
 b	is subblocked	1	[true if subblocked]
 "	subblock type	1	[subblock type]
@@ -636,6 +578,7 @@ abcr4	level vector	1	[level vector, length of the vector id the length of the bl
 abcn4	block count	1	[number of column, row, level blocks]
 b	is level size variable	1	[true if variable level heights]
 r4	level list	[number of levels] [length]*
+"	item list	[item Count]	[name of item]*
 }
 ]
 
@@ -843,7 +786,7 @@ tc	.
 tc	No value.  Indicates end of the item date or subblock data.
 
 t-
-tc	\n (text), 0 (binary)
+tc	\n
 tc	No value.  Indicates end value stream.
 ]
 
@@ -878,22 +821,10 @@ c                      Block 2, 2, 4 get default value.
 .[
 {	model
 B2R2C2v1 2 3cc.\n
+}
 ]
 
 	Note, if you can removed a separator without losing then that should be done.
-
-	In binary the above will look like...
-
-.[
-[n1:5][5 :model][n2:2]
-[1 :B][n2:2]
-[1 :R][n2:2]
-[1 :C][n2:2]
-[1 :v][i4:1][i4:2][i4:3]
-[1 :c]
-[1 :c]
-[n1:0]
-]
 
 
 hhh	|chapter| - SubBlock: Fixed
@@ -933,6 +864,7 @@ hhh	|chapter| - SubBlock: Octree
 hhh	|chapter| - SubBlock: Free
 
 	In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.
+
 
 t[
 thx	Key

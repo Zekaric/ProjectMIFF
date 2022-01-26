@@ -22,17 +22,13 @@
     2.1 - Header<br />
 **3 - Mine Information Block (MIB)**<br />
     3.1 - Information Block<br />
-    3.2 - Type List Block<br />
-        3.2.1 - Type Block<br />
-    3.3 - Item List Block<br />
-        3.3.1 - Item Block<br />
-    3.4 - Image List Block<br />
-        3.4.1 - Image Block<br />
+    3.2 - Type Block<br />
+    3.3 - Item Block<br />
+    3.4 - Image Block<br />
     3.5 - Drillhole Block<br />
-    3.6 - Geometry List Block<br />
-        3.6.1 - Geometry Block<br />
+    3.6 - Geometry Block<br />
     3.7 - Model Data<br />
-        3.7.1 - Model Information<br />
+        3.7.1 - Model Block<br />
     3.8 - Model Block:<br />
         3.8.1 - SubBlock: Fixed<br />
         3.8.2 - SubBlock: Semi<br />
@@ -222,27 +218,14 @@ Most keys are self explanatory.
 
 **[projectMin]** and **[projectMax]** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.
 
-## 3.2 - Type List Block
-
-
-This block is optional.  Types could be defined anywhere in the file as long as the type is defined before it is used.  It is better to have them all located in one place and near the beginning of the file.
-
-```
-{	type list
-...
-}
-```
-
-The type list will have 1 or more **type** blocks inside of it.
-
-### 3.2.1 - Type Block
+## 3.2 - Type Block
 
 
 ```
 {	type
-"	name	1	[name of user type]
+"	name	1	[name of type]
 v	[name of variable]	[array count of variable]	[type of variable]
-v	[name of enumeration]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])&#42;
+v	[name of enumeration variable]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])&#42;
 }
 ```
 
@@ -253,7 +236,6 @@ There will be 1 or more of the following two lines.  Each line indicates a membe
 When data is provided for the type, the order of the members will be the order of the values.
 
 ```
-{	type list
 {	type
 " 	name 	1	id
 v	value	1	n4
@@ -405,27 +387,14 @@ All MI-MIFF files will have the above types defined as they are listed above.  T
 
 For polyline, surface, and mesh, if the options don't require the presence of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.
 
-## 3.3 - Item List Block
-
-
-Item List will define items that are stored in Drillhole, Geometry, and Model data.  There can be more items defined here than what is actually being stored in the various places but an item needs to be defined here before it is used in those places.
-
-```
-{	item list
-...
-}
-```
-
-### 3.3.1 - Item Block
+## 3.3 - Item Block
 
 
 Item will describe the value that will be stored in the various places where the item is being tracked.
 
 ```
 {	item
-id	id	1	[id of item]
-"	nameLong	1	[item name]
-"	nameShort	1	[item name short]
+"	name	1	[item name]
 type	type	1	[item type]
 [item type]	min	1	[item min value]
 [item type]	max	1	[item max value]
@@ -473,58 +442,35 @@ Missing values for the various types
 Examples:
 
 ```
-{	type list
-...
 {	type
-"	name	1	rock type	15	Granite	17	Sandstone	19	Shale
+"	name	1	rock type
+v	value	1	n1	15	Granite	17	Sandstone	19	Shale
 }
-...
-}
-{	item list
-...
 {	item
-id	id	1	0
-"	nameLong	1	Copper
-"	nameShort	1	cu
+"	name	1	Copper
 type	type	1	r4
 r4	min	1	[base64 0]
 r4	max	1	[base64 5]
 r4	precision	1	[base64 0.01]
 r4	default	1	[base64 missing value]
 }
-...
 {	item
-id	id	1	1
-"	nameLong	1	Rock Type
-"	nameShort	1	rock
+"	name	1	Rock Type
 type	type	1	rock type
 rock type	default	1	0
-}
-...
 }
 ```
 
 An enumeration requires the types defined before the item is defined.  Place the enumeration in the type list.  Note, the enumeration has values 15-Granite, 17-Sandstone, and 19-Shale.  Yet the default for Rock Type item is 0.  This is because it is the index of the value and not the code value.  0 being Granite, 1 being Sandstone, and 2 being Shale in this case.
 
-## 3.4 - Image List Block
-
-
-Defining the images used by surfaces and such.
-
-```
-{	image list
-...
-}
-```
-
-### 3.4.1 - Image Block
+## 3.4 - Image Block
 
 
 Defining an image.
 
 ```
 {	image
-id	id	1	[image id]
+"	name	1	[image name]
 n4	width	1	[width of image]
 n4	height	1	[height of image]
 [color|colorA]	pixels	[pixel count]

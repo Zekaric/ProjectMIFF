@@ -218,9 +218,10 @@ MiffBool _ReadC2Key(Miff * const miff, MiffC2 * const key)
 /******************************************************************************
 func: _ReadType
 ******************************************************************************/
-MiffBool _ReadType(Miff * const miff, MiffType *type)
+MiffBool _ReadType(Miff * const miff, MiffType * const type, MiffC2 * const typeName)
 {
    MiffN4 index;
+   MiffN1 count;
 
    returnFalseIf(!type);
 
@@ -229,6 +230,9 @@ MiffBool _ReadType(Miff * const miff, MiffType *type)
    returnFalseIf(!miff);
 
    returnFalseIf(!_ReadPart(miff));
+
+   // Get the name of the type just in case it is a user type.
+   _C1ToC2Key(miff->readByteCount, miff->readByteData, &count, typeName);
 
    forCount (index, miffTypeCOUNT)
    {
@@ -244,7 +248,9 @@ MiffBool _ReadType(Miff * const miff, MiffType *type)
       }
    }
 
-   returnFalse;
+   *type = miffTypeUSER_TYPE;
+
+   returnTrue;
 }
 
 /******************************************************************************

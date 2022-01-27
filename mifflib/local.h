@@ -85,6 +85,7 @@ constant:
 #define miffTypeTYPE_STR                           "type"
 #define miffTypeSTRING_STR                         "\""
 #define miffTypeVARIABLE_STR                       "v"
+#define miffTypeUSER_TYPE_STR                      "u"
 #define miffTypeBOOLEAN_STR                        "b"
 #define miffTypeI1_STR                             "i1"
 #define miffTypeI2_STR                             "i2"
@@ -162,6 +163,7 @@ constant:
 #define miffTypeTYPE_STR_SIZE                      4
 #define miffTypeSTRING_STR_SIZE                    1
 #define miffTypeVARIABLE_STR_SIZE                  1
+#define miffTypeUSER_TYPE_STR_SIZE                 1
 #define miffTypeBOOLEAN_STR_SIZE                   1
 #define miffTypeI1_STR_SIZE                        2
 #define miffTypeI2_STR_SIZE                        2
@@ -299,13 +301,13 @@ void      _MemStop(           void);
 MiffBool  _ReadLine(          Miff       * const miff);
 MiffBool  _ReadLineSkip(      Miff       * const miff);
 MiffBool  _ReadPart(          Miff       * const miff);
-MiffBool  _ReadArrayCount(    Miff       * const miff, MiffN4 * const count);
-MiffBool  _ReadC2Key(         Miff       * const miff, MiffC2 * const key);
-MiffBool  _ReadR4(            Miff       * const miff, MiffR4 * const value);
-MiffBool  _ReadR4S(           Miff       * const miff, MiffR4 * const value);
-MiffBool  _ReadR8(            Miff       * const miff, MiffR8 * const value);
-MiffBool  _ReadR8S(           Miff       * const miff, MiffR8 * const value);
-MiffBool  _ReadType(          Miff       * const miff, MiffType *type);
+MiffBool  _ReadArrayCount(    Miff       * const miff, MiffN4   * const count);
+MiffBool  _ReadC2Key(         Miff       * const miff, MiffC2   * const key);
+MiffBool  _ReadR4(            Miff       * const miff, MiffR4   * const value);
+MiffBool  _ReadR4S(           Miff       * const miff, MiffR4   * const value);
+MiffBool  _ReadR8(            Miff       * const miff, MiffR8   * const value);
+MiffBool  _ReadR8S(           Miff       * const miff, MiffR8   * const value);
+MiffBool  _ReadType(          Miff       * const miff, MiffType * const type, MiffC2 * const typeName);
 
 MiffC2   *_TypeGetNameC2(     MiffType const type);
 MiffC1   *_TypeGetNameC1(     MiffType const type);

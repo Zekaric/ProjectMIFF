@@ -711,6 +711,7 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
    Miff           *miff;
    MiffBool        result;
    MiffC2          subFormatNameC2[miffKeySIZE];
+   MiffC2          typeName[miffKeySIZE];
    MiffN8          subFormatVersion;
    MiffType        type;
    MiffC2          key[miffKeySIZE];
@@ -771,7 +772,7 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
 
       for (;;)
       {
-         if (!miffRecordGetBegin(miff, &type, key, &arrayCount))
+         if (!miffRecordGetBegin(miff, &type, typeName, key, &arrayCount))
          {
             break;
          }
@@ -866,14 +867,14 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeI16 ||
-                  type == miffTypeI32 ||
-                  type == miffTypeI64 ||
-                  type == miffTypeI128 ||
-                  type == miffTypeI256)
-         {
-            wprintf(L"\n");
-         }
+         //else if (type == miffTypeI16 ||
+         //         type == miffTypeI32 ||
+         //         type == miffTypeI64 ||
+         //         type == miffTypeI128 ||
+         //         type == miffTypeI256)
+         //{
+         //   wprintf(L"\n");
+         //}
          else if (type == miffTypeN1 ||
                   type == miffTypeN2 ||
                   type == miffTypeN4 ||
@@ -890,14 +891,14 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeN16 ||
-                  type == miffTypeN32 ||
-                  type == miffTypeN64 ||
-                  type == miffTypeN128 ||
-                  type == miffTypeN256)
-         {
-            wprintf(L"\n");
-         }
+         //else if (type == miffTypeN16 ||
+         //         type == miffTypeN32 ||
+         //         type == miffTypeN64 ||
+         //         type == miffTypeN128 ||
+         //         type == miffTypeN256)
+         //{
+         //   wprintf(L"\n");
+         //}
          else if (type == miffTypeR4)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
@@ -1597,7 +1598,7 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
       miffSet1Matrix4x4R4S(  miff, L"mat444S",  &_matrix4x4r4);
       miffSet1Matrix4x4R8S(  miff, L"mat448S",  &_matrix4x4r8);
 
-      miffRecordSetBegin(    miff, miffTypeVARIABLE, L"variableIntStrReal", 1);
+      miffRecordSetBegin(    miff, miffTypeVARIABLE, NULL, L"variableIntStrReal", 1);
       miffSetValueI(         miff, 42);
       miffRecordSetSeparator(miff);
       miffSetValueStringC2(  miff, L"Yes, but what is the question?");

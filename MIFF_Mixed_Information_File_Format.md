@@ -189,7 +189,7 @@ This is also a valid key with internal spaces
 | mat4x4r4 mat4x4r8 | A 4x4 r4 or r8 matrix |
 | <br />**Variable Value Type**<br /> |
 | v | Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used. |
-| [any other value] | If the type code is any other string other that than defined above, it is treated in exactly the same way as a **v**, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format. |
+| [any other value] | If the type code is any other string other than what is defined above, it is treated in exactly the same way as a **v**, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format.  We will call this a User Type.  The length and rules of a User Type are the same as the rule governing a record key value. |
 
 
 #### 2.2.2.3 - Array Count

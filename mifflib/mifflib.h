@@ -67,6 +67,7 @@ typedef enum
    miffTypeTYPE,
    miffTypeSTRING,
    miffTypeVARIABLE,
+   miffTypeUSER_TYPE,
    miffTypeBOOLEAN,
    miffTypeI1,
    miffTypeI2,
@@ -431,13 +432,13 @@ MiffBool        miffGetValueR8(                    Miff       * const miff, Miff
 MiffBool        miffGetValueR8S(                   Miff       * const miff, MiffR8     * const value);
 MiffBool        miffGetValueStringC2(              Miff       * const miff, MiffC2    ** const value);
 
-MiffBool        miffRecordGetBegin(                Miff       * const miff, MiffType * const type, MiffC2       * const key, MiffN4 * const count);
+MiffBool        miffRecordGetBegin(                Miff       * const miff, MiffType * const type, MiffC2       * const typeName, MiffC2       * const key, MiffN4 * const count);
 MiffBool        miffRecordGetEnd(                  Miff       * const miff);
 MiffN8          miffRecordGetCount(                Miff       * const miff);
 MiffC2         *miffRecordGetName(                 Miff       * const miff);
 MiffType        miffRecordGetType(                 Miff       * const miff);
 
-MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType   const type, MiffC2 const * const key, MiffN4   const count);
+MiffBool        miffRecordSetBegin(                Miff       * const miff, MiffType   const type, MiffC2 const * const typeName, MiffC2 const * const key, MiffN4   const count);
 MiffBool        miffRecordSetEnd(                  Miff       * const miff);
 MiffBool        miffRecordSetSeparator(            Miff       * const miff);
 

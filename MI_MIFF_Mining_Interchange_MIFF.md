@@ -474,4 +474,331 @@ Defining an image.
 n4	width	1	[width of image]
 n4	height	1	[height of image]
 [color|colorA]	pixels	[pixel count]
+}
+{	image
+"	name	1	[image name]
+"	file	1	[file name]
+n1	data	[file byte count]	[file data]
+}
+{	image
+"	name	1	[image name]
+"	path	1	[path to image file]
+}
 ```
+
+The first image defines the image raw, inline.
+
+The second image defines the image embedded as a verbatum copy of the file contents.
+
+The third image refers to an image file external to the MIFF file.
+
+The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.
+
+## 3.5 - Drillhole Block
+
+
+Drillhole data holds information about drillholes.
+
+## 3.6 - Geometry Block
+
+
+Within the geometry list you will only find geometry blocks.
+
+```
+{	geom
+"	name	1	[geom name]
+"	item list geom	[item Count]	[name of item]&#42;
+"	item list point	[item count]	[name of item]&#42;
+"	item list line	[item count]	[name of item]&#42;
+type	type	1	[geom type]
+[geom type]	data	1	[data of geom type]
+attr	geom	1	[geom attr list]
+attr	point	[point count]	[point attr list]
+attr	line	[point count]	[line attr list]
+}
+```
+
+Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.
+
+Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.
+
+attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.
+
+In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.
+
+Each geom has a unique id.
+
+Each geom will have a type.  One of point, pointGroup, polyline, surface, mesh, grid, or text.
+
+Each geom will have data of the given type.
+
+Each geom may have an optional geomAttr key value block.
+
+If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.
+
+## 3.7 - Model Data
+
+
+Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.
+
+[LINK](https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf) Block Model Knowledge For Mining Engineers - An Introduction
+
+There are 3 basic model formats that are in use as Hexagon.
+
+
+* Block Model
+
+* Seam Model
+
+* Surface Model
+
+**Block Model** is a regular collection of, usually, uniform blocks.  Each block will have values for items that are being tracked by the client.
+
+**Seam Model** is a bit fancier Block Model.  This model is subdivided uniformly in the row and column directions of the model but instead of levels, seams are described.  Each block in a seam will have an elevation top and bottom to indicate the seam's limits, as well as any other values that are found within that seam block just like a normal block model.
+
+**Surface Model** is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.
+
+Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.
+
+### 3.7.1 - Model Block
+
+
+After the general information block the next block will be the Model Information block.
+
+```
+{	model
+"	type	1	[model type]
+b	is subblocked	1	[true if subblocked]
+"	subblock type	1	[subblock type]
+abcn4	subblock option	1	[subblock fixed resolution]
+abn4	subblock option	1	[subblock row col resolution]
+n1	subblock option	1	[subblock octtree level count]
+abcr8	origin	1	[origin point]
+abcr8	column vector	1	[column vector, length if vector is the length of the block]
+abcr4	row vector	1	[row vector, length of the vector is the length of the block]
+abcr4	level vector	1	[level vector, length of the vector id the length of the block]
+abcn4	block count	1	[number of column, row, level blocks]
+b	is level size variable	1	[true if variable level heights]
+r4	level list	[number of levels] [length]&#42;
+"	item list	[item Count]	[name of item]&#42;
+}
+```
+
+**[model type]** will be one of...
+
+| Value | Description |
+| --- | --- |
+| block | For a block model. |
+| seam | For a seam model. |
+| surface | For a surface model. |
+
+
+**[subblock type]** will be one of...
+
+| Value | Description |
+| --- | --- |
+| fixed | 
+For a regular division of the block in the east, north, and z directions of the block.
+
+```
+Using just a cross section.
+Level +--+--+--+--+
+  |   |  |  |  |  | <--- Each sub-block of the parent block is of uniform size.
+  |   +--+--+--+--+
+  |   |  |  |  |  |
+  |   +--+--+--+--+
+  |   |  |  |  |  |
+  V   +--+--+--+--+
+      Row or Column --->
+```
+ |
+| semi | 
+For a regular division of a block in the east and north directions but an infinitely variable z value for block height.
+
+```
++--+--+--+--+
+|  +--+  |  |
+|  |  +--+  |
+|  +--+  |  | Infinitely variable in the level direction.
++--+  |  |  |
++--+--+--+--+
+Uniform divisions in the row and column directions.
+```
+ |
+| octree | 
+For an oct-tree subvision of a block.
+
+```
++-----+-----+
+|     |     |
++--+--+-----+  Recursive bisecting the blocks until a limit.
++--+--+     |
++--+--+-----+
+```
+ |
+| free | 
+For a free subdivision of a block where each subblock is individually defined as being some subvolume of the parent.
+
+```
++-----------+
+|    +----+ |
+|    |    | |
+|    +----+ | Bad diagram but essentially possible with this option.  This is a catchall case for
++--+        | those types of subblocking I have not addressed.
+|  |        |
++--+--------+
+```
+ |
+
+
+Depending on what is set for [subblock type] there will be one of 3 [subblockOption] values.
+
+
+* fixed subblocking requires a v3n4 to define the number of divisions in the east, north and z directions.
+
+* semiFixed subblocking requires a v2n4 to define the number of divisions in the east and north directions.
+
+* octree subblocking requires a n1 to define the max number of oct-tree divisions that can occur for a block.
+
+* free subblocking does not require an option.
+
+```
+       \   /
+        \ /
+         +  Column 1
+        / \
+ Row 1 /   \   /
+      /     \ /
+     /Lev 0  +
+\   / Row 0 /|
+ \ /  Col 0/ |
+  +       / <----- colVec (Length is block size. Direction is direction of increasing column index.)
+  |\     /   |/
+  | \ <----------- rowVec (Length is block size. Direction is direction of increasing row index.)
+\ |  \ /    /|
+ \|   o <--------- origin (3D point indicating the outter most corner of the first block.)
+  +   |   /
+  |\  | <--------- levVec (Length can be block size or unit, depends see below. Direction is direction of increasing level index.)
+  | \ | /
+     \|/
+      +
+      | Level 1
+      |
+```
+
+**origin** - The extreme most point of the first column, first row, and first level block of the model.
+
+**colVec, rowVec, levVec** - The direction vectors of increasing block index for the column, row, and level directions.  The length of this vector is the size of the block in the column, row and level directions.  levVec does not need to be sized if the level height is variable.  It should at least be unit length.  All vectors need not be perpendicular to each other but usually this is the case in most software.  I believe there is one software where colVec and rowVec are not 90 degrees to the levVec.  Essentially creating non-square/cuboid blocks.
+
+**blockCount** - The number of column, row, and level blocks.
+
+**isLevVariable** - Flag to indicate the level heights are not uniform.  This does not need to be present if the levels are a fixed height.
+
+**levList** - A list of level heights starting from first level.  Only required if isLevVariable is true.
+
+## 3.8 - Model Block:
+
+
+This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.
+
+```
+{	model
+```
+
+The model data will be enclosed in a value stream chunk.  The contents are broken down in key, or key and value pairs.
+
+| Key (1 Byte) | Value |
+| --- | --- |
+| B | n2 value follows immediately.  Jump to current level index + N.  Reset current row, current column, and current item to 0 |
+| b | No value.  Jump to next level.  Reset current row, current column, and current item to 0 |
+| R | n2 value follows immediately.  Jump to current row index + N.  Reset currrent column and current item to 0 |
+| r | No value.  Jump to next row.  Reset current column and current item to 0. |
+| C | n2 value follows immediately.  Jump to current column index + N.  Reset current item to 0 |
+| c | No value.  Jump to next column.  Reset current item to 0 |
+| s | Defining subblock but parent block as values.  Provide parent block item values before subblock values.  'c' follows immediately if parent block has no values. |
+| I | n1 value follows immediately.  Jump to item index + N.  Skipped over items get default values. |
+| i | Jump to next item.  Skipped over item gets default value. |
+| V | n1 value follows.  Provide the values for the next n1 items. |
+| v | Provide the values for the rest of the block or subblock. |
+| D | n1 value follows immediately. Duplicate the next n1 values from the last block or subblock. |
+| d | Duplicate the remaining values from the last block or subblock. |
+| X | n1 value follows immediately.  Clone last block n1 times.  This is for all the item values. |
+| . | No value.  Indicates end of the item date or subblock data. |
+| \n | No value.  Indicates end value stream. |
+
+
+The above may not make that much sense yet so here is an example of a 5x5 block model where we have 3 i4 values per block.
+
+```
+File                   What is happening
+--------------------   -----------------
+model [...]-\n         Start of the model data value stream.
+                       Current block is 0 (first) level, 0 (first) row, 0 (column)
+B2                     Add 2 to the level index.
+                       Current block jumps to 2, 0, 0.
+                       All blocks on levels 0 and 1 have default values.
+R2                     Add 2 to the row index.
+                       Curent block jumps to 2, 2, 0.
+                       All blocks on level 2, rows 0 and 1 have default values.
+C2                     Add 2 to the column index.
+                       Current block jumps to 2, 2, 2.
+                       Block 2, 2, 0, and Block 2, 2, 1 have default values.
+v1 2 3                 Block 2, 2, 2 has values 1, 2, 3.
+                       Current block jumps to 2, 2, 3.
+c                      Block 2, 2, 3 get default value.
+                       Current block after this line is 2, 2, 4.
+c                      Block 2, 2, 4 get default value.
+                       Current block after this line is 2, 3, 0.
+                       We jumped to the next row
+\n                     This indicates that the rest of the model is set to default values.
+```
+
+Note that there are no \n after every key value pairs.  This is to keep the text representation as compact as possible.  So in actual text file this will look like...
+
+```
+{	model
+B2R2C2v1 2 3cc.\n
+}
+```
+
+Note, if you can removed a separator without losing then that should be done.
+
+### 3.8.1 - SubBlock: Fixed
+
+
+In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.
+
+### 3.8.2 - SubBlock: Semi
+
+
+In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...
+
+In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level subblocks will depend on how many times H is used for the same column.
+
+| Key | Value |
+| --- | --- |
+| H | r4 value immediately follows.  The r4 value is a percent of the block height.  This record needs to preceed a v record. |
+| h | No value.  The rest of the subblock cylinder is used. |
+
+
+If H or h follows an H or h then the previous block will be holding default values, and the current block will be incremented to the next subblock.  The following H or h will determin the height of the new current block.
+
+If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.
+
+### 3.8.3 - SubBlock: Octree
+
+
+In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.
+
+The 's' key need to preceed the v record.
+
+### 3.8.4 - SubBlock: Free
+
+
+In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.
+
+| Key | Value |
+| --- | --- |
+| c | 6 x r4 values follow.  First 3 r4 values are percents for the min point and the second 3 r4 values are percents for the max point of the subblock. |
+| . | Indicates we are done with the subblocking and to process to the next parent block. |
+

@@ -777,7 +777,14 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             break;
          }
 
-         wprintf(L"%s\t%s\t%d\t", miffTypeGetC2(type), key, arrayCount);
+         if (type == miffTypeUSER_TYPE)
+         {
+            wprintf(L"%s\t%s\t%d\t", typeName, key, arrayCount);
+         }
+         else
+         {
+            wprintf(L"%s\t%s\t%d\t", miffTypeGetC2(type), key, arrayCount);
+         }
 
          if      (type == miffTypeKEY_VALUE_BLOCK_STOP ||
                   type == miffTypeKEY_VALUE_BLOCK_START)
@@ -807,7 +814,8 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeVARIABLE)
+         else if (type == miffTypeVARIABLE ||
+                  type == miffTypeUSER_TYPE)
          {
             if (miffGetValueI(miff, &valueI) &&
                 valueI == 42)
@@ -1443,11 +1451,6 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeVARIABLE)
-         {
-            // TODO: variable types
-            wprintf(L"\n");
-         }
          else
          {
             wprintf(L"\n");
@@ -1626,6 +1629,14 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
       miffSetNStringC2(      miff, L"String_Array", 10,   _strings);
                              
       miffSetNBoolean(       miff, L"Bool_Array",   100,  _bools);
+
+      miffRecordSetBegin(    miff, miffTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
+      miffSetValueI(         miff, 42);
+      miffRecordSetSeparator(miff);
+      miffSetValueStringC2(  miff, L"Yes, but what is the question?");
+      miffRecordSetSeparator(miff);
+      miffSetValueR8(        miff, 3.1415926535897932);
+      miffRecordSetEnd(      miff);
 
       miffSetBlockStart(     miff, L"KeyValueBlock");
       {

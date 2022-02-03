@@ -231,6 +231,8 @@ MiffBool _ReadType(Miff * const miff, MiffType * const type, MiffC2 * const type
 
    returnFalseIf(!_ReadPart(miff));
 
+   returnFalseIf(miff->readByteCount == 0);
+
    // Get the name of the type just in case it is a user type.
    _C1ToC2Key(miff->readByteCount, miff->readByteData, &count, typeName);
 

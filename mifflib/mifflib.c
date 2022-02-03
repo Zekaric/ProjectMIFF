@@ -239,8 +239,9 @@ MiffBool miffGetValueBoolean(Miff * const miff, MiffBool * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeBOOLEAN ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeBOOLEAN  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -263,11 +264,12 @@ MiffBool miffGetValueABI(Miff * const miff, MiffABI8   * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABI1 ||
-        miff->currentRecord.type == miffTypeABI2 ||
-        miff->currentRecord.type == miffTypeABI4 ||
-        miff->currentRecord.type == miffTypeABI8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABI1     ||
+        miff->currentRecord.type == miffTypeABI2     ||
+        miff->currentRecord.type == miffTypeABI4     ||
+        miff->currentRecord.type == miffTypeABI8     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -290,11 +292,12 @@ MiffBool miffGetValueABN(Miff * const miff, MiffABN8   * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABN1 ||
-        miff->currentRecord.type == miffTypeABN2 ||
-        miff->currentRecord.type == miffTypeABN4 ||
-        miff->currentRecord.type == miffTypeABN8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABN1     ||
+        miff->currentRecord.type == miffTypeABN2     ||
+        miff->currentRecord.type == miffTypeABN4     ||
+        miff->currentRecord.type == miffTypeABN8     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -315,8 +318,9 @@ MiffBool miffGetValueABR4(Miff * const miff, MiffABR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR4     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->a));
    returnFalseIf(!_ReadR4(miff, &value->b));
@@ -332,8 +336,9 @@ MiffBool miffGetValueABR4S(Miff * const miff, MiffABR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR4S    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->a));
    returnFalseIf(!_ReadR4S(miff, &value->b));
@@ -349,8 +354,9 @@ MiffBool miffGetValueABR8(Miff * const miff, MiffABR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR8     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->a));
    returnFalseIf(!_ReadR8(miff, &value->b));
@@ -366,8 +372,9 @@ MiffBool miffGetValueABR8S(Miff * const miff, MiffABR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR8S    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->a));
    returnFalseIf(!_ReadR8S(miff, &value->b));
@@ -385,11 +392,12 @@ MiffBool miffGetValueABCI(Miff * const miff, MiffABCI8  * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCI1 ||
-        miff->currentRecord.type == miffTypeABCI2 ||
-        miff->currentRecord.type == miffTypeABCI4 ||
-        miff->currentRecord.type == miffTypeABCI8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCI1    ||
+        miff->currentRecord.type == miffTypeABCI2    ||
+        miff->currentRecord.type == miffTypeABCI4    ||
+        miff->currentRecord.type == miffTypeABCI8    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -416,11 +424,12 @@ MiffBool miffGetValueABCN(Miff * const miff, MiffABCN8  * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCN1 ||
-        miff->currentRecord.type == miffTypeABCN2 ||
-        miff->currentRecord.type == miffTypeABCN4 ||
-        miff->currentRecord.type == miffTypeABCN8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCN1    ||
+        miff->currentRecord.type == miffTypeABCN2    ||
+        miff->currentRecord.type == miffTypeABCN4    ||
+        miff->currentRecord.type == miffTypeABCN8    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -445,8 +454,9 @@ MiffBool miffGetValueABCR4(Miff * const miff, MiffABCR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR4    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->a));
    returnFalseIf(!_ReadR4(miff, &value->b));
@@ -463,8 +473,9 @@ MiffBool miffGetValueABCR4S(Miff * const miff, MiffABCR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR4S   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->a));
    returnFalseIf(!_ReadR4S(miff, &value->b));
@@ -481,8 +492,9 @@ MiffBool miffGetValueABCR8(Miff * const miff, MiffABCR8  * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR8    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->a));
    returnFalseIf(!_ReadR8(miff, &value->b));
@@ -499,8 +511,9 @@ MiffBool miffGetValueABCR8S(Miff * const miff, MiffABCR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR8S   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->a));
    returnFalseIf(!_ReadR8S(miff, &value->b));
@@ -519,11 +532,12 @@ MiffBool miffGetValueABCDI(Miff * const miff, MiffABCDI8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDI1 ||
-        miff->currentRecord.type == miffTypeABCDI2 ||
-        miff->currentRecord.type == miffTypeABCDI4 ||
-        miff->currentRecord.type == miffTypeABCDI8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDI1   ||
+        miff->currentRecord.type == miffTypeABCDI2   ||
+        miff->currentRecord.type == miffTypeABCDI4   ||
+        miff->currentRecord.type == miffTypeABCDI8   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -554,11 +568,12 @@ MiffBool miffGetValueABCDN(Miff * const miff, MiffABCDN8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDN1 ||
-        miff->currentRecord.type == miffTypeABCDN2 ||
-        miff->currentRecord.type == miffTypeABCDN4 ||
-        miff->currentRecord.type == miffTypeABCDN8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDN1   ||
+        miff->currentRecord.type == miffTypeABCDN2   ||
+        miff->currentRecord.type == miffTypeABCDN4   ||
+        miff->currentRecord.type == miffTypeABCDN8   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -587,8 +602,9 @@ MiffBool miffGetValueABCDR4(Miff * const miff, MiffABCDR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR4   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->a));
    returnFalseIf(!_ReadR4(miff, &value->b));
@@ -606,8 +622,9 @@ MiffBool miffGetValueABCDR4S(Miff * const miff, MiffABCDR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR4S  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->a));
    returnFalseIf(!_ReadR4S(miff, &value->b));
@@ -625,8 +642,9 @@ MiffBool miffGetValueABCDR8(Miff * const miff, MiffABCDR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR8   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->a));
    returnFalseIf(!_ReadR8(miff, &value->b));
@@ -644,8 +662,9 @@ MiffBool miffGetValueABCDR8S(Miff * const miff, MiffABCDR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeABCDR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR8S  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->a));
    returnFalseIf(!_ReadR8S(miff, &value->b));
@@ -665,11 +684,12 @@ MiffBool miffGetValueI(Miff * const miff, MiffI8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeI1 ||
-        miff->currentRecord.type == miffTypeI2 ||
-        miff->currentRecord.type == miffTypeI4 ||
-        miff->currentRecord.type == miffTypeI8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeI1       ||
+        miff->currentRecord.type == miffTypeI2       ||
+        miff->currentRecord.type == miffTypeI4       ||
+        miff->currentRecord.type == miffTypeI8       ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -687,7 +707,8 @@ MiffBool miffGetValueMatrix2x2R4(Miff * const miff, MiffMatrix2x2R4 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
@@ -706,7 +727,8 @@ MiffBool miffGetValueMatrix2x2R4S(Miff * const miff, MiffMatrix2x2R4 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
@@ -725,7 +747,8 @@ MiffBool miffGetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
@@ -744,7 +767,8 @@ MiffBool miffGetValueMatrix2x2R8S(Miff * const miff, MiffMatrix2x2R8 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
@@ -763,7 +787,8 @@ MiffBool miffGetValueMatrix3x3R4(Miff * const miff, MiffMatrix3x3R4 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
@@ -787,7 +812,8 @@ MiffBool miffGetValueMatrix3x3R4S(Miff * const miff, MiffMatrix3x3R4 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
@@ -811,7 +837,8 @@ MiffBool miffGetValueMatrix3x3R8(Miff * const miff, MiffMatrix3x3R8 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
@@ -835,7 +862,8 @@ MiffBool miffGetValueMatrix3x3R8S(Miff * const miff, MiffMatrix3x3R8 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
@@ -859,7 +887,8 @@ MiffBool miffGetValueMatrix4x4R4(Miff * const miff, MiffMatrix4x4R4 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
@@ -890,7 +919,8 @@ MiffBool miffGetValueMatrix4x4R4S(Miff * const miff, MiffMatrix4x4R4 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
@@ -921,7 +951,8 @@ MiffBool miffGetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 * const valu
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
@@ -952,7 +983,8 @@ MiffBool miffGetValueMatrix4x4R8S(Miff * const miff, MiffMatrix4x4R8 * const val
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
    returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
@@ -984,11 +1016,12 @@ MiffBool miffGetValueN(Miff * const miff, MiffN8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeN1 ||
-        miff->currentRecord.type == miffTypeN2 ||
-        miff->currentRecord.type == miffTypeN4 ||
-        miff->currentRecord.type == miffTypeN8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeN1       ||
+        miff->currentRecord.type == miffTypeN2       ||
+        miff->currentRecord.type == miffTypeN4       ||
+        miff->currentRecord.type == miffTypeN8       ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -1005,8 +1038,9 @@ MiffBool miffGetValueR4(Miff * const miff, MiffR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeR4       ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4(miff, value))
 
@@ -1021,8 +1055,9 @@ MiffBool miffGetValueR4S(Miff * const miff, MiffR4 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeR4S      ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR4S(miff, value))
 
@@ -1037,8 +1072,9 @@ MiffBool miffGetValueR8(Miff * const miff, MiffR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeR8       ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8(miff, value));
 
@@ -1053,8 +1089,9 @@ MiffBool miffGetValueR8S(Miff * const miff, MiffR8 * const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeR8S      ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadR8S(miff, value));
 
@@ -1071,8 +1108,9 @@ MiffBool miffGetValueStringC2(Miff *const miff, MiffC2 **const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeSTRING ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeSTRING   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_ReadPart(miff));
 
@@ -3116,8 +3154,9 @@ MiffBool miffSetValueABI1(Miff * const miff, MiffABI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABI1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABI1     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3135,8 +3174,9 @@ MiffBool miffSetValueABI2(Miff * const miff, MiffABI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABI2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABI2     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3154,8 +3194,9 @@ MiffBool miffSetValueABI4(Miff * const miff, MiffABI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABI4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABI4     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3173,8 +3214,9 @@ MiffBool miffSetValueABN1(Miff * const miff, MiffABN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABN1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABN1     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3192,8 +3234,9 @@ MiffBool miffSetValueABN2(Miff * const miff, MiffABN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABN2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABN2     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3211,8 +3254,9 @@ MiffBool miffSetValueABN4(Miff * const miff, MiffABN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABN4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABN4     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3230,8 +3274,9 @@ MiffBool miffSetValueABR4(Miff * const miff, MiffABR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR4     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3249,8 +3294,9 @@ MiffBool miffSetValueABR4S(Miff * const miff, MiffABR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR4S    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3268,8 +3314,9 @@ MiffBool miffSetValueABR8(Miff * const miff, MiffABR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR8     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3287,8 +3334,9 @@ MiffBool miffSetValueABR8S(Miff * const miff, MiffABR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABR8S    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3306,8 +3354,9 @@ MiffBool miffSetValueABCI1(Miff * const miff, MiffABCI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCI1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCI1    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3327,8 +3376,9 @@ MiffBool miffSetValueABCI2(Miff * const miff, MiffABCI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCI2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCI2    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3348,8 +3398,9 @@ MiffBool miffSetValueABCI4(Miff * const miff, MiffABCI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCI4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCI4    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3369,8 +3420,9 @@ MiffBool miffSetValueABCN1(Miff * const miff, MiffABCN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCN1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCN1    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3390,8 +3442,9 @@ MiffBool miffSetValueABCN2(Miff * const miff, MiffABCN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCN2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCN2    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3411,8 +3464,9 @@ MiffBool miffSetValueABCN4(Miff * const miff, MiffABCN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCN4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCN4    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3432,8 +3486,9 @@ MiffBool miffSetValueABCR4(Miff * const miff, MiffABCR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR4    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3453,8 +3508,9 @@ MiffBool miffSetValueABCR4S(Miff * const miff, MiffABCR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR4S   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3474,8 +3530,9 @@ MiffBool miffSetValueABCR8(Miff * const miff, MiffABCR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR8    ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3495,8 +3552,9 @@ MiffBool miffSetValueABCR8S(Miff * const miff, MiffABCR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCR8S   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3516,8 +3574,9 @@ MiffBool miffSetValueABCDI1(Miff * const miff, MiffABCDI1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDI1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDI1   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3539,8 +3598,9 @@ MiffBool miffSetValueABCDI2(Miff * const miff, MiffABCDI2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDI2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDI2   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3562,8 +3622,9 @@ MiffBool miffSetValueABCDI4(Miff * const miff, MiffABCDI4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDI4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDI4   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3585,8 +3646,9 @@ MiffBool miffSetValueABCDN1(Miff * const miff, MiffABCDN1 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDN1 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDN1   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3608,8 +3670,9 @@ MiffBool miffSetValueABCDN2(Miff * const miff, MiffABCDN2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDN2 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDN2   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3631,8 +3694,9 @@ MiffBool miffSetValueABCDN4(Miff * const miff, MiffABCDN4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDN4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDN4   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3654,8 +3718,9 @@ MiffBool miffSetValueABCDR4(Miff * const miff, MiffABCDR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDR4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR4   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3677,8 +3742,9 @@ MiffBool miffSetValueABCDR4S(Miff * const miff, MiffABCDR4 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDR4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR4S  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3700,8 +3766,9 @@ MiffBool miffSetValueABCDR8(Miff * const miff, MiffABCDR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDR8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR8   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3723,8 +3790,9 @@ MiffBool miffSetValueABCDR8S(Miff * const miff, MiffABCDR8 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeABCDR8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeABCDR8S  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3747,8 +3815,9 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeBOOLEAN ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeBOOLEAN  ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    c1 = (MiffC1 *) (value ? "T" : "F");
 
@@ -3778,7 +3847,8 @@ MiffBool miffSetValueMatrix2x2R4(Miff * const miff, MiffMatrix2x2R4 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3800,7 +3870,8 @@ MiffBool miffSetValueMatrix2x2R4S(Miff * const miff, MiffMatrix2x2R4 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3822,7 +3893,8 @@ MiffBool miffSetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3844,7 +3916,8 @@ MiffBool miffSetValueMatrix2x2R8S(Miff * const miff, MiffMatrix2x2R8 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX2X2R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
    
    returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3866,7 +3939,8 @@ MiffBool miffSetValueMatrix3x3R4(Miff * const miff, MiffMatrix3x3R4 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3898,7 +3972,8 @@ MiffBool miffSetValueMatrix3x3R4S(Miff * const miff, MiffMatrix3x3R4 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3930,7 +4005,8 @@ MiffBool miffSetValueMatrix3x3R8(Miff * const miff, MiffMatrix3x3R8 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3962,7 +4038,8 @@ MiffBool miffSetValueMatrix3x3R8S(Miff * const miff, MiffMatrix3x3R8 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX3X3R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -3994,7 +4071,8 @@ MiffBool miffSetValueMatrix4x4R4(Miff * const miff, MiffMatrix4x4R4 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R4 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -4040,7 +4118,8 @@ MiffBool miffSetValueMatrix4x4R4S(Miff * const miff, MiffMatrix4x4R4 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R4S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -4086,7 +4165,8 @@ MiffBool miffSetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 const * cons
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R8 ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE    ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -4132,7 +4212,8 @@ MiffBool miffSetValueMatrix4x4R8S(Miff * const miff, MiffMatrix4x4R8 const * con
       !_isStarted ||
       !miff       ||
       !(miff->currentRecord.type == miffTypeMATRIX4X4R8S ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+        miff->currentRecord.type == miffTypeVARIABLE     ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
@@ -4244,8 +4325,9 @@ MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
       !_isStarted ||
       !miff       ||
       !value      ||
-      !(miff->currentRecord.type == miffTypeSTRING ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeSTRING   ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    c1     =
       c1e = NULL;
@@ -4275,8 +4357,9 @@ MiffBool miffSetValueType(Miff * const miff, MiffType const value)
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !(miff->currentRecord.type == miffTypeTYPE ||
-        miff->currentRecord.type == miffTypeVARIABLE));
+      !(miff->currentRecord.type == miffTypeTYPE     ||
+        miff->currentRecord.type == miffTypeVARIABLE ||
+        miff->currentRecord.type == miffTypeUSER_TYPE));
 
    return _WriteC1(miff, _TypeGetNameC1(value));
 }

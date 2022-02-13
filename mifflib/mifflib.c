@@ -35,7 +35,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "miffLib.h"
+#include "mifflib.h"
 #include "local.h"
 
 /******************************************************************************
@@ -59,7 +59,7 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
    returnNullIf(!_isStarted);
 
    // Create the miff structure.
-   miff = _MemCreateType(Miff);
+   miff = _MiffMemCreateType(Miff);
    returnNullIf(!miff);
 
    // Initialize the miff structure.
@@ -71,7 +71,7 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
          subFormatVersion,
          dataRepo))
    {
-      _MemDestroy(miff);
+      _MiffMemDestroy(miff);
       returnNull;
    }
 
@@ -93,7 +93,7 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
       !miff       ||
       !getBufferFunc);
 
-   _MemClearType(Miff, miff);
+   _MiffMemClearType(Miff, miff);
    miff->method               = miffMethodREADING;
    miff->dataRepo             = dataRepo;
    miff->isByteSwapping       = isByteSwaping;
@@ -102,33 +102,33 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    miff->readStrCountActual   = 1024;
    miff->readByteCount        = 0;
    miff->readStrCount         = 0;
-   miff->readByteData         = _MemCreateTypeArray(1024, MiffN1);
-   miff->readStrData          = _MemCreateTypeArray(1024, MiffC2);
+   miff->readByteData         = _MiffMemCreateTypeArray(1024, MiffN1);
+   miff->readStrData          = _MiffMemCreateTypeArray(1024, MiffC2);
    returnFalseIf(!miff->readByteData);
    returnFalseIf(!miff->readStrData);
 
    // Read the header.
-   returnFalseIf(!_ReadLine(miff));
-   returnFalseIf(!_MemIsEqual(
+   returnFalseIf(!_MiffReadLine(miff));
+   returnFalseIf(!_MiffMemIsEqual(
       miff->readByteCount, 
       miff->readByteData, 
       4, 
       (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
 
-   returnFalseIf(!_ReadLine(miff));
-   miff->version = _C1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
-   returnFalseIf(!_MemIsEqual(
+   returnFalseIf(!_MiffReadLine(miff));
+   miff->version = _MiffC1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
+   returnFalseIf(!_MiffMemIsEqual(
       miff->readByteCount, 
       miff->readByteData, 
       1, 
       (MiffN1 *) MIFF_HEADER_VERSION_STR));
 
-   returnFalseIf(!_ReadLine(miff));
-   _C1ToC2Key(  miff->readByteCount, (MiffC1 *) miff->readByteData, &ntemp, miff->subFormatNameC2);
-   _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, subFormatName, miff->subFormatNameC2);
-   returnFalseIf(!_ReadLine(miff));
+   returnFalseIf(!_MiffReadLine(miff));
+   _MiffC1ToC2Key(  miff->readByteCount, (MiffC1 *) miff->readByteData, &ntemp, miff->subFormatNameC2);
+   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, subFormatName, miff->subFormatNameC2);
+   returnFalseIf(!_MiffReadLine(miff));
    miff->subFormatVersion =
-      *subFormatVersion   = _C1ToN(miff->readByteCount, miff->readByteData);
+      *subFormatVersion   = _MiffC1ToN(miff->readByteCount, miff->readByteData);
 
    returnTrue;
 }
@@ -144,7 +144,7 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
    returnNullIf(!_isStarted);
 
    // Create the miff structure
-   miff = _MemCreateType(Miff);
+   miff = _MiffMemCreateType(Miff);
    returnNullIf(!miff);
 
    // Initialize the structure
@@ -156,7 +156,7 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
          subFormatVersion,
          dataRepo))
    {
-      _MemDestroy(miff);
+      _MiffMemDestroy(miff);
       returnNull;
    }
 
@@ -180,7 +180,7 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
       !subFormatName  ||
       !subFormatVersion);
 
-   _MemClearType(Miff, miff);
+   _MiffMemClearType(Miff, miff);
    miff->version              = 1;
    miff->method               = miffMethodWRITING;
    miff->dataRepo             = dataRepo;
@@ -188,18 +188,18 @@ MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping
    miff->setBuffer            = setBufferFunc;
    miff->subFormatVersion     = subFormatVersion;
 
-   count = min(255, _C2GetCount(subFormatName));
-   _MemCopyTypeArray(count, MiffC2, miff->subFormatNameC2, subFormatName);
+   count = min(255, _MiffC2GetCount(subFormatName));
+   _MiffMemCopyTypeArray(count, MiffC2, miff->subFormatNameC2, subFormatName);
 
    // Write the miff header.
-   _WriteC1(        miff, (MiffC1 *) MIFF_HEADER_FILETYPE_STR);
+   _MiffWriteC1(        miff, (MiffC1 *) MIFF_HEADER_FILETYPE_STR);
    miffRecordSetEnd(miff);
-   _WriteC1(        miff, (MiffC1 *) MIFF_HEADER_VERSION_STR);
+   _MiffWriteC1(        miff, (MiffC1 *) MIFF_HEADER_VERSION_STR);
    miffRecordSetEnd(miff);
 
-   _WriteC2(        miff, miff->subFormatNameC2);
+   _MiffWriteC2(        miff, miff->subFormatNameC2);
    miffRecordSetEnd(miff);
-   _WriteN(         miff, miff->subFormatVersion);
+   _MiffWriteN(         miff, miff->subFormatVersion);
    miffRecordSetEnd(miff);
 
    returnTrue;
@@ -226,9 +226,9 @@ void miffDestroyContent(Miff * const miff)
       !_isStarted ||
       !miff);
 
-   _MemDestroy(miff->readByteData);
-   _MemDestroy(miff->readStrData);
-   _MemDestroy(miff);
+   _MiffMemDestroy(miff->readByteData);
+   _MiffMemDestroy(miff->readStrData);
+   _MiffMemDestroy(miff);
 }
 
 /******************************************************************************
@@ -243,7 +243,7 @@ MiffBool miffGetValueBoolean(Miff * const miff, MiffBool * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    *value = miffBoolFALSE;
    if (miff->readByteData[0] == 'T')
@@ -271,11 +271,11 @@ MiffBool miffGetValueABI(Miff * const miff, MiffABI8   * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
@@ -299,11 +299,11 @@ MiffBool miffGetValueABN(Miff * const miff, MiffABN8   * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
@@ -322,8 +322,8 @@ MiffBool miffGetValueABR4(Miff * const miff, MiffABR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->a));
-   returnFalseIf(!_ReadR4(miff, &value->b));
+   returnFalseIf(!_MiffReadR4(miff, &value->a));
+   returnFalseIf(!_MiffReadR4(miff, &value->b));
 
    returnTrue;
 }
@@ -340,8 +340,8 @@ MiffBool miffGetValueABR4S(Miff * const miff, MiffABR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->a));
-   returnFalseIf(!_ReadR4S(miff, &value->b));
+   returnFalseIf(!_MiffReadR4S(miff, &value->a));
+   returnFalseIf(!_MiffReadR4S(miff, &value->b));
 
    returnTrue;
 }
@@ -358,8 +358,8 @@ MiffBool miffGetValueABR8(Miff * const miff, MiffABR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->a));
-   returnFalseIf(!_ReadR8(miff, &value->b));
+   returnFalseIf(!_MiffReadR8(miff, &value->a));
+   returnFalseIf(!_MiffReadR8(miff, &value->b));
 
    returnTrue;
 }
@@ -376,8 +376,8 @@ MiffBool miffGetValueABR8S(Miff * const miff, MiffABR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->a));
-   returnFalseIf(!_ReadR8S(miff, &value->b));
+   returnFalseIf(!_MiffReadR8S(miff, &value->a));
+   returnFalseIf(!_MiffReadR8S(miff, &value->b));
 
    returnTrue;
 }
@@ -399,15 +399,15 @@ MiffBool miffGetValueABCI(Miff * const miff, MiffABCI8  * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->c = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
@@ -431,15 +431,15 @@ MiffBool miffGetValueABCN(Miff * const miff, MiffABCN8  * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->c = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
@@ -458,9 +458,9 @@ MiffBool miffGetValueABCR4(Miff * const miff, MiffABCR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->a));
-   returnFalseIf(!_ReadR4(miff, &value->b));
-   returnFalseIf(!_ReadR4(miff, &value->c));
+   returnFalseIf(!_MiffReadR4(miff, &value->a));
+   returnFalseIf(!_MiffReadR4(miff, &value->b));
+   returnFalseIf(!_MiffReadR4(miff, &value->c));
 
    returnTrue;
 }
@@ -477,9 +477,9 @@ MiffBool miffGetValueABCR4S(Miff * const miff, MiffABCR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->a));
-   returnFalseIf(!_ReadR4S(miff, &value->b));
-   returnFalseIf(!_ReadR4S(miff, &value->c));
+   returnFalseIf(!_MiffReadR4S(miff, &value->a));
+   returnFalseIf(!_MiffReadR4S(miff, &value->b));
+   returnFalseIf(!_MiffReadR4S(miff, &value->c));
 
    returnTrue;
 }
@@ -496,9 +496,9 @@ MiffBool miffGetValueABCR8(Miff * const miff, MiffABCR8  * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->a));
-   returnFalseIf(!_ReadR8(miff, &value->b));
-   returnFalseIf(!_ReadR8(miff, &value->c));
+   returnFalseIf(!_MiffReadR8(miff, &value->a));
+   returnFalseIf(!_MiffReadR8(miff, &value->b));
+   returnFalseIf(!_MiffReadR8(miff, &value->c));
 
    returnTrue;
 }
@@ -515,9 +515,9 @@ MiffBool miffGetValueABCR8S(Miff * const miff, MiffABCR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->a));
-   returnFalseIf(!_ReadR8S(miff, &value->b));
-   returnFalseIf(!_ReadR8S(miff, &value->c));
+   returnFalseIf(!_MiffReadR8S(miff, &value->a));
+   returnFalseIf(!_MiffReadR8S(miff, &value->b));
+   returnFalseIf(!_MiffReadR8S(miff, &value->c));
 
    returnTrue;
 }
@@ -539,19 +539,19 @@ MiffBool miffGetValueABCDI(Miff * const miff, MiffABCDI8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->c = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->d = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
@@ -575,19 +575,19 @@ MiffBool miffGetValueABCDN(Miff * const miff, MiffABCDN8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->a = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->b = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->c = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    value->d = (MiffI8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
@@ -606,10 +606,10 @@ MiffBool miffGetValueABCDR4(Miff * const miff, MiffABCDR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->a));
-   returnFalseIf(!_ReadR4(miff, &value->b));
-   returnFalseIf(!_ReadR4(miff, &value->c));
-   returnFalseIf(!_ReadR4(miff, &value->d));
+   returnFalseIf(!_MiffReadR4(miff, &value->a));
+   returnFalseIf(!_MiffReadR4(miff, &value->b));
+   returnFalseIf(!_MiffReadR4(miff, &value->c));
+   returnFalseIf(!_MiffReadR4(miff, &value->d));
 
    returnTrue;
 }
@@ -626,10 +626,10 @@ MiffBool miffGetValueABCDR4S(Miff * const miff, MiffABCDR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->a));
-   returnFalseIf(!_ReadR4S(miff, &value->b));
-   returnFalseIf(!_ReadR4S(miff, &value->c));
-   returnFalseIf(!_ReadR4S(miff, &value->d));
+   returnFalseIf(!_MiffReadR4S(miff, &value->a));
+   returnFalseIf(!_MiffReadR4S(miff, &value->b));
+   returnFalseIf(!_MiffReadR4S(miff, &value->c));
+   returnFalseIf(!_MiffReadR4S(miff, &value->d));
 
    returnTrue;
 }
@@ -646,10 +646,10 @@ MiffBool miffGetValueABCDR8(Miff * const miff, MiffABCDR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->a));
-   returnFalseIf(!_ReadR8(miff, &value->b));
-   returnFalseIf(!_ReadR8(miff, &value->c));
-   returnFalseIf(!_ReadR8(miff, &value->d));
+   returnFalseIf(!_MiffReadR8(miff, &value->a));
+   returnFalseIf(!_MiffReadR8(miff, &value->b));
+   returnFalseIf(!_MiffReadR8(miff, &value->c));
+   returnFalseIf(!_MiffReadR8(miff, &value->d));
 
    returnTrue;
 }
@@ -666,10 +666,10 @@ MiffBool miffGetValueABCDR8S(Miff * const miff, MiffABCDR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->a));
-   returnFalseIf(!_ReadR8S(miff, &value->b));
-   returnFalseIf(!_ReadR8S(miff, &value->c));
-   returnFalseIf(!_ReadR8S(miff, &value->d));
+   returnFalseIf(!_MiffReadR8S(miff, &value->a));
+   returnFalseIf(!_MiffReadR8S(miff, &value->b));
+   returnFalseIf(!_MiffReadR8S(miff, &value->c));
+   returnFalseIf(!_MiffReadR8S(miff, &value->d));
 
    returnTrue;
 }
@@ -691,7 +691,7 @@ MiffBool miffGetValueI(Miff * const miff, MiffI8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    *value = (MiffI8) _strtoi64((char *) miff->readByteData, &endPtr, 10);
    
@@ -710,10 +710,10 @@ MiffBool miffGetValueMatrix2x2R4(Miff * const miff, MiffMatrix2x2R4 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][1]));
 
    returnTrue;
 }
@@ -730,10 +730,10 @@ MiffBool miffGetValueMatrix2x2R4S(Miff * const miff, MiffMatrix2x2R4 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][1]));
 
    returnTrue;
 }
@@ -750,10 +750,10 @@ MiffBool miffGetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][1]));
 
    returnTrue;
 }
@@ -770,10 +770,10 @@ MiffBool miffGetValueMatrix2x2R8S(Miff * const miff, MiffMatrix2x2R8 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][1]));
 
    returnTrue;
 }
@@ -790,15 +790,15 @@ MiffBool miffGetValueMatrix3x3R4(Miff * const miff, MiffMatrix3x3R4 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][2]));
 
    returnTrue;
 }
@@ -815,15 +815,15 @@ MiffBool miffGetValueMatrix3x3R4S(Miff * const miff, MiffMatrix3x3R4 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][2]));
 
    returnTrue;
 }
@@ -840,15 +840,15 @@ MiffBool miffGetValueMatrix3x3R8(Miff * const miff, MiffMatrix3x3R8 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][2]));
 
    returnTrue;
 }
@@ -865,15 +865,15 @@ MiffBool miffGetValueMatrix3x3R8S(Miff * const miff, MiffMatrix3x3R8 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][2]));
 
    returnTrue;
 }
@@ -890,22 +890,22 @@ MiffBool miffGetValueMatrix4x4R4(Miff * const miff, MiffMatrix4x4R4 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[0][3]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[1][3]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[2][3]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[3][0]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[3][1]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[3][2]));
-   returnFalseIf(!_ReadR4(miff, &value->cell[3][3]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[0][3]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[1][3]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[2][3]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[3][0]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[3][1]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[3][2]));
+   returnFalseIf(!_MiffReadR4(miff, &value->cell[3][3]));
 
    returnTrue;
 }
@@ -922,22 +922,22 @@ MiffBool miffGetValueMatrix4x4R4S(Miff * const miff, MiffMatrix4x4R4 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[0][3]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[1][3]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[2][3]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[3][0]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[3][1]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[3][2]));
-   returnFalseIf(!_ReadR4S(miff, &value->cell[3][3]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[0][3]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[1][3]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[2][3]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[3][0]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[3][1]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[3][2]));
+   returnFalseIf(!_MiffReadR4S(miff, &value->cell[3][3]));
 
    returnTrue;
 }
@@ -954,22 +954,22 @@ MiffBool miffGetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 * const valu
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[0][3]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[1][3]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[2][3]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[3][0]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[3][1]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[3][2]));
-   returnFalseIf(!_ReadR8(miff, &value->cell[3][3]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[0][3]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[1][3]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[2][3]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[3][0]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[3][1]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[3][2]));
+   returnFalseIf(!_MiffReadR8(miff, &value->cell[3][3]));
 
    returnTrue;
 }
@@ -986,22 +986,22 @@ MiffBool miffGetValueMatrix4x4R8S(Miff * const miff, MiffMatrix4x4R8 * const val
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[0][3]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[1][3]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[2][3]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[3][0]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[3][1]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[3][2]));
-   returnFalseIf(!_ReadR8S(miff, &value->cell[3][3]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[0][3]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[1][3]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[2][3]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[3][0]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[3][1]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[3][2]));
+   returnFalseIf(!_MiffReadR8S(miff, &value->cell[3][3]));
 
    returnTrue;
 }
@@ -1023,7 +1023,7 @@ MiffBool miffGetValueN(Miff * const miff, MiffN8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    *value = (MiffN8) _strtoui64((char *) miff->readByteData, &endPtr, 10);
    
@@ -1042,7 +1042,7 @@ MiffBool miffGetValueR4(Miff * const miff, MiffR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4(miff, value))
+   returnFalseIf(!_MiffReadR4(miff, value))
 
    returnTrue;
 }
@@ -1059,7 +1059,7 @@ MiffBool miffGetValueR4S(Miff * const miff, MiffR4 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR4S(miff, value))
+   returnFalseIf(!_MiffReadR4S(miff, value))
 
    returnTrue;
 }
@@ -1076,7 +1076,7 @@ MiffBool miffGetValueR8(Miff * const miff, MiffR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8(miff, value));
+   returnFalseIf(!_MiffReadR8(miff, value));
 
    returnTrue;
 }
@@ -1093,7 +1093,7 @@ MiffBool miffGetValueR8S(Miff * const miff, MiffR8 * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadR8S(miff, value));
+   returnFalseIf(!_MiffReadR8S(miff, value));
 
    returnTrue;
 }
@@ -1112,28 +1112,28 @@ MiffBool miffGetValueStringC2(Miff *const miff, MiffC2 **const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
-   _C1EncodedToC1(&miff->readByteCount, miff->readByteData);
+   _MiffC1EncodedToC1(&miff->readByteCount, miff->readByteData);
 
    // Adjust the str buffer.
    if (miff->readByteCount >= miff->readStrCountActual)
    {
-      _MemDestroy(miff->readStrData);
+      _MiffMemDestroy(miff->readStrData);
 
       // Get the new buffer size.
       miff->readStrCountActual = ((miff->readByteCount / 1024) + 2) * 1024;
-      miff->readStrData        = _MemCreateTypeArray(miff->readStrCountActual, MiffC2);
+      miff->readStrData        = _MiffMemCreateTypeArray(miff->readStrCountActual, MiffC2);
 
       // Ran out of memory.
       returnFalseIf(!miff->readStrData);
    }
 
    // Clear the string.
-   _MemClearTypeArray(miff->readStrCountActual, MiffC2, miff->readStrData);
+   _MiffMemClearTypeArray(miff->readStrCountActual, MiffC2, miff->readStrData);
 
    // Convert the stirng to Unicode.
-   _C1ToC2(miff->readByteCount, miff->readByteData, &miff->readStrCount, miff->readStrData);
+   _MiffC1ToC2(miff->readByteCount, miff->readByteData, &miff->readStrCount, miff->readStrData);
 
    // Return string.
    *value = miff->readStrData;
@@ -1160,10 +1160,10 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    *count                 = 0;
 
    // Clear the key.
-   _MemClearTypeArray(miffKeySIZE, MiffC2, key);
+   _MiffMemClearTypeArray(miffKeySIZE, MiffC2, key);
 
    // Read in the type.
-   returnFalseIf(!_ReadType(miff, &miff->currentRecord.type, typeName));
+   returnFalseIf(!_MiffReadType(miff, &miff->currentRecord.type, typeName));
    *type = miff->currentRecord.type;
 
    // Special case,
@@ -1173,8 +1173,8 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    }
 
    // Read in the name of the record
-   returnFalseIf(!_ReadC2Key(miff, miff->currentRecord.nameC2));
-   _MemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, key, miff->currentRecord.nameC2);
+   returnFalseIf(!_MiffReadC2Key(miff, miff->currentRecord.nameC2));
+   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffC2, key, miff->currentRecord.nameC2);
 
    // Special case,
    if (*type == miffTypeKEY_VALUE_BLOCK_START)
@@ -1183,7 +1183,7 @@ MiffBool miffRecordGetBegin(Miff * const miff, MiffType * const type, MiffC2 * c
    }
 
    // Read in the array count
-   returnFalseIf(!_ReadArrayCount(miff, &miff->currentRecord.arrayCount));
+   returnFalseIf(!_MiffReadArrayCount(miff, &miff->currentRecord.arrayCount));
    *count = miff->currentRecord.arrayCount;
 
    returnTrue;
@@ -1200,7 +1200,7 @@ MiffBool miffRecordGetEnd(Miff * const miff)
 
    returnTrueIf(miff->readRecordIsDone);
 
-   returnFalseIf(!_ReadLineSkip(miff));
+   returnFalseIf(!_MiffReadLineSkip(miff));
 
    miff->readRecordIsDone = miffBoolTRUE;
 
@@ -1259,11 +1259,11 @@ MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const
    // Write the type for the record.  Common for all cases.
    if (type == miffTypeUSER_TYPE)
    {
-      returnFalseIf(!_WriteC2Key(miff, typeName));
+      returnFalseIf(!_MiffWriteC2Key(miff, typeName));
    }
    else
    {
-      returnFalseIf(!_WriteC1(   miff, _TypeGetNameC1(type)));
+      returnFalseIf(!_MiffWriteC1(   miff, _MiffTypeGetNameC1(type)));
    }
 
    // We are ending a key value block.
@@ -1280,11 +1280,11 @@ MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const
    miff->currentArrayIndex        = 0;
    miff->currentRecord.type       = type;
    miff->currentRecord.arrayCount = count;
-   _MemClearTypeArray(miffKeySIZE,      MiffC2, miff->currentRecord.nameC2);
-   _MemCopyTypeArray( _C2GetCount(key), MiffC2, miff->currentRecord.nameC2, key);
+   _MiffMemClearTypeArray(miffKeySIZE,      MiffC2, miff->currentRecord.nameC2);
+   _MiffMemCopyTypeArray( _MiffC2GetCount(key), MiffC2, miff->currentRecord.nameC2, key);
 
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteC2Key(           miff, miff->currentRecord.nameC2));
+   returnFalseIf(!_MiffWriteC2Key(           miff, miff->currentRecord.nameC2));
    // We are starting a new key value block.
    if (type == miffTypeKEY_VALUE_BLOCK_START)
    {
@@ -1294,7 +1294,7 @@ MiffBool miffRecordSetBegin(Miff * const miff, MiffType const type, MiffC2 const
 
    // Write out the record.
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, count));
+   returnFalseIf(!_MiffWriteN(               miff, count));
    returnFalseIf(!miffRecordSetSeparator(miff));
 
    returnTrue;
@@ -1313,7 +1313,7 @@ MiffBool miffRecordSetEnd(Miff * const miff)
    // fullfill the record requirements.
    miff->currentRecord.type = miffTypeNONE;
 
-   return _WriteC1(miff, (MiffC1 *) "\n");
+   return _MiffWriteC1(miff, (MiffC1 *) "\n");
 }
 
 /******************************************************************************
@@ -1325,7 +1325,7 @@ MiffBool miffRecordSetSeparator(Miff * const miff)
       !_isStarted ||
       !miff);
 
-   return _WriteC1(miff, (MiffC1 *) "\t");
+   return _MiffWriteC1(miff, (MiffC1 *) "\t");
 }
 
 /******************************************************************************
@@ -1341,11 +1341,11 @@ MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDe
       !memCreateFunc ||
       !memDestroyFunc)
 
-   _MemStart(memCreateFunc, memDestroyFunc);
+   _MiffMemStart(memCreateFunc, memDestroyFunc);
 
    _isStarted = miffBoolTRUE;
 
-   _Base64Start();
+   _MiffBase64Start();
 
    returnTrue;
 }
@@ -1357,7 +1357,7 @@ void miffStop(void)
 {
    returnVoidIf(!_isStarted);
 
-   _MemStop();
+   _MiffMemStop();
 
    _isStarted = miffBoolFALSE;
 }
@@ -3158,9 +3158,9 @@ MiffBool miffSetValueABI1(Miff * const miff, MiffABI1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
 
    returnTrue;
 }
@@ -3178,9 +3178,9 @@ MiffBool miffSetValueABI2(Miff * const miff, MiffABI2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
 
    returnTrue;
 }
@@ -3198,9 +3198,9 @@ MiffBool miffSetValueABI4(Miff * const miff, MiffABI4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
 
    returnTrue;
 }
@@ -3218,9 +3218,9 @@ MiffBool miffSetValueABN1(Miff * const miff, MiffABN1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
 
    returnTrue;
 }
@@ -3238,9 +3238,9 @@ MiffBool miffSetValueABN2(Miff * const miff, MiffABN2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
 
    returnTrue;
 }
@@ -3258,9 +3258,9 @@ MiffBool miffSetValueABN4(Miff * const miff, MiffABN4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
 
    returnTrue;
 }
@@ -3278,9 +3278,9 @@ MiffBool miffSetValueABR4(Miff * const miff, MiffABR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->a));
+   returnFalseIf(!_MiffWriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->b));
+   returnFalseIf(!_MiffWriteR4(              miff, value->b));
 
    returnTrue;
 }
@@ -3298,9 +3298,9 @@ MiffBool miffSetValueABR4S(Miff * const miff, MiffABR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->b));
 
    returnTrue;
 }
@@ -3318,9 +3318,9 @@ MiffBool miffSetValueABR8(Miff * const miff, MiffABR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->a));
+   returnFalseIf(!_MiffWriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->b));
+   returnFalseIf(!_MiffWriteR8(              miff, value->b));
 
    returnTrue;
 }
@@ -3338,9 +3338,9 @@ MiffBool miffSetValueABR8S(Miff * const miff, MiffABR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->b));
 
    returnTrue;
 }
@@ -3358,11 +3358,11 @@ MiffBool miffSetValueABCI1(Miff * const miff, MiffABCI1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
 
    returnTrue;
 }
@@ -3380,11 +3380,11 @@ MiffBool miffSetValueABCI2(Miff * const miff, MiffABCI2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
 
    returnTrue;
 }
@@ -3402,11 +3402,11 @@ MiffBool miffSetValueABCI4(Miff * const miff, MiffABCI4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
 
    returnTrue;
 }
@@ -3424,11 +3424,11 @@ MiffBool miffSetValueABCN1(Miff * const miff, MiffABCN1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
 
    returnTrue;
 }
@@ -3446,11 +3446,11 @@ MiffBool miffSetValueABCN2(Miff * const miff, MiffABCN2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
 
    returnTrue;
 }
@@ -3468,11 +3468,11 @@ MiffBool miffSetValueABCN4(Miff * const miff, MiffABCN4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
 
    returnTrue;
 }
@@ -3490,11 +3490,11 @@ MiffBool miffSetValueABCR4(Miff * const miff, MiffABCR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->a));
+   returnFalseIf(!_MiffWriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->b));
+   returnFalseIf(!_MiffWriteR4(              miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->c));
+   returnFalseIf(!_MiffWriteR4(              miff, value->c));
 
    returnTrue;
 }
@@ -3512,11 +3512,11 @@ MiffBool miffSetValueABCR4S(Miff * const miff, MiffABCR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->c));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->c));
 
    returnTrue;
 }
@@ -3534,11 +3534,11 @@ MiffBool miffSetValueABCR8(Miff * const miff, MiffABCR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->a));
+   returnFalseIf(!_MiffWriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->b));
+   returnFalseIf(!_MiffWriteR8(              miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->c));
+   returnFalseIf(!_MiffWriteR8(              miff, value->c));
 
    returnTrue;
 }
@@ -3556,11 +3556,11 @@ MiffBool miffSetValueABCR8S(Miff * const miff, MiffABCR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->c));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->c));
 
    returnTrue;
 }
@@ -3578,13 +3578,13 @@ MiffBool miffSetValueABCDI1(Miff * const miff, MiffABCDI1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->d));
+   returnFalseIf(!_MiffWriteI(               miff, value->d));
 
    returnTrue;
 }
@@ -3602,13 +3602,13 @@ MiffBool miffSetValueABCDI2(Miff * const miff, MiffABCDI2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->d));
+   returnFalseIf(!_MiffWriteI(               miff, value->d));
 
    returnTrue;
 }
@@ -3626,13 +3626,13 @@ MiffBool miffSetValueABCDI4(Miff * const miff, MiffABCDI4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteI(               miff, value->a));
+   returnFalseIf(!_MiffWriteI(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->b));
+   returnFalseIf(!_MiffWriteI(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->c));
+   returnFalseIf(!_MiffWriteI(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteI(               miff, value->d));
+   returnFalseIf(!_MiffWriteI(               miff, value->d));
 
    returnTrue;
 }
@@ -3650,13 +3650,13 @@ MiffBool miffSetValueABCDN1(Miff * const miff, MiffABCDN1 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->d));
+   returnFalseIf(!_MiffWriteN(               miff, value->d));
 
    returnTrue;
 }
@@ -3674,13 +3674,13 @@ MiffBool miffSetValueABCDN2(Miff * const miff, MiffABCDN2 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->d));
+   returnFalseIf(!_MiffWriteN(               miff, value->d));
 
    returnTrue;
 }
@@ -3698,13 +3698,13 @@ MiffBool miffSetValueABCDN4(Miff * const miff, MiffABCDN4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteN(               miff, value->a));
+   returnFalseIf(!_MiffWriteN(               miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->b));
+   returnFalseIf(!_MiffWriteN(               miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->c));
+   returnFalseIf(!_MiffWriteN(               miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteN(               miff, value->d));
+   returnFalseIf(!_MiffWriteN(               miff, value->d));
 
    returnTrue;
 }
@@ -3722,13 +3722,13 @@ MiffBool miffSetValueABCDR4(Miff * const miff, MiffABCDR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->a));
+   returnFalseIf(!_MiffWriteR4(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->b));
+   returnFalseIf(!_MiffWriteR4(              miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->c));
+   returnFalseIf(!_MiffWriteR4(              miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->d));
+   returnFalseIf(!_MiffWriteR4(              miff, value->d));
 
    returnTrue;
 }
@@ -3746,13 +3746,13 @@ MiffBool miffSetValueABCDR4S(Miff * const miff, MiffABCDR4 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->c));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->d));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->d));
 
    returnTrue;
 }
@@ -3770,13 +3770,13 @@ MiffBool miffSetValueABCDR8(Miff * const miff, MiffABCDR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->a));
+   returnFalseIf(!_MiffWriteR8(              miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->b));
+   returnFalseIf(!_MiffWriteR8(              miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->c));
+   returnFalseIf(!_MiffWriteR8(              miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->d));
+   returnFalseIf(!_MiffWriteR8(              miff, value->d));
 
    returnTrue;
 }
@@ -3794,13 +3794,13 @@ MiffBool miffSetValueABCDR8S(Miff * const miff, MiffABCDR8 const * const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8S(             miff, value->a));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->a));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->b));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->b));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->c));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->c));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->d));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->d));
 
    returnTrue;
 }
@@ -3821,7 +3821,7 @@ MiffBool miffSetValueBoolean(Miff * const miff, MiffBool const value)
 
    c1 = (MiffC1 *) (value ? "T" : "F");
 
-   returnFalseIf(!_WriteC1(miff, c1));
+   returnFalseIf(!_MiffWriteC1(miff, c1));
 
    returnTrue;
 }
@@ -3835,7 +3835,7 @@ MiffBool miffSetValueI(Miff * const miff, MiffI8 const value)
       !_isStarted ||
       !miff)
 
-   return _WriteI(miff, value);
+   return _MiffWriteI(miff, value);
 }
 
 /******************************************************************************
@@ -3850,13 +3850,13 @@ MiffBool miffSetValueMatrix2x2R4(Miff * const miff, MiffMatrix2x2R4 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][1]));
 
    returnTrue;
 }
@@ -3873,13 +3873,13 @@ MiffBool miffSetValueMatrix2x2R4S(Miff * const miff, MiffMatrix2x2R4 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][1]));
 
    returnTrue;
 }
@@ -3896,13 +3896,13 @@ MiffBool miffSetValueMatrix2x2R8(Miff * const miff, MiffMatrix2x2R8 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][1]));
 
    returnTrue;
 }
@@ -3919,13 +3919,13 @@ MiffBool miffSetValueMatrix2x2R8S(Miff * const miff, MiffMatrix2x2R8 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
    
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][1]));
 
    returnTrue;
 }
@@ -3942,23 +3942,23 @@ MiffBool miffSetValueMatrix3x3R4(Miff * const miff, MiffMatrix3x3R4 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][2]));
 
    returnTrue;
 }
@@ -3975,23 +3975,23 @@ MiffBool miffSetValueMatrix3x3R4S(Miff * const miff, MiffMatrix3x3R4 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][2]));
 
    returnTrue;
 }
@@ -4008,23 +4008,23 @@ MiffBool miffSetValueMatrix3x3R8(Miff * const miff, MiffMatrix3x3R8 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][2]));
 
    returnTrue;
 }
@@ -4041,23 +4041,23 @@ MiffBool miffSetValueMatrix3x3R8S(Miff * const miff, MiffMatrix3x3R8 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][2]));
 
    returnTrue;
 }
@@ -4074,37 +4074,37 @@ MiffBool miffSetValueMatrix4x4R4(Miff * const miff, MiffMatrix4x4R4 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[0][3]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[0][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[1][3]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[1][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[2][3]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[2][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[3][0]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[3][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[3][1]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[3][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[3][2]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[3][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4(              miff, value->cell[3][3]));
+   returnFalseIf(!_MiffWriteR4(              miff, value->cell[3][3]));
 
    returnTrue;
 }
@@ -4121,37 +4121,37 @@ MiffBool miffSetValueMatrix4x4R4S(Miff * const miff, MiffMatrix4x4R4 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[0][3]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[0][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[1][3]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[1][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[2][3]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[2][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[3][0]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[3][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[3][1]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[3][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[3][2]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[3][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR4S(             miff, value->cell[3][3]));
+   returnFalseIf(!_MiffWriteR4S(             miff, value->cell[3][3]));
 
    returnTrue;
 }
@@ -4168,37 +4168,37 @@ MiffBool miffSetValueMatrix4x4R8(Miff * const miff, MiffMatrix4x4R8 const * cons
         miff->currentRecord.type == miffTypeVARIABLE    ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[0][3]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[0][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[1][3]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[1][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[2][3]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[2][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[3][0]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[3][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[3][1]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[3][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[3][2]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[3][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8(              miff, value->cell[3][3]));
+   returnFalseIf(!_MiffWriteR8(              miff, value->cell[3][3]));
 
    returnTrue;
 }
@@ -4215,37 +4215,37 @@ MiffBool miffSetValueMatrix4x4R8S(Miff * const miff, MiffMatrix4x4R8 const * con
         miff->currentRecord.type == miffTypeVARIABLE     ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[0][3]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[0][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[1][3]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[1][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[2][3]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[2][3]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[3][0]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[3][0]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[3][1]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[3][1]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[3][2]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[3][2]));
    returnFalseIf(!miffRecordSetSeparator(miff));
-   returnFalseIf(!_WriteR8S(             miff, value->cell[3][3]));
+   returnFalseIf(!_MiffWriteR8S(             miff, value->cell[3][3]));
 
    returnTrue;
 }
@@ -4259,7 +4259,7 @@ MiffBool miffSetValueN(Miff * const miff, MiffN8 const value)
       !_isStarted ||
       !miff);
 
-   return _WriteN(miff, value);
+   return _MiffWriteN(miff, value);
 }
 
 /******************************************************************************
@@ -4271,7 +4271,7 @@ MiffBool miffSetValueR4(Miff * const miff, MiffR4 const value)
       !_isStarted ||
       !miff);
 
-   return _WriteR4(miff, value);
+   return _MiffWriteR4(miff, value);
 }
 
 /******************************************************************************
@@ -4283,7 +4283,7 @@ MiffBool miffSetValueR4S(Miff * const miff, MiffR4 const value)
       !_isStarted ||
       !miff);
 
-   return _WriteR4S(miff, value);
+   return _MiffWriteR4S(miff, value);
 }
 
 /******************************************************************************
@@ -4295,7 +4295,7 @@ MiffBool miffSetValueR8(Miff * const miff, MiffR8 const value)
       !_isStarted ||
       !miff);
 
-   return _WriteR8(miff, value);
+   return _MiffWriteR8(miff, value);
 }
 
 /******************************************************************************
@@ -4307,7 +4307,7 @@ MiffBool miffSetValueR8S(Miff * const miff, MiffR8 const value)
       !_isStarted ||
       !miff);
 
-   return _WriteR8S(miff, value);
+   return _MiffWriteR8S(miff, value);
 }
 
 /******************************************************************************
@@ -4334,17 +4334,17 @@ MiffBool miffSetValueStringC2(Miff * const miff, MiffC2 const * const value)
    result = miffBoolFALSE;
    once
    {
-      breakIf(!_C2ToC1(_C2GetCount(value), value, &c1Count, &c1));
+      breakIf(!_MiffC2ToC1(_MiffC2GetCount(value), value, &c1Count, &c1));
 
-      breakIf(!_C1ToC1Encoded(_C1GetCount(c1), c1, &c1eCount, &c1e));
+      breakIf(!_MiffC1ToC1Encoded(_MiffC1GetCount(c1), c1, &c1eCount, &c1e));
 
-      breakIf(!_WriteC1(miff, c1e));
+      breakIf(!_MiffWriteC1(miff, c1e));
 
       result = miffBoolTRUE;
    }
 
-   _MemDestroy(c1e);
-   _MemDestroy(c1);
+   _MiffMemDestroy(c1e);
+   _MiffMemDestroy(c1);
 
    returnTrue;
 }
@@ -4361,7 +4361,7 @@ MiffBool miffSetValueType(Miff * const miff, MiffType const value)
         miff->currentRecord.type == miffTypeVARIABLE ||
         miff->currentRecord.type == miffTypeUSER_TYPE));
 
-   return _WriteC1(miff, _TypeGetNameC1(value));
+   return _MiffWriteC1(miff, _MiffTypeGetNameC1(value));
 }
 
 /******************************************************************************
@@ -4369,7 +4369,7 @@ func: miffTypeGetC1
 ******************************************************************************/
 MiffC1 const *miffTypeGetC1(MiffType const type)
 {
-   return _TypeGetNameC1(type);
+   return _MiffTypeGetNameC1(type);
 }
 
 /******************************************************************************
@@ -4377,5 +4377,5 @@ func: miffTypeGetC2
 ******************************************************************************/
 MiffC2 const *miffTypeGetC2(MiffType const type)
 {
-   return _TypeGetNameC2(type);
+   return _MiffTypeGetNameC2(type);
 }

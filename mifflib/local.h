@@ -247,7 +247,7 @@ typedef struct
    MiffN1  byte;
    MiffN4  index;
    MiffN1 *buffer;
-} Base64Data;
+} MiffBase64Data;
 
 /******************************************************************************
 variable:
@@ -256,71 +256,71 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-Base64Data   _Base64Restart(     MiffN1 * const buffer);
-MiffBool     _Base64Get(         Base64Data * const buffer, MiffN1 * const byte);
-MiffBool     _Base64Set(         Base64Data * const buffer, MiffN1   const byte);
-MiffBool     _Base64SetEnd(      Base64Data * const buffer);
-void         _Base64Start(       void);
+MiffBase64Data  _MiffBase64Restart(     MiffN1 * const buffer);
+MiffBool        _MiffBase64Get(         MiffBase64Data * const buffer, MiffN1 * const byte);
+MiffBool        _MiffBase64Set(         MiffBase64Data * const buffer, MiffN1   const byte);
+MiffBool        _MiffBase64SetEnd(      MiffBase64Data * const buffer);
+void            _MiffBase64Start(       void);
 
 #if 0 // Currently not used
-void      _ByteSwap2(         Miff const * const miff, Miff2 * const value);
+void            _MiffByteSwap2(         Miff const * const miff, Miff2 * const value);
 #endif
-void      _ByteSwap4(         Miff const * const miff, Miff4 * const value);
-void      _ByteSwap8(         Miff const * const miff, Miff8 * const value);
+void            _MiffByteSwap4(         Miff const * const miff, Miff4 * const value);
+void            _MiffByteSwap8(         Miff const * const miff, Miff8 * const value);
 
-MiffBool  _C1EncodedToC1(     MiffN4  * const c1Count, MiffC1       * const c1);
-MiffBool  _C1ToC1Encoded(     MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c1eCount, MiffC1 ** const c1e);
-void      _C1ToC2(            MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c2Count,  MiffC2 *  const c2);
-void      _C1ToC2Key(         MiffN4    const c1Count, MiffC1 const * const c1, MiffN1 * const c2Count,  MiffC2 *  const c2);
-MiffI8    _C1ToI(             MiffN4    const c1Count, MiffC1 const * const c1);
-MiffN8    _C1ToN(             MiffN4    const c1Count, MiffC1 const * const c1);
-MiffC2   *_C2Append(          MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c);
-MiffC2   *_C2Clone(           MiffN4    const c2Count, MiffC2 const * const c2);
-MiffBool  _C2ToC1(            MiffN4    const c2Count, MiffC2 const * const c2, MiffN4 * const c1Count, MiffC1 ** const c1);
-MiffBool  _C2ToC1Key(         MiffN4    const c2Count, MiffC2 const * const c2, MiffN1 * const c1Count, MiffC1 *  const c1);
-MiffN4    _C1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4);
-MiffN4    _C2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4);
-MiffN4    _C4LetterToC1Letter(MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
-MiffN4    _C4LetterToC2Letter(MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
+MiffBool        _MiffC1EncodedToC1(     MiffN4  * const c1Count, MiffC1       * const c1);
+MiffBool        _MiffC1ToC1Encoded(     MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c1eCount, MiffC1 ** const c1e);
+void            _MiffC1ToC2(            MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c2Count,  MiffC2 *  const c2);
+void            _MiffC1ToC2Key(         MiffN4    const c1Count, MiffC1 const * const c1, MiffN1 * const c2Count,  MiffC2 *  const c2);
+MiffI8          _MiffC1ToI(             MiffN4    const c1Count, MiffC1 const * const c1);
+MiffN8          _MiffC1ToN(             MiffN4    const c1Count, MiffC1 const * const c1);
+MiffC2         *_MiffC2Append(          MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c);
+MiffC2         *_MiffC2Clone(           MiffN4    const c2Count, MiffC2 const * const c2);
+MiffBool        _MiffC2ToC1(            MiffN4    const c2Count, MiffC2 const * const c2, MiffN4 * const c1Count, MiffC1 ** const c1);
+MiffBool        _MiffC2ToC1Key(         MiffN4    const c2Count, MiffC2 const * const c2, MiffN1 * const c1Count, MiffC1 *  const c1);
+MiffN4          _MiffC1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4);
+MiffN4          _MiffC2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4);
+MiffN4          _MiffC4LetterToC1Letter(MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
+MiffN4          _MiffC4LetterToC2Letter(MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
 
-#define   _C1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
-#define   _C2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))
+#define         _MiffC1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
+#define         _MiffC2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))
 
-void     *_MemCreate(         MiffN4 const memByteCount);
-void      _MemDestroy(        void * const mem);
-MiffBool  _MemIsEqual(        MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB, MiffN1 const * const memB);
-void      _MemStart(          MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
-void      _MemStop(           void);
+void           *_MiffMemCreate(         MiffN4 const memByteCount);
+void            _MiffMemDestroy(        void * const mem);
+MiffBool        _MiffMemIsEqual(        MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB, MiffN1 const * const memB);
+void            _MiffMemStart(          MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
+void            _MiffMemStop(           void);
 
-#define   _MemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
-#define   _MemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
-#define   _MemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
-#define   _MemCreateType(            TYPE)           (TYPE *) _MemCreate(                    sizeof(TYPE))
-#define   _MemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MemCreate(          (COUNT) * sizeof(TYPE))
+#define         _MiffMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
+#define         _MiffMemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
+#define         _MiffMemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
+#define         _MiffMemCreateType(            TYPE)           (TYPE *) _MiffMemCreate(                    sizeof(TYPE))
+#define         _MiffMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MiffMemCreate(          (COUNT) * sizeof(TYPE))
 
-MiffBool  _ReadLine(          Miff       * const miff);
-MiffBool  _ReadLineSkip(      Miff       * const miff);
-MiffBool  _ReadPart(          Miff       * const miff);
-MiffBool  _ReadArrayCount(    Miff       * const miff, MiffN4   * const count);
-MiffBool  _ReadC2Key(         Miff       * const miff, MiffC2   * const key);
-MiffBool  _ReadR4(            Miff       * const miff, MiffR4   * const value);
-MiffBool  _ReadR4S(           Miff       * const miff, MiffR4   * const value);
-MiffBool  _ReadR8(            Miff       * const miff, MiffR8   * const value);
-MiffBool  _ReadR8S(           Miff       * const miff, MiffR8   * const value);
-MiffBool  _ReadType(          Miff       * const miff, MiffType * const type, MiffC2 * const typeName);
+MiffBool        _MiffReadLine(          Miff       * const miff);
+MiffBool        _MiffReadLineSkip(      Miff       * const miff);
+MiffBool        _MiffReadPart(          Miff       * const miff);
+MiffBool        _MiffReadArrayCount(    Miff       * const miff, MiffN4   * const count);
+MiffBool        _MiffReadC2Key(         Miff       * const miff, MiffC2   * const key);
+MiffBool        _MiffReadR4(            Miff       * const miff, MiffR4   * const value);
+MiffBool        _MiffReadR4S(           Miff       * const miff, MiffR4   * const value);
+MiffBool        _MiffReadR8(            Miff       * const miff, MiffR8   * const value);
+MiffBool        _MiffReadR8S(           Miff       * const miff, MiffR8   * const value);
+MiffBool        _MiffReadType(          Miff       * const miff, MiffType * const type, MiffC2 * const typeName);
 
-MiffC2   *_TypeGetNameC2(     MiffType const type);
-MiffC1   *_TypeGetNameC1(     MiffType const type);
-MiffN4    _TypeGetNameSize(   MiffType const type);
+MiffC2         *_MiffTypeGetNameC2(     MiffType const type);
+MiffC1         *_MiffTypeGetNameC1(     MiffType const type);
+MiffN4          _MiffTypeGetNameSize(   MiffType const type);
 
-MiffBool  _WriteC1(           Miff const * const miff, MiffC1 const * const value);
-MiffBool  _WriteC2(           Miff const * const miff, MiffC2 const * const value);
-MiffBool  _WriteC2Key(        Miff const * const miff, MiffC2 const * const key);
-MiffBool  _WriteI(            Miff       * const miff, MiffI8 const value);
-MiffBool  _WriteN(            Miff       * const miff, MiffN8 const value);
-MiffBool  _WriteR4(           Miff       * const miff, MiffR4 const value);
-MiffBool  _WriteR4S(          Miff       * const miff, MiffR4 const value);
-MiffBool  _WriteR8(           Miff       * const miff, MiffR8 const value);
-MiffBool  _WriteR8S(          Miff       * const miff, MiffR8 const value);
+MiffBool        _MiffWriteC1(           Miff const * const miff, MiffC1 const * const value);
+MiffBool        _MiffWriteC2(           Miff const * const miff, MiffC2 const * const value);
+MiffBool        _MiffWriteC2Key(        Miff const * const miff, MiffC2 const * const key);
+MiffBool        _MiffWriteI(            Miff       * const miff, MiffI8 const value);
+MiffBool        _MiffWriteN(            Miff       * const miff, MiffN8 const value);
+MiffBool        _MiffWriteR4(           Miff       * const miff, MiffR4 const value);
+MiffBool        _MiffWriteR4S(          Miff       * const miff, MiffR4 const value);
+MiffBool        _MiffWriteR8(           Miff       * const miff, MiffR8 const value);
+MiffBool        _MiffWriteR8S(          Miff       * const miff, MiffR8 const value);
 
 #endif

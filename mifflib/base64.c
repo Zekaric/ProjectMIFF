@@ -48,11 +48,11 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _Base64Restart
+func: _MiffBase64Restart
 ******************************************************************************/
-Base64Data _Base64Restart(MiffN1 * const value)
+MiffBase64Data _MiffBase64Restart(MiffN1 * const value)
 {
-   Base64Data data;
+   MiffBase64Data data;
 
    data.state  = 0;
    data.byte   = 0;
@@ -63,9 +63,9 @@ Base64Data _Base64Restart(MiffN1 * const value)
 }
 
 /******************************************************************************
-func: _Base64Get
-Base64Buffer * const buffer, ******************************************************************************/
-MiffBool _Base64Get(Base64Data * const data, MiffN1 * const byte)
+func: _MiffBase64Get
+******************************************************************************/
+MiffBool _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
 {
    *byte = 0;
    
@@ -125,9 +125,9 @@ MiffBool _Base64Get(Base64Data * const data, MiffN1 * const byte)
 }
 
 /******************************************************************************
-func: _Base64Set
+func: _MiffBase64Set
 ******************************************************************************/
-MiffBool _Base64Set(Base64Data * const data, MiffN1 const byte)
+MiffBool _MiffBase64Set(MiffBase64Data * const data, MiffN1 const byte)
 {
    MiffN1 btemp;
    MiffN1 sixbit;
@@ -188,11 +188,11 @@ MiffBool _Base64Set(Base64Data * const data, MiffN1 const byte)
 }
 
 /******************************************************************************
-func: _Base64SetEnd
+func: _MiffBase64SetEnd
 
 Send out the remainder bits.
 ******************************************************************************/
-MiffBool _Base64SetEnd(Base64Data * const data)
+MiffBool _MiffBase64SetEnd(MiffBase64Data * const data)
 {
    MiffN1 sixbit;
 
@@ -224,13 +224,13 @@ MiffBool _Base64SetEnd(Base64Data * const data)
 }
 
 /******************************************************************************
-func: _Base64Start
+func: _MiffBase64Start
 ******************************************************************************/
-void _Base64Start(void)
+void _MiffBase64Start(void)
 {
    MiffN1 index;
 
-   _MemClearTypeArray(128, MiffN1, _base64LetterToValue);
+   _MiffMemClearTypeArray(128, MiffN1, _base64LetterToValue);
    index = 0;
    _base64LetterToValue['A'] = index++;
    _base64LetterToValue['B'] = index++;

@@ -41,9 +41,9 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _ReadLine
+func: _MiffReadLine
 ******************************************************************************/
-MiffBool _ReadLine(Miff * const miff)
+MiffBool _MiffReadLine(Miff * const miff)
 {
    MiffN4  index;
    MiffN1  byte;
@@ -58,13 +58,13 @@ MiffBool _ReadLine(Miff * const miff)
       if (miff->readByteCountActual == index)
       {
          // Create a new buffer double the size.
-         bufTemp = _MemCreateTypeArray(miff->readByteCountActual * 2, MiffN1);
+         bufTemp = _MiffMemCreateTypeArray(miff->readByteCountActual * 2, MiffN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _MemCopyTypeArray(miff->readByteCountActual, MiffN1, bufTemp, miff->readByteData);
+         _MiffMemCopyTypeArray(miff->readByteCountActual, MiffN1, bufTemp, miff->readByteData);
          // Destroy the old buffer.
-         _MemDestroy(miff->readByteData);
+         _MiffMemDestroy(miff->readByteData);
 
          // Reset the internal buffer to the new larger buffer.
          miff->readByteCountActual = miff->readByteCountActual * 2;
@@ -88,9 +88,9 @@ MiffBool _ReadLine(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadLineSkip
+func: _MiffReadLineSkip
 ******************************************************************************/
-MiffBool _ReadLineSkip(Miff * const miff)
+MiffBool _MiffReadLineSkip(Miff * const miff)
 {
    MiffN1 byte;
 
@@ -107,9 +107,9 @@ MiffBool _ReadLineSkip(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadPart
+func: _MiffReadPart
 ******************************************************************************/
-MiffBool _ReadPart(Miff * const miff)
+MiffBool _MiffReadPart(Miff * const miff)
 {
    MiffN4  index;
    MiffN1  byte;
@@ -127,13 +127,13 @@ MiffBool _ReadPart(Miff * const miff)
       if (miff->readByteCountActual == index)
       {
          // Create a new buffer double the size.
-         bufTemp = _MemCreateTypeArray(miff->readByteCountActual * 2, MiffN1);
+         bufTemp = _MiffMemCreateTypeArray(miff->readByteCountActual * 2, MiffN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _MemCopyTypeArray(miff->readByteCountActual, MiffN1, bufTemp, miff->readByteData);
+         _MiffMemCopyTypeArray(miff->readByteCountActual, MiffN1, bufTemp, miff->readByteData);
          // Destroy the old buffer.
-         _MemDestroy(miff->readByteData);
+         _MiffMemDestroy(miff->readByteData);
 
          // Reset the internal buffer to the new larger buffer.
          miff->readByteCountActual = miff->readByteCountActual * 2;
@@ -163,9 +163,9 @@ MiffBool _ReadPart(Miff * const miff)
 }
 
 /******************************************************************************
-func: _ReadArrayCount
+func: _MiffReadArrayCount
 ******************************************************************************/
-MiffBool _ReadArrayCount(Miff * const miff, MiffN4 * const count)
+MiffBool _MiffReadArrayCount(Miff * const miff, MiffN4 * const count)
 {
    returnFalseIf(!count);
 
@@ -173,7 +173,7 @@ MiffBool _ReadArrayCount(Miff * const miff, MiffN4 * const count)
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    if (miff->readByteData[0] == L'*')
    {
@@ -181,7 +181,7 @@ MiffBool _ReadArrayCount(Miff * const miff, MiffN4 * const count)
       returnTrue;
    }
 
-   miff->currentRecord.arrayCount = (MiffN4) _C1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
+   miff->currentRecord.arrayCount = (MiffN4) _MiffC1ToN(miff->readByteCount, (MiffC1 *) miff->readByteData);
 
    *count = miff->currentRecord.arrayCount;
 
@@ -189,36 +189,36 @@ MiffBool _ReadArrayCount(Miff * const miff, MiffN4 * const count)
 }
 
 /******************************************************************************
-func: _ReadC2Key
+func: _MiffReadC2Key
 ******************************************************************************/
-MiffBool _ReadC2Key(Miff * const miff, MiffC2 * const key)
+MiffBool _MiffReadC2Key(Miff * const miff, MiffC2 * const key)
 {
    MiffN1 keySize;
 
    returnFalseIf(!key);
 
-   _MemClearTypeArray(miffKeySIZE, MiffC2, key);
+   _MiffMemClearTypeArray(miffKeySIZE, MiffC2, key);
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
-   _MemClearTypeArray(miffKeySIZE, MiffC2, miff->currentRecord.nameC2);
-   _C1ToC2Key(
+   _MiffMemClearTypeArray(miffKeySIZE, MiffC2, miff->currentRecord.nameC2);
+   _MiffC1ToC2Key(
       miff->readByteCount,
       (MiffC1 *) miff->readByteData,
       &keySize,
       miff->currentRecord.nameC2);
 
-   _MemCopyTypeArray(miffKeySIZE, MiffC2, key, miff->currentRecord.nameC2);
+   _MiffMemCopyTypeArray(miffKeySIZE, MiffC2, key, miff->currentRecord.nameC2);
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _ReadType
+func: _MiffReadType
 ******************************************************************************/
-MiffBool _ReadType(Miff * const miff, MiffType * const type, MiffC2 * const typeName)
+MiffBool _MiffReadType(Miff * const miff, MiffType * const type, MiffC2 * const typeName)
 {
    MiffN4 index;
    MiffN1 count;
@@ -229,19 +229,19 @@ MiffBool _ReadType(Miff * const miff, MiffType * const type, MiffC2 * const type
 
    returnFalseIf(!miff);
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    returnFalseIf(miff->readByteCount == 0);
 
    // Get the name of the type just in case it is a user type.
-   _C1ToC2Key(miff->readByteCount, miff->readByteData, &count, typeName);
+   _MiffC1ToC2Key(miff->readByteCount, miff->readByteData, &count, typeName);
 
    forCount (index, miffTypeCOUNT)
    {
-      continueIf(_TypeGetNameSize(index) == 0);
+      continueIf(_MiffTypeGetNameSize(index) == 0);
 
-      if (_MemIsEqual(
-            _TypeGetNameSize(index), (MiffN1 *) _TypeGetNameC1(index),
+      if (_MiffMemIsEqual(
+            _MiffTypeGetNameSize(index), (MiffN1 *) _MiffTypeGetNameC1(index),
             miff->readByteCount,     miff->readByteData))
       {
          *type = index;
@@ -256,23 +256,23 @@ MiffBool _ReadType(Miff * const miff, MiffType * const type, MiffC2 * const type
 }
 
 /******************************************************************************
-func: _ReadR4
+func: _MiffReadR4
 ******************************************************************************/
-MiffBool _ReadR4(Miff * const miff, MiffR4 * const value)
+MiffBool _MiffReadR4(Miff * const miff, MiffR4 * const value)
 {
    Miff4      vtemp;
-   Base64Data data;
+   MiffBase64Data data;
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
-   data = _Base64Restart(miff->readByteData);
+   data = _MiffBase64Restart(miff->readByteData);
 
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[0]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[1]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[2]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
 
-   _ByteSwap4(miff, &vtemp);
+   _MiffByteSwap4(miff, &vtemp);
 
    *value = vtemp.r;
 
@@ -280,13 +280,13 @@ MiffBool _ReadR4(Miff * const miff, MiffR4 * const value)
 }
 
 /******************************************************************************
-func: _ReadR4S
+func: _MiffReadR4S
 ******************************************************************************/
-MiffBool _ReadR4S(Miff * const miff, MiffR4 * const value)
+MiffBool _MiffReadR4S(Miff * const miff, MiffR4 * const value)
 {
    MiffC1 *ctemp;
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    *value = (MiffR4) strtod((char *) miff->readByteData, (char **) &ctemp);
 
@@ -294,27 +294,27 @@ MiffBool _ReadR4S(Miff * const miff, MiffR4 * const value)
 }
 
 /******************************************************************************
-func: _ReadR8
+func: _MiffReadR8
 ******************************************************************************/
-MiffBool _ReadR8(Miff * const miff, MiffR8 * const value)
+MiffBool _MiffReadR8(Miff * const miff, MiffR8 * const value)
 {
    Miff8      vtemp;
-   Base64Data data;
+   MiffBase64Data data;
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
-   data = _Base64Restart(miff->readByteData);
+   data = _MiffBase64Restart(miff->readByteData);
 
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[0]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[1]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[2]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[3]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[4]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[5]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[6]));
-   returnFalseIf(!_Base64Get(&data, &vtemp.byte[7]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[4]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[5]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[6]));
+   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[7]));
 
-   _ByteSwap8(miff, &vtemp);
+   _MiffByteSwap8(miff, &vtemp);
 
    *value = vtemp.r;
 
@@ -322,13 +322,13 @@ MiffBool _ReadR8(Miff * const miff, MiffR8 * const value)
 }
 
 /******************************************************************************
-func: _ReadR8S
+func: _MiffReadR8S
 ******************************************************************************/
-MiffBool _ReadR8S(Miff * const miff, MiffR8 * const value)
+MiffBool _MiffReadR8S(Miff * const miff, MiffR8 * const value)
 {
    MiffC1 *ctemp;
 
-   returnFalseIf(!_ReadPart(miff));
+   returnFalseIf(!_MiffReadPart(miff));
 
    *value = strtod((char *) miff->readByteData, (char **) &ctemp);
 

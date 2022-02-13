@@ -42,9 +42,9 @@ function:
 ******************************************************************************/
 #if 0 // Currently not used
 /******************************************************************************
-func: _ByteSwap2
+func: _MiffByteSwap2
 ******************************************************************************/
-void _ByteSwap2(Miff const * const miff, Miff2 * const value)
+void _MiffByteSwap2(Miff const * const miff, Miff2 * const value)
 {
    if (miff->isByteSwapping)
    {
@@ -56,9 +56,9 @@ void _ByteSwap2(Miff const * const miff, Miff2 * const value)
 #endif
 
 /******************************************************************************
-func: _ByteSwap4
+func: _MiffByteSwap4
 ******************************************************************************/
-void _ByteSwap4(Miff const * const miff, Miff4 * const value)
+void _MiffByteSwap4(Miff const * const miff, Miff4 * const value)
 {
    if (miff->isByteSwapping)
    {
@@ -73,9 +73,9 @@ void _ByteSwap4(Miff const * const miff, Miff4 * const value)
 }
 
 /******************************************************************************
-func: _ByteSwap8
+func: _MiffByteSwap8
 ******************************************************************************/
-void _ByteSwap8(Miff const * const miff, Miff8 * const value)
+void _MiffByteSwap8(Miff const * const miff, Miff8 * const value)
 {
    if (miff->isByteSwapping)
    {

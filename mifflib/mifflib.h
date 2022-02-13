@@ -145,7 +145,7 @@ typedef enum
 } MiffType;
 
 #define miffArrayCountUNKNOWN                ((MiffN4) 0xFFFFFFFF)
-#define miffArrayCountUNKNOWN_C2             L"*"
+#define miffArrayCountUNKNOWN_MiffC2             L"*"
 
 /******************************************************************************
 type:

@@ -43,51 +43,51 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _WriteC1
+func: _MiffWriteC1
 ******************************************************************************/
-MiffBool _WriteC1(Miff const * const miff, MiffC1 const * const value)
+MiffBool _MiffWriteC1(Miff const * const miff, MiffC1 const * const value)
 {
-   return miff->setBuffer(miff->dataRepo, _C1GetCount(value), value);
+   return miff->setBuffer(miff->dataRepo, _MiffC1GetCount(value), value);
 }
 
 /******************************************************************************
-func: _WriteC2
+func: _MiffWriteC2
 ******************************************************************************/
-MiffBool _WriteC2(Miff const * const miff, MiffC2 const * const c2)
+MiffBool _MiffWriteC2(Miff const * const miff, MiffC2 const * const c2)
 {
    MiffN4  c1Count;
    MiffC1 *c1;
 
-   if (!_C2ToC1(_C2GetCount(c2) + 1, c2, &c1Count, &c1))
+   if (!_MiffC2ToC1(_MiffC2GetCount(c2) + 1, c2, &c1Count, &c1))
    {
       returnFalse;
    }
 
-   _WriteC1(miff, c1);
+   _MiffWriteC1(miff, c1);
 
-   _MemDestroy(c1);
+   _MiffMemDestroy(c1);
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _WriteC2Key
+func: _MiffWriteC2Key
 ******************************************************************************/
-MiffBool _WriteC2Key(Miff const * const miff, MiffC2 const * const key)
+MiffBool _MiffWriteC2Key(Miff const * const miff, MiffC2 const * const key)
 {
    MiffC1 c1Key[256];
    MiffN1 c1Count;
 
-   _MemClearTypeArray(256, MiffC1, c1Key);
+   _MiffMemClearTypeArray(256, MiffC1, c1Key);
 
-   returnFalseIf(!_C2ToC1Key(_C2GetCount(key), key, &c1Count, c1Key));
-   return _WriteC1(miff, c1Key);
+   returnFalseIf(!_MiffC2ToC1Key(_MiffC2GetCount(key), key, &c1Count, c1Key));
+   return _MiffWriteC1(miff, c1Key);
 }
 
 /******************************************************************************
-func: _WriteI
+func: _MiffWriteI
 ******************************************************************************/
-MiffBool _WriteI(Miff * const miff, MiffI8 const value)
+MiffBool _MiffWriteI(Miff * const miff, MiffI8 const value)
 {
    MiffN8 ntemp;
 
@@ -102,13 +102,13 @@ MiffBool _WriteI(Miff * const miff, MiffI8 const value)
       ntemp =  value;
    }
 
-   return _WriteN(miff, ntemp);
+   return _MiffWriteN(miff, ntemp);
 }
 
 /******************************************************************************
-func: _WriteN
+func: _MiffWriteN
 ******************************************************************************/
-MiffBool _WriteN(Miff * const miff, MiffN8 const value)
+MiffBool _MiffWriteN(Miff * const miff, MiffN8 const value)
 {
    int    index,
           count,
@@ -137,75 +137,75 @@ MiffBool _WriteN(Miff * const miff, MiffN8 const value)
 }
 
 /******************************************************************************
-func: _WriteR4
+func: _MiffWriteR4
 ******************************************************************************/
-MiffBool _WriteR4(Miff * const miff, MiffR4 const value)
+MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
 {
    Miff4      vtemp;
-   Base64Data data;
+   MiffBase64Data data;
    MiffN1     buffer[16];
 
    vtemp.r = value;
-   _ByteSwap4(miff, &vtemp);
+   _MiffByteSwap4(miff, &vtemp);
 
-   data = _Base64Restart(buffer);
+   data = _MiffBase64Restart(buffer);
 
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_Base64SetEnd(&data));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _WriteC1(miff, buffer);
+   return _MiffWriteC1(miff, buffer);
 }
 
 /******************************************************************************
-func: _WriteR4S
+func: _MiffWriteR4S
 ******************************************************************************/
-MiffBool _WriteR4S(Miff * const miff, MiffR4 const value)
+MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
 {
    MiffC1 ctemp[80];
 
    sprintf_s((char *) ctemp, 80, "%.6g", value);
    
-   return _WriteC1(miff, ctemp);
+   return _MiffWriteC1(miff, ctemp);
 }
 
 /******************************************************************************
-func: _WriteR8
+func: _MiffWriteR8
 ******************************************************************************/
-MiffBool _WriteR8(Miff * const miff, MiffR8 const value)
+MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
 {
    Miff8      vtemp;
-   Base64Data data;
+   MiffBase64Data data;
    MiffN1     buffer[16];
 
    vtemp.r = value;
-   _ByteSwap8(miff, &vtemp);
+   _MiffByteSwap8(miff, &vtemp);
 
-   data = _Base64Restart(buffer);
+   data = _MiffBase64Restart(buffer);
 
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[4]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[5]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[6]));
-   returnFalseIf(!_Base64Set(   &data, vtemp.byte[7]));
-   returnFalseIf(!_Base64SetEnd(&data));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
+   returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _WriteC1(miff, buffer);
+   return _MiffWriteC1(miff, buffer);
 }
 
 /******************************************************************************
-func: _WriteR8S
+func: _MiffWriteR8S
 ******************************************************************************/
-MiffBool _WriteR8S(Miff * const miff, MiffR8 const value)
+MiffBool _MiffWriteR8S(Miff * const miff, MiffR8 const value)
 {
    MiffC1 ctemp[80];
 
    sprintf_s((char *) ctemp, 80, "%.15g", value);
 
-   return _WriteC1(miff, ctemp);
+   return _MiffWriteC1(miff, ctemp);
 }

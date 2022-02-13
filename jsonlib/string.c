@@ -42,7 +42,7 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffC1EncodedToC1
+func: _JsonC1EncodedToC1
 
 Unescape certain characters
 
@@ -50,9 +50,9 @@ Unescape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-MiffBool _MiffC1EncodedToC1(MiffN4 * const c1Count, MiffC1 * const c1)
+JsonBool _JsonC1EncodedToC1(JsonN4 * const c1Count, JsonC1 * const c1)
 {
-   MiffN4    index,
+   JsonN4    index,
              eindex,
              charCount;
 
@@ -98,7 +98,7 @@ MiffBool _MiffC1EncodedToC1(MiffN4 * const c1Count, MiffC1 * const c1)
 }
 
 /******************************************************************************
-func: _MiffC1ToC1Encoded
+func: _JsonC1ToC1Encoded
 
 Escape certain characters
 
@@ -106,14 +106,14 @@ Escape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-MiffBool _MiffC1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1, 
-   MiffN4 * const c1eCount, MiffC1 ** const c1e)
+JsonBool _JsonC1ToC1Encoded(JsonN4 const c1Count, JsonC1 const * const c1, 
+   JsonN4 * const c1eCount, JsonC1 ** const c1e)
 {
-   MiffN4    index,
+   JsonN4    index,
              eindex,
              charCount,
              eCount;
-   MiffC1   *etemp;
+   JsonC1   *etemp;
 
    *c1eCount = 0;
    *c1e      = NULL;
@@ -131,7 +131,7 @@ MiffBool _MiffC1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1,
    }
 
    eCount = c1Count + charCount + 1;
-   etemp  = _MiffMemCreateTypeArray(eCount, MiffC1);
+   etemp  = _JsonMemCreateTypeArray(eCount, JsonC1);
    returnFalseIf(!etemp);
 
    eindex = c1Count + charCount - 1;
@@ -155,24 +155,24 @@ MiffBool _MiffC1ToC1Encoded(MiffN4 const c1Count, MiffC1 const * const c1,
 }
 
 /******************************************************************************
-func: _MiffC1ToC2
+func: _JsonC1ToC2
 
 Size of C2 should be the same count as C1 even though it may need less.
 ******************************************************************************/
-void _MiffC1ToC2(MiffN4 const c1Count, MiffC1 const * const c1, MiffN4 * const c2Count,
-   MiffC2 * const c2)
+void _JsonC1ToC2(JsonN4 const c1Count, JsonC1 const * const c1, JsonN4 * const c2Count,
+   JsonC2 * const c2)
 {
-   MiffN4 c1Index,
+   JsonN4 c1Index,
           c2Index,
           c1Consumed,
           c2Required;
-   MiffC4 c4;
+   JsonC4 c4;
 
    c2Index = 0;
    forCount(c1Index, c1Count)
    {
-      c1Consumed = _MiffC1LetterToC4Letter(&c1[c1Index], &c4);
-      c2Required = _MiffC4LetterToC2Letter(c4, &c2[c2Index], &c2[c2Index + 1]);
+      c1Consumed = _JsonC1LetterToC4Letter(&c1[c1Index], &c4);
+      c2Required = _JsonC4LetterToC2Letter(c4, &c2[c2Index], &c2[c2Index + 1]);
 
       c1Index += c1Consumed - 1;
       c2Index += c2Required;
@@ -181,39 +181,39 @@ void _MiffC1ToC2(MiffN4 const c1Count, MiffC1 const * const c1, MiffN4 * const c
 }
 
 /******************************************************************************
-func: _MiffC1ToC2Key
+func: _JsonC1ToC2Key
 ******************************************************************************/
-void _MiffC1ToC2Key(MiffN4 const c1Count, MiffC1 const * const c1, MiffN1 * const c2Count,
-   MiffC2 * const c2)
+void _JsonC1ToC2Key(JsonN4 const c1Count, JsonC1 const * const c1, JsonN1 * const c2Count,
+   JsonC2 * const c2)
 {
-   MiffN4 c1Index,
+   JsonN4 c1Index,
           c2Index,
           c1Consumed,
           c2Required;
-   MiffC4 c4;
+   JsonC4 c4;
 
    c2Index = 0;
    forCount(c1Index, min(255, c1Count))
    {    
-      c1Consumed = _MiffC1LetterToC4Letter(&c1[c1Index], &c4);
-      c2Required = _MiffC4LetterToC2Letter(c4, &c2[c2Index], &c2[c2Index + 1]);
+      c1Consumed = _JsonC1LetterToC4Letter(&c1[c1Index], &c4);
+      c2Required = _JsonC4LetterToC2Letter(c4, &c2[c2Index], &c2[c2Index + 1]);
 
       c1Index += c1Consumed - 1;
       c2Index += c2Required;
    }
-   *c2Count = (MiffN1) c2Index;
+   *c2Count = (JsonN1) c2Index;
 }
 
 /******************************************************************************
-func: _MiffC1ToI
+func: _JsonC1ToI
 ******************************************************************************/
-MiffI8 _MiffC1ToI(MiffN4 const c1Count, MiffC1 const * const c1)
+JsonI8 _JsonC1ToI(JsonN4 const c1Count, JsonC1 const * const c1)
 {
-   MiffBool isNegative;
-   MiffN4   c1Index;
-   MiffN8   value;
+   JsonBool isNegative;
+   JsonN4   c1Index;
+   JsonN8   value;
 
-   isNegative = miffBoolFALSE;
+   isNegative = jsonBoolFALSE;
    value      = 0;
    forCount(c1Index, c1Count)
    {
@@ -221,7 +221,7 @@ MiffI8 _MiffC1ToI(MiffN4 const c1Count, MiffC1 const * const c1)
       {
          if (c1[c1Index] == '-')
          {
-            isNegative = miffBoolTRUE;
+            isNegative = jsonBoolTRUE;
             continue;
          }
       }
@@ -231,19 +231,19 @@ MiffI8 _MiffC1ToI(MiffN4 const c1Count, MiffC1 const * const c1)
 
    if (isNegative)
    {
-      return -((MiffI8) value);
+      return -((JsonI8) value);
    }
 
    return value;
 }
 
 /******************************************************************************
-func: _MiffC1ToN
+func: _JsonC1ToN
 ******************************************************************************/
-MiffN8 _MiffC1ToN(MiffN4 const c1Count, MiffC1 const * const c1)
+JsonN8 _JsonC1ToN(JsonN4 const c1Count, JsonC1 const * const c1)
 {
-   MiffN4   c1Index;
-   MiffN8   value;
+   JsonN4   c1Index;
+   JsonN8   value;
 
    value = 0;
    forCount(c1Index, c1Count)
@@ -255,75 +255,75 @@ MiffN8 _MiffC1ToN(MiffN4 const c1Count, MiffC1 const * const c1)
 }
 
 /******************************************************************************
-func: _MiffC2Append
+func: _JsonC2Append
 ******************************************************************************/
-MiffC2 *_MiffC2Append(MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c)
+JsonC2 *_JsonC2Append(JsonC2 const * const a, JsonC2 const * const b, JsonC2 const * const c)
 {
-   MiffN4    length,
+   JsonN4    length,
              offset;
-   MiffC2   *result;
+   JsonC2   *result;
 
-   length = _MiffC2GetCount(a) + _MiffC2GetCount(b) + _MiffC2GetCount(c) + 1;
+   length = _JsonC2GetCount(a) + _JsonC2GetCount(b) + _JsonC2GetCount(c) + 1;
 
-   result = _MiffMemCreateTypeArray(length, MiffC2);
+   result = _JsonMemCreateTypeArray(length, JsonC2);
    returnNullIf(!result);
 
    offset = 0;
-   length = _MiffC2GetCount(a);
-   _MiffMemCopyTypeArray(length, MiffC2, &result[offset], a);
+   length = _JsonC2GetCount(a);
+   _JsonMemCopyTypeArray(length, JsonC2, &result[offset], a);
    
    offset += length;
-   length  = _MiffC2GetCount(b);
-   _MiffMemCopyTypeArray(length, MiffC2, &result[offset], b);
+   length  = _JsonC2GetCount(b);
+   _JsonMemCopyTypeArray(length, JsonC2, &result[offset], b);
    
    offset += length;
-   length  = _MiffC2GetCount(c);
-   _MiffMemCopyTypeArray(length, MiffC2, &result[offset], c);
+   length  = _JsonC2GetCount(c);
+   _JsonMemCopyTypeArray(length, JsonC2, &result[offset], c);
 
    return result;
 }
 
 /******************************************************************************
-func: _MiffC2Clone
+func: _JsonC2Clone
 ******************************************************************************/
-MiffC2 *_MiffC2Clone(MiffN4 const c2Count, MiffC2 const * const c2)
+JsonC2 *_JsonC2Clone(JsonN4 const c2Count, JsonC2 const * const c2)
 {
-   MiffC2 *result;
+   JsonC2 *result;
 
-   result = _MiffMemCreateTypeArray(c2Count, MiffC2);
+   result = _JsonMemCreateTypeArray(c2Count, JsonC2);
    returnNullIf(!result);
 
-   _MiffMemCopyTypeArray(c2Count, MiffC2, result, c2);
+   _JsonMemCopyTypeArray(c2Count, JsonC2, result, c2);
 
    return result;
 }
 
 /******************************************************************************
-func: _MiffC2ToC1
+func: _JsonC2ToC1
 ******************************************************************************/
-MiffBool _MiffC2ToC1(MiffN4 const c2Count, MiffC2 const * const c2, MiffN4 * const c1Count,
-   MiffC1 ** const c1)
+JsonBool _JsonC2ToC1(JsonN4 const c2Count, JsonC2 const * const c2, JsonN4 * const c1Count,
+   JsonC1 ** const c1)
 {
-   MiffN4    c1Index,
+   JsonN4    c1Index,
              c2Index,
              c1CountMax,
              c1Required,
              c2Consumed;
-   MiffC1   *c1Result;
-   MiffC4    c4;
+   JsonC1   *c1Result;
+   JsonC4    c4;
 
    *c1Count = 0;
    *c1      = NULL;
 
    c1CountMax = c2Count * 2 + 1;
-   c1Result   = _MiffMemCreateTypeArray(c1CountMax, MiffC1);
+   c1Result   = _JsonMemCreateTypeArray(c1CountMax, JsonC1);
    returnFalseIf(!c1Result);
 
    c1Index = 0;
    forCount(c2Index, c2Count)
    {
-      c2Consumed = _MiffC2LetterToC4Letter(&c2[c2Index], &c4);
-      c1Required = _MiffC4LetterToC1Letter(
+      c2Consumed = _JsonC2LetterToC4Letter(&c2[c2Index], &c4);
+      c1Required = _JsonC4LetterToC1Letter(
          c4, 
          &c1Result[c1Index + 0], 
          &c1Result[c1Index + 1],
@@ -341,20 +341,20 @@ MiffBool _MiffC2ToC1(MiffN4 const c2Count, MiffC2 const * const c2, MiffN4 * con
 }
 
 /******************************************************************************
-func: _MiffC2ToC1Key
+func: _JsonC2ToC1Key
 ******************************************************************************/
-MiffBool _MiffC2ToC1Key(MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * const c1Count,
-   MiffC1 * const c1)
+JsonBool _JsonC2ToC1Key(JsonN4 const c2Count, JsonC2 const * const c2, JsonN1 * const c1Count,
+   JsonC1 * const c1)
 {
-   MiffN4    c1Index,
+   JsonN4    c1Index,
              c2Index,
              c1Required,
              c2Consumed;
-   MiffC1    a,
+   JsonC1    a,
              b,
              c, 
              d;
-   MiffC4    c4;
+   JsonC4    c4;
 
    *c1Count = 0;
    c1[0]    = 0;
@@ -362,8 +362,8 @@ MiffBool _MiffC2ToC1Key(MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * 
    c1Index = 0;
    forCount(c2Index, c2Count)
    {
-      c2Consumed = _MiffC2LetterToC4Letter(&c2[c2Index], &c4);
-      c1Required = _MiffC4LetterToC1Letter(c4, &a, &b, &c, &d);
+      c2Consumed = _JsonC2LetterToC4Letter(&c2[c2Index], &c4);
+      c1Required = _JsonC4LetterToC1Letter(c4, &a, &b, &c, &d);
 
       if (c1Index + c1Required >= 256)
       {
@@ -390,15 +390,15 @@ MiffBool _MiffC2ToC1Key(MiffN4 const c2Count, MiffC2 const * const c2, MiffN1 * 
       c1Index += c1Required;
    }
 
-   *c1Count = (MiffN1) c1Index;
+   *c1Count = (JsonN1) c1Index;
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffC1LetterToC4Letter
+func: _JsonC1LetterToC4Letter
 ******************************************************************************/
-MiffN4 _MiffC1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4)
+JsonN4 _JsonC1LetterToC4Letter(JsonC1 const * const c1, JsonC4 * const c4)
 {
    returnIf(!c1, 0);
 
@@ -413,8 +413,8 @@ MiffN4 _MiffC1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4)
    if ((c1[0] & 0xe0) == 0xc0)
    {
       *c4 =
-          (((MiffC4) c1[0]) & 0x3f)        +
-         ((((MiffC4) c1[1]) & 0x1f) << 6);
+          (((JsonC4) c1[0]) & 0x3f)        +
+         ((((JsonC4) c1[1]) & 0x1f) << 6);
 
       return 2;
    }
@@ -423,27 +423,27 @@ MiffN4 _MiffC1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4)
    if ((c1[0] & 0xf0) == 0xe0)
    {
       *c4 =
-          (((MiffC4) c1[0]) & 0x3f)        +
-         ((((MiffC4) c1[1]) & 0x3f) <<  6) +
-         ((((MiffC4) c1[2]) & 0x0f) << 12);
+          (((JsonC4) c1[0]) & 0x3f)        +
+         ((((JsonC4) c1[1]) & 0x3f) <<  6) +
+         ((((JsonC4) c1[2]) & 0x0f) << 12);
 
       return 3;
    }
 
    // four byte.
    *c4 =
-       (((MiffC4) c1[0]) & 0x3f)        +
-      ((((MiffC4) c1[1]) & 0x3f) <<  6) +
-      ((((MiffC4) c1[2]) & 0x3f) << 12) +
-      ((((MiffC4) c1[3]) & 0x07) << 18);
+       (((JsonC4) c1[0]) & 0x3f)        +
+      ((((JsonC4) c1[1]) & 0x3f) <<  6) +
+      ((((JsonC4) c1[2]) & 0x3f) << 12) +
+      ((((JsonC4) c1[3]) & 0x07) << 18);
 
    return 4;
 }
 
 /******************************************************************************
-func: _MiffC2LetterToC4Letter
+func: _JsonC2LetterToC4Letter
 ******************************************************************************/
-MiffN4 _MiffC2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4)
+JsonN4 _JsonC2LetterToC4Letter(JsonC2 const * const c2, JsonC4 * const c4)
 {
    return0If(!c2);
 
@@ -465,66 +465,66 @@ MiffN4 _MiffC2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4)
 }
 
 /******************************************************************************
-func: _MiffC4LetterToC1Letter
+func: _JsonC4LetterToC1Letter
 ******************************************************************************/
-MiffN4 _MiffC4LetterToC1Letter(MiffN4 const c4, MiffN1 * const a, MiffN1 * const b,
-   MiffN1 * const c, MiffN1 * const d)
+JsonN4 _JsonC4LetterToC1Letter(JsonN4 const c4, JsonN1 * const a, JsonN1 * const b,
+   JsonN1 * const c, JsonN1 * const d)
 {
    return0If(!a || !b || !c || !d);
 
    if (c4 < 0x0000007f)
    {
-      *a = (MiffN1) c4;
+      *a = (JsonN1) c4;
 
       return 1;
    }
 
    if (c4 < 0x000007ff)
    {
-      *b = (MiffN1) (0x80 |  (c4       & 0x3f));
-      *a = (MiffN1) (0xc0 | ((c4 >> 6) & 0x1f));
+      *b = (JsonN1) (0x80 |  (c4       & 0x3f));
+      *a = (JsonN1) (0xc0 | ((c4 >> 6) & 0x1f));
 
       return 2;
    }
 
    if (c4 < 0x0000ffff)
    {
-      *c = (MiffN1) (0x80 |  (c4        & 0x3f));
-      *b = (MiffN1) (0x80 | ((c4 >>  6) & 0x3f));
-      *a = (MiffN1) (0xe0 | ((c4 >> 12) & 0x0f));
+      *c = (JsonN1) (0x80 |  (c4        & 0x3f));
+      *b = (JsonN1) (0x80 | ((c4 >>  6) & 0x3f));
+      *a = (JsonN1) (0xe0 | ((c4 >> 12) & 0x0f));
 
       return 3;
    }
 
    // c4 < 0x001fffff
-   *d = (MiffN1) (0x80 |  (c4        & 0x3f));
-   *c = (MiffN1) (0x80 | ((c4 >>  6) & 0x3f));
-   *b = (MiffN1) (0x80 | ((c4 >> 12) & 0x3f));
-   *c = (MiffN1) (0xf0 | ((c4 >> 18) & 0x07));
+   *d = (JsonN1) (0x80 |  (c4        & 0x3f));
+   *c = (JsonN1) (0x80 | ((c4 >>  6) & 0x3f));
+   *b = (JsonN1) (0x80 | ((c4 >> 12) & 0x3f));
+   *c = (JsonN1) (0xf0 | ((c4 >> 18) & 0x07));
 
    return 4;
 }
 
 /******************************************************************************
-func: _MiffC4LetterToC2Letter
+func: _JsonC4LetterToC2Letter
 ******************************************************************************/
-MiffN4 _MiffC4LetterToC2Letter(MiffC4 const c4, MiffC2 * const a, MiffC2 * const b)
+JsonN4 _JsonC4LetterToC2Letter(JsonC4 const c4, JsonC2 * const a, JsonC2 * const b)
 {
    return0If(!a || !b);
 
    if (c4 < 0x0000FFFF)
    {
       *b = 0;
-      *a = (MiffC2) c4;
+      *a = (JsonC2) c4;
 
       return 1;
    }
 
-   *a = (MiffC2) (
+   *a = (JsonC2) (
       0xD800                                 +
       ((((c4 >> 16) & 0x1F) - 1) << 6) +
        (((c4 >> 10) & 0x3F)));
-   *b = (MiffC2) (
+   *b = (JsonC2) (
       0xDC00 +  
       (c4 & 0x000003FF));
 

@@ -40,42 +40,42 @@ include:
 local:
 variable:
 ******************************************************************************/
-static MiffMemCreate    _memCreate  = NULL;
-static MiffMemDestroy   _memDestroy = NULL;
+static JsonMemCreate    _memCreate  = NULL;
+static JsonMemDestroy   _memDestroy = NULL;
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffMemCreate
+func: _JsonMemCreate
 ******************************************************************************/
-void *_MiffMemCreate(MiffN4 const memByteCount)
+void *_JsonMemCreate(JsonN4 const memByteCount)
 {
    return _memCreate(memByteCount);
 }
 
 /******************************************************************************
-func: _MiffMemDestroy
+func: _JsonMemDestroy
 ******************************************************************************/
-void _MiffMemDestroy(void * const mem)
+void _JsonMemDestroy(void * const mem)
 {
    _memDestroy(mem);
 }
 
 /******************************************************************************
-func: _MiffMemStart
+func: _JsonMemStart
 ******************************************************************************/
-void _MiffMemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
+void _JsonMemStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc)
 {
    _memCreate        = memCreateFunc;
    _memDestroy       = memDestroyFunc;
 }
 
 /******************************************************************************
-func: _MiffMemStop
+func: _JsonMemStop
 ******************************************************************************/
-void _MiffMemStop(void)
+void _JsonMemStop(void)
 {
    _memCreate        = NULL;
    _memDestroy       = NULL;

@@ -41,8 +41,9 @@ include:
 #include <limits.h>
 #include <float.h>
 
-#include "zlib.h"
+//#include "zlib.h"
 #include "mifflib.h"
+#include "jsonlib.h"
 
 /******************************************************************************
 local:
@@ -614,15 +615,18 @@ static MiffMatrix4x4R8      _matrix4x4r8 = { 1.1,  1.2,  1.3,  1.4,  2.1,  2.2, 
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffBool _GetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
+static MiffBool _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1       * const byteData);
+static void    *_JsonMemCreate(     JsonN4 const memByteCount);
+static void     _JsonMemDestroy(    void * const mem);
+static JsonBool _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData);
+static JsonBool _JsonTestWrite(     JsonC2 const * const fileName);
 
-static void    *_MemCreate(         MiffN4 const memByteCount);
-static void     _MemDestroy(        void * const mem);
-
-static MiffBool _SetBuffer(         void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
-
-static MiffBool _TestRead(          MiffC2 const * const fileName);
-static MiffBool _TestWrite(         MiffC2 const * const fileName);
+static MiffBool _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
+static void    *_MiffMemCreate(     JsonN4 const memByteCount);
+static void     _MiffMemDestroy(    void * const mem);
+static MiffBool _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
+static MiffBool _MiffTestRead(      MiffC2 const * const fileName);
+static MiffBool _MiffTestWrite(     MiffC2 const * const fileName);
 
 /******************************************************************************
 global:
@@ -640,28 +644,36 @@ int main(int acount, char **alist)
    result = 0;
 
    // Start miff library.
-   if (!miffStart(_MemCreate, _MemDestroy))
+   if (!miffStart(_MiffMemCreate, _MiffMemDestroy) ||
+       !jsonStart(_JsonMemCreate, _JsonMemDestroy))
    {
       result = 1;
       goto DONE;
    }
 
    // Test the writing.
-   if (!_TestWrite(L"MiffFileTestTxt.miff"))
+   if (!_MiffTestWrite(L"MiffFileTest.miff"))
    {
       result = 2;
       goto DONE;
    }
 
-   if (!_TestRead(L"MiffFileTestTxt.miff"))
+   if (!_MiffTestRead(L"MiffFileTest.miff"))
    {
       result = 4;
+      goto DONE;
+   }
+
+   if (!_JsonTestWrite(L"JsonFileTest.json"))
+   {
+      result = 8;
       goto DONE;
    }
 
 DONE:
    // Stop miff library.
    miffStop();
+   jsonStop();
 
    return result;
 }
@@ -673,7 +685,12 @@ function:
 /******************************************************************************
 func: _GetBuffer
 ******************************************************************************/
-static MiffBool _GetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
+static JsonBool _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 * const byteData)
+{
+   return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
+}
+
+static MiffBool _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -681,7 +698,12 @@ static MiffBool _GetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1
 /******************************************************************************
 func: _MemCreate
 ******************************************************************************/
-void *_MemCreate(MiffN4 const memByteCount)
+void *_JsonMemCreate(JsonN4 const memByteCount)
+{
+   return calloc(1, (size_t) memByteCount);
+}
+
+void *_MiffMemCreate(MiffN4 const memByteCount)
 {
    return calloc(1, (size_t) memByteCount);
 }
@@ -689,7 +711,12 @@ void *_MemCreate(MiffN4 const memByteCount)
 /******************************************************************************
 func: _MemDestroy
 ******************************************************************************/
-void _MemDestroy(void * const mem)
+void _JsonMemDestroy(void * const mem)
+{
+   free(mem);
+}
+
+void _MiffMemDestroy(void * const mem)
 {
    free(mem);
 }
@@ -697,15 +724,243 @@ void _MemDestroy(void * const mem)
 /******************************************************************************
 func: _SetBuffer
 ******************************************************************************/
-static MiffBool _SetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
+static JsonBool _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData)
+{
+   return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
+}
+
+static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
 /******************************************************************************
-func: _TestRead
+func: _MiffTestWrite
 ******************************************************************************/
-static MiffBool _TestRead(MiffC2 const * const fileName)
+static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
+{
+   FILE     *file;
+   Json     *json;
+   JsonBool  result;
+
+   file   = NULL;
+   json   = NULL;
+   result = jsonBoolFALSE;
+
+   for (;;)
+   {
+      if (_wfopen_s(&file, (wchar_t *) fileName, L"wb") != 0)
+      {
+         break;
+      }
+
+      // Create a json file.
+      json = jsonCreateWriter(_JsonSetBuffer, (void *) file);
+      if (!json)
+      {
+         break;
+      }
+
+      jsonWriteObjectStart(json);
+
+      jsonWriteKey1Boolean(   json, L"True",  jsonBoolTRUE);
+      jsonWriteKey1Boolean(   json, L"False", jsonBoolFALSE);
+
+      jsonWriteKey1I(         json, L"I1_0",     0);
+      jsonWriteKey1I(         json, L"I1_1",     1);
+      jsonWriteKey1I(         json, L"I1_-1",    -1);
+      jsonWriteKey1I(         json, L"I1_127",   127);
+      jsonWriteKey1I(         json, L"I1_-128",  -128);
+
+      jsonWriteKey1N(         json, L"N1_0",     0);
+      jsonWriteKey1N(         json, L"N1_1",     1);
+      jsonWriteKey1N(         json, L"N1_255",   255);
+
+      jsonWriteKey1I(         json, L"I2_0",     0);
+      jsonWriteKey1I(         json, L"I2_1",     1);
+      jsonWriteKey1I(         json, L"I2_-1",    -1);
+
+      jsonWriteKey1N(         json, L"N2_0",     0);
+      jsonWriteKey1N(         json, L"N2_1",     1);
+
+      jsonWriteKey1I(         json, L"I4_0",     0);
+      jsonWriteKey1I(         json, L"I4_1",     1);
+      jsonWriteKey1I(         json, L"I4_-1",    -1);
+
+      jsonWriteKey1N(         json, L"N4_0",     0);
+      jsonWriteKey1N(         json, L"N4_1",     1);
+
+      jsonWriteKey1R4(        json, L"R4_0",     0.0);
+      jsonWriteKey1R4(        json, L"R4_1",     1.0);
+      jsonWriteKey1R4(        json, L"R4_-1",    -1.0);
+      jsonWriteKey1R4(        json, L"R4_PI",    3.1415926535897932f);
+
+      jsonWriteKey1I(         json, L"I8_0",     0);
+      jsonWriteKey1I(         json, L"I8_1",     1);
+      jsonWriteKey1I(         json, L"I8_-1",    -1);
+
+      jsonWriteKey1N(         json, L"N8_0",     0);
+      jsonWriteKey1N(         json, L"N8_1",     1);
+
+      jsonWriteKey1R8(        json, L"R8_0",     0.0);
+      jsonWriteKey1R8(        json, L"R8_1",     1.0);
+      jsonWriteKey1R8(        json, L"R8_-1",    -1.0);
+      jsonWriteKey1R8(        json, L"R8_PI",    3.1415926535897932);
+
+      jsonWriteKey1String(    json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+      /*
+      jsonSet1ABI1(          json, L"ABI1",     &_abi1       );
+      jsonSet1ABI2(          json, L"ABI2",     &_abi2       );
+      jsonSet1ABI4(          json, L"ABI4",     &_abi4       );
+      jsonSet1ABN1(          json, L"ABN1",     &_abn1       );
+      jsonSet1ABN2(          json, L"ABN2",     &_abn2       );
+      jsonSet1ABN4(          json, L"ABN4",     &_abn4       );
+      jsonSet1ABR4(          json, L"ABR4",     &_abr4       );
+      jsonSet1ABR8(          json, L"ABR8",     &_abr8       );
+      jsonSet1ABR4S(         json, L"ABR4S",    &_abr4       );
+      jsonSet1ABR8S(         json, L"ABR8S",    &_abr8       );
+      jsonSet1ABCI1(         json, L"ABCI1",    &_abci1      );
+      jsonSet1ABCI2(         json, L"ABCI2",    &_abci2      );
+      jsonSet1ABCI4(         json, L"ABCI4",    &_abci4      );
+      jsonSet1ABCN1(         json, L"ABCN1",    &_abcn1      );
+      jsonSet1ABCN2(         json, L"ABCN2",    &_abcn2      );
+      jsonSet1ABCN4(         json, L"ABCN4",    &_abcn4      );
+      jsonSet1ABCR4(         json, L"ABCR4",    &_abcr4      );
+      jsonSet1ABCR8(         json, L"ABCR8",    &_abcr8      );
+      jsonSet1ABCR4S(        json, L"ABCR4S",   &_abcr4      );
+      jsonSet1ABCR8S(        json, L"ABCR8S",   &_abcr8      );
+      jsonSet1ABCDI1(        json, L"ABCDI1",   &_abcdi1     );
+      jsonSet1ABCDI2(        json, L"ABCDI2",   &_abcdi2     );
+      jsonSet1ABCDI4(        json, L"ABCDI4",   &_abcdi4     );
+      jsonSet1ABCDN1(        json, L"ABCDN1",   &_abcdn1     );
+      jsonSet1ABCDN2(        json, L"ABCDN2",   &_abcdn2     );
+      jsonSet1ABCDN4(        json, L"ABCDN4",   &_abcdn4     );
+      jsonSet1ABCDR4(        json, L"ABCDR4",   &_abcdr4     );
+      jsonSet1ABCDR8(        json, L"ABCDR8",   &_abcdr8     );
+      jsonSet1ABCDR4S(       json, L"ABCDR4S",  &_abcdr4     );
+      jsonSet1ABCDR8S(       json, L"ABCDR8S",  &_abcdr8     );
+      jsonSet1Matrix2x2R4(   json, L"mat224",   &_matrix2x2r4);
+      jsonSet1Matrix2x2R8(   json, L"mat228",   &_matrix2x2r8);
+      jsonSet1Matrix3x3R4(   json, L"mat334",   &_matrix3x3r4);
+      jsonSet1Matrix3x3R8(   json, L"mat338",   &_matrix3x3r8);
+      jsonSet1Matrix4x4R4(   json, L"mat444",   &_matrix4x4r4);
+      jsonSet1Matrix4x4R8(   json, L"mat448",   &_matrix4x4r8);
+      jsonSet1Matrix2x2R4S(  json, L"mat224S",  &_matrix2x2r4);
+      jsonSet1Matrix2x2R8S(  json, L"mat228S",  &_matrix2x2r8);
+      jsonSet1Matrix3x3R4S(  json, L"mat334S",  &_matrix3x3r4);
+      jsonSet1Matrix3x3R8S(  json, L"mat338S",  &_matrix3x3r8);
+      jsonSet1Matrix4x4R4S(  json, L"mat444S",  &_matrix4x4r4);
+      jsonSet1Matrix4x4R8S(  json, L"mat448S",  &_matrix4x4r8);
+
+      jsonRecordSetBegin(    json, jsonTypeVARIABLE, NULL, L"variableIntStrReal", 1);
+      jsonSetValueI(         json, 42);
+      jsonRecordSetSeparator(json);
+      jsonSetValueStringC2(  json, L"Yes, but what is the question?");
+      jsonRecordSetSeparator(json);
+      jsonSetValueR8(        json, 3.1415926535897932);
+      jsonRecordSetEnd(      json);
+
+      jsonSetNI1(            json, L"I1_Array",     256,     (MiffI1 *) _n1array);
+      jsonSetNN1(            json, L"N1_Array",     256,     _n1array);
+
+      jsonSetNI2(            json, L"I2_Array",     256,     (MiffI2 *) _n2array);
+      jsonSetNN2(            json, L"N2_Array",     256,     _n2array);
+
+      jsonSetNI4(            json, L"I4_Array",     256,     (MiffI4 *) _n4array);
+      jsonSetNN4(            json, L"N4_Array",     256,     _n4array);
+
+      jsonSetNI8(            json, L"I8_Array",     256,     (MiffI8 *) _n8array);
+      jsonSetNN8(            json, L"N8_Array",     256,     _n8array);
+
+      jsonSetNR4(            json, L"R4_Array",     300,     _reals4);
+      jsonSetNR8(            json, L"R8_Array",     300,     _reals8);
+      jsonSetNR4S(           json, L"R4S_Array",    300,     _reals4);
+      jsonSetNR8S(           json, L"R8S_Array",    300,     _reals8);
+
+      jsonSetNStringC2(      json, L"String_Array", 10,   _strings);
+
+      jsonSetNBoolean(       json, L"Bool_Array",   100,  _bools);
+
+      jsonRecordSetBegin(    json, jsonTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
+      jsonSetValueI(         json, 42);
+      jsonRecordSetSeparator(json);
+      jsonSetValueStringC2(  json, L"Yes, but what is the question?");
+      jsonRecordSetSeparator(json);
+      jsonSetValueR8(        json, 3.1415926535897932);
+      jsonRecordSetEnd(      json);
+
+      jsonSetBlockStart(     json, L"KeyValueBlock");
+      {
+         jsonSet1Boolean( json, L"True",     jsonBoolTRUE);
+         jsonSet1Boolean( json, L"False",    jsonBoolFALSE);
+
+         jsonSet1I1(      json, L"I1_0",     0);
+         jsonSet1I1(      json, L"I1_1",     1);
+         jsonSet1I1(      json, L"I1_-1",    -1);
+         jsonSet1I1(      json, L"I1_127",   127);
+         jsonSet1I1(      json, L"I1_-128",  -128);
+
+         jsonSet1N1(      json, L"N1_0",     0);
+         jsonSet1N1(      json, L"N1_1",     1);
+         jsonSet1N1(      json, L"N1_255",   255);
+
+         jsonSet1I2(      json, L"I2_0",     0);
+         jsonSet1I2(      json, L"I2_1",     1);
+         jsonSet1I2(      json, L"I2_-1",    -1);
+
+         jsonSet1N2(      json, L"N2_0",     0);
+         jsonSet1N2(      json, L"N2_1",     1);
+
+         jsonSet1I4(      json, L"I4_0",     0);
+         jsonSet1I4(      json, L"I4_1",     1);
+         jsonSet1I4(      json, L"I4_-1",    -1);
+
+         jsonSet1N4(      json, L"N4_0",     0);
+         jsonSet1N4(      json, L"N4_1",     1);
+
+         jsonSet1R4(      json, L"R4_0",     0.0);
+         jsonSet1R4(      json, L"R4_1",     1.0);
+         jsonSet1R4(      json, L"R4_-1",    -1.0);
+         jsonSet1R4(      json, L"R4_PI",    3.1415926535897932f);
+
+         jsonSet1I8(      json, L"I8_0",     0);
+         jsonSet1I8(      json, L"I8_1",     1);
+         jsonSet1I8(      json, L"I8_-1",    -1);
+
+         jsonSet1N8(      json, L"N8_0",     0);
+         jsonSet1N8(      json, L"N8_1",     1);
+
+         jsonSet1R8(      json, L"R8_0",     0.0);
+         jsonSet1R8(      json, L"R8_1",     1.0);
+         jsonSet1R8(      json, L"R8_-1",    -1.0);
+         jsonSet1R8(      json, L"R8_PI",    3.1415926535897932);
+
+         jsonSet1Type(    json, L"TypeBool", jsonTypeBOOLEAN);
+         jsonSet1Type(    json, L"TypeType", jsonTypeTYPE);
+
+         jsonSet1StringC2(json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+         jsonSetNStringC2(json, L"String_Array", 10,      _strings);
+      }
+      jsonSetBlockStop(json);
+      */
+      jsonWriteObjectStop(json);
+
+      result = jsonBoolTRUE;
+      break;
+   }
+
+   jsonDestroy(json);
+   fclose(file);
+
+   return result;
+}
+
+/******************************************************************************
+func: _MiffTestRead
+******************************************************************************/
+static MiffBool _MiffTestRead(MiffC2 const * const fileName)
 {
    FILE           *file;
    Miff           *miff;
@@ -758,7 +1013,7 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
       // Set Miff up for reading.
       miff = miffCreateReader(
          miffBoolTRUE,
-         _GetBuffer,
+         _MiffGetBuffer,
          subFormatNameC2,
          &subFormatVersion,
          (void *) file);
@@ -1473,9 +1728,9 @@ static MiffBool _TestRead(MiffC2 const * const fileName)
 }
 
 /******************************************************************************
-func: _TestWrite
+func: _MiffTestWrite
 ******************************************************************************/
-static MiffBool _TestWrite(MiffC2 const * const fileName)
+static MiffBool _MiffTestWrite(MiffC2 const * const fileName)
 {
    FILE     *file;
    Miff     *miff;
@@ -1493,7 +1748,7 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
       }
 
       // Create a miff file.
-      miff = miffCreateWriter(miffBoolTRUE, _SetBuffer, L"MiffTestFile", 1, (void *) file);
+      miff = miffCreateWriter(miffBoolTRUE, _MiffSetBuffer, L"MiffTestFile", 1, (void *) file);
       if (!miff)
       {
          break;
@@ -1501,61 +1756,61 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
 
       miffSet1Boolean(       miff, L"True",     miffBoolTRUE);
       miffSet1Boolean(       miff, L"False",    miffBoolFALSE);
-                             
+
       miffSet1I1(            miff, L"I1_0",     0);
       miffSet1I1(            miff, L"I1_1",     1);
       miffSet1I1(            miff, L"I1_-1",    -1);
       miffSet1I1(            miff, L"I1_127",   127);
       miffSet1I1(            miff, L"I1_-128",  -128);
-                             
+
       miffSet1N1(            miff, L"N1_0",     0);
       miffSet1N1(            miff, L"N1_1",     1);
       miffSet1N1(            miff, L"N1_255",   255);
-                             
+
       miffSet1I2(            miff, L"I2_0",     0);
       miffSet1I2(            miff, L"I2_1",     1);
       miffSet1I2(            miff, L"I2_-1",    -1);
-                             
+
       miffSet1N2(            miff, L"N2_0",     0);
       miffSet1N2(            miff, L"N2_1",     1);
-                             
+
       miffSet1I4(            miff, L"I4_0",     0);
       miffSet1I4(            miff, L"I4_1",     1);
       miffSet1I4(            miff, L"I4_-1",    -1);
-                             
+
       miffSet1N4(            miff, L"N4_0",     0);
       miffSet1N4(            miff, L"N4_1",     1);
-                             
+
       miffSet1R4(            miff, L"R4_0",     0.0);
       miffSet1R4(            miff, L"R4_1",     1.0);
       miffSet1R4(            miff, L"R4_-1",    -1.0);
       miffSet1R4(            miff, L"R4_PI",    3.1415926535897932f);
-                             
+
       miffSet1R4S(           miff, L"R4S_0",     0.0);
       miffSet1R4S(           miff, L"R4S_1",     1.0);
       miffSet1R4S(           miff, L"R4S_-1",    -1.0);
       miffSet1R4S(           miff, L"R4S_PI",    3.1415926535897932f);
-                             
+
       miffSet1I8(            miff, L"I8_0",     0);
       miffSet1I8(            miff, L"I8_1",     1);
       miffSet1I8(            miff, L"I8_-1",    -1);
-                             
+
       miffSet1N8(            miff, L"N8_0",     0);
       miffSet1N8(            miff, L"N8_1",     1);
-                             
+
       miffSet1R8(            miff, L"R8_0",     0.0);
       miffSet1R8(            miff, L"R8_1",     1.0);
       miffSet1R8(            miff, L"R8_-1",    -1.0);
       miffSet1R8(            miff, L"R8_PI",    3.1415926535897932);
-                             
+
       miffSet1R8S(           miff, L"R8S_0",     0.0);
       miffSet1R8S(           miff, L"R8S_1",     1.0);
       miffSet1R8S(           miff, L"R8S_-1",    -1.0);
       miffSet1R8S(           miff, L"R8S_PI",    3.1415926535897932);
-                             
+
       miffSet1Type(          miff, L"TypeBool", miffTypeBOOLEAN);
       miffSet1Type(          miff, L"TypeKey",  miffTypeTYPE);
-                             
+
       miffSet1StringC2(      miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
       miffSet1ABI1(          miff, L"ABI1",     &_abi1       );
@@ -1611,23 +1866,23 @@ static MiffBool _TestWrite(MiffC2 const * const fileName)
 
       miffSetNI1(            miff, L"I1_Array",     256,     (MiffI1 *) _n1array);
       miffSetNN1(            miff, L"N1_Array",     256,     _n1array);
-                             
+
       miffSetNI2(            miff, L"I2_Array",     256,     (MiffI2 *) _n2array);
       miffSetNN2(            miff, L"N2_Array",     256,     _n2array);
-                             
+
       miffSetNI4(            miff, L"I4_Array",     256,     (MiffI4 *) _n4array);
       miffSetNN4(            miff, L"N4_Array",     256,     _n4array);
-                             
+
       miffSetNI8(            miff, L"I8_Array",     256,     (MiffI8 *) _n8array);
       miffSetNN8(            miff, L"N8_Array",     256,     _n8array);
-                             
+
       miffSetNR4(            miff, L"R4_Array",     300,     _reals4);
       miffSetNR8(            miff, L"R8_Array",     300,     _reals8);
       miffSetNR4S(           miff, L"R4S_Array",    300,     _reals4);
       miffSetNR8S(           miff, L"R8S_Array",    300,     _reals8);
-                             
+
       miffSetNStringC2(      miff, L"String_Array", 10,   _strings);
-                             
+
       miffSetNBoolean(       miff, L"Bool_Array",   100,  _bools);
 
       miffRecordSetBegin(    miff, miffTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);

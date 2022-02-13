@@ -42,11 +42,11 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MemIsEqual
+func: _MiffMemIsEqual
 
 Compare two binary buffers for equality.
 ******************************************************************************/
-MiffBool _MemIsEqual(MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB,
+MiffBool _MiffMemIsEqual(MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB,
    MiffN1 const * const memB)
 {
    returnFalseIf(countA != countB);
@@ -55,9 +55,9 @@ MiffBool _MemIsEqual(MiffN4 const countA, MiffN1 const * const memA, MiffN4 cons
 }
 
 /******************************************************************************
-func: _TypeGetName
+func: _MiffTypeGetName
 ******************************************************************************/
-MiffC2 *_TypeGetNameC2(MiffType const type)
+MiffC2 *_MiffTypeGetNameC2(MiffType const type)
 {
    switch (type)
    {
@@ -144,9 +144,9 @@ MiffC2 *_TypeGetNameC2(MiffType const type)
 }
 
 /******************************************************************************
-func: _TypeGetNameC1
+func: _MiffTypeGetNameC1
 ******************************************************************************/
-MiffC1 *_TypeGetNameC1(MiffType const type)
+MiffC1 *_MiffTypeGetNameC1(MiffType const type)
 {
    switch (type)
    {
@@ -233,9 +233,9 @@ MiffC1 *_TypeGetNameC1(MiffType const type)
 }
 
 /******************************************************************************
-func: _TypeGetNameSize
+func: _MiffTypeGetNameSize
 ******************************************************************************/
-MiffN4 _TypeGetNameSize(MiffType const type)
+MiffN4 _MiffTypeGetNameSize(MiffType const type)
 {
    switch (type)
    {

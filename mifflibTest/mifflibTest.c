@@ -763,96 +763,84 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
 
       jsonWriteObjectStart(json);
 
-      jsonWriteKey1Boolean(   json, L"True",  jsonBoolTRUE);
-      jsonWriteKey1Boolean(   json, L"False", jsonBoolFALSE);
+      jsonWriteKey1Boolean(      json, L"True",  jsonBoolTRUE);
+      jsonWriteKey1Boolean(      json, L"False", jsonBoolFALSE);
 
-      jsonWriteKey1I(         json, L"I1_0",     0);
-      jsonWriteKey1I(         json, L"I1_1",     1);
-      jsonWriteKey1I(         json, L"I1_-1",    -1);
-      jsonWriteKey1I(         json, L"I1_127",   127);
-      jsonWriteKey1I(         json, L"I1_-128",  -128);
+      jsonWriteKey1I1(           json, L"I1_0",     0);
+      jsonWriteKey1I1(           json, L"I1_1",     1);
+      jsonWriteKey1I1(           json, L"I1_-1",    -1);
+      jsonWriteKey1I1(           json, L"I1_127",   127);
+      jsonWriteKey1I1(           json, L"I1_-128",  -128);
+                    
+      jsonWriteKey1N1(           json, L"N1_0",     0);
+      jsonWriteKey1N1(           json, L"N1_1",     1);
+      jsonWriteKey1N1(           json, L"N1_255",   255);
 
-      jsonWriteKey1N(         json, L"N1_0",     0);
-      jsonWriteKey1N(         json, L"N1_1",     1);
-      jsonWriteKey1N(         json, L"N1_255",   255);
+      jsonWriteKey1I2(           json, L"I2_0",     0);
+      jsonWriteKey1I2(           json, L"I2_1",     1);
+      jsonWriteKey1I2(           json, L"I2_-1",    -1);
 
-      jsonWriteKey1I(         json, L"I2_0",     0);
-      jsonWriteKey1I(         json, L"I2_1",     1);
-      jsonWriteKey1I(         json, L"I2_-1",    -1);
+      jsonWriteKey1N2(           json, L"N2_0",     0);
+      jsonWriteKey1N2(           json, L"N2_1",     1);
 
-      jsonWriteKey1N(         json, L"N2_0",     0);
-      jsonWriteKey1N(         json, L"N2_1",     1);
+      jsonWriteKey1I4(           json, L"I4_0",     0);
+      jsonWriteKey1I4(           json, L"I4_1",     1);
+      jsonWriteKey1I4(           json, L"I4_-1",    -1);
 
-      jsonWriteKey1I(         json, L"I4_0",     0);
-      jsonWriteKey1I(         json, L"I4_1",     1);
-      jsonWriteKey1I(         json, L"I4_-1",    -1);
+      jsonWriteKey1N4(           json, L"N4_0",     0);
+      jsonWriteKey1N4(           json, L"N4_1",     1);
 
-      jsonWriteKey1N(         json, L"N4_0",     0);
-      jsonWriteKey1N(         json, L"N4_1",     1);
+      jsonWriteKey1R4(           json, L"R4_0",     0.0);
+      jsonWriteKey1R4(           json, L"R4_1",     1.0);
+      jsonWriteKey1R4(           json, L"R4_-1",    -1.0);
+      jsonWriteKey1R4(           json, L"R4_PI",    3.1415926535897932f);
 
-      jsonWriteKey1R4(        json, L"R4_0",     0.0);
-      jsonWriteKey1R4(        json, L"R4_1",     1.0);
-      jsonWriteKey1R4(        json, L"R4_-1",    -1.0);
-      jsonWriteKey1R4(        json, L"R4_PI",    3.1415926535897932f);
+      jsonWriteKey1I8(           json, L"I8_0",     0);
+      jsonWriteKey1I8(           json, L"I8_1",     1);
+      jsonWriteKey1I8(           json, L"I8_-1",    -1);
 
-      jsonWriteKey1I(         json, L"I8_0",     0);
-      jsonWriteKey1I(         json, L"I8_1",     1);
-      jsonWriteKey1I(         json, L"I8_-1",    -1);
+      jsonWriteKey1N8(           json, L"N8_0",     0);
+      jsonWriteKey1N8(           json, L"N8_1",     1);
 
-      jsonWriteKey1N(         json, L"N8_0",     0);
-      jsonWriteKey1N(         json, L"N8_1",     1);
+      jsonWriteKey1R8(           json, L"R8_0",     0.0);
+      jsonWriteKey1R8(           json, L"R8_1",     1.0);
+      jsonWriteKey1R8(           json, L"R8_-1",    -1.0);
+      jsonWriteKey1R8(           json, L"R8_PI",    3.1415926535897932);
 
-      jsonWriteKey1R8(        json, L"R8_0",     0.0);
-      jsonWriteKey1R8(        json, L"R8_1",     1.0);
-      jsonWriteKey1R8(        json, L"R8_-1",    -1.0);
-      jsonWriteKey1R8(        json, L"R8_PI",    3.1415926535897932);
+      jsonWriteKey1StringC2(     json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      jsonWriteKey1String(    json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      jsonWriteKey1ABI1(         json, L"ABI1",     (JsonABI1 *)        &_abi1       );
+      jsonWriteKey1ABI2(         json, L"ABI2",     (JsonABI2 *)        &_abi2       );
+      jsonWriteKey1ABI4(         json, L"ABI4",     (JsonABI4 *)        &_abi4       );
+      jsonWriteKey1ABN1(         json, L"ABN1",     (JsonABN1 *)        &_abn1       );
+      jsonWriteKey1ABN2(         json, L"ABN2",     (JsonABN2 *)        &_abn2       );
+      jsonWriteKey1ABN4(         json, L"ABN4",     (JsonABN4 *)        &_abn4       );
+      jsonWriteKey1ABR4(         json, L"ABR4",     (JsonABR4 *)        &_abr4       );
+      jsonWriteKey1ABR8(         json, L"ABR8",     (JsonABR8 *)        &_abr8       );
+      jsonWriteKey1ABCI1(        json, L"ABCI1",    (JsonABCI1 *)       &_abci1      );
+      jsonWriteKey1ABCI2(        json, L"ABCI2",    (JsonABCI2 *)       &_abci2      );
+      jsonWriteKey1ABCI4(        json, L"ABCI4",    (JsonABCI4 *)       &_abci4      );
+      jsonWriteKey1ABCN1(        json, L"ABCN1",    (JsonABCN1 *)       &_abcn1      );
+      jsonWriteKey1ABCN2(        json, L"ABCN2",    (JsonABCN2 *)       &_abcn2      );
+      jsonWriteKey1ABCN4(        json, L"ABCN4",    (JsonABCN4 *)       &_abcn4      );
+      jsonWriteKey1ABCR4(        json, L"ABCR4",    (JsonABCR4 *)       &_abcr4      );
+      jsonWriteKey1ABCR8(        json, L"ABCR8",    (JsonABCR8 *)       &_abcr8      );
+      jsonWriteKey1ABCDI1(       json, L"ABCDI1",   (JsonABCDI1 *)      &_abcdi1     );
+      jsonWriteKey1ABCDI2(       json, L"ABCDI2",   (JsonABCDI2 *)      &_abcdi2     );
+      jsonWriteKey1ABCDI4(       json, L"ABCDI4",   (JsonABCDI4 *)      &_abcdi4     );
+      jsonWriteKey1ABCDN1(       json, L"ABCDN1",   (JsonABCDN1 *)      &_abcdn1     );
+      jsonWriteKey1ABCDN2(       json, L"ABCDN2",   (JsonABCDN2 *)      &_abcdn2     );
+      jsonWriteKey1ABCDN4(       json, L"ABCDN4",   (JsonABCDN4 *)      &_abcdn4     );
+      jsonWriteKey1ABCDR4(       json, L"ABCDR4",   (JsonABCDR4 *)      &_abcdr4     );
+      jsonWriteKey1ABCDR8(       json, L"ABCDR8",   (JsonABCDR8 *)      &_abcdr8     );
+      jsonWriteKey1Matrix2x2R4(  json, L"mat224",   (JsonMatrix2x2R4 *) &_matrix2x2r4);
+      jsonWriteKey1Matrix2x2R8(  json, L"mat228",   (JsonMatrix2x2R8 *) &_matrix2x2r8);
+      jsonWriteKey1Matrix3x3R4(  json, L"mat334",   (JsonMatrix3x3R4 *) &_matrix3x3r4);
+      jsonWriteKey1Matrix3x3R8(  json, L"mat338",   (JsonMatrix3x3R8 *) &_matrix3x3r8);
+      jsonWriteKey1Matrix4x4R4(  json, L"mat444",   (JsonMatrix4x4R4 *) &_matrix4x4r4);
+      jsonWriteKey1Matrix4x4R8(  json, L"mat448",   (JsonMatrix4x4R8 *) &_matrix4x4r8);
 
       /*
-      jsonSet1ABI1(          json, L"ABI1",     &_abi1       );
-      jsonSet1ABI2(          json, L"ABI2",     &_abi2       );
-      jsonSet1ABI4(          json, L"ABI4",     &_abi4       );
-      jsonSet1ABN1(          json, L"ABN1",     &_abn1       );
-      jsonSet1ABN2(          json, L"ABN2",     &_abn2       );
-      jsonSet1ABN4(          json, L"ABN4",     &_abn4       );
-      jsonSet1ABR4(          json, L"ABR4",     &_abr4       );
-      jsonSet1ABR8(          json, L"ABR8",     &_abr8       );
-      jsonSet1ABR4S(         json, L"ABR4S",    &_abr4       );
-      jsonSet1ABR8S(         json, L"ABR8S",    &_abr8       );
-      jsonSet1ABCI1(         json, L"ABCI1",    &_abci1      );
-      jsonSet1ABCI2(         json, L"ABCI2",    &_abci2      );
-      jsonSet1ABCI4(         json, L"ABCI4",    &_abci4      );
-      jsonSet1ABCN1(         json, L"ABCN1",    &_abcn1      );
-      jsonSet1ABCN2(         json, L"ABCN2",    &_abcn2      );
-      jsonSet1ABCN4(         json, L"ABCN4",    &_abcn4      );
-      jsonSet1ABCR4(         json, L"ABCR4",    &_abcr4      );
-      jsonSet1ABCR8(         json, L"ABCR8",    &_abcr8      );
-      jsonSet1ABCR4S(        json, L"ABCR4S",   &_abcr4      );
-      jsonSet1ABCR8S(        json, L"ABCR8S",   &_abcr8      );
-      jsonSet1ABCDI1(        json, L"ABCDI1",   &_abcdi1     );
-      jsonSet1ABCDI2(        json, L"ABCDI2",   &_abcdi2     );
-      jsonSet1ABCDI4(        json, L"ABCDI4",   &_abcdi4     );
-      jsonSet1ABCDN1(        json, L"ABCDN1",   &_abcdn1     );
-      jsonSet1ABCDN2(        json, L"ABCDN2",   &_abcdn2     );
-      jsonSet1ABCDN4(        json, L"ABCDN4",   &_abcdn4     );
-      jsonSet1ABCDR4(        json, L"ABCDR4",   &_abcdr4     );
-      jsonSet1ABCDR8(        json, L"ABCDR8",   &_abcdr8     );
-      jsonSet1ABCDR4S(       json, L"ABCDR4S",  &_abcdr4     );
-      jsonSet1ABCDR8S(       json, L"ABCDR8S",  &_abcdr8     );
-      jsonSet1Matrix2x2R4(   json, L"mat224",   &_matrix2x2r4);
-      jsonSet1Matrix2x2R8(   json, L"mat228",   &_matrix2x2r8);
-      jsonSet1Matrix3x3R4(   json, L"mat334",   &_matrix3x3r4);
-      jsonSet1Matrix3x3R8(   json, L"mat338",   &_matrix3x3r8);
-      jsonSet1Matrix4x4R4(   json, L"mat444",   &_matrix4x4r4);
-      jsonSet1Matrix4x4R8(   json, L"mat448",   &_matrix4x4r8);
-      jsonSet1Matrix2x2R4S(  json, L"mat224S",  &_matrix2x2r4);
-      jsonSet1Matrix2x2R8S(  json, L"mat228S",  &_matrix2x2r8);
-      jsonSet1Matrix3x3R4S(  json, L"mat334S",  &_matrix3x3r4);
-      jsonSet1Matrix3x3R8S(  json, L"mat338S",  &_matrix3x3r8);
-      jsonSet1Matrix4x4R4S(  json, L"mat444S",  &_matrix4x4r4);
-      jsonSet1Matrix4x4R8S(  json, L"mat448S",  &_matrix4x4r8);
-
       jsonRecordSetBegin(    json, jsonTypeVARIABLE, NULL, L"variableIntStrReal", 1);
       jsonSetValueI(         json, 42);
       jsonRecordSetSeparator(json);
@@ -860,91 +848,90 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
       jsonRecordSetSeparator(json);
       jsonSetValueR8(        json, 3.1415926535897932);
       jsonRecordSetEnd(      json);
-
-      jsonSetNI1(            json, L"I1_Array",     256,     (MiffI1 *) _n1array);
-      jsonSetNN1(            json, L"N1_Array",     256,     _n1array);
-
-      jsonSetNI2(            json, L"I2_Array",     256,     (MiffI2 *) _n2array);
-      jsonSetNN2(            json, L"N2_Array",     256,     _n2array);
-
-      jsonSetNI4(            json, L"I4_Array",     256,     (MiffI4 *) _n4array);
-      jsonSetNN4(            json, L"N4_Array",     256,     _n4array);
-
-      jsonSetNI8(            json, L"I8_Array",     256,     (MiffI8 *) _n8array);
-      jsonSetNN8(            json, L"N8_Array",     256,     _n8array);
-
-      jsonSetNR4(            json, L"R4_Array",     300,     _reals4);
-      jsonSetNR8(            json, L"R8_Array",     300,     _reals8);
-      jsonSetNR4S(           json, L"R4S_Array",    300,     _reals4);
-      jsonSetNR8S(           json, L"R8S_Array",    300,     _reals8);
-
-      jsonSetNStringC2(      json, L"String_Array", 10,   _strings);
-
-      jsonSetNBoolean(       json, L"Bool_Array",   100,  _bools);
-
-      jsonRecordSetBegin(    json, jsonTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
-      jsonSetValueI(         json, 42);
-      jsonRecordSetSeparator(json);
-      jsonSetValueStringC2(  json, L"Yes, but what is the question?");
-      jsonRecordSetSeparator(json);
-      jsonSetValueR8(        json, 3.1415926535897932);
-      jsonRecordSetEnd(      json);
-
-      jsonSetBlockStart(     json, L"KeyValueBlock");
-      {
-         jsonSet1Boolean( json, L"True",     jsonBoolTRUE);
-         jsonSet1Boolean( json, L"False",    jsonBoolFALSE);
-
-         jsonSet1I1(      json, L"I1_0",     0);
-         jsonSet1I1(      json, L"I1_1",     1);
-         jsonSet1I1(      json, L"I1_-1",    -1);
-         jsonSet1I1(      json, L"I1_127",   127);
-         jsonSet1I1(      json, L"I1_-128",  -128);
-
-         jsonSet1N1(      json, L"N1_0",     0);
-         jsonSet1N1(      json, L"N1_1",     1);
-         jsonSet1N1(      json, L"N1_255",   255);
-
-         jsonSet1I2(      json, L"I2_0",     0);
-         jsonSet1I2(      json, L"I2_1",     1);
-         jsonSet1I2(      json, L"I2_-1",    -1);
-
-         jsonSet1N2(      json, L"N2_0",     0);
-         jsonSet1N2(      json, L"N2_1",     1);
-
-         jsonSet1I4(      json, L"I4_0",     0);
-         jsonSet1I4(      json, L"I4_1",     1);
-         jsonSet1I4(      json, L"I4_-1",    -1);
-
-         jsonSet1N4(      json, L"N4_0",     0);
-         jsonSet1N4(      json, L"N4_1",     1);
-
-         jsonSet1R4(      json, L"R4_0",     0.0);
-         jsonSet1R4(      json, L"R4_1",     1.0);
-         jsonSet1R4(      json, L"R4_-1",    -1.0);
-         jsonSet1R4(      json, L"R4_PI",    3.1415926535897932f);
-
-         jsonSet1I8(      json, L"I8_0",     0);
-         jsonSet1I8(      json, L"I8_1",     1);
-         jsonSet1I8(      json, L"I8_-1",    -1);
-
-         jsonSet1N8(      json, L"N8_0",     0);
-         jsonSet1N8(      json, L"N8_1",     1);
-
-         jsonSet1R8(      json, L"R8_0",     0.0);
-         jsonSet1R8(      json, L"R8_1",     1.0);
-         jsonSet1R8(      json, L"R8_-1",    -1.0);
-         jsonSet1R8(      json, L"R8_PI",    3.1415926535897932);
-
-         jsonSet1Type(    json, L"TypeBool", jsonTypeBOOLEAN);
-         jsonSet1Type(    json, L"TypeType", jsonTypeTYPE);
-
-         jsonSet1StringC2(json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-         jsonSetNStringC2(json, L"String_Array", 10,      _strings);
-      }
-      jsonSetBlockStop(json);
       */
+
+      jsonWriteKeyNI1(                json, L"I1_Array",     256,     (MiffI1 *) _n1array);
+      jsonWriteKeyNN1(                json, L"N1_Array",     256,     _n1array);
+
+      jsonWriteKeyNI2(                json, L"I2_Array",     256,     (MiffI2 *) _n2array);
+      jsonWriteKeyNN2(                json, L"N2_Array",     256,     _n2array);
+
+      jsonWriteKeyNI4(                json, L"I4_Array",     256,     (MiffI4 *) _n4array);
+      jsonWriteKeyNN4(                json, L"N4_Array",     256,     _n4array);
+
+      jsonWriteKeyNI8(                json, L"I8_Array",     256,     (MiffI8 *) _n8array);
+      jsonWriteKeyNN8(                json, L"N8_Array",     256,     _n8array);
+
+      jsonWriteKeyNR4(                json, L"R4_Array",     300,     _reals4);
+      jsonWriteKeyNR8(                json, L"R8_Array",     300,     _reals8);
+
+      jsonWriteKeyNStringC2(          json, L"String_Array", 10,      (JsonC2 **) _strings);
+
+      jsonWriteKeyNBoolean(           json, L"Bool_Array",   100,     (JsonBool *) _bools);
+
+      /*
+      jsonRecordSetBegin(        json, jsonTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
+      jsonSetValueI(             json, 42);
+      jsonRecordSetSeparator(    json);
+      jsonSetValueStringC2(      json, L"Yes, but what is the question?");
+      jsonRecordSetSeparator(    json);
+      jsonSetValueR8(            json, 3.1415926535897932);
+      jsonRecordSetEnd(          json);
+      */
+
+      jsonWriteKey(        json, L"KeyValueBlock");
+      jsonWriteObjectStart(json);
+      {
+         jsonWriteKey1Boolean( json, L"True",     jsonBoolTRUE);
+         jsonWriteKey1Boolean( json, L"False",    jsonBoolFALSE);
+
+         jsonWriteKey1I1(      json, L"I1_0",     0);
+         jsonWriteKey1I1(      json, L"I1_1",     1);
+         jsonWriteKey1I1(      json, L"I1_-1",    -1);
+         jsonWriteKey1I1(      json, L"I1_127",   127);
+         jsonWriteKey1I1(      json, L"I1_-128",  -128);
+
+         jsonWriteKey1N1(      json, L"N1_0",     0);
+         jsonWriteKey1N1(      json, L"N1_1",     1);
+         jsonWriteKey1N1(      json, L"N1_255",   255);
+
+         jsonWriteKey1I2(      json, L"I2_0",     0);
+         jsonWriteKey1I2(      json, L"I2_1",     1);
+         jsonWriteKey1I2(      json, L"I2_-1",    -1);
+
+         jsonWriteKey1N2(      json, L"N2_0",     0);
+         jsonWriteKey1N2(      json, L"N2_1",     1);
+
+         jsonWriteKey1I4(      json, L"I4_0",     0);
+         jsonWriteKey1I4(      json, L"I4_1",     1);
+         jsonWriteKey1I4(      json, L"I4_-1",    -1);
+
+         jsonWriteKey1N4(      json, L"N4_0",     0);
+         jsonWriteKey1N4(      json, L"N4_1",     1);
+
+         jsonWriteKey1R4(      json, L"R4_0",     0.0);
+         jsonWriteKey1R4(      json, L"R4_1",     1.0);
+         jsonWriteKey1R4(      json, L"R4_-1",    -1.0);
+         jsonWriteKey1R4(      json, L"R4_PI",    3.1415926535897932f);
+
+         jsonWriteKey1I8(      json, L"I8_0",     0);
+         jsonWriteKey1I8(      json, L"I8_1",     1);
+         jsonWriteKey1I8(      json, L"I8_-1",    -1);
+
+         jsonWriteKey1N8(      json, L"N8_0",     0);
+         jsonWriteKey1N8(      json, L"N8_1",     1);
+
+         jsonWriteKey1R8(      json, L"R8_0",     0.0);
+         jsonWriteKey1R8(      json, L"R8_1",     1.0);
+         jsonWriteKey1R8(      json, L"R8_-1",    -1.0);
+         jsonWriteKey1R8(      json, L"R8_PI",    3.1415926535897932);
+
+         jsonWriteKey1StringC2(json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+         jsonWriteKeyNStringC2(json, L"String_Array", 10,      _strings);
+      }
+      jsonWriteObjectStop(json);
+
       jsonWriteObjectStop(json);
 
       result = jsonBoolTRUE;

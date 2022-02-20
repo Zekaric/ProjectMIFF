@@ -175,9 +175,9 @@ JsonBool _JsonWriteR8(Json * const json, JsonR8 const value)
 }
 
 /******************************************************************************
-func: _JsonWriteString
+func: _JsonWriteStringC2
 ******************************************************************************/
-JsonBool _JsonWriteString(Json * const json, JsonC2 const * const value)
+JsonBool _JsonWriteStringC2(Json * const json, JsonC2 const * const value)
 {
    JsonI4  index;
    JsonN4  valueC1Count;

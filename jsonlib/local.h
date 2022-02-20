@@ -153,6 +153,6 @@ JsonBool  _JsonWriteIndent(       Json       * const json);
 JsonBool  _JsonWriteN(            Json       * const json, JsonN8 const value);
 JsonBool  _JsonWriteR4(           Json       * const json, JsonR4 const value);
 JsonBool  _JsonWriteR8(           Json       * const json, JsonR8 const value);
-JsonBool  _JsonWriteString(       Json       * const json, JsonC2 const * const value);
+JsonBool  _JsonWriteStringC2(     Json       * const json, JsonC2 const * const value);
 
 #endif

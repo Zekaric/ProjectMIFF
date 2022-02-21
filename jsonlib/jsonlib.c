@@ -84,8 +84,8 @@ JsonBool jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
       !getBufferFunc);
 
    _JsonMemClearType(Json, json);
-   json->method = jsonMethodREADING;
-   json->dataRepo = dataRepo;
+   json->method    = jsonMethodREADING;
+   json->dataRepo  = dataRepo;
    json->getBuffer = getBufferFunc;
 
    returnTrue;
@@ -127,8 +127,8 @@ JsonBool jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
       !setBufferFunc);
 
    _JsonMemClearType(Json, json);
-   json->method = jsonMethodWRITING;
-   json->dataRepo = dataRepo;
+   json->method    = jsonMethodWRITING;
+   json->dataRepo  = dataRepo;
    json->setBuffer = setBufferFunc;
 
    returnTrue;
@@ -195,12 +195,11 @@ func: jsonWriteArrayStart
 ******************************************************************************/
 JsonBool jsonWriteArrayStart(Json * const json)
 {
-   json->isLastWriteValue = jsonBoolFALSE;
-   json->isIndentMissing = jsonBoolTRUE;
+   json->scopeType[json->scope] = jsonScopeARRAY;
    json->scope++;
+   json->isFirstItem            = jsonBoolTRUE;
 
    returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonARRAY_START_STR));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
    returnTrue;
 }
 
@@ -209,22 +208,13 @@ func: jsonWriteArrayStop
 ******************************************************************************/
 JsonBool jsonWriteArrayStop(Json * const json)
 {
-   if      (json->isIndentMissing)
-   {
-      // Nothing to do. Empty array.
-   }
-   else if (json->isLastWriteValue)
-   {
-      returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
-   }
-
-   json->isLastWriteValue = jsonBoolFALSE;
-   json->isIndentMissing = jsonBoolTRUE;
    json->scope--;
+   json->scopeType[json->scope] = jsonScopeNONE;
+   json->isFirstItem            = jsonBoolFALSE;
 
+   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonARRAY_STOP_STR));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
+   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) jsonARRAY_STOP_STR));
    returnTrue;
 }
 
@@ -233,18 +223,11 @@ func: jsonWriteKey
 ******************************************************************************/
 JsonBool jsonWriteKey(Json * const json, JsonC2 const * const key)
 {
-   // Missing indent we are following a open or close object, open or close array.
-   if      (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   else if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-   }
+   returnFalseIf(!jsonWriteSeparator(    json));
+   returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+   returnFalseIf(!_JsonWriteIndent(      json));
+   
+   json->isFirstItem = jsonBoolFALSE;
 
    returnFalseIf(!jsonWriteValueStringC2(json, key));
    returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) jsonKEY_VALUE_SEPARATOR_STR));
@@ -256,12 +239,11 @@ func: jsonWriteObjectStart
 ******************************************************************************/
 JsonBool jsonWriteObjectStart(Json * const json)
 {
-   json->isLastWriteValue = jsonBoolFALSE;
-
+   json->scopeType[json->scope] = jsonScopeOBJECT;
    json->scope++;
+   json->isFirstItem            = jsonBoolTRUE;
+
    returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonOBJECT_START_STR));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
-   returnFalseIf(!_JsonWriteIndent(json));
    returnTrue;
 }
 
@@ -270,17 +252,13 @@ func: jsonWriteObjectStop
 ******************************************************************************/
 JsonBool jsonWriteObjectStop(Json * const json)
 {
-   if (json->isLastWriteValue)
-   {
-      returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
-   }
-   json->isLastWriteValue = jsonBoolFALSE;
-
    json->scope--;
+   json->scopeType[json->scope] = jsonScopeNONE;
+   json->isFirstItem            = jsonBoolFALSE;
+
+   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonOBJECT_STOP_STR));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
-   returnFalseIf(!_JsonWriteIndent(json));
+   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) jsonOBJECT_STOP_STR));
    returnTrue;
 }
 
@@ -289,11 +267,10 @@ func: jsonWriteSeparator
 ******************************************************************************/
 JsonBool jsonWriteSeparator(Json * const json)
 {
-   json->isLastWriteValue = jsonBoolFALSE;
-
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSEPARATOR_STR));
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\n"));
-   returnFalseIf(!_JsonWriteIndent(json));
+   if (!json->isFirstItem)
+   {
+      returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSEPARATOR_STR));
+   }
    returnTrue;
 }
 
@@ -302,26 +279,10 @@ func: jsonWriteValueABI
 ******************************************************************************/
 JsonBool jsonWriteValueABI(Json * const json, JsonI8 const va, JsonI8 const vb)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueI(    json, va));
    returnFalseIf(!jsonWriteValueI(    json, vb));
    returnFalseIf(!jsonWriteArrayStop( json));
-
-   json->isLastWriteValue = jsonBoolTRUE;
    returnTrue;
 }
 
@@ -330,20 +291,6 @@ func: jsonWriteValueABN
 ******************************************************************************/
 JsonBool jsonWriteValueABN(Json * const json, JsonN8 const va, JsonN8 const vb)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueN(    json, va));
    returnFalseIf(!jsonWriteValueN(    json, vb));
@@ -356,20 +303,6 @@ func: jsonWriteValueABR4
 ******************************************************************************/
 JsonBool jsonWriteValueABR4(Json * const json, JsonABR4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->a));
    returnFalseIf(!jsonWriteValueR4(   json, value->b));
@@ -382,20 +315,6 @@ func: jsonWriteValueABR8
 ******************************************************************************/
 JsonBool jsonWriteValueABR8(Json * const json, JsonABR8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->a));
    returnFalseIf(!jsonWriteValueR8(   json, value->b));
@@ -408,20 +327,6 @@ func: jsonWriteValueABCI
 ******************************************************************************/
 JsonBool jsonWriteValueABCI(Json * const json, JsonI8 const va, JsonI8 const vb, JsonI8 const vc)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueI(    json, va));
    returnFalseIf(!jsonWriteValueI(    json, vb));
@@ -435,20 +340,6 @@ func: jsonWriteValueABCN
 ******************************************************************************/
 JsonBool jsonWriteValueABCN(Json * const json, JsonN8 const va, JsonN8 const vb, JsonN8 const vc)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueN(    json, va));
    returnFalseIf(!jsonWriteValueN(    json, vb));
@@ -462,20 +353,6 @@ func: jsonWriteValueABCR4
 ******************************************************************************/
 JsonBool jsonWriteValueABCR4(Json * const json, JsonABCR4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->a));
    returnFalseIf(!jsonWriteValueR4(   json, value->b));
@@ -489,20 +366,6 @@ func: jsonWriteValueABCR8
 ******************************************************************************/
 JsonBool jsonWriteValueABCR8(Json * const json, JsonABCR8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->a));
    returnFalseIf(!jsonWriteValueR8(   json, value->b));
@@ -516,20 +379,6 @@ func: jsonWriteValueABCDI
 ******************************************************************************/
 JsonBool jsonWriteValueABCDI(Json * const json, JsonI8 const va, JsonI8 const vb, JsonI8 const vc, JsonI8 const vd)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueI(    json, va));
    returnFalseIf(!jsonWriteValueI(    json, vb));
@@ -544,20 +393,6 @@ func: jsonWriteValueABCDN
 ******************************************************************************/
 JsonBool jsonWriteValueABCDN(Json * const json, JsonN8 const va, JsonN8 const vb, JsonN8 const vc, JsonN8 const vd)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueN(    json, va));
    returnFalseIf(!jsonWriteValueN(    json, vb));
@@ -572,20 +407,6 @@ func: jsonWriteValueABCDR4
 ******************************************************************************/
 JsonBool jsonWriteValueABCDR4(Json * const json, JsonABCDR4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->a));
    returnFalseIf(!jsonWriteValueR4(   json, value->b));
@@ -600,20 +421,6 @@ func: jsonWriteValueABCDR8
 ******************************************************************************/
 JsonBool jsonWriteValueABCDR8(Json * const json, JsonABCDR8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->a));
    returnFalseIf(!jsonWriteValueR8(   json, value->b));
@@ -628,21 +435,15 @@ func: jsonWriteValueBoolean
 ******************************************************************************/
 JsonBool jsonWriteValueBoolean(Json * const json, JsonBool const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   returnFalseIf(!jsonWriteValueStringC2(json, (value == jsonBoolTRUE) ? L"true" : L"false"));
+   json->isFirstItem = jsonBoolFALSE;
+   
+   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) ((value == jsonBoolTRUE) ? "\"true\"" : "\"false\"")));
    returnTrue;
 }
 
@@ -651,21 +452,14 @@ func: jsonWriteValueI
 ******************************************************************************/
 JsonBool jsonWriteValueI(Json * const json, JsonI8 const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   json->isLastWriteValue = jsonBoolTRUE;
+   json->isFirstItem = jsonBoolFALSE;
+   
    return _JsonWriteI(json, value);
 }
 
@@ -674,21 +468,14 @@ func: jsonWriteValueN
 ******************************************************************************/
 JsonBool jsonWriteValueN(Json * const json, JsonN8 const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   json->isLastWriteValue = jsonBoolTRUE;
+   json->isFirstItem = jsonBoolFALSE;
+   
    return _JsonWriteN(json, value);
 }
 
@@ -697,20 +484,6 @@ func: jsonWriteValueMatrix2x2R4
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix2x2R4(Json * const json, JsonMatrix2x2R4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][1]));
@@ -725,20 +498,6 @@ func: jsonWriteValueMatrix2x2R8
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix2x2R8(Json * const json, JsonMatrix2x2R8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][1]));
@@ -753,20 +512,6 @@ func: jsonWriteValueMatrix3x3R4
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix3x3R4(Json * const json, JsonMatrix3x3R4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][1]));
@@ -786,20 +531,6 @@ func: jsonWriteValueMatrix3x3R8
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix3x3R8(Json * const json, JsonMatrix3x3R8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][1]));
@@ -819,20 +550,6 @@ func: jsonWriteValueMatrix4x4R4
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix4x4R4(Json * const json, JsonMatrix4x4R4 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR4(   json, value->cell[0][1]));
@@ -859,20 +576,6 @@ func: jsonWriteValueMatrix4x4R8
 ******************************************************************************/
 JsonBool jsonWriteValueMatrix4x4R8(Json * const json, JsonMatrix4x4R8 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
-   {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
-   }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
    returnFalseIf(!jsonWriteArrayStart(json));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][0]));
    returnFalseIf(!jsonWriteValueR8(   json, value->cell[0][1]));
@@ -899,21 +602,14 @@ func: jsonWriteValueStringC2
 ******************************************************************************/
 JsonBool jsonWriteValueStringC2(Json * const json, JsonC2 const * const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   json->isLastWriteValue = jsonBoolTRUE;
+   json->isFirstItem = jsonBoolFALSE;
+   
    return _JsonWriteStringC2(json, value);
 }
 
@@ -922,21 +618,14 @@ func: jsonWriteValueR4
 ******************************************************************************/
 JsonBool jsonWriteValueR4(Json * const json, JsonR4 const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   json->isLastWriteValue = jsonBoolTRUE;
+   json->isFirstItem = jsonBoolFALSE;
+   
    return _JsonWriteR4(json, value);
 }
 
@@ -945,21 +634,14 @@ func: jsonWriteValueR8
 ******************************************************************************/
 JsonBool jsonWriteValueR8(Json * const json, JsonR8 const value)
 {
-   // Last item written was a value, this must be another key value in an object. Add a separator.
-   if (json->isLastWriteValue)
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
-      json->isLastWriteValue = jsonBoolFALSE;
-      returnFalseIf(!jsonWriteSeparator(json));
-      returnFalseIf(!_JsonWriteIndent(  json));
+      returnFalseIf(!jsonWriteSeparator(    json));
+      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteIndent(      json));
    }
-   // Missing indent we are following a open or close object, open or close array.
-   else if (json->isIndentMissing)
-   {
-      returnFalseIf(!_JsonWriteIndent(json));
-      json->isIndentMissing = jsonBoolFALSE;
-   }
-
-   json->isLastWriteValue = jsonBoolTRUE;
+   json->isFirstItem = jsonBoolFALSE;
+   
    return _JsonWriteR8(json, value);
 }
 
@@ -1211,8 +893,8 @@ func: jsonWriteKey1Boolean
 ******************************************************************************/
 JsonBool jsonWriteKey1Boolean(Json * const json, JsonC2 const * const key, JsonBool const value)
 {
-   returnFalseIf(!jsonWriteKey(      json, key));
-   returnFalseIf(!_jsonWriteStringC2(json, (value == jsonBoolTRUE) ? L"true" : L"false"));
+   returnFalseIf(!jsonWriteKey(         json, key));
+   returnFalseIf(!jsonWriteValueBoolean(json, value));
    returnTrue;
 }
 

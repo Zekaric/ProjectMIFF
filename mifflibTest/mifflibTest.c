@@ -652,19 +652,19 @@ int main(int acount, char **alist)
    }
 
    // Test the writing.
-   if (!_MiffTestWrite(L"MiffFileTest.miff"))
+   if (!_MiffTestWrite(L"FileTest.miff"))
    {
       result = 2;
       goto DONE;
    }
 
-   if (!_MiffTestRead(L"MiffFileTest.miff"))
+   if (!_MiffTestRead(L"FileTest.miff"))
    {
       result = 4;
       goto DONE;
    }
 
-   if (!_JsonTestWrite(L"JsonFileTest.json"))
+   if (!_JsonTestWrite(L"FileTest.json"))
    {
       result = 8;
       goto DONE;

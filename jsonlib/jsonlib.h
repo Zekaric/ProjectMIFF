@@ -57,6 +57,16 @@ typedef enum
    jsonMethodWRITING,
 } JsonMethod;
 
+typedef enum
+{
+   jsonScopeNONE,
+
+   jsonScopeOBJECT,
+   jsonScopeARRAY,
+
+   jsonScopeCOUNT
+} JsonScope;
+
 /******************************************************************************
 type:
 ******************************************************************************/
@@ -253,8 +263,8 @@ typedef struct
    JsonN8                      version;
    JsonMethod                  method;
    JsonI4                      scope;
-   JsonBool                    isIndentMissing;
-   JsonBool                    isLastWriteValue;
+   JsonScope                   scopeType[256];
+   JsonBool                    isFirstItem;
 
    // Data repo getters and setters.
    void                       *dataRepo;

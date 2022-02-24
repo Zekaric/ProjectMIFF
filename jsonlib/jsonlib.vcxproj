@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="jsonlib.c" />
     <ClCompile Include="mem.c" />
+    <ClCompile Include="read.c" />
     <ClCompile Include="string.c" />
     <ClCompile Include="write.c" />
   </ItemGroup>

@@ -735,7 +735,768 @@ static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, Mi
 }
 
 /******************************************************************************
-func: _MiffTestWrite
+func: _JsonTestRead
+******************************************************************************/
+static JsonBool _JsonTestRead(MiffC2 const * const fileName)
+{
+   FILE           *file;
+   Json           *json;
+   JsonBool        result;
+   JsonC2          subFormatNameC2[jsonKeySIZE];
+   JsonC2          typeName[jsonKeySIZE];
+   JsonN8          subFormatVersion;
+   JsonC2          key[jsonKeySIZE];
+   JsonN4          arrayIndex;
+   JsonN4          arrayCount;
+   JsonN4          row,
+                   col;
+   JsonBool        valueBool;
+   JsonI8          valueI;
+   JsonN8          valueN;
+   JsonR4          valueR4;
+   JsonR8          valueR8;
+   JsonC2         *valueStr;
+   JsonABI8        valueABI;
+   JsonABN8        valueABN;
+   JsonABR4        valueABR4;
+   JsonABR8        valueABR8;
+   JsonABCI8       valueABCI;
+   JsonABCN8       valueABCN;
+   JsonABCR4       valueABCR4;
+   JsonABCR8       valueABCR8;
+   JsonABCDI8      valueABCDI;
+   JsonABCDN8      valueABCDN;
+   JsonABCDR4      valueABCDR4;
+   JsonABCDR8      valueABCDR8;
+   JsonMatrix2x2R4 valueMatrix2x2R4;
+   JsonMatrix3x3R4 valueMatrix3x3R4;
+   JsonMatrix4x4R4 valueMatrix4x4R4;
+   JsonMatrix2x2R8 valueMatrix2x2R8;
+   JsonMatrix3x3R8 valueMatrix3x3R8;
+   JsonMatrix4x4R8 valueMatrix4x4R8;
+
+   file   = NULL;
+   json   = NULL;
+   result = jsonBoolFALSE;
+
+   for (;;)
+   {
+      if (_wfopen_s(&file, fileName, L"rb") != 0)
+      {
+         break;
+      }
+
+      // Set Json up for reading.
+      json = jsonCreateReader(jsonBoolTRUE, _JsonGetBuffer, (void *) file);
+      if (!json)
+      {
+         break;
+      }
+
+      for (;;)
+      {
+         if (!jsonRead(json, &type))
+         {
+            break;
+         }
+
+         if (type == jsonTypeUSER_TYPE)
+         {
+            wprintf(L"%s\t%s\t%d\t", typeName, key, arrayCount);
+         }
+         else
+         {
+            wprintf(L"%s\t%s\t%d\t", jsonTypeGetC2(type), key, arrayCount);
+         }
+
+         if      (type == jsonTypeKEY_VALUE_BLOCK_STOP ||
+                  type == jsonTypeKEY_VALUE_BLOCK_START)
+         {
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeTYPE)
+         {
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeSTRING)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               // Separate strings.
+               if (arrayIndex)
+               {
+                  wprintf(L"\n---");
+               }
+
+               if (!jsonGetValueStringC2(json, &valueStr))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"\n%s ", valueStr);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeVARIABLE ||
+                  type == jsonTypeUSER_TYPE)
+         {
+            if (jsonGetValueI(json, &valueI) &&
+                valueI == 42)
+            {
+               wprintf(L"P1 ok, ");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
+            if (jsonGetValueStringC2(json, &valueStr) &&
+                memcmp(valueStr, L"Yes, but what is the question?", wcslen(L"Yes, but what is the question?")) == 0)
+            {
+               wprintf(L"P2 ok, ");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
+            if (jsonGetValueR8(json, &valueR8) &&
+                valueR8 == 3.1415926535897932)
+            {
+               wprintf(L"P3 ok");
+            }
+            else
+            {
+               wprintf(L"ERROR\n");
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeBOOLEAN)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueBoolean(json, &valueBool))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%c ", (valueBool == jsonBoolTRUE) ? L'T' : L'F');
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeI1 ||
+                  type == jsonTypeI2 ||
+                  type == jsonTypeI4 ||
+                  type == jsonTypeI8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueI(json, &valueI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d ", valueI);
+            }
+            wprintf(L"\n");
+         }
+         //else if (type == jsonTypeI16 ||
+         //         type == jsonTypeI32 ||
+         //         type == jsonTypeI64 ||
+         //         type == jsonTypeI128 ||
+         //         type == jsonTypeI256)
+         //{
+         //   wprintf(L"\n");
+         //}
+         else if (type == jsonTypeN1 ||
+                  type == jsonTypeN2 ||
+                  type == jsonTypeN4 ||
+                  type == jsonTypeN8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueN(json, &valueN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u ", valueN);
+            }
+            wprintf(L"\n");
+         }
+         //else if (type == jsonTypeN16 ||
+         //         type == jsonTypeN32 ||
+         //         type == jsonTypeN64 ||
+         //         type == jsonTypeN128 ||
+         //         type == jsonTypeN256)
+         //{
+         //   wprintf(L"\n");
+         //}
+         else if (type == jsonTypeR4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueR4(json, &valueR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g ", (double) valueR4);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueR4S(json, &valueR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g ", (double) valueR4);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeR8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueR8(json, &valueR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g ", valueR8);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueR8S(json, &valueR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g ", valueR8);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABI1 ||
+                  type == jsonTypeABI2 ||
+                  type == jsonTypeABI4 ||
+                  type == jsonTypeABI8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABI(json, &valueABI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d ", valueABI.a, valueABI.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABN1 ||
+                  type == jsonTypeABN2 ||
+                  type == jsonTypeABN4 ||
+                  type == jsonTypeABN8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABN(json, &valueABN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u ", valueABN.a, valueABN.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABR4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABR4(json, &valueABR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABR4S(json, &valueABR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABR8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABR8(json, &valueABR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABR8S(json, &valueABR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCI1 ||
+                  type == jsonTypeABCI2 ||
+                  type == jsonTypeABCI4 ||
+                  type == jsonTypeABCI8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCI(json, &valueABCI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d %I64d ", valueABCI.a, valueABCI.b, valueABCI.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCN1 ||
+                  type == jsonTypeABCN2 ||
+                  type == jsonTypeABCN4 ||
+                  type == jsonTypeABCN8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCN(json, &valueABCN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u %I64u ", valueABCN.a, valueABCN.b, valueABCN.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCR4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCR4(json, &valueABCR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCR4S(json, &valueABCR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCR8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCR8(json, &valueABCR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCR8S(json, &valueABCR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDI1 ||
+                  type == jsonTypeABCDI2 ||
+                  type == jsonTypeABCDI4 ||
+                  type == jsonTypeABCDI8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDI(json, &valueABCDI))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64d %I64d %I64d %I64d ", valueABCDI.a, valueABCDI.b, valueABCDI.c, valueABCDI.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDN1 ||
+                  type == jsonTypeABCDN2 ||
+                  type == jsonTypeABCDN4 ||
+                  type == jsonTypeABCDN8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDN(json, &valueABCDN))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%I64u %I64u %I64u %I64u ", valueABCDN.a, valueABCDN.b, valueABCDN.c, valueABCDN.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDR4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDR4(json, &valueABCDR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDR4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDR4S(json, &valueABCDR4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDR8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDR8(json, &valueABCDR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeABCDR8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueABCDR8S(json, &valueABCDR8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX2X2R4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix2x2R4(json, &valueMatrix2x2R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX2X2R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix2x2R4S(json, &valueMatrix2x2R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX2X2R8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix2x2R8(json, &valueMatrix2x2R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX2X2R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix2x2R8S(json, &valueMatrix2x2R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 2; row++)
+               {
+                  for (col = 0; col < 2; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX3X3R4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix3x3R4(json, &valueMatrix3x3R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX3X3R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix3x3R4S(json, &valueMatrix3x3R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX3X3R8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix3x3R8(json, &valueMatrix3x3R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX3X3R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix3x3R8S(json, &valueMatrix3x3R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 3; row++)
+               {
+                  for (col = 0; col < 3; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX4X4R4)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix4x4R4(json, &valueMatrix4x4R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX4X4R4S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix4x4R4S(json, &valueMatrix4x4R4))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX4X4R8)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix4x4R8(json, &valueMatrix4x4R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else if (type == jsonTypeMATRIX4X4R8S)
+         {
+            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
+            {
+               if (!jsonGetValueMatrix4x4R8S(json, &valueMatrix4x4R8))
+               {
+                  wprintf(L"ERROR\n");
+                  break;
+               }
+
+               for (row = 0; row < 4; row++)
+               {
+                  for (col = 0; col < 4; col++)
+                  {
+                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
+                  }
+               }
+            }
+            wprintf(L"\n");
+         }
+         else
+         {
+            wprintf(L"\n");
+         }
+
+         if (!jsonRecordGetEnd(json))
+         {
+            break;
+         }
+      }
+
+      result = jsonBoolTRUE;
+      break;
+   }
+
+   jsonDestroy(json);
+   fclose(file);
+
+   return result;
+}
+
+/******************************************************************************
+func: _JsonTestWrite
 ******************************************************************************/
 static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
 {
@@ -840,44 +1601,38 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
       jsonWriteKey1Matrix4x4R4(  json, L"mat444",   (JsonMatrix4x4R4 *) &_matrix4x4r4);
       jsonWriteKey1Matrix4x4R8(  json, L"mat448",   (JsonMatrix4x4R8 *) &_matrix4x4r8);
 
-      /*
-      jsonRecordSetBegin(    json, jsonTypeVARIABLE, NULL, L"variableIntStrReal", 1);
-      jsonSetValueI(         json, 42);
-      jsonRecordSetSeparator(json);
-      jsonSetValueStringC2(  json, L"Yes, but what is the question?");
-      jsonRecordSetSeparator(json);
-      jsonSetValueR8(        json, 3.1415926535897932);
-      jsonRecordSetEnd(      json);
-      */
+      jsonWriteKey(              json, L"variableIntStrReal");
+      jsonWriteArrayStart(       json);
+      jsonWriteValueI(           json, 42);
+      jsonWriteValueStringC2(    json, L"Yes, but what is the question?");
+      jsonWriteValueR8(          json, 3.1415926535897932);
+      jsonWriteArrayStop(        json);
 
-      jsonWriteKeyNI1(                json, L"I1_Array",     256,     (MiffI1 *) _n1array);
-      jsonWriteKeyNN1(                json, L"N1_Array",     256,     _n1array);
+      jsonWriteKeyNI1(           json, L"I1_Array",     256,     (MiffI1 *) _n1array);
+      jsonWriteKeyNN1(           json, L"N1_Array",     256,     _n1array);
 
-      jsonWriteKeyNI2(                json, L"I2_Array",     256,     (MiffI2 *) _n2array);
-      jsonWriteKeyNN2(                json, L"N2_Array",     256,     _n2array);
+      jsonWriteKeyNI2(           json, L"I2_Array",     256,     (MiffI2 *) _n2array);
+      jsonWriteKeyNN2(           json, L"N2_Array",     256,     _n2array);
 
-      jsonWriteKeyNI4(                json, L"I4_Array",     256,     (MiffI4 *) _n4array);
-      jsonWriteKeyNN4(                json, L"N4_Array",     256,     _n4array);
+      jsonWriteKeyNI4(           json, L"I4_Array",     256,     (MiffI4 *) _n4array);
+      jsonWriteKeyNN4(           json, L"N4_Array",     256,     _n4array);
 
-      jsonWriteKeyNI8(                json, L"I8_Array",     256,     (MiffI8 *) _n8array);
-      jsonWriteKeyNN8(                json, L"N8_Array",     256,     _n8array);
+      jsonWriteKeyNI8(           json, L"I8_Array",     256,     (MiffI8 *) _n8array);
+      jsonWriteKeyNN8(           json, L"N8_Array",     256,     _n8array);
 
-      jsonWriteKeyNR4(                json, L"R4_Array",     300,     _reals4);
-      jsonWriteKeyNR8(                json, L"R8_Array",     300,     _reals8);
+      jsonWriteKeyNR4(           json, L"R4_Array",     300,     _reals4);
+      jsonWriteKeyNR8(           json, L"R8_Array",     300,     _reals8);
 
-      jsonWriteKeyNStringC2(          json, L"String_Array", 10,      (JsonC2 **) _strings);
+      jsonWriteKeyNStringC2(     json, L"String_Array", 10,      (JsonC2 **) _strings);
 
-      jsonWriteKeyNBoolean(           json, L"Bool_Array",   100,     (JsonBool *) _bools);
+      jsonWriteKeyNBoolean(      json, L"Bool_Array",   100,     (JsonBool *) _bools);
 
-      /*
-      jsonRecordSetBegin(        json, jsonTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
-      jsonSetValueI(             json, 42);
-      jsonRecordSetSeparator(    json);
-      jsonSetValueStringC2(      json, L"Yes, but what is the question?");
-      jsonRecordSetSeparator(    json);
-      jsonSetValueR8(            json, 3.1415926535897932);
-      jsonRecordSetEnd(          json);
-      */
+      jsonWriteKey(              json, L"userVarIntStrReal");
+      jsonWriteArrayStart(       json);
+      jsonWriteValueI(           json, 42);
+      jsonWriteValueStringC2(    json, L"Yes, but what is the question?");
+      jsonWriteValueR8(          json, 3.1415926535897932);
+      jsonWriteArrayStop(        json);
 
       jsonWriteKey(        json, L"KeyValueBlock");
       jsonWriteObjectStart(json);

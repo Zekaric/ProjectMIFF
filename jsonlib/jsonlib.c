@@ -84,9 +84,14 @@ JsonBool jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
       !getBufferFunc);
 
    _JsonMemClearType(Json, json);
-   json->method    = jsonMethodREADING;
-   json->dataRepo  = dataRepo;
-   json->getBuffer = getBufferFunc;
+   json->method              = jsonMethodREADING;
+   json->dataRepo            = dataRepo;
+   json->getBuffer           = getBufferFunc;
+   json->readByteCount       = 1024;
+   json->readByteCountActual = 1024;
+   json->readByteData        = _JsonMemCreateTypeArray(json->readByteCount, JsonC1);
+
+   returnFalseIf(!json->readByteData);
 
    returnTrue;
 }
@@ -155,8 +160,260 @@ void jsonDestroyContent(Json * const json)
       !_isStarted ||
       !json);
 
+   _JsonMemDestroy(json->readByteData);
    _JsonMemDestroy(json);
 }
+
+/******************************************************************************
+func: jsonRead
+******************************************************************************/
+JsonBool jsonRead(Json * const json, JsonReadType * const type)
+{
+   JsonN4  index;
+   JsonN1  byte;
+   JsonN1 *bufTemp;
+
+   returnFalseIf(
+      !_isStarted ||
+      !json       ||
+      !type);
+
+   // Start of a Json object.
+   if (json->readState == jsonReadStateEXPECTING_OBJECT_START)
+   {
+      loop
+      {
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+
+         // Skip over white space.
+         continueIf(
+            byte == ' '  ||
+            byte == '\t' ||
+            byte == '\n' ||
+            byte == '\r');
+         
+         // Found the object start.
+         if (byte == jsonOBJECT_START_STR[0])
+         {
+            json->readState                = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
+            json->scopeType[json->scope++] = jsonScopeOBJECT;
+            json->scope++
+
+            *type = jsonReadTypeOBJECT_START;
+            returnTrue;
+         }
+
+         // Anything else is an error.
+         break;
+      }
+
+      *type = jsonReadTypeNONE;
+      returnFalse;
+   }
+
+   // Inside an object scope.  Looking for a key or a close object scope.
+   if (json->readState == jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP)
+   {
+      loop
+      {
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+
+         // Skip over white space.
+         continueIf(
+            byte == ' '  ||
+            byte == '\t' ||
+            byte == '\n' ||
+            byte == '\r');
+
+         // Found the object stop
+         if (byte == jsonOBJECT_STOP_STR[0])
+         {
+            json->scope--;
+            json->scopeType[json->scope] = jsonScopeNONE;
+
+            if (json->scope)
+            {
+               if      (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+               {
+                  json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
+               }
+               else if (json->scopeType[json->scope - 1] == jsonScopeOBJECT)
+               {
+                  json->readState = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
+               }
+               else
+               {
+                  // Should never happening.  Butt flapping.
+                  break;
+               }
+            }
+            else
+            {
+               json->readState = jsonReadStateEXPECTING_OBJECT_START;
+            }
+            
+            *type = jsonReadTypeOBJECT_STOP;
+            returnTrue;
+         }
+
+         // Found a comma so there is another key value.
+         if (byte == jsonSEPARATOR_STR[0])
+         {
+            // Skip to the start of the string.
+            loop
+            {
+               breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+
+               // Skip over white space.
+               continueIf(
+                  byte == ' '  ||
+                  byte == '\t' ||
+                  byte == '\n' ||
+                  byte == '\r');
+            }
+            breakIf(byte != jsonSTRING_QUOTE_STR[0]);
+            
+            // Read in the key value.
+            // TODO
+
+            *type = jsonReadTypeKEY;
+            returnTrue;
+         }
+      }
+
+      *type = jsonReadTypeNONE;
+      returnFalse;
+   }
+
+   // Getting a value inside an array.
+   if (json->readState == jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP)
+   {
+      loop
+      {
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+
+         // Skip over white space.
+         continueIf(
+            byte == ' '  ||
+            byte == '\t' ||
+            byte == '\n' ||
+            byte == '\r');
+
+         // Found the array stop
+         if (byte == jsonARRAY_STOP_STR[0])
+         {
+            json->scope--;
+            json->scopeType[json->scope] = jsonScopeNONE;
+
+            if      (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+            {
+               json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
+            }
+            else if (json->scopeType[sjon->scope - 1] == jsonScopeOBJECT)
+            {
+               json->readState = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
+            }
+            else
+            {
+               // Should never happening.  Butt flapping.
+               break;
+            }
+         }
+      }
+   }
+
+   index = 0;
+   loop
+   {
+      // Resize the internal buffer when we have exhausted it.
+      if (json->readByteCountActual == index)
+      {
+         // Create a new buffer double the size.
+         bufTemp = _JsonMemCreateTypeArray(json->readByteCountActual * 2, JsonN1);
+         returnFalseIf(!bufTemp);
+
+         // Copy over the olde buffer to the new buffer.
+         _JsonMemCopyTypeArray(json->readByteCountActual, JsonN1, bufTemp, json->readByteData);
+         // Destroy the old buffer.
+         _JsonMemDestroy(json->readByteData);
+
+         // Reset the internal buffer to the new larger buffer.
+         json->readByteCountActual = json->readByteCountActual * 2;
+         json->readByteData        = bufTemp;
+      }
+
+      // End of file?
+      breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+      // End of line or part, we done reading.
+      breakIf(byte == '\n' ||
+              byte == '\t');
+
+      // Add the letter to the byte array.
+      json->readByteData[index++] = byte;
+   }
+
+   // Need NULL terminator.
+   json->readByteCount       = index;
+   json->readByteData[index] = 0;
+
+   if (byte == '\n')
+   {
+      json->readRecordIsDone = jsonBoolTRUE;
+   }
+
+   returnTrue;
+}
+
+
+/******************************************************************************
+func: jsonReadKey
+******************************************************************************/
+JsonBool jsonReadKey(Json * const json, JsonC2 ** const key)
+{
+}
+
+/******************************************************************************
+func: jsonReadI
+******************************************************************************/
+JsonBool jsonReadI(Json * const json, JsonI8 *  const value)
+{
+}
+
+/******************************************************************************
+func: jsonReadN
+******************************************************************************/
+JsonBool jsonReadN(Json * const json, JsonN8 *  const value)
+{
+}
+
+/******************************************************************************
+func: jsonReadR4
+******************************************************************************/
+JsonBool jsonReadR4(Json * const json, JsonR4 *  const value)
+{
+}
+
+/******************************************************************************
+func: jsonReadR8
+******************************************************************************/
+JsonBool jsonReadR8(Json * const json, JsonR8 *  const value)
+{
+}
+
+/******************************************************************************
+func: jsonReadStringC2
+******************************************************************************/
+JsonBool jsonReadStringC2(Json * const json, JsonC2 ** const value)
+{
+}
+
+/******************************************************************************
+func: jsonReadStringC2Letter
+******************************************************************************/
+JsonBool jsonReadStringC2Letter(Json * const json, JsonC2 *  const value)
+{
+}
+
 
 /******************************************************************************
 func: jsonStart

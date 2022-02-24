@@ -35,5 +35,8 @@
     <ClCompile Include="write.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

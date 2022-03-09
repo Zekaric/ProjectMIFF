@@ -40,6 +40,11 @@ include:
 
 /******************************************************************************
 local:
+macro:
+******************************************************************************/
+#define IS_SPACE(BYTE) (BYTE == ' ' || BYTE == '\t' || BYTE == '\n' || BYTE == '\r')
+
+/******************************************************************************
 variable:
 ******************************************************************************/
 static JsonBool _isStarted = jsonBoolFALSE;
@@ -186,11 +191,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(
-            byte == ' '  ||
-            byte == '\t' ||
-            byte == '\n' ||
-            byte == '\r');
+         continueIf(IS_SPACE(byte));
          
          // Found the object start.
          if (byte == jsonOBJECT_START_STR[0])
@@ -219,11 +220,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(
-            byte == ' '  ||
-            byte == '\t' ||
-            byte == '\n' ||
-            byte == '\r');
+         continueIf(IS_SPACE(byte));
 
          // Found the object stop
          if (byte == jsonOBJECT_STOP_STR[0])
@@ -265,11 +262,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
                breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
                // Skip over white space.
-               continueIf(
-                  byte == ' '  ||
-                  byte == '\t' ||
-                  byte == '\n' ||
-                  byte == '\r');
+               continueIf(IS_SPACE(byte));
             }
             breakIf(byte != jsonSTRING_QUOTE_STR[0]);
             
@@ -293,11 +286,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(
-            byte == ' '  ||
-            byte == '\t' ||
-            byte == '\n' ||
-            byte == '\r');
+         continueIf(IS_SPACE(byte));
 
          // Found the array stop
          if (byte == jsonARRAY_STOP_STR[0])
@@ -309,7 +298,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
             {
                json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
             }
-            else if (json->scopeType[sjon->scope - 1] == jsonScopeOBJECT)
+            else if (json->scopeType[json->scope - 1] == jsonScopeOBJECT)
             {
                json->readState = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
             }
@@ -318,9 +307,22 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
                // Should never happening.  Butt flapping.
                break;
             }
+
+            *type = jsonReadTypeARRAY_STOP;
+            returnTrue;
+         }
+
+         // Found a comma so there is another value.
+         if (byte == jsonSEPARATOR_STR[0])
+         {
+            *type = jsonReadType
          }
       }
+
+      *type = jsonReadTypeNONE;
+      returnFalse;
    }
+
 
    index = 0;
    loop

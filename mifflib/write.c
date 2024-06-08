@@ -47,7 +47,8 @@ func: _MiffWriteStr
 ******************************************************************************/
 MiffBool _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
 {
-   return miff->setBuffer(miff->dataRepo, strLen, str);
+   assert(strLen < MiffN4_MAX);
+   return miff->setBuffer(miff->dataRepo, (MiffN4) strLen, str);
 }
 
 /******************************************************************************
@@ -60,7 +61,7 @@ MiffBool _MiffWriteI(Miff * const miff, MiffI const value)
    ntemp = 0;
    if (value < 0)
    {
-      miff->setBuffer(miff->dataRepo, 1, (MiffN1 *) "-");
+      miff->setBuffer(miff->dataRepo, 1, "-");
       ntemp = -value;
    }
    else
@@ -96,7 +97,7 @@ MiffBool _MiffWriteN(Miff * const miff, MiffN const value)
    count = index + 1;
    forCountDown (index, count)
    {
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, &string[index]));
+      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, (MiffStr *) &string[index]));
    }
 
    returnTrue;
@@ -107,9 +108,9 @@ func: _MiffWriteR4
 ******************************************************************************/
 MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
 {
-   Miff4      vtemp;
+   Miff4          vtemp;
    MiffBase64Data data;
-   MiffN1     buffer[16];
+   MiffN1         buffer[16];
 
    vtemp.r = value;
    _MiffByteSwap4(miff, &vtemp);
@@ -122,7 +123,7 @@ MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), buffer);
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
 }
 
 /******************************************************************************
@@ -142,9 +143,9 @@ func: _MiffWriteR8
 ******************************************************************************/
 MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
 {
-   Miff8      vtemp;
+   Miff8          vtemp;
    MiffBase64Data data;
-   MiffN1     buffer[16];
+   MiffN1         buffer[16];
 
    vtemp.r = value;
    _MiffByteSwap8(miff, &vtemp);
@@ -161,7 +162,7 @@ MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), buffer);
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
 }
 
 /******************************************************************************

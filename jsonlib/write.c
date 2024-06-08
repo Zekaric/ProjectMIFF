@@ -47,7 +47,7 @@ func: _JsonWriteStr
 ******************************************************************************/
 JsonBool _JsonWriteStr(Json const * const json, JsonStr const * const value)
 {
-   return json->setBuffer(json->dataRepo, _JsonStrGetCount(value), value);
+   return json->setBuffer(json->dataRepo, _JsonStrGetCount(value), (JsonN1 *) value);
 }
 
 /******************************************************************************
@@ -80,7 +80,7 @@ JsonBool _JsonWriteIndent(Json * const json)
 
    forCount (index, json->scope)
    {
-      returnFalseIf(!_JsonWriteStr(json, (JsonStr *) "\t"));
+      returnFalseIf(!_JsonWriteStr(json, "\t"));
    }
    returnTrue;
 }
@@ -150,49 +150,49 @@ JsonBool _JsonWriteString(Json * const json, JsonN const strLen, JsonStr const *
    
    letter[1] = 0;
 
-   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonWriteStr(json, jsonSTRING_QUOTE_STR));
    
    forCount(index, strLen)
    {
       if      (str[index] == '\"')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_QUOTE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_QUOTE_STR));
       }
       else if (str[index] == '\\')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_SLASH_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_SLASH_STR));
       }
       else if (str[index] == '/')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_BACKSLASH_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_BACKSLASH_STR));
       }
       else if (str[index] == '\b')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_BACKSPACE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_BACKSPACE_STR));
       }
       else if (str[index] == '\f')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_FORMFEED_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_FORMFEED_STR));
       }
       else if (str[index] == '\n')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_LINEFEED_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_LINEFEED_STR));
       }
       else if (str[index] == '\r')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
       }
       else if (str[index] == '\t')
       {
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_TAB_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_TAB_STR));
       }
       else
       {
@@ -201,7 +201,7 @@ JsonBool _JsonWriteString(Json * const json, JsonN const strLen, JsonStr const *
       }
    }
 
-   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonWriteStr(json, jsonSTRING_QUOTE_STR));
 
    returnTrue;
 }

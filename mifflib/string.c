@@ -157,31 +157,31 @@ MiffBool _MiffStrToStrEncoded(MiffN const strLen, MiffStr const * const str,
 /******************************************************************************
 func: _MiffStrToI
 ******************************************************************************/
-MiffI8 _MiffStrToI(MiffN const strLen, MiffStr const * const str)
+MiffI _MiffStrToI(MiffN const strLen, MiffStr const * const str)
 {
    MiffBool isNegative;
-   MiffN4   c1Index;
-   MiffN8   value;
+   MiffN    index;
+   MiffN    value;
 
    isNegative = miffBoolFALSE;
    value      = 0;
-   forCount(c1Index, strLen)
+   forCount(index, strLen)
    {
-      if (c1Index == 0)
+      if (index == 0)
       {
-         if (str[c1Index] == '-')
+         if (str[index] == '-')
          {
             isNegative = miffBoolTRUE;
             continue;
          }
       }
 
-      value = value * 10 + str[c1Index] - '0';
+      value = value * 10 + str[index] - '0';
    }
 
    if (isNegative)
    {
-      return -((MiffI8) value);
+      return -((MiffI) value);
    }
 
    return value;
@@ -190,15 +190,15 @@ MiffI8 _MiffStrToI(MiffN const strLen, MiffStr const * const str)
 /******************************************************************************
 func: _MiffStrToN
 ******************************************************************************/
-MiffN8 _MiffStrToN(MiffN const strLen, MiffStr const * const str)
+MiffN _MiffStrToN(MiffN const strLen, MiffStr const * const str)
 {
-   MiffN4   c1Index;
-   MiffN8   value;
+   MiffN index;
+   MiffN value;
 
    value = 0;
-   forCount(c1Index, strLen)
+   forCount(index, strLen)
    {
-      value = value * 10 + str[c1Index] - '0';
+      value = value * 10 + str[index] - '0';
    }
 
    return value;
@@ -256,7 +256,7 @@ MiffBool _MiffStrToKey(MiffN const strLen, MiffStr const * const str, MiffN * co
 {
    MiffN len;
 
-   len = min(256, strlen);
+   len = min(256, strLen);
    _MiffMemCopyTypeArray(len, MiffN1, key, str);
    key[len] = 0;
    *keyLen  = len - 1;

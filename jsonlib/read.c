@@ -188,7 +188,7 @@ JsonBool _JsonReadArrayCount(Json * const json, JsonN4 * const count)
       returnTrue;
    }
 
-   json->currentRecord.arrayCount = (JsonN4) _JsonStrToN(json->readByteCount, (JsonStr *) json->readByteData);
+   json->currentRecord.arrayCount = (JsonN4) _JsonStrToN(json->readByteCount, json->readByteData);
 
    *count = json->currentRecord.arrayCount;
 
@@ -371,7 +371,7 @@ JsonBool _JsonReadC2Key(Json * const json, JsonStr * const key)
    _JsonMemClearTypeArray(jsonKeySIZE, JsonStr, json->currentRecord.name);
    _JsonSTrToKey(
       json->readByteCount,
-      (JsonStr *) json->readByteData,
+      json->readByteData,
       &keySize,
       json->currentRecord.name);
 

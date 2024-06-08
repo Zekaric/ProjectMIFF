@@ -43,53 +43,19 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _MiffWriteC1
+func: _MiffWriteStr
 ******************************************************************************/
-MiffBool _MiffWriteC1(Miff const * const miff, MiffC1 const * const value)
+MiffBool _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
 {
-   return miff->setBuffer(miff->dataRepo, _MiffC1GetCount(value), value);
-}
-
-/******************************************************************************
-func: _MiffWriteC2
-******************************************************************************/
-MiffBool _MiffWriteC2(Miff const * const miff, MiffC2 const * const c2)
-{
-   MiffN4  c1Count;
-   MiffC1 *c1;
-
-   if (!_MiffC2ToC1(_MiffC2GetCount(c2) + 1, c2, &c1Count, &c1))
-   {
-      returnFalse;
-   }
-
-   _MiffWriteC1(miff, c1);
-
-   _MiffMemDestroy(c1);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _MiffWriteC2Key
-******************************************************************************/
-MiffBool _MiffWriteC2Key(Miff const * const miff, MiffC2 const * const key)
-{
-   MiffC1 c1Key[256];
-   MiffN1 c1Count;
-
-   _MiffMemClearTypeArray(256, MiffC1, c1Key);
-
-   returnFalseIf(!_MiffC2ToC1Key(_MiffC2GetCount(key), key, &c1Count, c1Key));
-   return _MiffWriteC1(miff, c1Key);
+   return miff->setBuffer(miff->dataRepo, strLen, str);
 }
 
 /******************************************************************************
 func: _MiffWriteI
 ******************************************************************************/
-MiffBool _MiffWriteI(Miff * const miff, MiffI8 const value)
+MiffBool _MiffWriteI(Miff * const miff, MiffI const value)
 {
-   MiffN8 ntemp;
+   MiffN ntemp;
 
    ntemp = 0;
    if (value < 0)
@@ -108,12 +74,12 @@ MiffBool _MiffWriteI(Miff * const miff, MiffI8 const value)
 /******************************************************************************
 func: _MiffWriteN
 ******************************************************************************/
-MiffBool _MiffWriteN(Miff * const miff, MiffN8 const value)
+MiffBool _MiffWriteN(Miff * const miff, MiffN const value)
 {
    int    index,
           count,
           digit;
-   MiffN8 temp;
+   MiffN  temp;
    MiffN1 string[32];
 
    temp = value;
@@ -156,7 +122,7 @@ MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteC1(miff, buffer);
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), buffer);
 }
 
 /******************************************************************************
@@ -164,11 +130,11 @@ func: _MiffWriteR4S
 ******************************************************************************/
 MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
 {
-   MiffC1 ctemp[80];
+   MiffStr ctemp[80];
 
-   sprintf_s((char *) ctemp, 80, "%.6g", value);
+   _sprintf_s_l((char *) ctemp, 80, "%.6g", _MiffLocaleGet(), value);
    
-   return _MiffWriteC1(miff, ctemp);
+   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
 }
 
 /******************************************************************************
@@ -195,7 +161,7 @@ MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteC1(miff, buffer);
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), buffer);
 }
 
 /******************************************************************************
@@ -203,9 +169,9 @@ func: _MiffWriteR8S
 ******************************************************************************/
 MiffBool _MiffWriteR8S(Miff * const miff, MiffR8 const value)
 {
-   MiffC1 ctemp[80];
+   MiffStr ctemp[80];
 
-   sprintf_s((char *) ctemp, 80, "%.15g", value);
+   _sprintf_s_l((char *) ctemp, 80, "%.15g", _MiffLocaleGet(), value);
 
-   return _MiffWriteC1(miff, ctemp);
+   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
 }

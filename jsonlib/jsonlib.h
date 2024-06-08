@@ -45,6 +45,8 @@ include:
 local:
 constant:
 ******************************************************************************/
+#define jsonKeySIZE                       257
+
 typedef enum
 {
    jsonBoolFALSE,
@@ -96,22 +98,21 @@ typedef char                             JsonI1;
 typedef short                            JsonI2;
 typedef int                              JsonI4;
 typedef int64_t                          JsonI8;
+typedef JsonI8                           JsonI;
 // Natural types
 typedef unsigned char                    JsonN1;
 typedef unsigned short                   JsonN2;
 typedef int                              JsonN4;
 typedef uint64_t                         JsonN8;
+typedef JsonN8                           JsonN;
 // Real types
 typedef float                            JsonR4;
 typedef double                           JsonR8;
 // String char types
 // C1 = UTF8
-typedef JsonN1                           JsonC1;
-// C2 = UTF16
-typedef wchar_t                          JsonC2;
-// C4 = UTF32
-typedef JsonN4                           JsonC4;
+typedef JsonN1                           JsonStr;
 
+#if 0
 #pragma pack(1)
 typedef struct { JsonI1   a, b;        } JsonABI1;
 typedef struct { JsonN1   a, b;        } JsonABN1;
@@ -270,6 +271,7 @@ typedef struct
    JsonN1             byte[256];
 } Json256;
 #pragma pack()
+#endif
 
 typedef void    *(*JsonMemCreate)(        JsonN4 const memByteCount);
 typedef void     (*JsonMemDestroy)(       void * const mem);
@@ -286,6 +288,7 @@ typedef struct
    JsonI4                      scope;
    JsonScope                   scopeType[256];
    JsonBool                    isFirstItem;
+   JsonStr                    *key;
 
    // Data repo getters and setters.
    void                       *dataRepo;
@@ -296,7 +299,7 @@ typedef struct
    JsonReadState               readState;
    JsonN4                      readByteCountActual;
    JsonN4                      readByteCount;
-   JsonC1                     *readByteData;
+   JsonStr                     *readByteData;
 } Json;
 
 /******************************************************************************
@@ -315,23 +318,30 @@ void            jsonDestroy(              Json       * const json);
 void            jsonDestroyContent(       Json       * const json);
 
 JsonBool        jsonRead(                 Json       * const json, JsonReadType * const type);
-JsonBool        jsonReadKey(              Json       * const json, JsonC2 ** const key);
+JsonBool        jsonReadKey(              Json       * const json, JsonStr ** const key);
 JsonBool        jsonReadI(                Json       * const json, JsonI8 *  const value);
 JsonBool        jsonReadN(                Json       * const json, JsonN8 *  const value);
 JsonBool        jsonReadR4(               Json       * const json, JsonR4 *  const value);
 JsonBool        jsonReadR8(               Json       * const json, JsonR8 *  const value);
-JsonBool        jsonReadStringC2(         Json       * const json, JsonC2 ** const value);
-JsonBool        jsonReadStringC2Letter(   Json       * const json, JsonC2 *  const value);
+JsonBool        jsonReadStr(         Json       * const json, JsonStr ** const value);
+JsonBool        jsonReadStringC2Letter(   Json       * const json, JsonStr *  const value);
 
 JsonBool        jsonStart(                JsonMemCreate const memCreate, JsonMemDestroy const memDestroy);
 void            jsonStop(                 void);
 
 JsonBool        jsonWriteArrayStart(      Json       * const json);
 JsonBool        jsonWriteArrayStop(       Json       * const json);
-JsonBool        jsonWriteKey(             Json       * const json, JsonC2 const * const key);
+JsonBool        jsonWriteKey(             Json       * const json, JsonStr const * const key);
 JsonBool        jsonWriteObjectStart(     Json       * const json);
 JsonBool        jsonWriteObjectStop(      Json       * const json);
 JsonBool        jsonWriteSeparator(       Json       * const json);
+JsonBool        jsonWriteValueBoolean(    Json       * const json, JsonBool                const value);
+JsonBool        jsonWriteValueI(          Json       * const json, JsonI8                  const value);
+JsonBool        jsonWriteValueN(          Json       * const json, JsonN8                  const value);
+JsonBool        jsonWriteValueR4(         Json       * const json, JsonR4                  const value);
+JsonBool        jsonWriteValueR8(         Json       * const json, JsonR8                  const value);
+JsonBool        jsonWriteValueStr(        Json       * const json, JsonStr         const * const value);
+#if 0
 JsonBool        jsonWriteValueABI(        Json       * const json, JsonI8                  const va, JsonI8 const vb);
 JsonBool        jsonWriteValueABN(        Json       * const json, JsonN8                  const va, JsonN8 const vb);
 JsonBool        jsonWriteValueABR4(       Json       * const json, JsonABR4        const * const value);
@@ -344,104 +354,99 @@ JsonBool        jsonWriteValueABCDI(      Json       * const json, JsonI8       
 JsonBool        jsonWriteValueABCDN(      Json       * const json, JsonN8                  const va, JsonN8 const vb, JsonN8 const vc, JsonN8 const vd);
 JsonBool        jsonWriteValueABCDR4(     Json       * const json, JsonABCDR4      const * const value);
 JsonBool        jsonWriteValueABCDR8(     Json       * const json, JsonABCDR8      const * const value);
-JsonBool        jsonWriteValueBoolean(    Json       * const json, JsonBool                const value);
-JsonBool        jsonWriteValueI(          Json       * const json, JsonI8                  const value);
-JsonBool        jsonWriteValueN(          Json       * const json, JsonN8                  const value);
 JsonBool        jsonWriteMatrix2x2R4(     Json       * const json, JsonMatrix2x2R4 const * const value);
 JsonBool        jsonWriteMatrix2x2R8(     Json       * const json, JsonMatrix2x2R8 const * const value);
 JsonBool        jsonWriteMatrix3x3R4(     Json       * const json, JsonMatrix3x3R4 const * const value);
 JsonBool        jsonWriteMatrix3x3R8(     Json       * const json, JsonMatrix3x3R8 const * const value);
 JsonBool        jsonWriteMatrix4x4R4(     Json       * const json, JsonMatrix4x4R4 const * const value);
 JsonBool        jsonWriteMatrix4x4R8(     Json       * const json, JsonMatrix4x4R8 const * const value);
-JsonBool        jsonWriteValueR4(         Json       * const json, JsonR4                  const value);
-JsonBool        jsonWriteValueR8(         Json       * const json, JsonR8                  const value);
-JsonBool        jsonWriteValueStringC2(   Json       * const json, JsonC2          const * const value);
 
 // Helper functions
-JsonBool        jsonWriteKey1ABI1(        Json       * const json, JsonC2 const * const key,                     JsonABI1        const * const value);
-JsonBool        jsonWriteKey1ABI2(        Json       * const json, JsonC2 const * const key,                     JsonABI2        const * const value);
-JsonBool        jsonWriteKey1ABI4(        Json       * const json, JsonC2 const * const key,                     JsonABI4        const * const value);
-JsonBool        jsonWriteKey1ABN1(        Json       * const json, JsonC2 const * const key,                     JsonABN1        const * const value);
-JsonBool        jsonWriteKey1ABN2(        Json       * const json, JsonC2 const * const key,                     JsonABN2        const * const value);
-JsonBool        jsonWriteKey1ABN4(        Json       * const json, JsonC2 const * const key,                     JsonABN4        const * const value);
-JsonBool        jsonWriteKey1ABR4(        Json       * const json, JsonC2 const * const key,                     JsonABR4        const * const value);
-JsonBool        jsonWriteKey1ABR8(        Json       * const json, JsonC2 const * const key,                     JsonABR8        const * const value);
-JsonBool        jsonWriteKey1ABCI1(       Json       * const json, JsonC2 const * const key,                     JsonABCI1       const * const value);
-JsonBool        jsonWriteKey1ABCI2(       Json       * const json, JsonC2 const * const key,                     JsonABCI2       const * const value);
-JsonBool        jsonWriteKey1ABCI4(       Json       * const json, JsonC2 const * const key,                     JsonABCI4       const * const value);
-JsonBool        jsonWriteKey1ABCN1(       Json       * const json, JsonC2 const * const key,                     JsonABCN1       const * const value);
-JsonBool        jsonWriteKey1ABCN2(       Json       * const json, JsonC2 const * const key,                     JsonABCN2       const * const value);
-JsonBool        jsonWriteKey1ABCN4(       Json       * const json, JsonC2 const * const key,                     JsonABCN4       const * const value);
-JsonBool        jsonWriteKey1ABCR4(       Json       * const json, JsonC2 const * const key,                     JsonABCR4       const * const value);
-JsonBool        jsonWriteKey1ABCR8(       Json       * const json, JsonC2 const * const key,                     JsonABCR8       const * const value);
-JsonBool        jsonWriteKey1ABCDI1(      Json       * const json, JsonC2 const * const key,                     JsonABCDI1      const * const value);
-JsonBool        jsonWriteKey1ABCDI2(      Json       * const json, JsonC2 const * const key,                     JsonABCDI2      const * const value);
-JsonBool        jsonWriteKey1ABCDI4(      Json       * const json, JsonC2 const * const key,                     JsonABCDI4      const * const value);
-JsonBool        jsonWriteKey1ABCDN1(      Json       * const json, JsonC2 const * const key,                     JsonABCDN1      const * const value);
-JsonBool        jsonWriteKey1ABCDN2(      Json       * const json, JsonC2 const * const key,                     JsonABCDN2      const * const value);
-JsonBool        jsonWriteKey1ABCDN4(      Json       * const json, JsonC2 const * const key,                     JsonABCDN4      const * const value);
-JsonBool        jsonWriteKey1ABCDR4(      Json       * const json, JsonC2 const * const key,                     JsonABCDR4      const * const value);
-JsonBool        jsonWriteKey1ABCDR8(      Json       * const json, JsonC2 const * const key,                     JsonABCDR8      const * const value);
-JsonBool        jsonWriteKey1Boolean(     Json       * const json, JsonC2 const * const key,                     JsonBool                const value);
-JsonBool        jsonWriteKey1I1(          Json       * const json, JsonC2 const * const key,                     JsonI1                  const value);
-JsonBool        jsonWriteKey1I2(          Json       * const json, JsonC2 const * const key,                     JsonI2                  const value);
-JsonBool        jsonWriteKey1I4(          Json       * const json, JsonC2 const * const key,                     JsonI4                  const value);
-JsonBool        jsonWriteKey1I8(          Json       * const json, JsonC2 const * const key,                     JsonI8                  const value);
-JsonBool        jsonWriteKey1Matrix2x2R4( Json       * const json, JsonC2 const * const key,                     JsonMatrix2x2R4 const * const value);
-JsonBool        jsonWriteKey1Matrix2x2R8( Json       * const json, JsonC2 const * const key,                     JsonMatrix2x2R8 const * const value);
-JsonBool        jsonWriteKey1Matrix3x3R4( Json       * const json, JsonC2 const * const key,                     JsonMatrix3x3R4 const * const value);
-JsonBool        jsonWriteKey1Matrix3x3R8( Json       * const json, JsonC2 const * const key,                     JsonMatrix3x3R8 const * const value);
-JsonBool        jsonWriteKey1Matrix4x4R4( Json       * const json, JsonC2 const * const key,                     JsonMatrix4x4R4 const * const value);
-JsonBool        jsonWriteKey1Matrix4x4R8( Json       * const json, JsonC2 const * const key,                     JsonMatrix4x4R8 const * const value);
-JsonBool        jsonWriteKey1N1(          Json       * const json, JsonC2 const * const key,                     JsonN1                  const value);
-JsonBool        jsonWriteKey1N2(          Json       * const json, JsonC2 const * const key,                     JsonN2                  const value);
-JsonBool        jsonWriteKey1N4(          Json       * const json, JsonC2 const * const key,                     JsonN4                  const value);
-JsonBool        jsonWriteKey1N8(          Json       * const json, JsonC2 const * const key,                     JsonN8                  const value);
-JsonBool        jsonWriteKey1R4(          Json       * const json, JsonC2 const * const key,                     JsonR4                  const value);
-JsonBool        jsonWriteKey1R8(          Json       * const json, JsonC2 const * const key,                     JsonR8                  const value);
-JsonBool        jsonWriteKey1StringC2(    Json       * const json, JsonC2 const * const key,                     JsonC2          const * const value);
+JsonBool        jsonWriteKey1ABI1(        Json       * const json, JsonStr const * const key,                     JsonABI1        const * const value);
+JsonBool        jsonWriteKey1ABI2(        Json       * const json, JsonStr const * const key,                     JsonABI2        const * const value);
+JsonBool        jsonWriteKey1ABI4(        Json       * const json, JsonStr const * const key,                     JsonABI4        const * const value);
+JsonBool        jsonWriteKey1ABN1(        Json       * const json, JsonStr const * const key,                     JsonABN1        const * const value);
+JsonBool        jsonWriteKey1ABN2(        Json       * const json, JsonStr const * const key,                     JsonABN2        const * const value);
+JsonBool        jsonWriteKey1ABN4(        Json       * const json, JsonStr const * const key,                     JsonABN4        const * const value);
+JsonBool        jsonWriteKey1ABR4(        Json       * const json, JsonStr const * const key,                     JsonABR4        const * const value);
+JsonBool        jsonWriteKey1ABR8(        Json       * const json, JsonStr const * const key,                     JsonABR8        const * const value);
+JsonBool        jsonWriteKey1ABCI1(       Json       * const json, JsonStr const * const key,                     JsonABCI1       const * const value);
+JsonBool        jsonWriteKey1ABCI2(       Json       * const json, JsonStr const * const key,                     JsonABCI2       const * const value);
+JsonBool        jsonWriteKey1ABCI4(       Json       * const json, JsonStr const * const key,                     JsonABCI4       const * const value);
+JsonBool        jsonWriteKey1ABCN1(       Json       * const json, JsonStr const * const key,                     JsonABCN1       const * const value);
+JsonBool        jsonWriteKey1ABCN2(       Json       * const json, JsonStr const * const key,                     JsonABCN2       const * const value);
+JsonBool        jsonWriteKey1ABCN4(       Json       * const json, JsonStr const * const key,                     JsonABCN4       const * const value);
+JsonBool        jsonWriteKey1ABCR4(       Json       * const json, JsonStr const * const key,                     JsonABCR4       const * const value);
+JsonBool        jsonWriteKey1ABCR8(       Json       * const json, JsonStr const * const key,                     JsonABCR8       const * const value);
+JsonBool        jsonWriteKey1ABCDI1(      Json       * const json, JsonStr const * const key,                     JsonABCDI1      const * const value);
+JsonBool        jsonWriteKey1ABCDI2(      Json       * const json, JsonStr const * const key,                     JsonABCDI2      const * const value);
+JsonBool        jsonWriteKey1ABCDI4(      Json       * const json, JsonStr const * const key,                     JsonABCDI4      const * const value);
+JsonBool        jsonWriteKey1ABCDN1(      Json       * const json, JsonStr const * const key,                     JsonABCDN1      const * const value);
+JsonBool        jsonWriteKey1ABCDN2(      Json       * const json, JsonStr const * const key,                     JsonABCDN2      const * const value);
+JsonBool        jsonWriteKey1ABCDN4(      Json       * const json, JsonStr const * const key,                     JsonABCDN4      const * const value);
+JsonBool        jsonWriteKey1ABCDR4(      Json       * const json, JsonStr const * const key,                     JsonABCDR4      const * const value);
+JsonBool        jsonWriteKey1ABCDR8(      Json       * const json, JsonStr const * const key,                     JsonABCDR8      const * const value);
+JsonBool        jsonWriteKey1Boolean(     Json       * const json, JsonStr const * const key,                     JsonBool                const value);
+JsonBool        jsonWriteKey1I1(          Json       * const json, JsonStr const * const key,                     JsonI1                  const value);
+JsonBool        jsonWriteKey1I2(          Json       * const json, JsonStr const * const key,                     JsonI2                  const value);
+JsonBool        jsonWriteKey1I4(          Json       * const json, JsonStr const * const key,                     JsonI4                  const value);
+JsonBool        jsonWriteKey1I8(          Json       * const json, JsonStr const * const key,                     JsonI8                  const value);
+JsonBool        jsonWriteKey1Matrix2x2R4( Json       * const json, JsonStr const * const key,                     JsonMatrix2x2R4 const * const value);
+JsonBool        jsonWriteKey1Matrix2x2R8( Json       * const json, JsonStr const * const key,                     JsonMatrix2x2R8 const * const value);
+JsonBool        jsonWriteKey1Matrix3x3R4( Json       * const json, JsonStr const * const key,                     JsonMatrix3x3R4 const * const value);
+JsonBool        jsonWriteKey1Matrix3x3R8( Json       * const json, JsonStr const * const key,                     JsonMatrix3x3R8 const * const value);
+JsonBool        jsonWriteKey1Matrix4x4R4( Json       * const json, JsonStr const * const key,                     JsonMatrix4x4R4 const * const value);
+JsonBool        jsonWriteKey1Matrix4x4R8( Json       * const json, JsonStr const * const key,                     JsonMatrix4x4R8 const * const value);
+JsonBool        jsonWriteKey1N1(          Json       * const json, JsonStr const * const key,                     JsonN1                  const value);
+JsonBool        jsonWriteKey1N2(          Json       * const json, JsonStr const * const key,                     JsonN2                  const value);
+JsonBool        jsonWriteKey1N4(          Json       * const json, JsonStr const * const key,                     JsonN4                  const value);
+JsonBool        jsonWriteKey1N8(          Json       * const json, JsonStr const * const key,                     JsonN8                  const value);
+JsonBool        jsonWriteKey1R4(          Json       * const json, JsonStr const * const key,                     JsonR4                  const value);
+JsonBool        jsonWriteKey1R8(          Json       * const json, JsonStr const * const key,                     JsonR8                  const value);
+JsonBool        jsonWriteKey1StringC2(    Json       * const json, JsonStr const * const key,                     JsonStr          const * const value);
 
-JsonBool        jsonWriteKeyNABI1(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABI1        const * const value);
-JsonBool        jsonWriteKeyNABI2(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABI2        const * const value);
-JsonBool        jsonWriteKeyNABI4(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABI4        const * const value);
-JsonBool        jsonWriteKeyNABN1(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABN1        const * const value);
-JsonBool        jsonWriteKeyNABN2(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABN2        const * const value);
-JsonBool        jsonWriteKeyNABN4(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABN4        const * const value);
-JsonBool        jsonWriteKeyNABR4(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABR4        const * const value);
-JsonBool        jsonWriteKeyNABR8(        Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABR8        const * const value);
-JsonBool        jsonWriteKeyNABCI1(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI1       const * const value);
-JsonBool        jsonWriteKeyNABCI2(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI2       const * const value);
-JsonBool        jsonWriteKeyNABCI4(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI4       const * const value);
-JsonBool        jsonWriteKeyNABCN1(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN1       const * const value);
-JsonBool        jsonWriteKeyNABCN2(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN2       const * const value);
-JsonBool        jsonWriteKeyNABCN4(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN4       const * const value);
-JsonBool        jsonWriteKeyNABCR4(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCR4       const * const value);
-JsonBool        jsonWriteKeyNABCR8(       Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCR8       const * const value);
-JsonBool        jsonWriteKeyNABCDI1(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI1      const * const value);
-JsonBool        jsonWriteKeyNABCDI2(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI2      const * const value);
-JsonBool        jsonWriteKeyNABCDI4(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI4      const * const value);
-JsonBool        jsonWriteKeyNABCDN1(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN1      const * const value);
-JsonBool        jsonWriteKeyNABCDN2(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN2      const * const value);
-JsonBool        jsonWriteKeyNABCDN4(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN4      const * const value);
-JsonBool        jsonWriteKeyNABCDR4(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDR4      const * const value);
-JsonBool        jsonWriteKeyNABCDR8(      Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDR8      const * const value);
-JsonBool        jsonWriteKeyNBoolean(     Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonBool        const * const value);
-JsonBool        jsonWriteKeyNI1(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonI1          const * const value);
-JsonBool        jsonWriteKeyNI2(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonI2          const * const value);
-JsonBool        jsonWriteKeyNI4(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonI4          const * const value);
-JsonBool        jsonWriteKeyNI8(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonI8          const * const value);
-JsonBool        jsonWriteKeyNMatrix2x2R4( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix2x2R4 const * const value);
-JsonBool        jsonWriteKeyNMatrix2x2R8( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix2x2R8 const * const value);
-JsonBool        jsonWriteKeyNMatrix3x3R4( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix3x3R4 const * const value);
-JsonBool        jsonWriteKeyNMatrix3x3R8( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix3x3R8 const * const value);
-JsonBool        jsonWriteKeyNMatrix4x4R4( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix4x4R4 const * const value);
-JsonBool        jsonWriteKeyNMatrix4x4R8( Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix4x4R8 const * const value);
-JsonBool        jsonWriteKeyNN1(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonN1          const * const value);
-JsonBool        jsonWriteKeyNN2(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonN2          const * const value);
-JsonBool        jsonWriteKeyNN4(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonN4          const * const value);
-JsonBool        jsonWriteKeyNN8(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonN8          const * const value);
-JsonBool        jsonWriteKeyNR4(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonR4          const * const value);
-JsonBool        jsonWriteKeyNR8(          Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonR8          const * const value);
-JsonBool        jsonWriteKeyNStringC2(    Json       * const json, JsonC2 const * const key, JsonN4 const count, JsonC2  const * const * const value);
+JsonBool        jsonWriteKeyNABI1(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABI1        const * const value);
+JsonBool        jsonWriteKeyNABI2(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABI2        const * const value);
+JsonBool        jsonWriteKeyNABI4(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABI4        const * const value);
+JsonBool        jsonWriteKeyNABN1(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABN1        const * const value);
+JsonBool        jsonWriteKeyNABN2(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABN2        const * const value);
+JsonBool        jsonWriteKeyNABN4(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABN4        const * const value);
+JsonBool        jsonWriteKeyNABR4(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABR4        const * const value);
+JsonBool        jsonWriteKeyNABR8(        Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABR8        const * const value);
+JsonBool        jsonWriteKeyNABCI1(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCI1       const * const value);
+JsonBool        jsonWriteKeyNABCI2(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCI2       const * const value);
+JsonBool        jsonWriteKeyNABCI4(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCI4       const * const value);
+JsonBool        jsonWriteKeyNABCN1(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCN1       const * const value);
+JsonBool        jsonWriteKeyNABCN2(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCN2       const * const value);
+JsonBool        jsonWriteKeyNABCN4(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCN4       const * const value);
+JsonBool        jsonWriteKeyNABCR4(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCR4       const * const value);
+JsonBool        jsonWriteKeyNABCR8(       Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCR8       const * const value);
+JsonBool        jsonWriteKeyNABCDI1(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI1      const * const value);
+JsonBool        jsonWriteKeyNABCDI2(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI2      const * const value);
+JsonBool        jsonWriteKeyNABCDI4(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI4      const * const value);
+JsonBool        jsonWriteKeyNABCDN1(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN1      const * const value);
+JsonBool        jsonWriteKeyNABCDN2(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN2      const * const value);
+JsonBool        jsonWriteKeyNABCDN4(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN4      const * const value);
+JsonBool        jsonWriteKeyNABCDR4(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDR4      const * const value);
+JsonBool        jsonWriteKeyNABCDR8(      Json       * const json, JsonStr const * const key, JsonN4 const count, JsonABCDR8      const * const value);
+JsonBool        jsonWriteKeyNBoolean(     Json       * const json, JsonStr const * const key, JsonN4 const count, JsonBool        const * const value);
+JsonBool        jsonWriteKeyNI1(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonI1          const * const value);
+JsonBool        jsonWriteKeyNI2(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonI2          const * const value);
+JsonBool        jsonWriteKeyNI4(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonI4          const * const value);
+JsonBool        jsonWriteKeyNI8(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonI8          const * const value);
+JsonBool        jsonWriteKeyNMatrix2x2R4( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix2x2R4 const * const value);
+JsonBool        jsonWriteKeyNMatrix2x2R8( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix2x2R8 const * const value);
+JsonBool        jsonWriteKeyNMatrix3x3R4( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix3x3R4 const * const value);
+JsonBool        jsonWriteKeyNMatrix3x3R8( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix3x3R8 const * const value);
+JsonBool        jsonWriteKeyNMatrix4x4R4( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix4x4R4 const * const value);
+JsonBool        jsonWriteKeyNMatrix4x4R8( Json       * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix4x4R8 const * const value);
+JsonBool        jsonWriteKeyNN1(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonN1          const * const value);
+JsonBool        jsonWriteKeyNN2(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonN2          const * const value);
+JsonBool        jsonWriteKeyNN4(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonN4          const * const value);
+JsonBool        jsonWriteKeyNN8(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonN8          const * const value);
+JsonBool        jsonWriteKeyNR4(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonR4          const * const value);
+JsonBool        jsonWriteKeyNR8(          Json       * const json, JsonStr const * const key, JsonN4 const count, JsonR8          const * const value);
+JsonBool        jsonWriteKeyNStringC2(    Json       * const json, JsonStr const * const key, JsonN4 const count, JsonStr  const * const * const value);
+#endif
 
 #endif

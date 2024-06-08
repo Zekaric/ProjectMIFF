@@ -41,6 +41,7 @@ include:
 #include <memory.h>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #include "mifflib.h"
 
@@ -57,10 +58,12 @@ constant:
 #define continueIf(EXP)                            if (EXP) { continue; }
 #define gotoIf(    EXP, LABEL)                     if (EXP) { goto LABEL; }
 
-#if !defined(min)
+#if defined(min)
+#undef min
+#undef max
+#endif
 #define min(A, B)                                  (((A) < (B)) ? (A) : (B))
 #define max(A, B)                                  (((A) < (B)) ? (B) : (A))
-#endif
 
 #define returnFalse                                return miffBoolFALSE
 #define returnNull                                 return NULL
@@ -72,43 +75,96 @@ constant:
 #define returnTrueIf( EXP)                         if (EXP) { returnTrue;     }
 #define returnVoidIf( EXP)                         if (EXP) { return;         }
 
-#define U_LITERAL_HELP(STR)                        L ## STR
-#define U_LITERAL(     STR)                        U_LITERAL_HELP(STR)
-
 #define MIFF_HEADER_FILETYPE_STR                   "MIFF"
+#define MIFF_HEADER_FILETYPE_SIZE                  4
+
 #define MIFF_HEADER_VERSION_STR                    "1"
-#define MIFF_HEADER_BIN_STR                        "BIN"
-#define MIFF_HEADER_TXT_STR                        "TXT"
+#define MIFF_HEADER_VERSION_SIZE                   1
 
 #define miffTypeKEY_VALUE_BLOCK_START_STR          "{"
+#define miffTypeKEY_VALUE_BLOCK_START_STR_SIZE     1
+
 #define miffTypeKEY_VALUE_BLOCK_STOP_STR           "}"
+#define miffTypeKEY_VALUE_BLOCK_STOP_STR_SIZE      1
+
 #define miffTypeTYPE_STR                           "type"
-#define miffTypeSTRING_STR                         "\""
+#define miffTypeTYPE_STR_SIZE                      4
+
+#define miffTypeSTR_STR                            "\""
+#define miffTypeSTR_STR_SIZE                       1
+
 #define miffTypeVARIABLE_STR                       "v"
+#define miffTypeVARIABLE_STR_SIZE                  1
+
 #define miffTypeUSER_TYPE_STR                      "u"
+#define miffTypeUSER_TYPE_STR_SIZE                 1
+
 #define miffTypeBOOLEAN_STR                        "b"
+#define miffTypeBOOLEAN_STR_SIZE                   1
+
+#define miffTypeI_STR                              "i"
+#define miffTypeI_STR_SIZE                         1
+
 #define miffTypeI1_STR                             "i1"
+#define miffTypeI1_STR_SIZE                        2
+
 #define miffTypeI2_STR                             "i2"
+#define miffTypeI2_STR_SIZE                        2
+
 #define miffTypeI4_STR                             "i4"
+#define miffTypeI4_STR_SIZE                        2
+
 #define miffTypeI8_STR                             "i8"
-#define miffTypeI16_STR                            "i16"
-#define miffTypeI32_STR                            "i32"
-#define miffTypeI64_STR                            "i64"
-#define miffTypeI128_STR                           "i128"
-#define miffTypeI256_STR                           "i256"
+#define miffTypeI8_STR_SIZE                        2
+
+#define miffTypeN_STR                              "n"
+#define miffTypeN_STR_SIZE                         1
+
 #define miffTypeN1_STR                             "n1"
+#define miffTypeN1_STR_SIZE                        2
+
 #define miffTypeN2_STR                             "n2"
+#define miffTypeN2_STR_SIZE                        2
+
 #define miffTypeN4_STR                             "n4"
+#define miffTypeN4_STR_SIZE                        2
+
 #define miffTypeN8_STR                             "n8"
-#define miffTypeN16_STR                            "n16"
-#define miffTypeN32_STR                            "n32"
-#define miffTypeN64_STR                            "n64"
-#define miffTypeN128_STR                           "n128"
-#define miffTypeN256_STR                           "n256"
+#define miffTypeN8_STR_SIZE                        2
+
 #define miffTypeR4_STR                             "r4"
+#define miffTypeR4_STR_SIZE                        2
+
 #define miffTypeR4S_STR                            "r4s"
+#define miffTypeR4S_STR_SIZE                       3
+
 #define miffTypeR8_STR                             "r8"
+#define miffTypeR8_STR_SIZE                        2
+
 #define miffTypeR8S_STR                            "r8s"
+#define miffTypeR8S_STR_SIZE                       3
+
+#if 0
+#define miffTypeI16_STR                            "i16"
+#define miffTypeI16_STR_SIZE                       3
+#define miffTypeI32_STR                            "i32"
+#define miffTypeI32_STR_SIZE                       3
+#define miffTypeI64_STR                            "i64"
+#define miffTypeI64_STR_SIZE                       3
+#define miffTypeI128_STR                           "i128"
+#define miffTypeI128_STR_SIZE                      4
+#define miffTypeI256_STR                           "i256"
+#define miffTypeI256_STR_SIZE                      4
+#define miffTypeN16_STR                            "n16"
+#define miffTypeN16_STR_SIZE                       3
+#define miffTypeN32_STR                            "n32"
+#define miffTypeN32_STR_SIZE                       3
+#define miffTypeN64_STR                            "n64"
+#define miffTypeN64_STR_SIZE                       3
+#define miffTypeN128_STR                           "n128"
+#define miffTypeN128_STR_SIZE                      4
+#define miffTypeN256_STR                           "n256"
+#define miffTypeN256_STR_SIZE                      4
 #define miffTypeABI1_STR                           "abi1"
 #define miffTypeABI2_STR                           "abi2"
 #define miffTypeABI4_STR                           "abi4"
@@ -158,35 +214,6 @@ constant:
 #define miffTypeMATRIX4X4R8_STR                    "mat4x4r8"
 #define miffTypeMATRIX4X4R8S_STR                   "mat4x4r8s"
 
-#define miffTypeKEY_VALUE_BLOCK_START_STR_SIZE     1
-#define miffTypeKEY_VALUE_BLOCK_STOP_STR_SIZE      1
-#define miffTypeTYPE_STR_SIZE                      4
-#define miffTypeSTRING_STR_SIZE                    1
-#define miffTypeVARIABLE_STR_SIZE                  1
-#define miffTypeUSER_TYPE_STR_SIZE                 1
-#define miffTypeBOOLEAN_STR_SIZE                   1
-#define miffTypeI1_STR_SIZE                        2
-#define miffTypeI2_STR_SIZE                        2
-#define miffTypeI4_STR_SIZE                        2
-#define miffTypeI8_STR_SIZE                        2
-#define miffTypeI16_STR_SIZE                       3
-#define miffTypeI32_STR_SIZE                       3
-#define miffTypeI64_STR_SIZE                       3
-#define miffTypeI128_STR_SIZE                      4
-#define miffTypeI256_STR_SIZE                      4
-#define miffTypeN1_STR_SIZE                        2
-#define miffTypeN2_STR_SIZE                        2
-#define miffTypeN4_STR_SIZE                        2
-#define miffTypeN8_STR_SIZE                        2
-#define miffTypeN16_STR_SIZE                       3
-#define miffTypeN32_STR_SIZE                       3
-#define miffTypeN64_STR_SIZE                       3
-#define miffTypeN128_STR_SIZE                      4
-#define miffTypeN256_STR_SIZE                      4
-#define miffTypeR4_STR_SIZE                        2
-#define miffTypeR4S_STR_SIZE                       3
-#define miffTypeR8_STR_SIZE                        2
-#define miffTypeR8S_STR_SIZE                       3
 #define miffTypeABI1_STR_SIZE                      4
 #define miffTypeABI2_STR_SIZE                      4
 #define miffTypeABI4_STR_SIZE                      4
@@ -235,6 +262,7 @@ constant:
 #define miffTypeMATRIX4X4R4S_STR_SIZE              9
 #define miffTypeMATRIX4X4R8_STR_SIZE               8
 #define miffTypeMATRIX4X4R8S_STR_SIZE              9
+#endif
 
 #define miffTypeSTR_SIZE_MAX                       16
 
@@ -268,27 +296,21 @@ void            _MiffByteSwap2(         Miff const * const miff, Miff2 * const v
 void            _MiffByteSwap4(         Miff const * const miff, Miff4 * const value);
 void            _MiffByteSwap8(         Miff const * const miff, Miff8 * const value);
 
-MiffBool        _MiffC1EncodedToC1(     MiffN4  * const c1Count, MiffC1       * const c1);
-MiffBool        _MiffC1ToC1Encoded(     MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c1eCount, MiffC1 ** const c1e);
-void            _MiffC1ToC2(            MiffN4    const c1Count, MiffC1 const * const c1, MiffN4 * const c2Count,  MiffC2 *  const c2);
-void            _MiffC1ToC2Key(         MiffN4    const c1Count, MiffC1 const * const c1, MiffN1 * const c2Count,  MiffC2 *  const c2);
-MiffI8          _MiffC1ToI(             MiffN4    const c1Count, MiffC1 const * const c1);
-MiffN8          _MiffC1ToN(             MiffN4    const c1Count, MiffC1 const * const c1);
-MiffC2         *_MiffC2Append(          MiffC2 const * const a, MiffC2 const * const b, MiffC2 const * const c);
-MiffC2         *_MiffC2Clone(           MiffN4    const c2Count, MiffC2 const * const c2);
-MiffBool        _MiffC2ToC1(            MiffN4    const c2Count, MiffC2 const * const c2, MiffN4 * const c1Count, MiffC1 ** const c1);
-MiffBool        _MiffC2ToC1Key(         MiffN4    const c2Count, MiffC2 const * const c2, MiffN1 * const c1Count, MiffC1 *  const c1);
-MiffN4          _MiffC1LetterToC4Letter(MiffC1 const * const c1, MiffC4 * const c4);
-MiffN4          _MiffC2LetterToC4Letter(MiffC2 const * const c2, MiffC4 * const c4);
-MiffN4          _MiffC4LetterToC1Letter(MiffC4 const c4Letter, MiffC1 * const a, MiffC1 * const b, MiffC1 * const c, MiffC1 * const d);
-MiffN4          _MiffC4LetterToC2Letter(MiffC4 const c4Letter, MiffC2 * const a, MiffC2 * const b);
+_locale_t       _MiffLocaleGet(         void);
 
-#define         _MiffC1GetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
-#define         _MiffC2GetCount(STR)                           ((MiffN4) wcslen((wchar_t const *) STR))
+MiffBool        _MiffStrEncodedToStr(   MiffN   * const strLen, MiffStr       * const str);
+MiffBool        _MiffStrToStrEncoded(   MiffN     const strLen, MiffStr const * const str, MiffN * const strEncodedLen, MiffStr ** const strEncoded);
+MiffI8          _MiffStrToI(            MiffN     const strLen, MiffStr const * const str);
+MiffN8          _MiffStrToN(            MiffN     const strLen, MiffStr const * const str);
+MiffStr        *_MiffStrAppend(         MiffStr const * const a, MiffStr const * const b, MiffStr const * const c);
+MiffStr        *_MiffStrClone(          MiffN     const strLen, MiffStr const * const str);
+MiffBool        _MiffStrToKey(          MiffN     const strLen, MiffStr const * const str, MiffN * const keyLen, MiffStr *  const key);
 
-void           *_MiffMemCreate(         MiffN4 const memByteCount);
+#define         _MiffStrGetCount(STR)                           ((MiffN4) strlen((char const *)    STR))
+
+void           *_MiffMemCreate(         MiffN const memByteCount);
 void            _MiffMemDestroy(        void * const mem);
-MiffBool        _MiffMemIsEqual(        MiffN4 const countA, MiffN1 const * const memA, MiffN4 const countB, MiffN1 const * const memB);
+MiffBool        _MiffMemIsEqual(        MiffN const countA, MiffN1 const * const memA, MiffN const countB, MiffN1 const * const memB);
 void            _MiffMemStart(          MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
 void            _MiffMemStop(           void);
 
@@ -298,26 +320,25 @@ void            _MiffMemStop(           void);
 #define         _MiffMemCreateType(            TYPE)           (TYPE *) _MiffMemCreate(                    sizeof(TYPE))
 #define         _MiffMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MiffMemCreate(          (COUNT) * sizeof(TYPE))
 
-MiffBool        _MiffReadLine(          Miff       * const miff);
+MiffBool        _MiffReadArrayCount(    Miff       * const miff, MiffN    * const count);
+MiffBool        _MiffReadKey(           Miff       * const miff, MiffStr  * const key);
 MiffBool        _MiffReadLineSkip(      Miff       * const miff);
 MiffBool        _MiffReadPart(          Miff       * const miff);
-MiffBool        _MiffReadArrayCount(    Miff       * const miff, MiffN4   * const count);
-MiffBool        _MiffReadC2Key(         Miff       * const miff, MiffC2   * const key);
-MiffBool        _MiffReadR4(            Miff       * const miff, MiffR4   * const value);
-MiffBool        _MiffReadR4S(           Miff       * const miff, MiffR4   * const value);
-MiffBool        _MiffReadR8(            Miff       * const miff, MiffR8   * const value);
-MiffBool        _MiffReadR8S(           Miff       * const miff, MiffR8   * const value);
-MiffBool        _MiffReadType(          Miff       * const miff, MiffType * const type, MiffC2 * const typeName);
+MiffBool        _MiffReadR4(            Miff       * const miff, MiffValue * const value);
+MiffBool        _MiffReadR4S(           Miff       * const miff, MiffValue * const value);
+MiffBool        _MiffReadR8(            Miff       * const miff, MiffValue * const value);
+MiffBool        _MiffReadR8S(           Miff       * const miff, MiffValue * const value);
+MiffBool        _MiffReadType(          Miff       * const miff, MiffType * const type, MiffStr * const typeName);
 
-MiffC2         *_MiffTypeGetNameC2(     MiffType const type);
-MiffC1         *_MiffTypeGetNameC1(     MiffType const type);
+MiffStr        *_MiffTypeGetName(       MiffType const type);
 MiffN4          _MiffTypeGetNameSize(   MiffType const type);
 
-MiffBool        _MiffWriteC1(           Miff const * const miff, MiffC1 const * const value);
-MiffBool        _MiffWriteC2(           Miff const * const miff, MiffC2 const * const value);
-MiffBool        _MiffWriteC2Key(        Miff const * const miff, MiffC2 const * const key);
-MiffBool        _MiffWriteI(            Miff       * const miff, MiffI8 const value);
-MiffBool        _MiffWriteN(            Miff       * const miff, MiffN8 const value);
+void            _MiffUtilStart(         void);
+void            _MiffUtilStop(          void);
+
+MiffBool        _MiffWriteStr(          Miff const * const miff, MiffN const strLen, MiffStr const * const str);
+MiffBool        _MiffWriteI(            Miff       * const miff, MiffI  const value);
+MiffBool        _MiffWriteN(            Miff       * const miff, MiffN  const value);
 MiffBool        _MiffWriteR4(           Miff       * const miff, MiffR4 const value);
 MiffBool        _MiffWriteR4S(          Miff       * const miff, MiffR4 const value);
 MiffBool        _MiffWriteR8(           Miff       * const miff, MiffR8 const value);

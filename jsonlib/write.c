@@ -43,45 +43,11 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _JsonWriteC1
+func: _JsonWriteStr
 ******************************************************************************/
-JsonBool _JsonWriteC1(Json const * const json, JsonC1 const * const value)
+JsonBool _JsonWriteStr(Json const * const json, JsonStr const * const value)
 {
-   return json->setBuffer(json->dataRepo, _JsonC1GetCount(value), value);
-}
-
-/******************************************************************************
-func: _JsonWriteC2
-******************************************************************************/
-JsonBool _JsonWriteC2(Json const * const json, JsonC2 const * const c2)
-{
-   JsonN4  c1Count;
-   JsonC1 *c1;
-
-   if (!_JsonC2ToC1(_JsonC2GetCount(c2) + 1, c2, &c1Count, &c1))
-   {
-      returnFalse;
-   }
-
-   _JsonWriteC1(json, c1);
-
-   _JsonMemDestroy(c1);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _JsonWriteC2Key
-******************************************************************************/
-JsonBool _JsonWriteC2Key(Json const * const json, JsonC2 const * const key)
-{
-   JsonC1 c1Key[256];
-   JsonN1 c1Count;
-
-   _JsonMemClearTypeArray(256, JsonC1, c1Key);
-
-   returnFalseIf(!_JsonC2ToC1Key(_JsonC2GetCount(key), key, &c1Count, c1Key));
-   return _JsonWriteC1(json, c1Key);
+   return json->setBuffer(json->dataRepo, _JsonStrGetCount(value), value);
 }
 
 /******************************************************************************
@@ -114,7 +80,7 @@ JsonBool _JsonWriteIndent(Json * const json)
 
    forCount (index, json->scope)
    {
-      returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) "\t"));
+      returnFalseIf(!_JsonWriteStr(json, (JsonStr *) "\t"));
    }
    returnTrue;
 }
@@ -155,11 +121,11 @@ func: _JsonWriteR4S
 ******************************************************************************/
 JsonBool _JsonWriteR4(Json * const json, JsonR4 const value)
 {
-   JsonC1 ctemp[80];
+   JsonStr ctemp[80];
 
-   sprintf_s((char *) ctemp, 80, "%.6g", value);
+   _sprintf_s_l((char *) ctemp, 80, "%.6g", _JsonLocaleGet(), value);
    
-   return _JsonWriteC1(json, ctemp);
+   return _JsonWriteStr(json, ctemp);
 }
 
 /******************************************************************************
@@ -167,79 +133,75 @@ func: _JsonWriteR8S
 ******************************************************************************/
 JsonBool _JsonWriteR8(Json * const json, JsonR8 const value)
 {
-   JsonC1 ctemp[80];
+   JsonStr ctemp[80];
 
-   sprintf_s((char *) ctemp, 80, "%.15g", value);
+   _sprintf_s_l((char *) ctemp, 80, "%.15g", _JsonLocaleGet(), value);
 
-   return _JsonWriteC1(json, ctemp);
+   return _JsonWriteStr(json, ctemp);
 }
 
 /******************************************************************************
-func: _JsonWriteStringC2
+func: _JsonWriteString
 ******************************************************************************/
-JsonBool _JsonWriteStringC2(Json * const json, JsonC2 const * const value)
+JsonBool _JsonWriteString(Json * const json, JsonN const strLen, JsonStr const * const str)
 {
-   JsonI4  index;
-   JsonN4  valueC1Count;
-   JsonC1 *valueC1,
-           letter[2];
+   JsonN    index;
+   JsonStr  letter[2];
    
    letter[1] = 0;
 
-   returnFalseIf(!_JsonC2ToC1(_JsonC2GetCount(value), value, &valueC1Count, &valueC1));
-
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_QUOTE_STR));
    
-   forCount(index, valueC1Count)
+   forCount(index, strLen)
    {
-      if      (valueC1[index] == '\"')
+      if      (str[index] == '\"')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_QUOTE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_QUOTE_STR));
       }
-      else if (valueC1[index] == '\\')
+      else if (str[index] == '\\')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_SLASH_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_SLASH_STR));
       }
-      else if (valueC1[index] == '/')
+      else if (str[index] == '/')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_BACKSLASH_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_BACKSLASH_STR));
       }
-      else if (valueC1[index] == '\b')
+      else if (str[index] == '\b')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_BACKSPACE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_BACKSPACE_STR));
       }
-      else if (valueC1[index] == '\f')
+      else if (str[index] == '\f')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_FORMFEED_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_FORMFEED_STR));
       }
-      else if (valueC1[index] == '\n')
+      else if (str[index] == '\n')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_LINEFEED_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_LINEFEED_STR));
       }
-      else if (valueC1[index] == '\r')
+      else if (str[index] == '\r')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
       }
-      else if (valueC1[index] == '\t')
+      else if (str[index] == '\t')
       {
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_ESCAPE_TAB_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_STR));
+         returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_ESCAPE_TAB_STR));
       }
       else
       {
-         letter[0] = valueC1[index];
-         returnFalseIf(!_JsonWriteC1(json, letter));
+         letter[0] = str[index];
+         returnFalseIf(!_JsonWriteStr(json, letter));
       }
    }
 
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSTRING_QUOTE_STR));
 
    returnTrue;
 }

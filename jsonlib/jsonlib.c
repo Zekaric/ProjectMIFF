@@ -42,7 +42,6 @@ include:
 local:
 macro:
 ******************************************************************************/
-#define IS_SPACE(BYTE) (BYTE == ' ' || BYTE == '\t' || BYTE == '\n' || BYTE == '\r')
 
 /******************************************************************************
 variable:
@@ -94,7 +93,7 @@ JsonBool jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
    json->getBuffer           = getBufferFunc;
    json->readByteCount       = 1024;
    json->readByteCountActual = 1024;
-   json->readByteData        = _JsonMemCreateTypeArray(json->readByteCount, JsonC1);
+   json->readByteData        = _JsonMemCreateTypeArray(json->readByteCount, JsonStr);
 
    returnFalseIf(!json->readByteData);
 
@@ -191,14 +190,14 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(IS_SPACE(byte));
+         continueIf(jsonIS_SPACE(byte));
          
          // Found the object start.
          if (byte == jsonOBJECT_START_STR[0])
          {
             json->readState                = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
             json->scopeType[json->scope++] = jsonScopeOBJECT;
-            json->scope++
+            json->scope++;
 
             *type = jsonReadTypeOBJECT_START;
             returnTrue;
@@ -220,7 +219,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(IS_SPACE(byte));
+         continueIf(jsonIS_SPACE(byte));
 
          // Found the object stop
          if (byte == jsonOBJECT_STOP_STR[0])
@@ -256,18 +255,8 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          // Found a comma so there is another key value.
          if (byte == jsonSEPARATOR_STR[0])
          {
-            // Skip to the start of the string.
-            loop
-            {
-               breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
-
-               // Skip over white space.
-               continueIf(IS_SPACE(byte));
-            }
-            breakIf(byte != jsonSTRING_QUOTE_STR[0]);
-            
             // Read in the key value.
-            // TODO
+            _JsonReadC2String(json, &json->key);
 
             *type = jsonReadTypeKEY;
             returnTrue;
@@ -286,7 +275,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
-         continueIf(IS_SPACE(byte));
+         continueIf(jsonIS_SPACE(byte));
 
          // Found the array stop
          if (byte == jsonARRAY_STOP_STR[0])
@@ -315,7 +304,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
          // Found a comma so there is another value.
          if (byte == jsonSEPARATOR_STR[0])
          {
-            *type = jsonReadType
+            *type = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
          }
       }
 
@@ -360,25 +349,33 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
 
    if (byte == '\n')
    {
-      json->readRecordIsDone = jsonBoolTRUE;
+      //json->readRecordIsDone = jsonBoolTRUE;
    }
 
    returnTrue;
 }
 
-
 /******************************************************************************
 func: jsonReadKey
 ******************************************************************************/
-JsonBool jsonReadKey(Json * const json, JsonC2 ** const key)
+JsonBool jsonReadKey(Json * const json, JsonStr ** const key)
 {
+   returnFalseIf(
+      !_isStarted ||
+      !json       ||
+      !key);
+
+   *key = json->key;
+
+   returnTrue;
 }
 
 /******************************************************************************
 func: jsonReadI
 ******************************************************************************/
-JsonBool jsonReadI(Json * const json, JsonI8 *  const value)
+JsonBool jsonReadI(Json * const json, JsonI8 * const value)
 {
+   returnTrue;
 }
 
 /******************************************************************************
@@ -386,6 +383,7 @@ func: jsonReadN
 ******************************************************************************/
 JsonBool jsonReadN(Json * const json, JsonN8 *  const value)
 {
+   returnTrue;
 }
 
 /******************************************************************************
@@ -393,6 +391,7 @@ func: jsonReadR4
 ******************************************************************************/
 JsonBool jsonReadR4(Json * const json, JsonR4 *  const value)
 {
+   returnTrue;
 }
 
 /******************************************************************************
@@ -400,22 +399,24 @@ func: jsonReadR8
 ******************************************************************************/
 JsonBool jsonReadR8(Json * const json, JsonR8 *  const value)
 {
+   returnTrue;
 }
 
 /******************************************************************************
-func: jsonReadStringC2
+func: jsonReadStr
 ******************************************************************************/
-JsonBool jsonReadStringC2(Json * const json, JsonC2 ** const value)
+JsonBool jsonReadStr(Json * const json, JsonStr ** const value)
 {
+   returnTrue;
 }
 
 /******************************************************************************
 func: jsonReadStringC2Letter
 ******************************************************************************/
-JsonBool jsonReadStringC2Letter(Json * const json, JsonC2 *  const value)
+JsonBool jsonReadStringC2Letter(Json * const json, JsonStr *  const value)
 {
+   returnTrue;
 }
-
 
 /******************************************************************************
 func: jsonStart
@@ -432,6 +433,8 @@ JsonBool jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDe
 
    _JsonMemStart(memCreateFunc, memDestroyFunc);
 
+   returnFalseIf(!_JsonReadStart());
+
    _isStarted = jsonBoolTRUE;
 
    returnTrue;
@@ -444,6 +447,7 @@ void jsonStop(void)
 {
    returnVoidIf(!_isStarted);
 
+   _JsonReadStop();
    _JsonMemStop();
 
    _isStarted = jsonBoolFALSE;
@@ -458,7 +462,7 @@ JsonBool jsonWriteArrayStart(Json * const json)
    json->scope++;
    json->isFirstItem            = jsonBoolTRUE;
 
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonARRAY_START_STR));
+   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonARRAY_START_STR));
    returnTrue;
 }
 
@@ -471,25 +475,25 @@ JsonBool jsonWriteArrayStop(Json * const json)
    json->scopeType[json->scope] = jsonScopeNONE;
    json->isFirstItem            = jsonBoolFALSE;
 
-   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) "\n"));
+   returnFalseIf(!_JsonWriteStr(    json, (JsonStr *) "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
-   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) jsonARRAY_STOP_STR));
+   returnFalseIf(!_JsonWriteStr(    json, (JsonStr *) jsonARRAY_STOP_STR));
    returnTrue;
 }
 
 /******************************************************************************
 func: jsonWriteKey
 ******************************************************************************/
-JsonBool jsonWriteKey(Json * const json, JsonC2 const * const key)
+JsonBool jsonWriteKey(Json * const json, JsonStr const * const key)
 {
-   returnFalseIf(!jsonWriteSeparator(    json));
-   returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
-   returnFalseIf(!_JsonWriteIndent(      json));
+   returnFalseIf(!jsonWriteSeparator(     json));
+   returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
+   returnFalseIf(!_JsonWriteIndent(       json));
    
    json->isFirstItem = jsonBoolFALSE;
 
-   returnFalseIf(!jsonWriteValueStringC2(json, key));
-   returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) jsonKEY_VALUE_SEPARATOR_STR));
+   returnFalseIf(!jsonWriteValueStr(      json, key));
+   returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) jsonKEY_VALUE_SEPARATOR_STR));
    returnTrue;
 }
 
@@ -502,7 +506,7 @@ JsonBool jsonWriteObjectStart(Json * const json)
    json->scope++;
    json->isFirstItem            = jsonBoolTRUE;
 
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonOBJECT_START_STR));
+   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonOBJECT_START_STR));
    returnTrue;
 }
 
@@ -515,9 +519,9 @@ JsonBool jsonWriteObjectStop(Json * const json)
    json->scopeType[json->scope] = jsonScopeNONE;
    json->isFirstItem            = jsonBoolFALSE;
 
-   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) "\n"));
+   returnFalseIf(!_JsonWriteStr(    json, (JsonStr *) "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
-   returnFalseIf(!_JsonWriteC1(    json, (JsonC1 *) jsonOBJECT_STOP_STR));
+   returnFalseIf(!_JsonWriteStr(    json, (JsonStr *) jsonOBJECT_STOP_STR));
    returnTrue;
 }
 
@@ -528,11 +532,12 @@ JsonBool jsonWriteSeparator(Json * const json)
 {
    if (!json->isFirstItem)
    {
-      returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) jsonSEPARATOR_STR));
+      returnFalseIf(!_JsonWriteStr(json, (JsonStr *) jsonSEPARATOR_STR));
    }
    returnTrue;
 }
 
+#if 0
 /******************************************************************************
 func: jsonWriteValueABI
 ******************************************************************************/
@@ -688,6 +693,7 @@ JsonBool jsonWriteValueABCDR8(Json * const json, JsonABCDR8 const * const value)
    returnFalseIf(!jsonWriteArrayStop( json));
    returnTrue;
 }
+#endif
 
 /******************************************************************************
 func: jsonWriteValueBoolean
@@ -697,12 +703,12 @@ JsonBool jsonWriteValueBoolean(Json * const json, JsonBool const value)
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
       returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
    json->isFirstItem = jsonBoolFALSE;
    
-   returnFalseIf(!_JsonWriteC1(json, (JsonC1 *) ((value == jsonBoolTRUE) ? "\"true\"" : "\"false\"")));
+   returnFalseIf(!_JsonWriteStr(json, (JsonStr *) ((value == jsonBoolTRUE) ? "\"true\"" : "\"false\"")));
    returnTrue;
 }
 
@@ -714,7 +720,7 @@ JsonBool jsonWriteValueI(Json * const json, JsonI8 const value)
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
       returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
    json->isFirstItem = jsonBoolFALSE;
@@ -730,7 +736,7 @@ JsonBool jsonWriteValueN(Json * const json, JsonN8 const value)
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
       returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
    json->isFirstItem = jsonBoolFALSE;
@@ -738,6 +744,7 @@ JsonBool jsonWriteValueN(Json * const json, JsonN8 const value)
    return _JsonWriteN(json, value);
 }
 
+#if 0
 /******************************************************************************
 func: jsonWriteValueMatrix2x2R4
 ******************************************************************************/
@@ -855,22 +862,7 @@ JsonBool jsonWriteValueMatrix4x4R8(Json * const json, JsonMatrix4x4R8 const * co
    returnFalseIf(!jsonWriteArrayStop( json));
    returnTrue;
 }
-
-/******************************************************************************
-func: jsonWriteValueStringC2
-******************************************************************************/
-JsonBool jsonWriteValueStringC2(Json * const json, JsonC2 const * const value)
-{
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
-   {
-      returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
-      returnFalseIf(!_JsonWriteIndent(      json));
-   }
-   json->isFirstItem = jsonBoolFALSE;
-   
-   return _JsonWriteStringC2(json, value);
-}
+#endif
 
 /******************************************************************************
 func: jsonWriteValueR4
@@ -880,7 +872,7 @@ JsonBool jsonWriteValueR4(Json * const json, JsonR4 const value)
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
       returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
    json->isFirstItem = jsonBoolFALSE;
@@ -896,7 +888,7 @@ JsonBool jsonWriteValueR8(Json * const json, JsonR8 const value)
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
       returnFalseIf(!jsonWriteSeparator(    json));
-      returnFalseIf(!_JsonWriteC1(          json, (JsonC1 *) "\n"));
+      returnFalseIf(!_JsonWriteStr(          json, (JsonStr *) "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
    json->isFirstItem = jsonBoolFALSE;
@@ -904,13 +896,14 @@ JsonBool jsonWriteValueR8(Json * const json, JsonR8 const value)
    return _JsonWriteR8(json, value);
 }
 
+#if 0
 /******************************************************************************
 helper functions:
 ******************************************************************************/
 /******************************************************************************
 func: jsonWriteKey1ABI1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABI1(Json * const json, JsonC2 const * const key, JsonABI1 const * const value)
+JsonBool jsonWriteKey1ABI1(Json * const json, JsonStr const * const key, JsonABI1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABI(json, value->a, value->b));
@@ -920,7 +913,7 @@ JsonBool jsonWriteKey1ABI1(Json * const json, JsonC2 const * const key, JsonABI1
 /******************************************************************************
 func: jsonWriteKey1ABI2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABI2(Json * const json, JsonC2 const * const key, JsonABI2 const * const value)
+JsonBool jsonWriteKey1ABI2(Json * const json, JsonStr const * const key, JsonABI2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABI(json, value->a, value->b));
@@ -930,7 +923,7 @@ JsonBool jsonWriteKey1ABI2(Json * const json, JsonC2 const * const key, JsonABI2
 /******************************************************************************
 func: jsonWriteKey1ABI4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABI4(Json * const json, JsonC2 const * const key, JsonABI4 const * const value)
+JsonBool jsonWriteKey1ABI4(Json * const json, JsonStr const * const key, JsonABI4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABI(json, value->a, value->b));
@@ -940,7 +933,7 @@ JsonBool jsonWriteKey1ABI4(Json * const json, JsonC2 const * const key, JsonABI4
 /******************************************************************************
 func: jsonWriteKey1ABN1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABN1(Json * const json, JsonC2 const * const key, JsonABN1 const * const value)
+JsonBool jsonWriteKey1ABN1(Json * const json, JsonStr const * const key, JsonABN1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABN(json, value->a, value->b));
@@ -950,7 +943,7 @@ JsonBool jsonWriteKey1ABN1(Json * const json, JsonC2 const * const key, JsonABN1
 /******************************************************************************
 func: jsonWriteKey1ABN2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABN2(Json * const json, JsonC2 const * const key, JsonABN2 const * const value)
+JsonBool jsonWriteKey1ABN2(Json * const json, JsonStr const * const key, JsonABN2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABN(json, value->a, value->b));
@@ -960,7 +953,7 @@ JsonBool jsonWriteKey1ABN2(Json * const json, JsonC2 const * const key, JsonABN2
 /******************************************************************************
 func: jsonWriteKey1ABN4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABN4(Json * const json, JsonC2 const * const key, JsonABN4 const * const value)
+JsonBool jsonWriteKey1ABN4(Json * const json, JsonStr const * const key, JsonABN4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(     json, key));
    returnFalseIf(!jsonWriteValueABN(json, value->a, value->b));
@@ -970,7 +963,7 @@ JsonBool jsonWriteKey1ABN4(Json * const json, JsonC2 const * const key, JsonABN4
 /******************************************************************************
 func: jsonWriteKey1ABR4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABR4(Json * const json, JsonC2 const * const key, JsonABR4 const * const value)
+JsonBool jsonWriteKey1ABR4(Json * const json, JsonStr const * const key, JsonABR4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABR4(json, value));
@@ -980,7 +973,7 @@ JsonBool jsonWriteKey1ABR4(Json * const json, JsonC2 const * const key, JsonABR4
 /******************************************************************************
 func: jsonWriteKey1ABR8
 ******************************************************************************/
-JsonBool jsonWriteKey1ABR8(Json * const json, JsonC2 const * const key, JsonABR8 const * const value)
+JsonBool jsonWriteKey1ABR8(Json * const json, JsonStr const * const key, JsonABR8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABR8(json, value));
@@ -990,7 +983,7 @@ JsonBool jsonWriteKey1ABR8(Json * const json, JsonC2 const * const key, JsonABR8
 /******************************************************************************
 func: jsonWriteKey1ABCI1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCI1(Json * const json, JsonC2 const * const key, JsonABCI1 const * const value)
+JsonBool jsonWriteKey1ABCI1(Json * const json, JsonStr const * const key, JsonABCI1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCI(json, value->a, value->b, value->c));
@@ -1000,7 +993,7 @@ JsonBool jsonWriteKey1ABCI1(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCI2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCI2(Json * const json, JsonC2 const * const key, JsonABCI2 const * const value)
+JsonBool jsonWriteKey1ABCI2(Json * const json, JsonStr const * const key, JsonABCI2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCI(json, value->a, value->b, value->c));
@@ -1010,7 +1003,7 @@ JsonBool jsonWriteKey1ABCI2(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCI4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCI4(Json * const json, JsonC2 const * const key, JsonABCI4 const * const value)
+JsonBool jsonWriteKey1ABCI4(Json * const json, JsonStr const * const key, JsonABCI4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCI(json, value->a, value->b, value->c));
@@ -1020,7 +1013,7 @@ JsonBool jsonWriteKey1ABCI4(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCN1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCN1(Json * const json, JsonC2 const * const key, JsonABCN1 const * const value)
+JsonBool jsonWriteKey1ABCN1(Json * const json, JsonStr const * const key, JsonABCN1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCN(json, value->a, value->b, value->c));
@@ -1030,7 +1023,7 @@ JsonBool jsonWriteKey1ABCN1(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCN2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCN2(Json * const json, JsonC2 const * const key, JsonABCN2 const * const value)
+JsonBool jsonWriteKey1ABCN2(Json * const json, JsonStr const * const key, JsonABCN2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCN(json, value->a, value->b, value->c));
@@ -1040,7 +1033,7 @@ JsonBool jsonWriteKey1ABCN2(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCN4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCN4(Json * const json, JsonC2 const * const key, JsonABCN4 const * const value)
+JsonBool jsonWriteKey1ABCN4(Json * const json, JsonStr const * const key, JsonABCN4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(      json, key));
    returnFalseIf(!jsonWriteValueABCN(json, value->a, value->b, value->c));
@@ -1050,7 +1043,7 @@ JsonBool jsonWriteKey1ABCN4(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCR4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCR4(Json * const json, JsonC2 const * const key, JsonABCR4 const * const value)
+JsonBool jsonWriteKey1ABCR4(Json * const json, JsonStr const * const key, JsonABCR4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCR4(json, value));
@@ -1060,7 +1053,7 @@ JsonBool jsonWriteKey1ABCR4(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCR8
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCR8(Json * const json, JsonC2 const * const key, JsonABCR8 const * const value)
+JsonBool jsonWriteKey1ABCR8(Json * const json, JsonStr const * const key, JsonABCR8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCR8(json, value));
@@ -1070,7 +1063,7 @@ JsonBool jsonWriteKey1ABCR8(Json * const json, JsonC2 const * const key, JsonABC
 /******************************************************************************
 func: jsonWriteKey1ABCDI1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDI1(Json * const json, JsonC2 const * const key, JsonABCDI1 const * const value)
+JsonBool jsonWriteKey1ABCDI1(Json * const json, JsonStr const * const key, JsonABCDI1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDI(json, value->a, value->b, value->c, value->d));
@@ -1080,7 +1073,7 @@ JsonBool jsonWriteKey1ABCDI1(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDI2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDI2(Json * const json, JsonC2 const * const key, JsonABCDI2 const * const value)
+JsonBool jsonWriteKey1ABCDI2(Json * const json, JsonStr const * const key, JsonABCDI2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDI(json, value->a, value->b, value->c, value->d));
@@ -1090,7 +1083,7 @@ JsonBool jsonWriteKey1ABCDI2(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDI4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDI4(Json * const json, JsonC2 const * const key, JsonABCDI4 const * const value)
+JsonBool jsonWriteKey1ABCDI4(Json * const json, JsonStr const * const key, JsonABCDI4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDI(json, value->a, value->b, value->c, value->d));
@@ -1100,7 +1093,7 @@ JsonBool jsonWriteKey1ABCDI4(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDN1
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDN1(Json * const json, JsonC2 const * const key, JsonABCDN1 const * const value)
+JsonBool jsonWriteKey1ABCDN1(Json * const json, JsonStr const * const key, JsonABCDN1 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDN(json, value->a, value->b, value->c, value->d));
@@ -1110,7 +1103,7 @@ JsonBool jsonWriteKey1ABCDN1(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDN2
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDN2(Json * const json, JsonC2 const * const key, JsonABCDN2 const * const value)
+JsonBool jsonWriteKey1ABCDN2(Json * const json, JsonStr const * const key, JsonABCDN2 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDN(json, value->a, value->b, value->c, value->d));
@@ -1120,7 +1113,7 @@ JsonBool jsonWriteKey1ABCDN2(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDN4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDN4(Json * const json, JsonC2 const * const key, JsonABCDN4 const * const value)
+JsonBool jsonWriteKey1ABCDN4(Json * const json, JsonStr const * const key, JsonABCDN4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteValueABCDN(json, value->a, value->b, value->c, value->d));
@@ -1130,7 +1123,7 @@ JsonBool jsonWriteKey1ABCDN4(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDR4
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDR4(Json * const json, JsonC2 const * const key, JsonABCDR4 const * const value)
+JsonBool jsonWriteKey1ABCDR4(Json * const json, JsonStr const * const key, JsonABCDR4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(        json, key));
    returnFalseIf(!jsonWriteValueABCDR4(json, value));
@@ -1140,7 +1133,7 @@ JsonBool jsonWriteKey1ABCDR4(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1ABCDR8
 ******************************************************************************/
-JsonBool jsonWriteKey1ABCDR8(Json * const json, JsonC2 const * const key, JsonABCDR8 const * const value)
+JsonBool jsonWriteKey1ABCDR8(Json * const json, JsonStr const * const key, JsonABCDR8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(        json, key));
    returnFalseIf(!jsonWriteValueABCDR8(json, value));
@@ -1150,7 +1143,7 @@ JsonBool jsonWriteKey1ABCDR8(Json * const json, JsonC2 const * const key, JsonAB
 /******************************************************************************
 func: jsonWriteKey1Boolean
 ******************************************************************************/
-JsonBool jsonWriteKey1Boolean(Json * const json, JsonC2 const * const key, JsonBool const value)
+JsonBool jsonWriteKey1Boolean(Json * const json, JsonStr const * const key, JsonBool const value)
 {
    returnFalseIf(!jsonWriteKey(         json, key));
    returnFalseIf(!jsonWriteValueBoolean(json, value));
@@ -1160,7 +1153,7 @@ JsonBool jsonWriteKey1Boolean(Json * const json, JsonC2 const * const key, JsonB
 /******************************************************************************
 func: jsonWriteKey1I1
 ******************************************************************************/
-JsonBool jsonWriteKey1I1(Json * const json, JsonC2 const * const key, JsonI1 const value)
+JsonBool jsonWriteKey1I1(Json * const json, JsonStr const * const key, JsonI1 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueI(json, value));
@@ -1170,7 +1163,7 @@ JsonBool jsonWriteKey1I1(Json * const json, JsonC2 const * const key, JsonI1 con
 /******************************************************************************
 func: jsonWriteKey1I2
 ******************************************************************************/
-JsonBool jsonWriteKey1I2(Json * const json, JsonC2 const * const key, JsonI2 const value)
+JsonBool jsonWriteKey1I2(Json * const json, JsonStr const * const key, JsonI2 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueI(json, value));
@@ -1180,7 +1173,7 @@ JsonBool jsonWriteKey1I2(Json * const json, JsonC2 const * const key, JsonI2 con
 /******************************************************************************
 func: jsonWriteKey1I4
 ******************************************************************************/
-JsonBool jsonWriteKey1I4(Json * const json, JsonC2 const * const key, JsonI4 const value)
+JsonBool jsonWriteKey1I4(Json * const json, JsonStr const * const key, JsonI4 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueI(json, value));
@@ -1190,7 +1183,7 @@ JsonBool jsonWriteKey1I4(Json * const json, JsonC2 const * const key, JsonI4 con
 /******************************************************************************
 func: jsonWriteKey1I8
 ******************************************************************************/
-JsonBool jsonWriteKey1I8(Json * const json, JsonC2 const * const key, JsonI8 const value)
+JsonBool jsonWriteKey1I8(Json * const json, JsonStr const * const key, JsonI8 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueI(json, value));
@@ -1200,7 +1193,7 @@ JsonBool jsonWriteKey1I8(Json * const json, JsonC2 const * const key, JsonI8 con
 /******************************************************************************
 func: jsonWriteKey1Matrix2x2R4
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix2x2R4(Json * const json, JsonC2 const * const key, JsonMatrix2x2R4 const * const value)
+JsonBool jsonWriteKey1Matrix2x2R4(Json * const json, JsonStr const * const key, JsonMatrix2x2R4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1215,7 +1208,7 @@ JsonBool jsonWriteKey1Matrix2x2R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1Matrix2x2R8
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix2x2R8(Json * const json, JsonC2 const * const key, JsonMatrix2x2R8 const * const value)
+JsonBool jsonWriteKey1Matrix2x2R8(Json * const json, JsonStr const * const key, JsonMatrix2x2R8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1230,7 +1223,7 @@ JsonBool jsonWriteKey1Matrix2x2R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1Matrix3x3R4
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix3x3R4(Json * const json, JsonC2 const * const key, JsonMatrix3x3R4 const * const value)
+JsonBool jsonWriteKey1Matrix3x3R4(Json * const json, JsonStr const * const key, JsonMatrix3x3R4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1250,7 +1243,7 @@ JsonBool jsonWriteKey1Matrix3x3R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1Matrix3x3R8
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix3x3R8(Json * const json, JsonC2 const * const key, JsonMatrix3x3R8 const * const value)
+JsonBool jsonWriteKey1Matrix3x3R8(Json * const json, JsonStr const * const key, JsonMatrix3x3R8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1270,7 +1263,7 @@ JsonBool jsonWriteKey1Matrix3x3R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1Matrix4x4R4
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix4x4R4(Json * const json, JsonC2 const * const key, JsonMatrix4x4R4 const * const value)
+JsonBool jsonWriteKey1Matrix4x4R4(Json * const json, JsonStr const * const key, JsonMatrix4x4R4 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1297,7 +1290,7 @@ JsonBool jsonWriteKey1Matrix4x4R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1Matrix4x4R8
 ******************************************************************************/
-JsonBool jsonWriteKey1Matrix4x4R8(Json * const json, JsonC2 const * const key, JsonMatrix4x4R8 const * const value)
+JsonBool jsonWriteKey1Matrix4x4R8(Json * const json, JsonStr const * const key, JsonMatrix4x4R8 const * const value)
 {
    returnFalseIf(!jsonWriteKey(       json, key));
    returnFalseIf(!jsonWriteArrayStart(json));
@@ -1324,7 +1317,7 @@ JsonBool jsonWriteKey1Matrix4x4R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKey1N1
 ******************************************************************************/
-JsonBool jsonWriteKey1N1(Json * const json, JsonC2 const * const key, JsonN1 const value)
+JsonBool jsonWriteKey1N1(Json * const json, JsonStr const * const key, JsonN1 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueN(json, value));
@@ -1334,7 +1327,7 @@ JsonBool jsonWriteKey1N1(Json * const json, JsonC2 const * const key, JsonN1 con
 /******************************************************************************
 func: jsonWriteKey1N2
 ******************************************************************************/
-JsonBool jsonWriteKey1N2(Json * const json, JsonC2 const * const key, JsonN2 const value)
+JsonBool jsonWriteKey1N2(Json * const json, JsonStr const * const key, JsonN2 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueN(json, value));
@@ -1344,7 +1337,7 @@ JsonBool jsonWriteKey1N2(Json * const json, JsonC2 const * const key, JsonN2 con
 /******************************************************************************
 func: jsonWriteKey1N4
 ******************************************************************************/
-JsonBool jsonWriteKey1N4(Json * const json, JsonC2 const * const key, JsonN4 const value)
+JsonBool jsonWriteKey1N4(Json * const json, JsonStr const * const key, JsonN4 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueN(json, value));
@@ -1354,7 +1347,7 @@ JsonBool jsonWriteKey1N4(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKey1N8
 ******************************************************************************/
-JsonBool jsonWriteKey1N8(Json * const json, JsonC2 const * const key, JsonN8 const value)
+JsonBool jsonWriteKey1N8(Json * const json, JsonStr const * const key, JsonN8 const value)
 {
    returnFalseIf(!jsonWriteKey(   json, key));
    returnFalseIf(!jsonWriteValueN(json, value));
@@ -1364,7 +1357,7 @@ JsonBool jsonWriteKey1N8(Json * const json, JsonC2 const * const key, JsonN8 con
 /******************************************************************************
 func: jsonWriteKey1R4
 ******************************************************************************/
-JsonBool jsonWriteKey1R4(Json * const json, JsonC2 const * const key, JsonR4 const value)
+JsonBool jsonWriteKey1R4(Json * const json, JsonStr const * const key, JsonR4 const value)
 {
    returnFalseIf(!jsonWriteKey(    json, key));
    returnFalseIf(!jsonWriteValueR4(json, value));
@@ -1374,7 +1367,7 @@ JsonBool jsonWriteKey1R4(Json * const json, JsonC2 const * const key, JsonR4 con
 /******************************************************************************
 func: jsonWriteKey1R8
 ******************************************************************************/
-JsonBool jsonWriteKey1R8(Json * const json, JsonC2 const * const key, JsonR8 const value)
+JsonBool jsonWriteKey1R8(Json * const json, JsonStr const * const key, JsonR8 const value)
 {
    returnFalseIf(!jsonWriteKey(    json, key));
    returnFalseIf(!jsonWriteValueR8(json, value));
@@ -1384,7 +1377,7 @@ JsonBool jsonWriteKey1R8(Json * const json, JsonC2 const * const key, JsonR8 con
 /******************************************************************************
 func: jsonWriteKey1StringC2
 ******************************************************************************/
-JsonBool jsonWriteKey1StringC2(Json * const json, JsonC2 const * const key, JsonC2 const * const value)
+JsonBool jsonWriteKey1StringC2(Json * const json, JsonStr const * const key, JsonStr const * const value)
 {
    returnFalseIf(!jsonWriteKey(          json, key));
    returnFalseIf(!jsonWriteValueStringC2(json, value));
@@ -1394,7 +1387,7 @@ JsonBool jsonWriteKey1StringC2(Json * const json, JsonC2 const * const key, Json
 /******************************************************************************
 func: jsonWriteKeyNABI1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABI1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABI1 const * const value)
+JsonBool jsonWriteKeyNABI1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABI1 const * const value)
 {
    JsonN4 index;
 
@@ -1411,7 +1404,7 @@ JsonBool jsonWriteKeyNABI1(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABI2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABI2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABI2 const * const value)
+JsonBool jsonWriteKeyNABI2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABI2 const * const value)
 {
    JsonN4 index;
 
@@ -1428,7 +1421,7 @@ JsonBool jsonWriteKeyNABI2(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABI4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABI4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABI4 const * const value)
+JsonBool jsonWriteKeyNABI4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABI4 const * const value)
 {
    JsonN4 index;
 
@@ -1445,7 +1438,7 @@ JsonBool jsonWriteKeyNABI4(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABN1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABN1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABN1 const * const value)
+JsonBool jsonWriteKeyNABN1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABN1 const * const value)
 {
    JsonN4 index;
 
@@ -1462,7 +1455,7 @@ JsonBool jsonWriteKeyNABN1(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABN2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABN2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABN2 const * const value)
+JsonBool jsonWriteKeyNABN2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABN2 const * const value)
 {
    JsonN4 index;
 
@@ -1479,7 +1472,7 @@ JsonBool jsonWriteKeyNABN2(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABN4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABN4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABN4 const * const value)
+JsonBool jsonWriteKeyNABN4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABN4 const * const value)
 {
    JsonN4 index;
 
@@ -1496,7 +1489,7 @@ JsonBool jsonWriteKeyNABN4(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABR4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABR4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABR4 const * const value)
+JsonBool jsonWriteKeyNABR4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABR4 const * const value)
 {
    JsonN4 index;
 
@@ -1513,7 +1506,7 @@ JsonBool jsonWriteKeyNABR4(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABR8
 ******************************************************************************/
-JsonBool jsonWriteKeyNABR8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABR8 const * const value)
+JsonBool jsonWriteKeyNABR8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABR8 const * const value)
 {
    JsonN4 index;
 
@@ -1530,7 +1523,7 @@ JsonBool jsonWriteKeyNABR8(Json * const json, JsonC2 const * const key, JsonN4 c
 /******************************************************************************
 func: jsonWriteKeyNABCI1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCI1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI1 const * const value)
+JsonBool jsonWriteKeyNABCI1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCI1 const * const value)
 {
    JsonN4 index;
 
@@ -1547,7 +1540,7 @@ JsonBool jsonWriteKeyNABCI1(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCI2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCI2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI2 const * const value)
+JsonBool jsonWriteKeyNABCI2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCI2 const * const value)
 {
    JsonN4 index;
 
@@ -1564,7 +1557,7 @@ JsonBool jsonWriteKeyNABCI2(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCI4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCI4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCI4 const * const value)
+JsonBool jsonWriteKeyNABCI4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCI4 const * const value)
 {
    JsonN4 index;
 
@@ -1581,7 +1574,7 @@ JsonBool jsonWriteKeyNABCI4(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCN1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCN1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN1 const * const value)
+JsonBool jsonWriteKeyNABCN1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCN1 const * const value)
 {
    JsonN4 index;
 
@@ -1598,7 +1591,7 @@ JsonBool jsonWriteKeyNABCN1(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCN2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCN2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN2 const * const value)
+JsonBool jsonWriteKeyNABCN2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCN2 const * const value)
 {
    JsonN4 index;
 
@@ -1615,7 +1608,7 @@ JsonBool jsonWriteKeyNABCN2(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCN4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCN4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCN4 const * const value)
+JsonBool jsonWriteKeyNABCN4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCN4 const * const value)
 {
    JsonN4 index;
 
@@ -1632,7 +1625,7 @@ JsonBool jsonWriteKeyNABCN4(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCR4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCR4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCR4 const * const value)
+JsonBool jsonWriteKeyNABCR4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCR4 const * const value)
 {
    JsonN4 index;
 
@@ -1649,7 +1642,7 @@ JsonBool jsonWriteKeyNABCR4(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCR8
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCR8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCR8 const * const value)
+JsonBool jsonWriteKeyNABCR8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCR8 const * const value)
 {
    JsonN4 index;
 
@@ -1666,7 +1659,7 @@ JsonBool jsonWriteKeyNABCR8(Json * const json, JsonC2 const * const key, JsonN4 
 /******************************************************************************
 func: jsonWriteKeyNABCDI1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDI1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI1 const * const value)
+JsonBool jsonWriteKeyNABCDI1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI1 const * const value)
 {
    JsonN4 index;
 
@@ -1683,7 +1676,7 @@ JsonBool jsonWriteKeyNABCDI1(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDI2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDI2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI2 const * const value)
+JsonBool jsonWriteKeyNABCDI2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI2 const * const value)
 {
    JsonN4 index;
 
@@ -1700,7 +1693,7 @@ JsonBool jsonWriteKeyNABCDI2(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDI4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDI4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDI4 const * const value)
+JsonBool jsonWriteKeyNABCDI4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDI4 const * const value)
 {
    JsonN4 index;
 
@@ -1717,7 +1710,7 @@ JsonBool jsonWriteKeyNABCDI4(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDN1
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDN1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN1 const * const value)
+JsonBool jsonWriteKeyNABCDN1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN1 const * const value)
 {
    JsonN4 index;
 
@@ -1734,7 +1727,7 @@ JsonBool jsonWriteKeyNABCDN1(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDN2
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDN2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN2 const * const value)
+JsonBool jsonWriteKeyNABCDN2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN2 const * const value)
 {
    JsonN4 index;
 
@@ -1751,7 +1744,7 @@ JsonBool jsonWriteKeyNABCDN2(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDN4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDN4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDN4 const * const value)
+JsonBool jsonWriteKeyNABCDN4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDN4 const * const value)
 {
    JsonN4 index;
 
@@ -1768,7 +1761,7 @@ JsonBool jsonWriteKeyNABCDN4(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDR4
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDR4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDR4 const * const value)
+JsonBool jsonWriteKeyNABCDR4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDR4 const * const value)
 {
    JsonN4 index;
 
@@ -1785,7 +1778,7 @@ JsonBool jsonWriteKeyNABCDR4(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNABCDR8
 ******************************************************************************/
-JsonBool jsonWriteKeyNABCDR8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonABCDR8 const * const value)
+JsonBool jsonWriteKeyNABCDR8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonABCDR8 const * const value)
 {
    JsonN4 index;
 
@@ -1802,7 +1795,7 @@ JsonBool jsonWriteKeyNABCDR8(Json * const json, JsonC2 const * const key, JsonN4
 /******************************************************************************
 func: jsonWriteKeyNBoolean
 ******************************************************************************/
-JsonBool jsonWriteKeyNBoolean(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonBool const * const value)
+JsonBool jsonWriteKeyNBoolean(Json * const json, JsonStr const * const key, JsonN4 const count, JsonBool const * const value)
 {
    JsonN4 index;
 
@@ -1819,7 +1812,7 @@ JsonBool jsonWriteKeyNBoolean(Json * const json, JsonC2 const * const key, JsonN
 /******************************************************************************
 func: jsonWriteKeyNI1
 ******************************************************************************/
-JsonBool jsonWriteKeyNI1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonI1 const * const value)
+JsonBool jsonWriteKeyNI1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonI1 const * const value)
 {
    JsonN4 index;
 
@@ -1836,7 +1829,7 @@ JsonBool jsonWriteKeyNI1(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNI2
 ******************************************************************************/
-JsonBool jsonWriteKeyNI2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonI2 const * const value)
+JsonBool jsonWriteKeyNI2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonI2 const * const value)
 {
    JsonN4 index;
 
@@ -1853,7 +1846,7 @@ JsonBool jsonWriteKeyNI2(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNI4
 ******************************************************************************/
-JsonBool jsonWriteKeyNI4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonI4 const * const value)
+JsonBool jsonWriteKeyNI4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonI4 const * const value)
 {
    JsonN4 index;
 
@@ -1870,7 +1863,7 @@ JsonBool jsonWriteKeyNI4(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNI8
 ******************************************************************************/
-JsonBool jsonWriteKeyNI8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonI8 const * const value)
+JsonBool jsonWriteKeyNI8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonI8 const * const value)
 {
    JsonN4 index;
 
@@ -1887,7 +1880,7 @@ JsonBool jsonWriteKeyNI8(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNMatrix2x2R4
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix2x2R4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix2x2R4 const * const value)
+JsonBool jsonWriteKeyNMatrix2x2R4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix2x2R4 const * const value)
 {
    JsonN4 index;
 
@@ -1904,7 +1897,7 @@ JsonBool jsonWriteKeyNMatrix2x2R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNMatrix2x2R8
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix2x2R8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix2x2R8 const * const value)
+JsonBool jsonWriteKeyNMatrix2x2R8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix2x2R8 const * const value)
 {
    JsonN4 index;
 
@@ -1921,7 +1914,7 @@ JsonBool jsonWriteKeyNMatrix2x2R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNMatrix3x3R4
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix3x3R4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix3x3R4 const * const value)
+JsonBool jsonWriteKeyNMatrix3x3R4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix3x3R4 const * const value)
 {
    JsonN4 index;
 
@@ -1938,7 +1931,7 @@ JsonBool jsonWriteKeyNMatrix3x3R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNMatrix3x3R8
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix3x3R8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix3x3R8 const * const value)
+JsonBool jsonWriteKeyNMatrix3x3R8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix3x3R8 const * const value)
 {
    JsonN4 index;
 
@@ -1955,7 +1948,7 @@ JsonBool jsonWriteKeyNMatrix3x3R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNMatrix4x4R4
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix4x4R4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix4x4R4 const * const value)
+JsonBool jsonWriteKeyNMatrix4x4R4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix4x4R4 const * const value)
 {
    JsonN4 index;
 
@@ -1972,7 +1965,7 @@ JsonBool jsonWriteKeyNMatrix4x4R4(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNMatrix4x4R8
 ******************************************************************************/
-JsonBool jsonWriteKeyNMatrix4x4R8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonMatrix4x4R8 const * const value)
+JsonBool jsonWriteKeyNMatrix4x4R8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonMatrix4x4R8 const * const value)
 {
    JsonN4 index;
 
@@ -1989,7 +1982,7 @@ JsonBool jsonWriteKeyNMatrix4x4R8(Json * const json, JsonC2 const * const key, J
 /******************************************************************************
 func: jsonWriteKeyNN1
 ******************************************************************************/
-JsonBool jsonWriteKeyNN1(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonN1 const * const value)
+JsonBool jsonWriteKeyNN1(Json * const json, JsonStr const * const key, JsonN4 const count, JsonN1 const * const value)
 {
    JsonN4 index;
 
@@ -2006,7 +1999,7 @@ JsonBool jsonWriteKeyNN1(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNN2
 ******************************************************************************/
-JsonBool jsonWriteKeyNN2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonN2 const * const value)
+JsonBool jsonWriteKeyNN2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonN2 const * const value)
 {
    JsonN4 index;
 
@@ -2023,7 +2016,7 @@ JsonBool jsonWriteKeyNN2(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNN4
 ******************************************************************************/
-JsonBool jsonWriteKeyNN4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonN4 const * const value)
+JsonBool jsonWriteKeyNN4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonN4 const * const value)
 {
    JsonN4 index;
 
@@ -2040,7 +2033,7 @@ JsonBool jsonWriteKeyNN4(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNN8
 ******************************************************************************/
-JsonBool jsonWriteKeyNN8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonN8 const * const value)
+JsonBool jsonWriteKeyNN8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonN8 const * const value)
 {
    JsonN4 index;
 
@@ -2057,7 +2050,7 @@ JsonBool jsonWriteKeyNN8(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNR4
 ******************************************************************************/
-JsonBool jsonWriteKeyNR4(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonR4 const * const value)
+JsonBool jsonWriteKeyNR4(Json * const json, JsonStr const * const key, JsonN4 const count, JsonR4 const * const value)
 {
    JsonN4 index;
 
@@ -2074,7 +2067,7 @@ JsonBool jsonWriteKeyNR4(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNR8
 ******************************************************************************/
-JsonBool jsonWriteKeyNR8(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonR8 const * const value)
+JsonBool jsonWriteKeyNR8(Json * const json, JsonStr const * const key, JsonN4 const count, JsonR8 const * const value)
 {
    JsonN4 index;
 
@@ -2091,7 +2084,7 @@ JsonBool jsonWriteKeyNR8(Json * const json, JsonC2 const * const key, JsonN4 con
 /******************************************************************************
 func: jsonWriteKeyNStringC2
 ******************************************************************************/
-JsonBool jsonWriteKeyNStringC2(Json * const json, JsonC2 const * const key, JsonN4 const count, JsonC2 const * const * const value)
+JsonBool jsonWriteKeyNStringC2(Json * const json, JsonStr const * const key, JsonN4 const count, JsonStr const * const * const value)
 {
    JsonN4 index;
 
@@ -2104,3 +2097,4 @@ JsonBool jsonWriteKeyNStringC2(Json * const json, JsonC2 const * const key, Json
    returnFalseIf(!jsonWriteArrayStop( json));
    returnTrue;
 }
+#endif

@@ -210,7 +210,7 @@ MiffBool _MiffReadType(Miff * const miff, MiffType * const type, MiffStr * const
 
       if (_MiffMemIsEqual(
             _MiffTypeGetNameSize(index), (MiffN1 *) _MiffTypeGetName(index),
-            miff->readByteCount,     miff->readByteData))
+            miff->readByteCount,         miff->readByteData))
       {
          *type = index;
 
@@ -218,31 +218,54 @@ MiffBool _MiffReadType(Miff * const miff, MiffType * const type, MiffStr * const
       }
    }
 
-   *type = miffTypeUSER;
+   *type = miffTypeOTHER;
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffReadR4
+func: _MiffReadR
 ******************************************************************************/
-MiffBool _MiffReadR4(Miff * const miff, MiffValue * const value)
+MiffBool _MiffReadR(Miff * const miff, MiffValue * const value)
 {
-   Miff4          vtemp;
    MiffBase64Data data;
 
    returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
 
    data = _MiffBase64Restart(miff->readByteData);
 
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
+   if (miff->readByteCount == 6)
+   {
+      Miff4 vtemp;
 
-   _MiffByteSwap4(miff, &vtemp);
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
 
-   value->r4 = vtemp.r;
+      _MiffByteSwap4(miff, &vtemp);
+
+      value->rType = 4;
+      value->r4    = vtemp.r;
+   }
+   else
+   {
+      Miff8 vtemp;
+
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[4]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[5]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[6]));
+      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[7]));
+
+      _MiffByteSwap8(miff, &vtemp);
+
+      value->rType = 8;
+      value->r8    = vtemp.r;
+   }
 
    returnTrue;
 }
@@ -261,37 +284,7 @@ MiffBool _MiffReadR4S(Miff * const miff, MiffValue * const value)
 
    returnTrue;
 }
-#endif
 
-/******************************************************************************
-func: _MiffReadR8
-******************************************************************************/
-MiffBool _MiffReadR8(Miff * const miff, MiffValue * const value)
-{
-   Miff8          vtemp;
-   MiffBase64Data data;
-
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
-
-   data = _MiffBase64Restart(miff->readByteData);
-
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[4]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[5]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[6]));
-   returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[7]));
-
-   _MiffByteSwap8(miff, &vtemp);
-
-   value->r8 = vtemp.r;
-
-   returnTrue;
-}
-
-#if 0
 /******************************************************************************
 func: _MiffReadR8S
 ******************************************************************************/

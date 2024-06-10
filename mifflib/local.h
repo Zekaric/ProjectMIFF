@@ -81,23 +81,20 @@ constant:
 #define MIFF_HEADER_VERSION_STR                    "1"
 #define MIFF_HEADER_VERSION_SIZE                   1
 
-#define miffTypeKEY_VALUE_BLOCK_START_STR          "{"
-#define miffTypeKEY_VALUE_BLOCK_START_STR_SIZE     1
+#define miffTypeBLOCK_START_STR                    "{"
+#define miffTypeBLOCK_START_STR_SIZE               1
 
-#define miffTypeKEY_VALUE_BLOCK_STOP_STR           "}"
-#define miffTypeKEY_VALUE_BLOCK_STOP_STR_SIZE      1
+#define miffTypeBLOCK_STOP_STR                     "}"
+#define miffTypeBLOCK_STOP_STR_SIZE                1
 
-#define miffTypeTYPE_STR                           "type"
-#define miffTypeTYPE_STR_SIZE                      4
+#define miffTypeTYPE_STR                           "t"
+#define miffTypeTYPE_STR_SIZE                      1
+
+#define miffTypeTYPE_DEFINITION_STR                "type"
+#define miffTypeTYPE_DEFINITION_STR_SIZE           4
 
 #define miffTypeSTR_STR                            "\""
 #define miffTypeSTR_STR_SIZE                       1
-
-#define miffTypeVARIABLE_STR                       "v"
-#define miffTypeVARIABLE_STR_SIZE                  1
-
-#define miffTypeUSER_TYPE_STR                      "u"
-#define miffTypeUSER_TYPE_STR_SIZE                 1
 
 #define miffTypeBOOLEAN_STR                        "b"
 #define miffTypeBOOLEAN_STR_SIZE                   1
@@ -105,44 +102,19 @@ constant:
 #define miffTypeI_STR                              "i"
 #define miffTypeI_STR_SIZE                         1
 
-#define miffTypeI1_STR                             "i1"
-#define miffTypeI1_STR_SIZE                        2
-
-#define miffTypeI2_STR                             "i2"
-#define miffTypeI2_STR_SIZE                        2
-
-#define miffTypeI4_STR                             "i4"
-#define miffTypeI4_STR_SIZE                        2
-
-#define miffTypeI8_STR                             "i8"
-#define miffTypeI8_STR_SIZE                        2
-
 #define miffTypeN_STR                              "n"
 #define miffTypeN_STR_SIZE                         1
 
-#define miffTypeN1_STR                             "n1"
-#define miffTypeN1_STR_SIZE                        2
+#define miffTypeR_STR                              "r"
+#define miffTypeR_STR_SIZE                         1
 
-#define miffTypeN2_STR                             "n2"
-#define miffTypeN2_STR_SIZE                        2
+#if 0
+#define miffTypeR_FIXED_STR                        "R"
+#define miffTypeR_FIXED_STR_SIZE                   1
+#endif
 
-#define miffTypeN4_STR                             "n4"
-#define miffTypeN4_STR_SIZE                        2
-
-#define miffTypeN8_STR                             "n8"
-#define miffTypeN8_STR_SIZE                        2
-
-#define miffTypeR4_STR                             "r4"
-#define miffTypeR4_STR_SIZE                        2
-
-#define miffTypeR4S_STR                            "r4s"
-#define miffTypeR4S_STR_SIZE                       3
-
-#define miffTypeR8_STR                             "r8"
-#define miffTypeR8_STR_SIZE                        2
-
-#define miffTypeR8S_STR                            "r8s"
-#define miffTypeR8S_STR_SIZE                       3
+#define miffTypeBINARY_STR                         "*"
+#define miffTypeBINARY_STR_SIZE                    1
 
 #define miffTypeSTR_SIZE_MAX                       16
 
@@ -201,10 +173,8 @@ MiffBool        _MiffReadArrayCount(    Miff       * const miff, MiffN    * cons
 MiffBool        _MiffReadKey(           Miff       * const miff, MiffStr  * const key);
 MiffBool        _MiffReadLineSkip(      Miff       * const miff);
 MiffBool        _MiffReadPart(          Miff       * const miff, MiffBool const trimLeadingTabs);
-MiffBool        _MiffReadR4(            Miff       * const miff, MiffValue * const value);
-MiffBool        _MiffReadR4S(           Miff       * const miff, MiffValue * const value);
+MiffBool        _MiffReadR(            Miff       * const miff, MiffValue * const value);
 MiffBool        _MiffReadR8(            Miff       * const miff, MiffValue * const value);
-MiffBool        _MiffReadR8S(           Miff       * const miff, MiffValue * const value);
 MiffBool        _MiffReadType(          Miff       * const miff, MiffType * const type, MiffStr * const typeName);
 
 MiffStr        *_MiffTypeGetName(       MiffType const type);
@@ -217,8 +187,6 @@ MiffBool        _MiffWriteStr(          Miff const * const miff, MiffN const str
 MiffBool        _MiffWriteI(            Miff       * const miff, MiffI  const value);
 MiffBool        _MiffWriteN(            Miff       * const miff, MiffN  const value);
 MiffBool        _MiffWriteR4(           Miff       * const miff, MiffR4 const value);
-MiffBool        _MiffWriteR4S(          Miff       * const miff, MiffR4 const value);
 MiffBool        _MiffWriteR8(           Miff       * const miff, MiffR8 const value);
-MiffBool        _MiffWriteR8S(          Miff       * const miff, MiffR8 const value);
 
 #endif

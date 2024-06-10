@@ -21,7 +21,7 @@ h	|chapter| - M.I.F.F.
 
 hh	|chapter| - Discussion
 
-	What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.
+	What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.  
 
 
 hh	|chapter| - Goals
@@ -33,12 +33,13 @@ hh	|chapter| - Goals
 -	|b |Accurate| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 ]
 
+
 hh	|chapter| - Design Decisions:
 
 	|b |Why not XML or JSON?| b|
 	I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.
-	|b |Why Big Endian for multibyte data types?| b|
-	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was Big Endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different Endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another.
+	|b |Why big endian for multibyte data types?| b|
+	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was big endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another, accurately.
 
 
 hh	|chapter| - Disclosure
@@ -49,11 +50,11 @@ hh	|chapter| - Disclosure
 	zekaric@gmail.com
 
 
-h	|chapter| - Format: Base
+h	|chapter| - Format
 
-	A MIFF File is a UTF8 text file where items inside are tab delimited and each record is terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.  Values are typed.  Nesting is allowed.
+	A MIFF File is a UTF8 text file where items inside are tab delimited and each record is a single line terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.  
 	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a transfer file format to move data from one program to another.
-	Any byte data that is encode or stored as a binary byte sequence will be in big endian order.  In a text file the data is stored in Base64 encoding.
+	Any data that is encode or stored as a binary byte sequence will be in big endian order.  
 
 
 hh	|chapter| - File Header
@@ -61,13 +62,13 @@ hh	|chapter| - File Header
 	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
 .[
-- MIFF|<--|
-- 1|<--|
-- [Sub-Format Name string]|<--|
-- [Sub-Format Version string]|<--|
+MIFF|<--|
+1|<--|
+[Sub-Format Name string]|<--|
+[Sub-Format Version string]|<--|
 ]
 
-	|-->| means a tab character.  |<--| means a new line character.  The '-' is not part of the line, is it denoting the start of the line.
+	|<--| means a new line character.
 
 :[
 -	|b |Line 1| b| - Format of the file.  MIFF.
@@ -81,355 +82,131 @@ hh	|chapter| - File Header
 
 hh	|chapter| - Content
 
-	Before going into the specifics of the format we will cover some things at a high level.
-
-hhh	|chapter| - Numbers
-
-	|b |Natural numbers| b| (unsigned integers for programmers) are whole numbers ranging from 0 to some positive max value.
-	|b |Integer numbers| b| are whole numbers ranging from some negative max value to some positive max value.
-	|b |Real numbers| b|    (floating point numbers for programmers) are positive and negative numbers that may not be whole.  I.E. PI, 3.14159, is a Real number.
-
-hhh	|chapter| - Record Composition
-
-	A record basically defines a key - value pair.  However the composition of that record is composed of a few parts.
-	
-	|b |[key]| b|              will be a sequence of characters that will somewhat uniquely identify the value.
-	|b |[type code]| b|        will be a sequence of characters that will dictate what the value will look like.
-	|b |[array count]| b|      will be a number or special character to indicate the number of values of a particular type is associated with the key.
-	|b |[value]| b|            will depend on the the above; it will vary in appearance.
-
-hhhh	|chapter| - Key
-
-	Keys are always a single string of any character in UTF8 encoding as long as none are |-->| and |<--|.  Whitespace, leading, trailing, and internal to the key string are significant and cannot be trimmed or thinned out.  Keys are limited to being 255 bytes long.  In UTF8 that may not mean 255 letters/characters as some characters may end up requiring more than 1 byte.  I would suggest to limit the whitespace to just spaces and nothing else.  Everything else should be a printable character.  We do not need another "Whitespace Language" monster.
+	Each line is split into 3 sections.  The header for the line, the key for the line, and the value section.
+	Each section is separated by a |-->| character.  The entire line ends in a |<--| character.
 
 .[
-12345
-;':][.,<>]
-a_b_c
-$cost
-été
-This is also a valid key with internal spaces
+[header]|-->|[key]|-->|[value]|<--|
 ]
 
+hhh	|chapter| - Header Section
 
-hhhh	|chapter| - Type Code
+	The header for the line is one of the following.
 
 t[
-thx	Type Code
+thx	Code
 th*	Description
-
-t-
-tcx	|line||b |Block Types| b||line|
-
-t-
-tcx	{
-tc	Key-Value block begins.
-
-t-
-tcx	}
-tc	Key-Value block ends.
-
-t-
-tcx	|line||b |Basic Value Types| b||line|
 
 t-
 tcx	-
-tc	Comment line.
+tc	Comment line.  This has no meaning whatsoever in the file.  It should never contain any data or meta-data.  These lines will be ignored completely when reading the file.
 
 t-
-tcx	type
-tc	Type value.  One of these type codes.  Or potentially a user defined type as dictated by a sub-format or documenation.
+tcx	{
+tc	Open new scope.  This is so you can group data into sections or objects.
 
 t-
-tcx	"
-tc	String (UTF8) data, can be of any length.
+tcx	}
+tc	Close scope.  Denotes the end of a scope.  
 
 t-
-tcx	b
-tc	Boolean value.
+tcx	[count]
+tc	This will be a number larger than 0 to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of complex objects, use scoped above and a separate count.
 
 t-
-tcx	i1 i2 i3 i4 i8 i16 i32 i64 i128 i256
-tc	An integer number.  Min and Max value will depend on how much the bytes can encode.  Yes I know there are no native types for some of these, like i3, but I include these byte counts because they may be useful in certain cases.
-
-t-
-tcx	n1 n2 n3 n4 n8 n16 n32 n64 n128 n256
-tc	A natural number.  Ranges from 0 to max value.  Max value will depend on how much the bytes can encode.  Yes I know there are no native types for a lot of these, like n3, but I include these byte counts because they may be useful in certain cases.
-
-t-
-tcx	r4 r8
-tc	A real value.  
-
-t-
-tcx	abi1 abi2 abi4 abi8
-tc	A 2D point using integers.
-
-t-
-tcx	abn1 abn2 abn4 abn8
-tc	A 2D point using naturals.
-
-t-
-tcx	abr4 abr8
-tc	A 2D point using reals.
-
-t-
-tcx	abci1 abci2 abci4 abci8
-tc	A 3D point using integers.
-
-t-
-tcx	abcn1 abcn2 abcn4 abcn8
-tc	A 3D point using naturals.
-
-t-
-tcx	abcr4 abcr8
-tc	A 3D point using reals.
-
-t-
-tcx	abcdi1 abcdi2 abcdi4 abcdi8
-tc	A 4D point using integers.
-
-t-
-tcx	abcdn1 abcdn2 abcdn4 abcdn8
-tc	A 4D point using naturals.
-
-t-
-tcx	abcdr4 abcdr8
-tc	A 4D point using reals.
-
-t-
-tcx	mat2x2r4 mat2x2r8
-tc	A 2x2 r4 or r8 matrix
-
-t-
-tcx	mat3x3r4 mat3x3r8
-tc	A 3x3 r4 or r8 matrix
-
-t-
-tcx	mat4x4r4 mat4x4r8
-tc	A 4x4 r4 or r8 matrix
-
-t-
-tcx	|line||b |Variable Value Type| b||line|
-
-t-
-tcx	v
-tc	Variable data follows.  Could be and combination of any Value type.  What follows should be defined somewhere in the format somewhere before this is used.
-
-t-
-tcx	[any other value]
-tc	If the type code is any other string other than what is defined above, it is treated in exactly the same way as a |b |v| b|, variable, record.  Typically the contents of this record would be defined through some documentation or through some other definition of the sub-format.  We will call this a User Type.  The length and rules of a User Type are the same as the rule governing a record key value.
+tcx	*
+tc	This will be to indicate an array of unknown size.  In generaly I would advise trying to avoid this as muck as possible.  It is better to know beforehand howmuch space data should take up.  However sometimes this is unavoidable.
 
 ]
 
+	The header can have leading spaces or |-->| characters to make it more obvious which scope it belongs to.  However these spaces and |-->| characters are not needed unless you want to make it more readable.  They are stripped when reading the file.
 
-hhhh	|chapter| - Array Count
+hhh	|chapter| - Key Section
+
+	Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, some characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes the key is valid.  The key can have spaces or any special characters you like except |-->| and |<--| characters.  This does mean leading, trailing, and internal spaces in the key are significant.
+
+hhh	|chapter| - Value Section
+
+	The sub-format of the file should be dictating what values follow the key.  This should be defined somewhere in the documentation of the sub-format.  
+	There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a |-->| character.
+	If there is a count in the line header other than 1 then there should be multiple copies of whatever type that is associated with the key.
+	Values have a simple format.
+
+.[
+[header][valueData]
+]
+
+	The header is a single character.  
+	The valueData will depend on the header.
 
 t[
-thx	Encoding Code
+thx	Header
 th*	Description
 
 t-
-tc	1
-tc	A single value follows.  In binary, no array count present.
+tcx	~
+tc	The value data is unset/null.  Nothing else follows the header.
 
 t-
-tc	[number of items]
-tc	An array of values follows.  In binary, 001 means an n1 count follows; 010 means an n2 count follows; 011 means an n4 count follows; 100 means an n8 count follows; 101 means an n16 count follows; 110 means an n32 count follows.
+tcx	T, F
+tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.
 
 t-
-tc	*
-tc	An unknown count array of values follows.
-]
-
-
-hhhh	|chapter| - Value
-
-	See the types respective sections for details.
-
-
-hh	|chapter| - Format
-
-	The format is a UTF8 text file.
-	The format is only somewhat human readable, and only somewhat text editor friendly.  It was not designed to be "human friendly" but rather "debug friendly."  What I mean is that you will be able to look at the format in a text editor, if that text editor is capable of handling really large files with really long lines; and if you know this format, you will be able to debug it.
-	The format does not adhere to any line length limit.  So if you are using a text editor that does have line length limits you may end up corrupting the file or you may not be seeing the whole file.
-	All lines are terminated with a single |<--| (\n).  NOT an MSDOS/Windows Cursor Return-New Line pair (\r\n) or a MAC \n\r or just a \r.  This is a strict rule.  If the file has \r\n, \n\r, or \r line endings then it is not a MIFF file.
-
-
-hhh	|chapter| - Whitespace Characters
-
-	A whitespace character is any character that does not make a blemish on a piece of paper if printed out; this includes control characters like bell, NULL, form feed, etc.
-
-
-hhh	|chapter| - Separator Characters
-
-	MIFF only uses |-->| as a separater character.  And only one |-->| between fields.  Whitespace is not considered a separater character and will be part of a key or value if it is present.
-
-
-hhh	|chapter| - Printable Characters
-
-	Just to be clear what a printable character is.  If you had a blank piece of paper with just one character on it, if the character causes ink to be placed on the paper, it is printable.  If it does not make a mark, it is not printable (like spaces, control characters, etc.)
-
-hhh	|chapter| - Base64
-
-	A few items are stored in Base64.  This is to add a little compression to the items in question but mainly it is to ensure binary exactness of the data when writing the values out and reading the values back in.  Unlike normal Base64 which will break the buffer into lines of a certain length, Base64 values in a MIFF are one long continuous stream of characters.  No \n or line breaks of any kind will be present.
-
-hhh	|chapter| - Real Number Representation
-
-	All real numbers are stored as a Base64 string.  No exceptions.  This is to ensure that when read back into memory from file, the number is exactly as it was when it was stored in the file.  The real value in the MIFF file will be in Big Endian order.
-
-hhh	|chapter| - Record Composition
-
-.	- [type code]|-->|[key]|-->|[array count]|-->|[value]|<--|
-
-	Any space found in the key that is not a |-->| will be part of the key.  They will be significant.  Do not strip or reduce them.
-	There has to be one |-->| separator between each part.
-	How the value appears will depend on the definition here.
-
-	To be clear...
-
-	|b |Invalid:| b| Absolutely no |<--| anywhere before or within the key value line*.  Absolutely no blank lines.  Absolutely no extra |-->| anywhere in the format.
-
-.	- [type code]|-->||-->|[key]|<--|[array count] [value]|<--|
-
-	What [value] will look like will depend on what is being stored for the record.  Values will be discussed lower in section 3.
-
-
-h	|chapter| - Format: Value Specifics
-
-
-hh	|chapter| - Key-Value Block Begin and End.
-
-	Key-Value blocks are special.  They are needed to allow nesting of key values.  
-
-.[
-- {|-->|[key]|<--|
-- ...
-- }|<--|
-]
-
-	A block is terminated when a value type of "}" is reached.  There is no key for this line value type.  Every begin block value type record requires an end block value type record, there must not be extras of each in the file.  Begin Block record must match with an End Block record.  Do not take a shortcut and omit them even if they are the last few records of the file.
-	Array Count is never used with this value type and there is not value that follows.
-
-	|b |Example 1:| b|
-
-.[
-- {|-->|docInfo|<--|
-- ...
-- }|<--|
-]
-
-	|b |Example 2:| b|
-
-.[
-- {|-->|level1|<--|
-- {|-->|level2|<--|
-- {|-->|level3|<--|
-- ...
-- }|<--|
-- {|-->|anotherLevel3|<--|
-- ...
-- }|<--|
-- }|<--|
-- {|-->|anotherLevel2|<--|
-- ...
-- }|<--|
-- }|<--|
-- {|-->|anotherLevel1|<--|
-- ...
-- }|<--|
-]
-
-hh	|chapter| - Basic Values
-
-	Basic value encoding.  Based on what is being stored the byte streams only look slighly different.
-
-.[
-- [text type code]|-->|[key]|-->|1|-->|[type value]|<--|
-- [text type code]|-->|[key]|-->|[array count](|-->|[type value])*|<--|
-]
-
-	Text representation for a value will be...
-
-t[
-thx	Type Code
-thx	Representation
+tcx	+, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+tc	The value data will be a number of some sort.  An integer, real, or complex number, in human readable form.  The header is part of the number.
 
 t-
-tcx	type
-tcx	text string for the type.
+tcx	x, o, b
+tc	The value data will be a number of some sort.  But encoded in |b |x| b| hexidecimal (0123456789abcdef), |b |o| b| octal (01234567), |b |b| b| binary (01) digits.  
 
 t-
-tcx	b
-tcx	'T' or 'F'.
+tcx	I, R
+tc	The value data will be an |b |I| b| integer or a |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.
 
 t-
-tcx	i*, n*
-tcx	1 value in regular digits.
+tcx	n, N
+tc	The value data will be a big integer or big real number.  |b |n| b| will be in human readable format.  |b |N| b| will be in Base64 encoding.
 
 t-
-tcx	r*
-tcx	1 Base64 stream of the 1 value.  Big endian order.
+tcx	"
+tc	The value data will be a string.  There is no closing |b |"| b|.  Whatever follows the header |b |"| b| to the next |-->| or |<--| which ever is next, is the string.  The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  
+
+t-
+tcx	*
+tc	The value data is a binary chunk.  It will be two parts separated by a space.  First part immediately follows the * an it denotes the size of the binary chunk.  After the space will be the binary chunk in Base64 encoding.
+
 ]
 
-	If using an array flag, the above is repeated as many times as there are array elements.  Each array element will be separated by one |-->|.
-
-	|b |Example 1:| b|
-.	- type|-->|type1|-->|1|-->|b|<--|
-
-	|b |Example 2:| b|
-.	- type|-->|type2|-->|2|-->|b|-->|n4|<--|
-
-	|b |Example 4:| b|
-.	- b|-->|Bool1|-->|1|-->|T|<--|
-
-	|b |Example 5:| b|
-.	- b|-->|Bool2|-->|10|-->|T|-->|T|-->|T|-->|T|-->|T|-->|F|-->|F|-->|F|-->|F|-->|F|<--|
-
-	|b |Example 6:| b|
-.	- i4|-->|1Int|-->|1|-->|1024|<--|
-
-	|b |Example 7:| b|
-.	- n4|-->|NNat|-->|8|-->|1|-->|2|-->|4|-->|8|-->|16|-->|32|-->|64|-->|128|<--|
-
-	|b |Example 8:| b|
-.	- r4|-->|1Real|-->|1|-->|[Base64 encoded value]|<--|
-
-	|b |Example 9:| b|
-.	- r8|-->|NReal|-->|3|-->|[Base64 encoded value]|-->|[Base64 encoded value]|-->|[Base64 encoded value]|<--|
-
-
-hh	|chapter| - String values
+hh	Examples
 
 .[
-- "|-->|[key]|-->|1|-->|[string value]|<--|
-- "|-->|[key]|-->|[array count](|-->|[string value])*|<--|
+- A null value.
+1|-->|Null|-->|~|<--|
+- A true and false array.
+2|-->|True And False|-->|T|-->|F|<--|
+- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
+7|-->|Numbers|-->|0|-->|1|-->|-1|-->|3.14159|-->|-3.14159|-->|RQEkP2w|-->|RQAkh+1RELRg|<--|
+- Some integers in different encoding..
+3|-->|Encoded Numbers|-->|xfeedface|-->|o12345670|-->|b0000111100110101|<--|
+- Some strings.
+3|-->|Strings|-->|"The quick brown fox\njumped over the lazy dog.|-->|"Salut, c'est été.|-->|"你好马|<--|
+- Some binary data.
+1|-->|binary buffer|-->|*32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg|<--|
 ]
 
-	The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  This way when you see an actual tab in the record, these are used to separate strings in an array of strings.  And the actual new line character is the terminater of the record.
+	Same with removing the tabs and newlines to give you a better idea what you might see in an actual file.
 
 .[
-\t - tab            - 0x09
-\n - new line       - 0x0a
-\\ - \
+- A null value.
+1        Null             ~
+- A true and false array.
+2        True And False   T        F
+- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
+7        Numbers          0        1        -1        3.14159        -3.14159        RQEkP2w        RQAkh+1RELRg
+- Some integers in different encoding..
+3        Encoded Numbers  xfeedface        o12345670        b0000111100110101
+- Some strings.
+3        Strings          "The quick brown fox\njumped over the lazy dog.        "Salut, c'est été.        "你好马
+- Some binary data.
+1        binary buffer    *32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg
 ]
-
-	|b |Example 1:| b|
-.	- "|-->|string1|-->|1|-->|This is line1.\nThis is line 2.|<--|
-
-	|b |Example 2:| b|
-.	- "|-->|stringList1|-->|3|-->|This is string 1, line 1.\nThis is string1, line 2.\n|-->|This is string 2.|-->|This is string 3.|<--|
-
-hh	|chapter| - Variable values
-
-	Variable records should be used sparingly or when using the basic types would make the format too unweildy.  The contents of the variable record should be defined somewhere in the format documentation or through other records in the file so that the file reader will be able to parse the contents properly and safely.
-
-.[
-- v|-->|[key]|-->|1|-->|[tab delimited values]|<--|
-- v|-->|[key]|-->|[array count]|-->|[tab delimited values]|<--|
-]
-
-	A single variable type is already an array of mixed values.  And array of variables is not really any different than the single value because the API has no idea what one value would mean.  But this is potentially useful information for a reader.  In other words the reader and writer of a variable type is in control of what goes into the variable type.
-	
-hh	|chapter| - Unknown values
-
-	

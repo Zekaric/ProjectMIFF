@@ -91,17 +91,17 @@ MiffStr *_MiffTypeGetName(MiffType const type)
 {
    switch (type)
    {
-   case miffTypeBLOCK_START: return miffTypeKEY_VALUE_BLOCK_START_STR;
-   case miffTypeBLOCK_STOP:  return miffTypeKEY_VALUE_BLOCK_STOP_STR;
+   case miffTypeBLOCK_START: return miffTypeBLOCK_START_STR;
+   case miffTypeBLOCK_STOP:  return miffTypeBLOCK_STOP_STR;
    case miffTypeTYPE:        return miffTypeTYPE_STR;
    case miffTypeSTR:         return miffTypeSTR_STR;
-   case miffTypeVAR:         return miffTypeVARIABLE_STR;
-   case miffTypeUSER:        return miffTypeUSER_TYPE_STR;
    case miffTypeBOOL:        return miffTypeBOOLEAN_STR;
    case miffTypeI:           return miffTypeI_STR;
    case miffTypeN:           return miffTypeN_STR;
-   case miffTypeR4:          return miffTypeR4_STR;
-   case miffTypeR8:          return miffTypeR8_STR;
+   case miffTypeR:           return miffTypeR_STR;
+#if 0
+   case miffTypeR_FIXED:     return miffTypeR_FIXED_STR;
+#endif
    }
 
    return "";
@@ -114,17 +114,17 @@ MiffN4 _MiffTypeGetNameSize(MiffType const type)
 {
    switch (type)
    {
-   case miffTypeBLOCK_START: return miffTypeKEY_VALUE_BLOCK_START_STR_SIZE;
-   case miffTypeBLOCK_STOP:  return miffTypeKEY_VALUE_BLOCK_STOP_STR_SIZE;
+   case miffTypeBLOCK_START: return miffTypeBLOCK_START_STR_SIZE;
+   case miffTypeBLOCK_STOP:  return miffTypeBLOCK_STOP_STR_SIZE;
    case miffTypeTYPE:        return miffTypeTYPE_STR_SIZE;
    case miffTypeSTR:         return miffTypeSTR_STR_SIZE;
-   case miffTypeVAR:         return miffTypeVARIABLE_STR_SIZE;
-   case miffTypeUSER:        return miffTypeUSER_TYPE_STR_SIZE;
    case miffTypeBOOL:        return miffTypeBOOLEAN_STR_SIZE;
    case miffTypeI:           return miffTypeI_STR_SIZE;
    case miffTypeN:           return miffTypeN_STR_SIZE;
-   case miffTypeR4:          return miffTypeR4_STR_SIZE;
-   case miffTypeR8:          return miffTypeR8_STR_SIZE;
+   case miffTypeR:           return miffTypeR_STR_SIZE;
+#if 0
+   case miffTypeR_FIXED:     return miffTypeR_FIXED_STR_SIZE;
+#endif
    }
 
    return 0;

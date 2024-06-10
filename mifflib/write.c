@@ -127,18 +127,6 @@ MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
 }
 
 /******************************************************************************
-func: _MiffWriteR4S
-******************************************************************************/
-MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
-{
-   MiffStr ctemp[80];
-
-   _sprintf_s_l((char *) ctemp, 80, "%.6g", _MiffLocaleGet(), value);
-   
-   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
-}
-
-/******************************************************************************
 func: _MiffWriteR8
 ******************************************************************************/
 MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
@@ -165,6 +153,19 @@ MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
    return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
 }
 
+#if 0
+/******************************************************************************
+func: _MiffWriteR4S
+******************************************************************************/
+MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
+{
+   MiffStr ctemp[80];
+
+   _sprintf_s_l((char *) ctemp, 80, "%.6g", _MiffLocaleGet(), value);
+   
+   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
+}
+
 /******************************************************************************
 func: _MiffWriteR8S
 ******************************************************************************/
@@ -176,3 +177,4 @@ MiffBool _MiffWriteR8S(Miff * const miff, MiffR8 const value)
 
    return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
 }
+#endif

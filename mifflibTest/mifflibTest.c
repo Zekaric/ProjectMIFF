@@ -47,6 +47,11 @@ include:
 
 /******************************************************************************
 local:
+macro
+******************************************************************************/
+#define streq(S1, S2)  (strcmp(S1, S2) == 0)
+
+/******************************************************************************
 variable:
 ******************************************************************************/
 static MiffN1               _binary[] =
@@ -308,7 +313,8 @@ static MiffN1               _binary[] =
       254, 254, 254,
       255, 255, 255
 };
-static MiffN1               _n1array[] =
+
+static MiffN               _narray[] =
 {
       0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
       34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
@@ -343,111 +349,7 @@ static MiffN1               _n1array[] =
       212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
       235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
 };
-static MiffN2               _n2array[] =
-{
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
 
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
-
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-};
-static MiffN4               _n4array[] =
-{
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
-
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
-
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-};
-static MiffN8               _n8array[] =
-{
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
-
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,
-
-      0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,
-      34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,
-      65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,
-      96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,
-      120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,
-      143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,
-      166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,
-      189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,
-      212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,
-      235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
-};
 static MiffR4               _reals4[300] =
 {
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.141592653589793226535897932,
@@ -501,6 +403,7 @@ static MiffR4               _reals4[300] =
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.141592653589793226535897932,
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.141592653589793226535897932,
 };
+
 static MiffR8               _reals8[300] =
 {
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.141592653589793226535897932,
@@ -554,18 +457,19 @@ static MiffR8               _reals8[300] =
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.141592653589793226535897932,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.141592653589793226535897932,
 };
-static MiffC2              *_strings[10] =
+
+static MiffStr              *_strings[10] =
 {
-      L"the quick brown fox jumped over the lazy dog.",
-      L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
-      L"I fart in your general direction.",
-      L"No one expects the Spanish Inquisition!",
-      L"And now for something completely different.",
-      L"the quick brown fox jumped over the lazy dog.\tTHE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
-      L"THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.\nthe quick brown fox jumped over the lazy dog.",
-      L"I fart in your general direction.",
-      L"No one expects the Spanish Inquisition!",
-      L"And now for something completely different."
+      "the quick brown fox jumped over the lazy dog.",
+      "THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
+      "I fart in your general direction.",
+      "No one expects the Spanish Inquisition!",
+      "And now for something completely different.",
+      "the quick brown fox jumped over the lazy dog.\tTHE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.",
+      "THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.\nthe quick brown fox jumped over the lazy dog.",
+      "I fart in your general direction.",
+      "No one expects the Spanish Inquisition!",
+      "And now for something completely different."
 };
 static MiffBool             _bools[100] =
 {
@@ -580,53 +484,24 @@ static MiffBool             _bools[100] =
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
       miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
 };
-static MiffABI1             _abi1        = { -10, -20 };
-static MiffABI2             _abi2        = { -10, -20 };
-static MiffABI4             _abi4        = { -10, -20 };
-static MiffABN1             _abn1        = {  10,  20 };
-static MiffABN2             _abn2        = {  10,  20 };
-static MiffABN4             _abn4        = {  10,  20 };
-static MiffABR4             _abr4        = {  11.1f, 22.2f };
-static MiffABR8             _abr8        = {  11.1,  22.2 };
-static MiffABCI1            _abci1       = { -10, -20, -30 };
-static MiffABCI2            _abci2       = { -10, -20, -30 };
-static MiffABCI4            _abci4       = { -10, -20, -30 };
-static MiffABCN1            _abcn1       = {  10,  20,  30 };
-static MiffABCN2            _abcn2       = {  10,  20,  30 };
-static MiffABCN4            _abcn4       = {  10,  20,  30 };
-static MiffABCR4            _abcr4       = {  11.1f, 22.2f, 33.3f };
-static MiffABCR8            _abcr8       = {  11.1,  22.2,  33.3 };
-static MiffABCDI1           _abcdi1      = { -10, -20, -30, -40 };
-static MiffABCDI2           _abcdi2      = { -10, -20, -30, -40 };
-static MiffABCDI4           _abcdi4      = { -10, -20, -30, -40 };
-static MiffABCDN1           _abcdn1      = {  10,  20,  30,  40 };
-static MiffABCDN2           _abcdn2      = {  10,  20,  30,  40 };
-static MiffABCDN4           _abcdn4      = {  10,  20,  30,  40 };
-static MiffABCDR4           _abcdr4      = {  11.1f, 22.2f, 33.3f, 44.4f };
-static MiffABCDR8           _abcdr8      = {  11.1,  22.2,  33.3,  44.4 };
-static MiffMatrix2x2R4      _matrix2x2r4 = { 1.1f, 1.2f,             2.1f, 2.2f };
-static MiffMatrix2x2R8      _matrix2x2r8 = { 1.1,  1.2,              2.1,  2.2  };
-static MiffMatrix3x3R4      _matrix3x3r4 = { 1.1f, 1.2f, 1.3f,       2.1f, 2.2f, 2.3f,       3.1f, 3.2f, 3.3f };
-static MiffMatrix3x3R8      _matrix3x3r8 = { 1.1,  1.2,  1.3,        2.1,  2.2,  2.3,        3.1,  3.2,  3.3  };
-static MiffMatrix4x4R4      _matrix4x4r4 = { 1.1f, 1.2f, 1.3f, 1.4f, 2.1f, 2.2f, 2.3f, 2.4f, 3.1f, 3.2f, 3.3f, 3.4f, 4.1f, 4.2f, 4.3f, 4.4f };
-static MiffMatrix4x4R8      _matrix4x4r8 = { 1.1,  1.2,  1.3,  1.4,  2.1,  2.2,  2.3,  2.4,  3.1,  3.2,  3.3,  3.4,  4.1,  4.2,  4.3,  4.4 };
-
 
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffBool _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1       * const byteData);
+static MiffBool _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr       * const byteData);
 static void    *_JsonMemCreate(     JsonN4 const memByteCount);
 static void     _JsonMemDestroy(    void * const mem);
-static JsonBool _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData);
-static JsonBool _JsonTestWrite(     JsonC2 const * const fileName);
+static JsonBool _JsonTestRead(      JsonStr const * const fileName);
+static JsonBool _JsonTestReadObject(Json * const json);
+static JsonBool _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr const * const byteData);
+static JsonBool _JsonTestWrite(     JsonStr const * const fileName);
 
-static MiffBool _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
-static void    *_MiffMemCreate(     JsonN4 const memByteCount);
+static MiffBool _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr       * const byteData);
+static void    *_MiffMemCreate(     MiffN4 const memByteCount);
 static void     _MiffMemDestroy(    void * const mem);
-static MiffBool _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
-static MiffBool _MiffTestRead(      MiffC2 const * const fileName);
-static MiffBool _MiffTestWrite(     MiffC2 const * const fileName);
+static MiffBool _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData);
+static MiffBool _MiffTestRead(      MiffStr const * const fileName);
+static MiffBool _MiffTestWrite(     MiffStr const * const fileName);
 
 /******************************************************************************
 global:
@@ -652,19 +527,19 @@ int main(int acount, char **alist)
    }
 
    // Test the writing.
-   if (!_MiffTestWrite(L"FileTest.miff"))
+   if (!_MiffTestWrite("FileTest.miff"))
    {
       result = 2;
       goto DONE;
    }
 
-   if (!_MiffTestRead(L"FileTest.miff"))
+   if (!_MiffTestRead("FileTest.miff"))
    {
       result = 4;
       goto DONE;
    }
 
-   if (!_JsonTestWrite(L"FileTest.json"))
+   if (!_JsonTestWrite("FileTest.json"))
    {
       result = 8;
       goto DONE;
@@ -685,12 +560,12 @@ function:
 /******************************************************************************
 func: _GetBuffer
 ******************************************************************************/
-static JsonBool _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 * const byteData)
+static JsonBool _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonStr * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffBool _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
+static MiffBool _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -724,12 +599,12 @@ void _MiffMemDestroy(void * const mem)
 /******************************************************************************
 func: _SetBuffer
 ******************************************************************************/
-static JsonBool _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData)
+static JsonBool _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonStr const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
+static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -737,43 +612,12 @@ static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, Mi
 /******************************************************************************
 func: _JsonTestRead
 ******************************************************************************/
-static JsonBool _JsonTestRead(MiffC2 const * const fileName)
+static JsonBool _JsonTestRead(JsonStr const * const fileName)
 {
    FILE           *file;
    Json           *json;
    JsonBool        result;
-   JsonC2          subFormatNameC2[jsonKeySIZE];
-   JsonC2          typeName[jsonKeySIZE];
-   JsonN8          subFormatVersion;
-   JsonC2          key[jsonKeySIZE];
-   JsonN4          arrayIndex;
-   JsonN4          arrayCount;
-   JsonN4          row,
-                   col;
-   JsonBool        valueBool;
-   JsonI8          valueI;
-   JsonN8          valueN;
-   JsonR4          valueR4;
-   JsonR8          valueR8;
-   JsonC2         *valueStr;
-   JsonABI8        valueABI;
-   JsonABN8        valueABN;
-   JsonABR4        valueABR4;
-   JsonABR8        valueABR8;
-   JsonABCI8       valueABCI;
-   JsonABCN8       valueABCN;
-   JsonABCR4       valueABCR4;
-   JsonABCR8       valueABCR8;
-   JsonABCDI8      valueABCDI;
-   JsonABCDN8      valueABCDN;
-   JsonABCDR4      valueABCDR4;
-   JsonABCDR8      valueABCDR8;
-   JsonMatrix2x2R4 valueMatrix2x2R4;
-   JsonMatrix3x3R4 valueMatrix3x3R4;
-   JsonMatrix4x4R4 valueMatrix4x4R4;
-   JsonMatrix2x2R8 valueMatrix2x2R8;
-   JsonMatrix3x3R8 valueMatrix3x3R8;
-   JsonMatrix4x4R8 valueMatrix4x4R8;
+   JsonReadType    type;
 
    file   = NULL;
    json   = NULL;
@@ -781,13 +625,13 @@ static JsonBool _JsonTestRead(MiffC2 const * const fileName)
 
    for (;;)
    {
-      if (_wfopen_s(&file, fileName, L"rb") != 0)
+      if (fopen_s(&file, fileName, "rb") != 0)
       {
          break;
       }
 
       // Set Json up for reading.
-      json = jsonCreateReader(jsonBoolTRUE, _JsonGetBuffer, (void *) file);
+      json = jsonCreateReader(_JsonGetBuffer, (void *) file);
       if (!json)
       {
          break;
@@ -800,686 +644,15 @@ static JsonBool _JsonTestRead(MiffC2 const * const fileName)
             break;
          }
 
-         if (type == jsonTypeUSER_TYPE)
+         if (type == jsonReadTypeOBJECT_START)
          {
-            wprintf(L"%s\t%s\t%d\t", typeName, key, arrayCount);
+            wprintf(L"Object Start {\n");
+            if (!_JsonTestReadObject(json))
+            {
+               break;
+            }
          }
          else
-         {
-            wprintf(L"%s\t%s\t%d\t", jsonTypeGetC2(type), key, arrayCount);
-         }
-
-         if      (type == jsonTypeKEY_VALUE_BLOCK_STOP ||
-                  type == jsonTypeKEY_VALUE_BLOCK_START)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeTYPE)
-         {
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeSTRING)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               // Separate strings.
-               if (arrayIndex)
-               {
-                  wprintf(L"\n---");
-               }
-
-               if (!jsonGetValueStringC2(json, &valueStr))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"\n%s ", valueStr);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeVARIABLE ||
-                  type == jsonTypeUSER_TYPE)
-         {
-            if (jsonGetValueI(json, &valueI) &&
-                valueI == 42)
-            {
-               wprintf(L"P1 ok, ");
-            }
-            else
-            {
-               wprintf(L"ERROR\n");
-            }
-            if (jsonGetValueStringC2(json, &valueStr) &&
-                memcmp(valueStr, L"Yes, but what is the question?", wcslen(L"Yes, but what is the question?")) == 0)
-            {
-               wprintf(L"P2 ok, ");
-            }
-            else
-            {
-               wprintf(L"ERROR\n");
-            }
-            if (jsonGetValueR8(json, &valueR8) &&
-                valueR8 == 3.1415926535897932)
-            {
-               wprintf(L"P3 ok");
-            }
-            else
-            {
-               wprintf(L"ERROR\n");
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeBOOLEAN)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueBoolean(json, &valueBool))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%c ", (valueBool == jsonBoolTRUE) ? L'T' : L'F');
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeI1 ||
-                  type == jsonTypeI2 ||
-                  type == jsonTypeI4 ||
-                  type == jsonTypeI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueI(json, &valueI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d ", valueI);
-            }
-            wprintf(L"\n");
-         }
-         //else if (type == jsonTypeI16 ||
-         //         type == jsonTypeI32 ||
-         //         type == jsonTypeI64 ||
-         //         type == jsonTypeI128 ||
-         //         type == jsonTypeI256)
-         //{
-         //   wprintf(L"\n");
-         //}
-         else if (type == jsonTypeN1 ||
-                  type == jsonTypeN2 ||
-                  type == jsonTypeN4 ||
-                  type == jsonTypeN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueN(json, &valueN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u ", valueN);
-            }
-            wprintf(L"\n");
-         }
-         //else if (type == jsonTypeN16 ||
-         //         type == jsonTypeN32 ||
-         //         type == jsonTypeN64 ||
-         //         type == jsonTypeN128 ||
-         //         type == jsonTypeN256)
-         //{
-         //   wprintf(L"\n");
-         //}
-         else if (type == jsonTypeR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueR4(json, &valueR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g ", (double) valueR4);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueR4S(json, &valueR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g ", (double) valueR4);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueR8(json, &valueR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g ", valueR8);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueR8S(json, &valueR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g ", valueR8);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABI1 ||
-                  type == jsonTypeABI2 ||
-                  type == jsonTypeABI4 ||
-                  type == jsonTypeABI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABI(json, &valueABI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d ", valueABI.a, valueABI.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABN1 ||
-                  type == jsonTypeABN2 ||
-                  type == jsonTypeABN4 ||
-                  type == jsonTypeABN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABN(json, &valueABN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u ", valueABN.a, valueABN.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABR4(json, &valueABR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABR4S(json, &valueABR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABR8(json, &valueABR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABR8S(json, &valueABR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCI1 ||
-                  type == jsonTypeABCI2 ||
-                  type == jsonTypeABCI4 ||
-                  type == jsonTypeABCI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCI(json, &valueABCI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d %I64d ", valueABCI.a, valueABCI.b, valueABCI.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCN1 ||
-                  type == jsonTypeABCN2 ||
-                  type == jsonTypeABCN4 ||
-                  type == jsonTypeABCN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCN(json, &valueABCN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u %I64u ", valueABCN.a, valueABCN.b, valueABCN.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCR4(json, &valueABCR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCR4S(json, &valueABCR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCR8(json, &valueABCR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCR8S(json, &valueABCR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDI1 ||
-                  type == jsonTypeABCDI2 ||
-                  type == jsonTypeABCDI4 ||
-                  type == jsonTypeABCDI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDI(json, &valueABCDI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d %I64d %I64d ", valueABCDI.a, valueABCDI.b, valueABCDI.c, valueABCDI.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDN1 ||
-                  type == jsonTypeABCDN2 ||
-                  type == jsonTypeABCDN4 ||
-                  type == jsonTypeABCDN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDN(json, &valueABCDN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u %I64u %I64u ", valueABCDN.a, valueABCDN.b, valueABCDN.c, valueABCDN.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDR4(json, &valueABCDR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDR4S(json, &valueABCDR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDR8(json, &valueABCDR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeABCDR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueABCDR8S(json, &valueABCDR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX2X2R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix2x2R4(json, &valueMatrix2x2R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX2X2R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix2x2R4S(json, &valueMatrix2x2R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX2X2R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix2x2R8(json, &valueMatrix2x2R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX2X2R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix2x2R8S(json, &valueMatrix2x2R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX3X3R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix3x3R4(json, &valueMatrix3x3R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX3X3R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix3x3R4S(json, &valueMatrix3x3R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX3X3R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix3x3R8(json, &valueMatrix3x3R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX3X3R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix3x3R8S(json, &valueMatrix3x3R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX4X4R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix4x4R4(json, &valueMatrix4x4R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX4X4R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix4x4R4S(json, &valueMatrix4x4R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX4X4R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix4x4R8(json, &valueMatrix4x4R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == jsonTypeMATRIX4X4R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!jsonGetValueMatrix4x4R8S(json, &valueMatrix4x4R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else
-         {
-            wprintf(L"\n");
-         }
-
-         if (!jsonRecordGetEnd(json))
          {
             break;
          }
@@ -1496,10 +669,40 @@ static JsonBool _JsonTestRead(MiffC2 const * const fileName)
 }
 
 /******************************************************************************
+func: _JsonTestReadObject
+******************************************************************************/
+static JsonBool _JsonTestReadObject(Json * const json)
+{
+   JsonReadType type;
+
+   for (;;)
+   {
+      if (!jsonRead(json, &type))
+      {
+         break;
+      }
+
+      if (type == jsonReadTypeOBJECT_STOP)
+      {
+         wprintf(L"} Object Stop \n");
+         continue;
+      }
+      else
+      {
+         // We got something we were not expecting.
+         return jsonBoolFALSE;
+      }
+   }
+
+   return jsonBoolTRUE;
+}
+
+/******************************************************************************
 func: _JsonTestWrite
 ******************************************************************************/
-static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
+static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 {
+#if 0
    FILE     *file;
    Json     *json;
    JsonBool  result;
@@ -1510,7 +713,7 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
 
    for (;;)
    {
-      if (_wfopen_s(&file, (wchar_t *) fileName, L"wb") != 0)
+      if (fopen_s(&file, fileName, "wb") != 0)
       {
          break;
       }
@@ -1524,166 +727,135 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
 
       jsonWriteObjectStart(json);
 
-      jsonWriteKey1Boolean(      json, L"True",  jsonBoolTRUE);
-      jsonWriteKey1Boolean(      json, L"False", jsonBoolFALSE);
+      jsonWriteKey1Boolean(      json, "True",  jsonBoolTRUE);
+      jsonWriteKey1Boolean(      json, "False", jsonBoolFALSE);
 
-      jsonWriteKey1I1(           json, L"I1_0",     0);
-      jsonWriteKey1I1(           json, L"I1_1",     1);
-      jsonWriteKey1I1(           json, L"I1_-1",    -1);
-      jsonWriteKey1I1(           json, L"I1_127",   127);
-      jsonWriteKey1I1(           json, L"I1_-128",  -128);
+      jsonWriteKey1I1(           json, "I1_0",     0);
+      jsonWriteKey1I1(           json, "I1_1",     1);
+      jsonWriteKey1I1(           json, "I1_-1",    -1);
+      jsonWriteKey1I1(           json, "I1_127",   127);
+      jsonWriteKey1I1(           json, "I1_-128",  -128);
                     
-      jsonWriteKey1N1(           json, L"N1_0",     0);
-      jsonWriteKey1N1(           json, L"N1_1",     1);
-      jsonWriteKey1N1(           json, L"N1_255",   255);
+      jsonWriteKey1N1(           json, "N1_0",     0);
+      jsonWriteKey1N1(           json, "N1_1",     1);
+      jsonWriteKey1N1(           json, "N1_255",   255);
 
-      jsonWriteKey1I2(           json, L"I2_0",     0);
-      jsonWriteKey1I2(           json, L"I2_1",     1);
-      jsonWriteKey1I2(           json, L"I2_-1",    -1);
+      jsonWriteKey1I2(           json, "I2_0",     0);
+      jsonWriteKey1I2(           json, "I2_1",     1);
+      jsonWriteKey1I2(           json, "I2_-1",    -1);
 
-      jsonWriteKey1N2(           json, L"N2_0",     0);
-      jsonWriteKey1N2(           json, L"N2_1",     1);
+      jsonWriteKey1N2(           json, "N2_0",     0);
+      jsonWriteKey1N2(           json, "N2_1",     1);
 
-      jsonWriteKey1I4(           json, L"I4_0",     0);
-      jsonWriteKey1I4(           json, L"I4_1",     1);
-      jsonWriteKey1I4(           json, L"I4_-1",    -1);
+      jsonWriteKey1I4(           json, "I4_0",     0);
+      jsonWriteKey1I4(           json, "I4_1",     1);
+      jsonWriteKey1I4(           json, "I4_-1",    -1);
 
-      jsonWriteKey1N4(           json, L"N4_0",     0);
-      jsonWriteKey1N4(           json, L"N4_1",     1);
+      jsonWriteKey1N4(           json, "N4_0",     0);
+      jsonWriteKey1N4(           json, "N4_1",     1);
 
-      jsonWriteKey1R4(           json, L"R4_0",     0.0);
-      jsonWriteKey1R4(           json, L"R4_1",     1.0);
-      jsonWriteKey1R4(           json, L"R4_-1",    -1.0);
-      jsonWriteKey1R4(           json, L"R4_PI",    3.1415926535897932f);
+      jsonWriteKey1R4(           json, "R4_0",     0.0);
+      jsonWriteKey1R4(           json, "R4_1",     1.0);
+      jsonWriteKey1R4(           json, "R4_-1",    -1.0);
+      jsonWriteKey1R4(           json, "R4_PI",    3.1415926535897932f);
 
-      jsonWriteKey1I8(           json, L"I8_0",     0);
-      jsonWriteKey1I8(           json, L"I8_1",     1);
-      jsonWriteKey1I8(           json, L"I8_-1",    -1);
+      jsonWriteKey1I8(           json, "I8_0",     0);
+      jsonWriteKey1I8(           json, "I8_1",     1);
+      jsonWriteKey1I8(           json, "I8_-1",    -1);
 
-      jsonWriteKey1N8(           json, L"N8_0",     0);
-      jsonWriteKey1N8(           json, L"N8_1",     1);
+      jsonWriteKey1N8(           json, "N8_0",     0);
+      jsonWriteKey1N8(           json, "N8_1",     1);
 
-      jsonWriteKey1R8(           json, L"R8_0",     0.0);
-      jsonWriteKey1R8(           json, L"R8_1",     1.0);
-      jsonWriteKey1R8(           json, L"R8_-1",    -1.0);
-      jsonWriteKey1R8(           json, L"R8_PI",    3.1415926535897932);
+      jsonWriteKey1R8(           json, "R8_0",     0.0);
+      jsonWriteKey1R8(           json, "R8_1",     1.0);
+      jsonWriteKey1R8(           json, "R8_-1",    -1.0);
+      jsonWriteKey1R8(           json, "R8_PI",    3.1415926535897932);
 
-      jsonWriteKey1StringC2(     json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      jsonWriteKey1StringC2(     json, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      jsonWriteKey1ABI1(         json, L"ABI1",     (JsonABI1 *)        &_abi1       );
-      jsonWriteKey1ABI2(         json, L"ABI2",     (JsonABI2 *)        &_abi2       );
-      jsonWriteKey1ABI4(         json, L"ABI4",     (JsonABI4 *)        &_abi4       );
-      jsonWriteKey1ABN1(         json, L"ABN1",     (JsonABN1 *)        &_abn1       );
-      jsonWriteKey1ABN2(         json, L"ABN2",     (JsonABN2 *)        &_abn2       );
-      jsonWriteKey1ABN4(         json, L"ABN4",     (JsonABN4 *)        &_abn4       );
-      jsonWriteKey1ABR4(         json, L"ABR4",     (JsonABR4 *)        &_abr4       );
-      jsonWriteKey1ABR8(         json, L"ABR8",     (JsonABR8 *)        &_abr8       );
-      jsonWriteKey1ABCI1(        json, L"ABCI1",    (JsonABCI1 *)       &_abci1      );
-      jsonWriteKey1ABCI2(        json, L"ABCI2",    (JsonABCI2 *)       &_abci2      );
-      jsonWriteKey1ABCI4(        json, L"ABCI4",    (JsonABCI4 *)       &_abci4      );
-      jsonWriteKey1ABCN1(        json, L"ABCN1",    (JsonABCN1 *)       &_abcn1      );
-      jsonWriteKey1ABCN2(        json, L"ABCN2",    (JsonABCN2 *)       &_abcn2      );
-      jsonWriteKey1ABCN4(        json, L"ABCN4",    (JsonABCN4 *)       &_abcn4      );
-      jsonWriteKey1ABCR4(        json, L"ABCR4",    (JsonABCR4 *)       &_abcr4      );
-      jsonWriteKey1ABCR8(        json, L"ABCR8",    (JsonABCR8 *)       &_abcr8      );
-      jsonWriteKey1ABCDI1(       json, L"ABCDI1",   (JsonABCDI1 *)      &_abcdi1     );
-      jsonWriteKey1ABCDI2(       json, L"ABCDI2",   (JsonABCDI2 *)      &_abcdi2     );
-      jsonWriteKey1ABCDI4(       json, L"ABCDI4",   (JsonABCDI4 *)      &_abcdi4     );
-      jsonWriteKey1ABCDN1(       json, L"ABCDN1",   (JsonABCDN1 *)      &_abcdn1     );
-      jsonWriteKey1ABCDN2(       json, L"ABCDN2",   (JsonABCDN2 *)      &_abcdn2     );
-      jsonWriteKey1ABCDN4(       json, L"ABCDN4",   (JsonABCDN4 *)      &_abcdn4     );
-      jsonWriteKey1ABCDR4(       json, L"ABCDR4",   (JsonABCDR4 *)      &_abcdr4     );
-      jsonWriteKey1ABCDR8(       json, L"ABCDR8",   (JsonABCDR8 *)      &_abcdr8     );
-      jsonWriteKey1Matrix2x2R4(  json, L"mat224",   (JsonMatrix2x2R4 *) &_matrix2x2r4);
-      jsonWriteKey1Matrix2x2R8(  json, L"mat228",   (JsonMatrix2x2R8 *) &_matrix2x2r8);
-      jsonWriteKey1Matrix3x3R4(  json, L"mat334",   (JsonMatrix3x3R4 *) &_matrix3x3r4);
-      jsonWriteKey1Matrix3x3R8(  json, L"mat338",   (JsonMatrix3x3R8 *) &_matrix3x3r8);
-      jsonWriteKey1Matrix4x4R4(  json, L"mat444",   (JsonMatrix4x4R4 *) &_matrix4x4r4);
-      jsonWriteKey1Matrix4x4R8(  json, L"mat448",   (JsonMatrix4x4R8 *) &_matrix4x4r8);
-
-      jsonWriteKey(              json, L"variableIntStrReal");
+      jsonWriteKey(              json, "variableIntStrReal");
       jsonWriteArrayStart(       json);
       jsonWriteValueI(           json, 42);
-      jsonWriteValueStringC2(    json, L"Yes, but what is the question?");
+      jsonWriteValueStringC2(    json, "Yes, but what is the question?");
       jsonWriteValueR8(          json, 3.1415926535897932);
       jsonWriteArrayStop(        json);
 
-      jsonWriteKeyNI1(           json, L"I1_Array",     256,     (MiffI1 *) _n1array);
-      jsonWriteKeyNN1(           json, L"N1_Array",     256,     _n1array);
+      jsonWriteKeyNI1(           json, "I1_Array",     256,     (MiffI1 *) _n1array);
+      jsonWriteKeyNN1(           json, "N1_Array",     256,     _n1array);
 
-      jsonWriteKeyNI2(           json, L"I2_Array",     256,     (MiffI2 *) _n2array);
-      jsonWriteKeyNN2(           json, L"N2_Array",     256,     _n2array);
+      jsonWriteKeyNI2(           json, "I2_Array",     256,     (MiffI2 *) _n2array);
+      jsonWriteKeyNN2(           json, "N2_Array",     256,     _n2array);
 
-      jsonWriteKeyNI4(           json, L"I4_Array",     256,     (MiffI4 *) _n4array);
-      jsonWriteKeyNN4(           json, L"N4_Array",     256,     _n4array);
+      jsonWriteKeyNI4(           json, "I4_Array",     256,     (MiffI4 *) _n4array);
+      jsonWriteKeyNN4(           json, "N4_Array",     256,     _n4array);
 
-      jsonWriteKeyNI8(           json, L"I8_Array",     256,     (MiffI8 *) _n8array);
-      jsonWriteKeyNN8(           json, L"N8_Array",     256,     _n8array);
+      jsonWriteKeyNI8(           json, "I8_Array",     256,     (MiffI8 *) _n8array);
+      jsonWriteKeyNN8(           json, "N8_Array",     256,     _n8array);
 
-      jsonWriteKeyNR4(           json, L"R4_Array",     300,     _reals4);
-      jsonWriteKeyNR8(           json, L"R8_Array",     300,     _reals8);
+      jsonWriteKeyNR4(           json, "R4_Array",     300,     _reals4);
+      jsonWriteKeyNR8(           json, "R8_Array",     300,     _reals8);
 
-      jsonWriteKeyNStringC2(     json, L"String_Array", 10,      (JsonC2 **) _strings);
+      jsonWriteKeyNStringC2(     json, "String_Array", 10,      (JsonStr **) _strings);
 
-      jsonWriteKeyNBoolean(      json, L"Bool_Array",   100,     (JsonBool *) _bools);
+      jsonWriteKeyNBoolean(      json, "Bool_Array",   100,     (JsonBool *) _bools);
 
-      jsonWriteKey(              json, L"userVarIntStrReal");
+      jsonWriteKey(              json, "userVarIntStrReal");
       jsonWriteArrayStart(       json);
       jsonWriteValueI(           json, 42);
-      jsonWriteValueStringC2(    json, L"Yes, but what is the question?");
+      jsonWriteValueStringC2(    json, "Yes, but what is the question?");
       jsonWriteValueR8(          json, 3.1415926535897932);
       jsonWriteArrayStop(        json);
 
-      jsonWriteKey(        json, L"KeyValueBlock");
+      jsonWriteKey(        json, "KeyValueBlock");
       jsonWriteObjectStart(json);
       {
-         jsonWriteKey1Boolean( json, L"True",     jsonBoolTRUE);
-         jsonWriteKey1Boolean( json, L"False",    jsonBoolFALSE);
+         jsonWriteKey1Boolean( json, "True",     jsonBoolTRUE);
+         jsonWriteKey1Boolean( json, "False",    jsonBoolFALSE);
 
-         jsonWriteKey1I1(      json, L"I1_0",     0);
-         jsonWriteKey1I1(      json, L"I1_1",     1);
-         jsonWriteKey1I1(      json, L"I1_-1",    -1);
-         jsonWriteKey1I1(      json, L"I1_127",   127);
-         jsonWriteKey1I1(      json, L"I1_-128",  -128);
+         jsonWriteKey1I1(      json, "I1_0",     0);
+         jsonWriteKey1I1(      json, "I1_1",     1);
+         jsonWriteKey1I1(      json, "I1_-1",    -1);
+         jsonWriteKey1I1(      json, "I1_127",   127);
+         jsonWriteKey1I1(      json, "I1_-128",  -128);
 
-         jsonWriteKey1N1(      json, L"N1_0",     0);
-         jsonWriteKey1N1(      json, L"N1_1",     1);
-         jsonWriteKey1N1(      json, L"N1_255",   255);
+         jsonWriteKey1N1(      json, "N1_0",     0);
+         jsonWriteKey1N1(      json, "N1_1",     1);
+         jsonWriteKey1N1(      json, "N1_255",   255);
 
-         jsonWriteKey1I2(      json, L"I2_0",     0);
-         jsonWriteKey1I2(      json, L"I2_1",     1);
-         jsonWriteKey1I2(      json, L"I2_-1",    -1);
+         jsonWriteKey1I2(      json, "I2_0",     0);
+         jsonWriteKey1I2(      json, "I2_1",     1);
+         jsonWriteKey1I2(      json, "I2_-1",    -1);
 
-         jsonWriteKey1N2(      json, L"N2_0",     0);
-         jsonWriteKey1N2(      json, L"N2_1",     1);
+         jsonWriteKey1N2(      json, "N2_0",     0);
+         jsonWriteKey1N2(      json, "N2_1",     1);
 
-         jsonWriteKey1I4(      json, L"I4_0",     0);
-         jsonWriteKey1I4(      json, L"I4_1",     1);
-         jsonWriteKey1I4(      json, L"I4_-1",    -1);
+         jsonWriteKey1I4(      json, "I4_0",     0);
+         jsonWriteKey1I4(      json, "I4_1",     1);
+         jsonWriteKey1I4(      json, "I4_-1",    -1);
 
-         jsonWriteKey1N4(      json, L"N4_0",     0);
-         jsonWriteKey1N4(      json, L"N4_1",     1);
+         jsonWriteKey1N4(      json, "N4_0",     0);
+         jsonWriteKey1N4(      json, "N4_1",     1);
 
-         jsonWriteKey1R4(      json, L"R4_0",     0.0);
-         jsonWriteKey1R4(      json, L"R4_1",     1.0);
-         jsonWriteKey1R4(      json, L"R4_-1",    -1.0);
-         jsonWriteKey1R4(      json, L"R4_PI",    3.1415926535897932f);
+         jsonWriteKey1R4(      json, "R4_0",     0.0);
+         jsonWriteKey1R4(      json, "R4_1",     1.0);
+         jsonWriteKey1R4(      json, "R4_-1",    -1.0);
+         jsonWriteKey1R4(      json, "R4_PI",    3.1415926535897932f);
 
-         jsonWriteKey1I8(      json, L"I8_0",     0);
-         jsonWriteKey1I8(      json, L"I8_1",     1);
-         jsonWriteKey1I8(      json, L"I8_-1",    -1);
+         jsonWriteKey1I8(      json, "I8_0",     0);
+         jsonWriteKey1I8(      json, "I8_1",     1);
+         jsonWriteKey1I8(      json, "I8_-1",    -1);
 
-         jsonWriteKey1N8(      json, L"N8_0",     0);
-         jsonWriteKey1N8(      json, L"N8_1",     1);
+         jsonWriteKey1N8(      json, "N8_0",     0);
+         jsonWriteKey1N8(      json, "N8_1",     1);
 
-         jsonWriteKey1R8(      json, L"R8_0",     0.0);
-         jsonWriteKey1R8(      json, L"R8_1",     1.0);
-         jsonWriteKey1R8(      json, L"R8_-1",    -1.0);
-         jsonWriteKey1R8(      json, L"R8_PI",    3.1415926535897932);
+         jsonWriteKey1R8(      json, "R8_0",     0.0);
+         jsonWriteKey1R8(      json, "R8_1",     1.0);
+         jsonWriteKey1R8(      json, "R8_-1",    -1.0);
+         jsonWriteKey1R8(      json, "R8_PI",    3.1415926535897932);
 
-         jsonWriteKey1StringC2(json, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+         jsonWriteKey1StringC2(json, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-         jsonWriteKeyNStringC2(json, L"String_Array", 10,      _strings);
+         jsonWriteKeyNStringC2(json, "String_Array", 10,      _strings);
       }
       jsonWriteObjectStop(json);
 
@@ -1697,49 +869,27 @@ static JsonBool _JsonTestWrite(JsonC2 const * const fileName)
    fclose(file);
 
    return result;
+#endif
+   return jsonBoolFALSE;
 }
 
 /******************************************************************************
 func: _MiffTestRead
 ******************************************************************************/
-static MiffBool _MiffTestRead(MiffC2 const * const fileName)
+static MiffBool _MiffTestRead(MiffStr const * const fileName)
 {
    FILE           *file;
    Miff           *miff;
    MiffBool        result;
-   MiffC2          subFormatNameC2[miffKeySIZE];
-   MiffC2          typeName[miffKeySIZE];
-   MiffN8          subFormatVersion;
+   MiffStr         subFormatName[miffKeySIZE];
+   MiffStr         typeName[miffKeySIZE];
+   MiffN           subFormatVersion;
    MiffType        type;
-   MiffC2          key[miffKeySIZE];
-   MiffN4          arrayIndex;
-   MiffN4          arrayCount;
-   MiffN4          row,
-                   col;
-   MiffBool        valueBool;
-   MiffI8          valueI;
-   MiffN8          valueN;
-   MiffR4          valueR4;
-   MiffR8          valueR8;
-   MiffC2         *valueStr;
-   MiffABI8        valueABI;
-   MiffABN8        valueABN;
-   MiffABR4        valueABR4;
-   MiffABR8        valueABR8;
-   MiffABCI8       valueABCI;
-   MiffABCN8       valueABCN;
-   MiffABCR4       valueABCR4;
-   MiffABCR8       valueABCR8;
-   MiffABCDI8      valueABCDI;
-   MiffABCDN8      valueABCDN;
-   MiffABCDR4      valueABCDR4;
-   MiffABCDR8      valueABCDR8;
-   MiffMatrix2x2R4 valueMatrix2x2R4;
-   MiffMatrix3x3R4 valueMatrix3x3R4;
-   MiffMatrix4x4R4 valueMatrix4x4R4;
-   MiffMatrix2x2R8 valueMatrix2x2R8;
-   MiffMatrix3x3R8 valueMatrix3x3R8;
-   MiffMatrix4x4R8 valueMatrix4x4R8;
+   MiffStr         key[miffKeySIZE];
+   MiffN           arrayIndex;
+   MiffN           arrayCount;
+   MiffValue       value;
+   MiffN           index;
 
    file   = NULL;
    miff   = NULL;
@@ -1747,7 +897,7 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
 
    for (;;)
    {
-      if (_wfopen_s(&file, fileName, L"rb") != 0)
+      if (fopen_s(&file, fileName, "rb") != 0)
       {
          break;
       }
@@ -1756,7 +906,7 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
       miff = miffCreateReader(
          miffBoolTRUE,
          _MiffGetBuffer,
-         subFormatNameC2,
+         subFormatName,
          &subFormatVersion,
          (void *) file);
       if (!miff)
@@ -1765,26 +915,242 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
       }
 
       // Read in the header information.
-      wprintf(L"%s\t%d\n", subFormatNameC2, (int) subFormatVersion);
+      wprintf(L"%S\t%d\n", (char *) subFormatName, (int) subFormatVersion);
 
-      for (;;)
+
+#define TEST_B(KEY)                                                                                            \
+      printf("b\t%s\t", KEY);                                                                                  \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeBOOL || !streq(key, KEY)) { printf("ERROR\t"); }                                  \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_B_VALUE(VALUE)                                                                                    \
+      value = miffGetValueBoolean(miff);                                                                       \
+      if (miffValueGetValueType(value) != miffTypeBOOL || miffValueGetBool(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_I(KEY)                                                                                            \
+      printf("i\t%s\t", KEY);                                                                                  \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeI || !streq(key, KEY) { printf("ERROR\t"); }                                      \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_I_VALUE(VALUE)                                                                                    \
+      value = miffGetValueI(miff);                                                                             \
+      if (miffValueGetValueType(value) != miffTypeI || miffValueGetI(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_N(KEY)                                                                                            \
+      printf("n\t%s\t", KEY);                                                                                  \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeN || !streq(key, KEY)) { printf("ERROR\t"); }                                     \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_N_VALUE(VALUE)                                                                                    \
+      value = miffGetValueN(miff);                                                                             \
+      if (miffValueGetValueType(value) != miffTypeN || miffValueGetN(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_R(KEY)                                                                                            \
+      printf("r\t%s\t", KEY);                                                                                  \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeR || !streq(key, KEY)) { printf("ERROR\t"); }                                     \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_R4_VALUE(VALUE)                                                                                   \
+      value = miffGetValueR(miff);                                                                             \
+      if (miffValueGetValueType(value) != miffTypeR || miffValueGetRType(value) == 4 || miffValueGetR4(value) != VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
+#define TEST_R8_VALUE(VALUE)                                                                                   \
+      value = miffGetValueR(miff);                                                                             \
+      if (miffValueGetValueType(value) != miffTypeR || miffValueGetRType(value) == 8 || miffValueGetR4(value) != VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_TYPE(KEY)                                                                                         \
+      printf("t\t%s\t", KEY);                                                                                  \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeTYPE || !streq(key, KEY)) { printf("ERROR\t"); }                                  \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_TYPE_VALUE(VALUE)                                                                                 \
+      value = miffGetValueType(miff);                                                                          \
+      if (miffValueGetValueType(value) != miffTypeTYPE || miffValueGetType(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_STR(KEY)                                                                                          \
+      printf("\"\t%s\t", KEY);                                                                                 \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeSTR || !streq(key, KEY)) { printf("ERROR\t"); }                                   \
+         else { printf("OK\t"); }                                                                              \
+      }
+#define TEST_STR_VALUE(VALUE)                                                                                  \
+      value = miffGetValueStr(miff);                                                                           \
+      if (miffValueGetValueType(value) != miffTypeSTR || !streq(miffValueGetStr(value), VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
+
+#define TEST_COUNT(COUNT) if (COUNT != count) { printf("ERROR\t"); } else { printf("OK\t"); }
+
+#define TEST_NEXT() if (!miffGetRecordEnd(miff)) { printf("ERROR, No Next Record\n"); }
+
+#define TEST_VAR(KEY, TYPE)                                                                                    \
+      printf("\"\t%s\t", KEY);                                                                                 \
+      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
+      else {                                                                                                   \
+         if (type != miffTypeOTHER || !streq(key, KEY) || !streq(typeName, TYPE)) { printf("ERROR\t"); }       \
+         else { printf("OK\t"); }                                                                              \
+      }
+
+
+      // Unless you are in full control of the format, do not assume that there will be an order
+      // to the values.
+      TEST_B("True");      TEST_B_VALUE(miffBoolTRUE);            TEST_NEXT();
+      TEST_B("False");     TEST_B_VALUE(miffBoolFALSE);           TEST_NEXT();
+
+      TEST_I("I_0");       TEST_I_VALUE(0);                       TEST_NEXT();
+      TEST_I("I_1");       TEST_I_VALUE(1);                       TEST_NEXT();
+      TEST_I("I_-1");      TEST_I_VALUE(-1);                      TEST_NEXT();
+      TEST_I("I_127");     TEST_I_VALUE(127);                     TEST_NEXT();
+      TEST_I("I_-128");    TEST_I_VALUE(-128);                    TEST_NEXT();
+                             
+      TEST_N("N_0");       TEST_N_VALUE(0);                       TEST_NEXT();
+      TEST_N("N_1");       TEST_N_VALUE(1);                       TEST_NEXT();
+      TEST_N("N_255");     TEST_N_VALUE(255);                     TEST_NEXT();
+                             
+      TEST_R("R4_0");      TEST_R4_VALUE(0.0);                    TEST_NEXT();
+      TEST_R("R4_1");      TEST_R4_VALUE(1.0);                    TEST_NEXT();
+      TEST_R("R4_-1");     TEST_R4_VALUE(-1.0);                   TEST_NEXT();
+      TEST_R("R4_PI");     TEST_R4_VALUE(3.1415926535897932f);    TEST_NEXT();
+      
+      TEST_R("R8_0");      TEST_R8_VALUE(0.0);                    TEST_NEXT();
+      TEST_R("R8_1");      TEST_R8_VALUE(1.0);                    TEST_NEXT();
+      TEST_R("R8_-1");     TEST_R8_VALUE(-1.0);                   TEST_NEXT();
+      TEST_R("R8_PI");     TEST_R8_VALUE(3.1415926535897932);     TEST_NEXT();
+                             
+      TEST_TYPE("TypeBool"); TEST_TYPE_VALUE(miffTypeBOOL);       TEST_NEXT();
+      TEST_TYPE("TypeKey");  TEST_TYPE_VALUE(miffTypeTYPE);       TEST_NEXT();
+                             
+      TEST_STR("String");    TEST_STR_VALUE("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                                                                  TEST_NEXT();
+                             
+      TEST_B("Bool_Array"); TEST_COUNT(100);
+      forCount(index, count)
       {
-         if (!miffRecordGetBegin(miff, &type, typeName, key, &arrayCount))
-         {
-            break;
-         }
+         value = miffGetValueBoolean(miff);
+         if (miffValueGetBool(value) != _bools[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
 
-         if (type == miffTypeUSER_TYPE)
+      TEST_I("I_Array"); TEST_COUNT(256);,
+      forCount(index, count)
+      {
+         value = miffGetValueI(miff);
+         if (miffValueGetI(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_N("N_Array"); TEST_COUNT(256(, );
+      forCount(index, count)
+      {
+         value = miffGetValueI(miff);
+         if (miffValueGetN(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_R("R4_Array"); TEST_COUNT(300);
+      forCount(index, count)
+      {
+         value = miffGetValueR(miff);
+         if (miffValueGetRType(value) != 4 || miffValueGetR4(value) != _reals4[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_R("R8_Array"); TEST_COUNT(300);
+      forCount(index, count)
+      {
+         value = miffGetValueR(miff);
+         if (miffValueGetRType(value) != 8 || miffValueGetR8(value) != _reals8[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_STR("String_Array"); TEST_COUNT(10);
+      forCount(index, count)
+      {
+         value = miffGetValueSTR(miff);
+         if (!streq(miffValueGetSTR(value) _strings[index])) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == count) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_VAR("userTypeIntStrReal", "userVarIntStrReal");
+      value = miffGetValueI()
+         miffSetValue(          miff, miffValueSetI(42));
+         miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
+         miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+         miffSetRecordEnd(      miff);
+
+         miffSetBlockStart(     miff, "KeyValueBlock");
          {
-            wprintf(L"%s\t%s\t%d\t", typeName, key, arrayCount);
+            miffSetBoolean(        miff, "True",     miffBoolTRUE);
+            miffSetBoolean(        miff, "False",    miffBoolFALSE);
+                             
+            miffSetI(              miff, "I_0",      0);
+            miffSetI(              miff, "I_1",      1);
+            miffSetI(              miff, "I_-1",     -1);
+            miffSetI(              miff, "I_127",    127);
+            miffSetI(              miff, "I_-128",   -128);
+                             
+            miffSetN(              miff, "N_0",      0);
+            miffSetN(              miff, "N_1",      1);
+            miffSetN(              miff, "N_255",    255);
+                             
+            miffSetR4(             miff, "R4_0",     0.0);
+            miffSetR4(             miff, "R4_1",     1.0);
+            miffSetR4(             miff, "R4_-1",    -1.0);
+            miffSetR4(             miff, "R4_PI",    3.1415926535897932f);
+                             
+            miffSetR8(             miff, "R8_0",     0.0);
+            miffSetR8(             miff, "R8_1",     1.0);
+            miffSetR8(             miff, "R8_-1",    -1.0);
+            miffSetR8(             miff, "R8_PI",    3.1415926535897932);
+                             
+            miffSetType(           miff, "TypeBool", miffTypeBOOL);
+            miffSetType(           miff, "TypeKey",  miffTypeTYPE);
+                             
+            miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                             
+            miffSetBooleanArray(   miff, "Bool_Array",   100,  _bools);
+
+            miffSetIArray(         miff, "I_Array",      256,  _narray);
+            miffSetNArray(         miff, "N_Array",      256,  _narray);
+
+            miffSetR4Array(        miff, "R4_Array",     300,  _reals4);
+            miffSetR8Array(        miff, "R8_Array",     300,  _reals8);
+
+            miffSetStrArray(       miff, "String_Array", 10,   _strings);
+
+            miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
+            miffSetValue(          miff, miffValueSetI(42));
+            miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
+            miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+            miffSetRecordEnd(      miff);
+         }
+         miffSetBlockStop(miff);
+
+         if (type == miffTypeOTHER)
+         {
+            wprintf(L"%S\t%S\t%d\t", (char *) typeName, (char *) key, (int) arrayCount);
          }
          else
          {
-            wprintf(L"%s\t%s\t%d\t", miffTypeGetC2(type), key, arrayCount);
+            wprintf(L"%S\t%S\t%d\t", (char *) miffTypeGetStr(type), (char *) key, (int) arrayCount);
          }
 
-         if      (type == miffTypeKEY_VALUE_BLOCK_STOP ||
-                  type == miffTypeKEY_VALUE_BLOCK_START)
+         if      (type == miffTypeBLOCK_STOP ||
+                  type == miffTypeBLOCK_START)
          {
             wprintf(L"\n");
          }
@@ -1792,7 +1158,7 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
          {
             wprintf(L"\n");
          }
-         else if (type == miffTypeSTRING)
+         else if (type == miffTypeSTR)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
@@ -1802,20 +1168,21 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
                   wprintf(L"\n---");
                }
 
-               if (!miffGetValueStringC2(miff, &valueStr))
+               value = miffGetValueStr(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"\n%s ", valueStr);
+               wprintf(L"\n%S ", (char *) miffValueGetStr(value));
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeVARIABLE ||
-                  type == miffTypeUSER_TYPE)
+         else if (type == miffTypeOTHER)
          {
-            if (miffGetValueI(miff, &valueI) &&
-                valueI == 42)
+            value = miffGetValueI(miff);
+            if (miffValueGetValueType(value) == miffTypeI &&
+                miffValueGetI(        value) == 42)
             {
                wprintf(L"P1 ok, ");
             }
@@ -1823,8 +1190,12 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
             {
                wprintf(L"ERROR\n");
             }
-            if (miffGetValueStringC2(miff, &valueStr) &&
-                memcmp(valueStr, L"Yes, but what is the question?", wcslen(L"Yes, but what is the question?")) == 0)
+            value = miffGetValueStr(miff);
+            if (miffValueGetValueType(value) == miffTypeSTR &&
+                memcmp(
+                   (char *) miffValueGetStr(value), 
+                   "Yes, but what is the question?", 
+                   wcslen(L"Yes, but what is the question?")) == 0)
             {
                wprintf(L"P2 ok, ");
             }
@@ -1832,8 +1203,9 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
             {
                wprintf(L"ERROR\n");
             }
-            if (miffGetValueR8(miff, &valueR8) &&
-                valueR8 == 3.1415926535897932)
+            value = miffGetValueR8(miff);
+            if (miffValueGetValueType(value) == miffTypeR &&
+                miffValueGetR8(       value) == 3.1415926535897932)
             {
                wprintf(L"P3 ok");
             }
@@ -1843,608 +1215,73 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeBOOLEAN)
+         else if (type == miffTypeBOOL)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               if (!miffGetValueBoolean(miff, &valueBool))
+               value = miffGetValueBoolean(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%c ", (valueBool == miffBoolTRUE) ? L'T' : L'F');
+               wprintf(L"%c ", (miffValueGetBool(value) == miffBoolTRUE) ? L'T' : L'F');
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeI1 ||
-                  type == miffTypeI2 ||
-                  type == miffTypeI4 ||
-                  type == miffTypeI8)
+         else if (type == miffTypeI)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               if (!miffGetValueI(miff, &valueI))
+               value = miffGetValueI(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%I64d ", valueI);
+               wprintf(L"%I64d ", miffValueGetI(value));
             }
             wprintf(L"\n");
          }
-         //else if (type == miffTypeI16 ||
-         //         type == miffTypeI32 ||
-         //         type == miffTypeI64 ||
-         //         type == miffTypeI128 ||
-         //         type == miffTypeI256)
-         //{
-         //   wprintf(L"\n");
-         //}
-         else if (type == miffTypeN1 ||
-                  type == miffTypeN2 ||
-                  type == miffTypeN4 ||
-                  type == miffTypeN8)
+         else if (type == miffTypeN)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               if (!miffGetValueN(miff, &valueN))
+               value = miffGetValueN(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%I64u ", valueN);
+               wprintf(L"%I64u ", miffValueGetN(value));
             }
             wprintf(L"\n");
          }
-         //else if (type == miffTypeN16 ||
-         //         type == miffTypeN32 ||
-         //         type == miffTypeN64 ||
-         //         type == miffTypeN128 ||
-         //         type == miffTypeN256)
-         //{
-         //   wprintf(L"\n");
-         //}
-         else if (type == miffTypeR4)
+         else if (type == miffTypeR)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               if (!miffGetValueR4(miff, &valueR4))
+               value = miffGetValueR4(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%.6g ", (double) valueR4);
+               wprintf(L"%.6g ", (double) miffValueGetR4(value));
             }
             wprintf(L"\n");
          }
-         else if (type == miffTypeR4S)
+         else if (type == miffTypeR)
          {
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
-               if (!miffGetValueR4S(miff, &valueR4))
+               value = miffGetValueR8(miff);
+               if (miffValueGetValueType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%.6g ", (double) valueR4);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueR8(miff, &valueR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g ", valueR8);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueR8S(miff, &valueR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g ", valueR8);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABI1 ||
-                  type == miffTypeABI2 ||
-                  type == miffTypeABI4 ||
-                  type == miffTypeABI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABI(miff, &valueABI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d ", valueABI.a, valueABI.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABN1 ||
-                  type == miffTypeABN2 ||
-                  type == miffTypeABN4 ||
-                  type == miffTypeABN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABN(miff, &valueABN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u ", valueABN.a, valueABN.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABR4(miff, &valueABR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABR4S(miff, &valueABR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g ", valueABR4.a, valueABR4.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABR8(miff, &valueABR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABR8S(miff, &valueABR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g ", valueABR8.a, valueABR8.b);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCI1 ||
-                  type == miffTypeABCI2 ||
-                  type == miffTypeABCI4 ||
-                  type == miffTypeABCI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCI(miff, &valueABCI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d %I64d ", valueABCI.a, valueABCI.b, valueABCI.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCN1 ||
-                  type == miffTypeABCN2 ||
-                  type == miffTypeABCN4 ||
-                  type == miffTypeABCN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCN(miff, &valueABCN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u %I64u ", valueABCN.a, valueABCN.b, valueABCN.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCR4(miff, &valueABCR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCR4S(miff, &valueABCR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g ", valueABCR4.a, valueABCR4.b, valueABCR4.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCR8(miff, &valueABCR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCR8S(miff, &valueABCR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g ", valueABCR8.a, valueABCR8.b, valueABCR8.c);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDI1 ||
-                  type == miffTypeABCDI2 ||
-                  type == miffTypeABCDI4 ||
-                  type == miffTypeABCDI8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDI(miff, &valueABCDI))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64d %I64d %I64d %I64d ", valueABCDI.a, valueABCDI.b, valueABCDI.c, valueABCDI.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDN1 ||
-                  type == miffTypeABCDN2 ||
-                  type == miffTypeABCDN4 ||
-                  type == miffTypeABCDN8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDN(miff, &valueABCDN))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%I64u %I64u %I64u %I64u ", valueABCDN.a, valueABCDN.b, valueABCDN.c, valueABCDN.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDR4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDR4(miff, &valueABCDR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDR4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDR4S(miff, &valueABCDR4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.6g %.6g %.6g %.6g ", valueABCDR4.a, valueABCDR4.b, valueABCDR4.c, valueABCDR4.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDR8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDR8(miff, &valueABCDR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeABCDR8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueABCDR8S(miff, &valueABCDR8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-               wprintf(L"%.15g %.15g %.15g %.15g ", valueABCDR8.a, valueABCDR8.b, valueABCDR8.c, valueABCDR8.d);
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX2X2R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix2x2R4(miff, &valueMatrix2x2R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX2X2R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix2x2R4S(miff, &valueMatrix2x2R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix2x2R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX2X2R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix2x2R8(miff, &valueMatrix2x2R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX2X2R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix2x2R8S(miff, &valueMatrix2x2R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 2; row++)
-               {
-                  for (col = 0; col < 2; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix2x2R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX3X3R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix3x3R4(miff, &valueMatrix3x3R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX3X3R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix3x3R4S(miff, &valueMatrix3x3R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix3x3R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX3X3R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix3x3R8(miff, &valueMatrix3x3R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX3X3R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix3x3R8S(miff, &valueMatrix3x3R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 3; row++)
-               {
-                  for (col = 0; col < 3; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix3x3R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX4X4R4)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix4x4R4(miff, &valueMatrix4x4R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX4X4R4S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix4x4R4S(miff, &valueMatrix4x4R4))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.6g ", valueMatrix4x4R4.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX4X4R8)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix4x4R8(miff, &valueMatrix4x4R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
-                  }
-               }
-            }
-            wprintf(L"\n");
-         }
-         else if (type == miffTypeMATRIX4X4R8S)
-         {
-            for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
-            {
-               if (!miffGetValueMatrix4x4R8S(miff, &valueMatrix4x4R8))
-               {
-                  wprintf(L"ERROR\n");
-                  break;
-               }
-
-               for (row = 0; row < 4; row++)
-               {
-                  for (col = 0; col < 4; col++)
-                  {
-                     wprintf(L"%.15g ", valueMatrix4x4R8.cell[row][col]);
-                  }
-               }
+               wprintf(L"%.15g ", miffValueGetR8(value));
             }
             wprintf(L"\n");
          }
@@ -2453,7 +1290,7 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
             wprintf(L"\n");
          }
 
-         if (!miffRecordGetEnd(miff))
+         if (!miffGetRecordEnd(miff))
          {
             break;
          }
@@ -2472,7 +1309,7 @@ static MiffBool _MiffTestRead(MiffC2 const * const fileName)
 /******************************************************************************
 func: _MiffTestWrite
 ******************************************************************************/
-static MiffBool _MiffTestWrite(MiffC2 const * const fileName)
+static MiffBool _MiffTestWrite(MiffStr const * const fileName)
 {
    FILE     *file;
    Miff     *miff;
@@ -2484,209 +1321,107 @@ static MiffBool _MiffTestWrite(MiffC2 const * const fileName)
 
    for (;;)
    {
-      if (_wfopen_s(&file, (wchar_t *) fileName, L"wb") != 0)
+      if (fopen_s(&file, fileName, "wb") != 0)
       {
          break;
       }
 
       // Create a miff file.
-      miff = miffCreateWriter(miffBoolTRUE, _MiffSetBuffer, L"MiffTestFile", 1, (void *) file);
+      miff = miffCreateWriter(miffBoolTRUE, _MiffSetBuffer, "MiffTestFile", 1, (void *) file);
       if (!miff)
       {
          break;
       }
 
-      miffSet1Boolean(       miff, L"True",     miffBoolTRUE);
-      miffSet1Boolean(       miff, L"False",    miffBoolFALSE);
+      miffSetBoolean(        miff, "True",     miffBoolTRUE);
+      miffSetBoolean(        miff, "False",    miffBoolFALSE);
+                             
+      miffSetI(              miff, "I_0",      0);
+      miffSetI(              miff, "I_1",      1);
+      miffSetI(              miff, "I_-1",     -1);
+      miffSetI(              miff, "I_127",    127);
+      miffSetI(              miff, "I_-128",   -128);
+                             
+      miffSetN(              miff, "N_0",      0);
+      miffSetN(              miff, "N_1",      1);
+      miffSetN(              miff, "N_255",    255);
+                             
+      miffSetR4(             miff, "R4_0",     0.0);
+      miffSetR4(             miff, "R4_1",     1.0);
+      miffSetR4(             miff, "R4_-1",    -1.0);
+      miffSetR4(             miff, "R4_PI",    3.1415926535897932f);
+                             
+      miffSetR8(             miff, "R8_0",     0.0);
+      miffSetR8(             miff, "R8_1",     1.0);
+      miffSetR8(             miff, "R8_-1",    -1.0);
+      miffSetR8(             miff, "R8_PI",    3.1415926535897932);
+                             
+      miffSetType(           miff, "TypeBool", miffTypeBOOL);
+      miffSetType(           miff, "TypeKey",  miffTypeTYPE);
+                             
+      miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                             
+      miffSetBooleanArray(   miff, "Bool_Array",   100,  _bools);
 
-      miffSet1I1(            miff, L"I1_0",     0);
-      miffSet1I1(            miff, L"I1_1",     1);
-      miffSet1I1(            miff, L"I1_-1",    -1);
-      miffSet1I1(            miff, L"I1_127",   127);
-      miffSet1I1(            miff, L"I1_-128",  -128);
+      miffSetIArray(         miff, "I_Array",      256,  _narray);
+      miffSetNArray(         miff, "N_Array",      256,  _narray);
 
-      miffSet1N1(            miff, L"N1_0",     0);
-      miffSet1N1(            miff, L"N1_1",     1);
-      miffSet1N1(            miff, L"N1_255",   255);
+      miffSetR4Array(        miff, "R4_Array",     300,  _reals4);
+      miffSetR8Array(        miff, "R8_Array",     300,  _reals8);
 
-      miffSet1I2(            miff, L"I2_0",     0);
-      miffSet1I2(            miff, L"I2_1",     1);
-      miffSet1I2(            miff, L"I2_-1",    -1);
+      miffSetStrArray(       miff, "String_Array", 10,   _strings);
 
-      miffSet1N2(            miff, L"N2_0",     0);
-      miffSet1N2(            miff, L"N2_1",     1);
+      miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
+      miffSetValue(          miff, miffValueSetI(42));
+      miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
+      miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+      miffSetRecordEnd(      miff);
 
-      miffSet1I4(            miff, L"I4_0",     0);
-      miffSet1I4(            miff, L"I4_1",     1);
-      miffSet1I4(            miff, L"I4_-1",    -1);
-
-      miffSet1N4(            miff, L"N4_0",     0);
-      miffSet1N4(            miff, L"N4_1",     1);
-
-      miffSet1R4(            miff, L"R4_0",     0.0);
-      miffSet1R4(            miff, L"R4_1",     1.0);
-      miffSet1R4(            miff, L"R4_-1",    -1.0);
-      miffSet1R4(            miff, L"R4_PI",    3.1415926535897932f);
-
-      miffSet1R4S(           miff, L"R4S_0",     0.0);
-      miffSet1R4S(           miff, L"R4S_1",     1.0);
-      miffSet1R4S(           miff, L"R4S_-1",    -1.0);
-      miffSet1R4S(           miff, L"R4S_PI",    3.1415926535897932f);
-
-      miffSet1I8(            miff, L"I8_0",     0);
-      miffSet1I8(            miff, L"I8_1",     1);
-      miffSet1I8(            miff, L"I8_-1",    -1);
-
-      miffSet1N8(            miff, L"N8_0",     0);
-      miffSet1N8(            miff, L"N8_1",     1);
-
-      miffSet1R8(            miff, L"R8_0",     0.0);
-      miffSet1R8(            miff, L"R8_1",     1.0);
-      miffSet1R8(            miff, L"R8_-1",    -1.0);
-      miffSet1R8(            miff, L"R8_PI",    3.1415926535897932);
-
-      miffSet1R8S(           miff, L"R8S_0",     0.0);
-      miffSet1R8S(           miff, L"R8S_1",     1.0);
-      miffSet1R8S(           miff, L"R8S_-1",    -1.0);
-      miffSet1R8S(           miff, L"R8S_PI",    3.1415926535897932);
-
-      miffSet1Type(          miff, L"TypeBool", miffTypeBOOLEAN);
-      miffSet1Type(          miff, L"TypeKey",  miffTypeTYPE);
-
-      miffSet1StringC2(      miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-      miffSet1ABI1(          miff, L"ABI1",     &_abi1       );
-      miffSet1ABI2(          miff, L"ABI2",     &_abi2       );
-      miffSet1ABI4(          miff, L"ABI4",     &_abi4       );
-      miffSet1ABN1(          miff, L"ABN1",     &_abn1       );
-      miffSet1ABN2(          miff, L"ABN2",     &_abn2       );
-      miffSet1ABN4(          miff, L"ABN4",     &_abn4       );
-      miffSet1ABR4(          miff, L"ABR4",     &_abr4       );
-      miffSet1ABR8(          miff, L"ABR8",     &_abr8       );
-      miffSet1ABR4S(         miff, L"ABR4S",    &_abr4       );
-      miffSet1ABR8S(         miff, L"ABR8S",    &_abr8       );
-      miffSet1ABCI1(         miff, L"ABCI1",    &_abci1      );
-      miffSet1ABCI2(         miff, L"ABCI2",    &_abci2      );
-      miffSet1ABCI4(         miff, L"ABCI4",    &_abci4      );
-      miffSet1ABCN1(         miff, L"ABCN1",    &_abcn1      );
-      miffSet1ABCN2(         miff, L"ABCN2",    &_abcn2      );
-      miffSet1ABCN4(         miff, L"ABCN4",    &_abcn4      );
-      miffSet1ABCR4(         miff, L"ABCR4",    &_abcr4      );
-      miffSet1ABCR8(         miff, L"ABCR8",    &_abcr8      );
-      miffSet1ABCR4S(        miff, L"ABCR4S",   &_abcr4      );
-      miffSet1ABCR8S(        miff, L"ABCR8S",   &_abcr8      );
-      miffSet1ABCDI1(        miff, L"ABCDI1",   &_abcdi1     );
-      miffSet1ABCDI2(        miff, L"ABCDI2",   &_abcdi2     );
-      miffSet1ABCDI4(        miff, L"ABCDI4",   &_abcdi4     );
-      miffSet1ABCDN1(        miff, L"ABCDN1",   &_abcdn1     );
-      miffSet1ABCDN2(        miff, L"ABCDN2",   &_abcdn2     );
-      miffSet1ABCDN4(        miff, L"ABCDN4",   &_abcdn4     );
-      miffSet1ABCDR4(        miff, L"ABCDR4",   &_abcdr4     );
-      miffSet1ABCDR8(        miff, L"ABCDR8",   &_abcdr8     );
-      miffSet1ABCDR4S(       miff, L"ABCDR4S",  &_abcdr4     );
-      miffSet1ABCDR8S(       miff, L"ABCDR8S",  &_abcdr8     );
-      miffSet1Matrix2x2R4(   miff, L"mat224",   &_matrix2x2r4);
-      miffSet1Matrix2x2R8(   miff, L"mat228",   &_matrix2x2r8);
-      miffSet1Matrix3x3R4(   miff, L"mat334",   &_matrix3x3r4);
-      miffSet1Matrix3x3R8(   miff, L"mat338",   &_matrix3x3r8);
-      miffSet1Matrix4x4R4(   miff, L"mat444",   &_matrix4x4r4);
-      miffSet1Matrix4x4R8(   miff, L"mat448",   &_matrix4x4r8);
-      miffSet1Matrix2x2R4S(  miff, L"mat224S",  &_matrix2x2r4);
-      miffSet1Matrix2x2R8S(  miff, L"mat228S",  &_matrix2x2r8);
-      miffSet1Matrix3x3R4S(  miff, L"mat334S",  &_matrix3x3r4);
-      miffSet1Matrix3x3R8S(  miff, L"mat338S",  &_matrix3x3r8);
-      miffSet1Matrix4x4R4S(  miff, L"mat444S",  &_matrix4x4r4);
-      miffSet1Matrix4x4R8S(  miff, L"mat448S",  &_matrix4x4r8);
-
-      miffRecordSetBegin(    miff, miffTypeVARIABLE, NULL, L"variableIntStrReal", 1);
-      miffSetValueI(         miff, 42);
-      miffRecordSetSeparator(miff);
-      miffSetValueStringC2(  miff, L"Yes, but what is the question?");
-      miffRecordSetSeparator(miff);
-      miffSetValueR8(        miff, 3.1415926535897932);
-      miffRecordSetEnd(      miff);
-
-      miffSetNI1(            miff, L"I1_Array",     256,     (MiffI1 *) _n1array);
-      miffSetNN1(            miff, L"N1_Array",     256,     _n1array);
-
-      miffSetNI2(            miff, L"I2_Array",     256,     (MiffI2 *) _n2array);
-      miffSetNN2(            miff, L"N2_Array",     256,     _n2array);
-
-      miffSetNI4(            miff, L"I4_Array",     256,     (MiffI4 *) _n4array);
-      miffSetNN4(            miff, L"N4_Array",     256,     _n4array);
-
-      miffSetNI8(            miff, L"I8_Array",     256,     (MiffI8 *) _n8array);
-      miffSetNN8(            miff, L"N8_Array",     256,     _n8array);
-
-      miffSetNR4(            miff, L"R4_Array",     300,     _reals4);
-      miffSetNR8(            miff, L"R8_Array",     300,     _reals8);
-      miffSetNR4S(           miff, L"R4S_Array",    300,     _reals4);
-      miffSetNR8S(           miff, L"R8S_Array",    300,     _reals8);
-
-      miffSetNStringC2(      miff, L"String_Array", 10,   _strings);
-
-      miffSetNBoolean(       miff, L"Bool_Array",   100,  _bools);
-
-      miffRecordSetBegin(    miff, miffTypeUSER_TYPE, L"userTypeIntStrReal", L"userVarIntStrReal", 1);
-      miffSetValueI(         miff, 42);
-      miffRecordSetSeparator(miff);
-      miffSetValueStringC2(  miff, L"Yes, but what is the question?");
-      miffRecordSetSeparator(miff);
-      miffSetValueR8(        miff, 3.1415926535897932);
-      miffRecordSetEnd(      miff);
-
-      miffSetBlockStart(     miff, L"KeyValueBlock");
+      miffSetBlockStart(     miff, "KeyValueBlock");
       {
-         miffSet1Boolean( miff, L"True",     miffBoolTRUE);
-         miffSet1Boolean( miff, L"False",    miffBoolFALSE);
+         miffSetBoolean(        miff, "True",     miffBoolTRUE);
+         miffSetBoolean(        miff, "False",    miffBoolFALSE);
+                             
+         miffSetI(              miff, "I_0",      0);
+         miffSetI(              miff, "I_1",      1);
+         miffSetI(              miff, "I_-1",     -1);
+         miffSetI(              miff, "I_127",    127);
+         miffSetI(              miff, "I_-128",   -128);
+                             
+         miffSetN(              miff, "N_0",      0);
+         miffSetN(              miff, "N_1",      1);
+         miffSetN(              miff, "N_255",    255);
+                             
+         miffSetR4(             miff, "R4_0",     0.0);
+         miffSetR4(             miff, "R4_1",     1.0);
+         miffSetR4(             miff, "R4_-1",    -1.0);
+         miffSetR4(             miff, "R4_PI",    3.1415926535897932f);
+                             
+         miffSetR8(             miff, "R8_0",     0.0);
+         miffSetR8(             miff, "R8_1",     1.0);
+         miffSetR8(             miff, "R8_-1",    -1.0);
+         miffSetR8(             miff, "R8_PI",    3.1415926535897932);
+                             
+         miffSetType(           miff, "TypeBool", miffTypeBOOL);
+         miffSetType(           miff, "TypeKey",  miffTypeTYPE);
+                             
+         miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                             
+         miffSetBooleanArray(   miff, "Bool_Array",   100,  _bools);
 
-         miffSet1I1(      miff, L"I1_0",     0);
-         miffSet1I1(      miff, L"I1_1",     1);
-         miffSet1I1(      miff, L"I1_-1",    -1);
-         miffSet1I1(      miff, L"I1_127",   127);
-         miffSet1I1(      miff, L"I1_-128",  -128);
+         miffSetIArray(         miff, "I_Array",      256,  _narray);
+         miffSetNArray(         miff, "N_Array",      256,  _narray);
 
-         miffSet1N1(      miff, L"N1_0",     0);
-         miffSet1N1(      miff, L"N1_1",     1);
-         miffSet1N1(      miff, L"N1_255",   255);
+         miffSetR4Array(        miff, "R4_Array",     300,  _reals4);
+         miffSetR8Array(        miff, "R8_Array",     300,  _reals8);
 
-         miffSet1I2(      miff, L"I2_0",     0);
-         miffSet1I2(      miff, L"I2_1",     1);
-         miffSet1I2(      miff, L"I2_-1",    -1);
+         miffSetStrArray(       miff, "String_Array", 10,   _strings);
 
-         miffSet1N2(      miff, L"N2_0",     0);
-         miffSet1N2(      miff, L"N2_1",     1);
-
-         miffSet1I4(      miff, L"I4_0",     0);
-         miffSet1I4(      miff, L"I4_1",     1);
-         miffSet1I4(      miff, L"I4_-1",    -1);
-
-         miffSet1N4(      miff, L"N4_0",     0);
-         miffSet1N4(      miff, L"N4_1",     1);
-
-         miffSet1R4(      miff, L"R4_0",     0.0);
-         miffSet1R4(      miff, L"R4_1",     1.0);
-         miffSet1R4(      miff, L"R4_-1",    -1.0);
-         miffSet1R4(      miff, L"R4_PI",    3.1415926535897932f);
-
-         miffSet1I8(      miff, L"I8_0",     0);
-         miffSet1I8(      miff, L"I8_1",     1);
-         miffSet1I8(      miff, L"I8_-1",    -1);
-
-         miffSet1N8(      miff, L"N8_0",     0);
-         miffSet1N8(      miff, L"N8_1",     1);
-
-         miffSet1R8(      miff, L"R8_0",     0.0);
-         miffSet1R8(      miff, L"R8_1",     1.0);
-         miffSet1R8(      miff, L"R8_-1",    -1.0);
-         miffSet1R8(      miff, L"R8_PI",    3.1415926535897932);
-
-         miffSet1Type(    miff, L"TypeBool", miffTypeBOOLEAN);
-         miffSet1Type(    miff, L"TypeType", miffTypeTYPE);
-
-         miffSet1StringC2(miff, L"String",   L"The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-         miffSetNStringC2(miff, L"String_Array", 10,      _strings);
+         miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
+         miffSetValue(          miff, miffValueSetI(42));
+         miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
+         miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+         miffSetRecordEnd(      miff);
       }
       miffSetBlockStop(miff);
 

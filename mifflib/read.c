@@ -43,7 +43,7 @@ function:
 /******************************************************************************
 func: _MiffReadLineSkip
 ******************************************************************************/
-MiffBool _MiffReadLineSkip(Miff * const miff)
+MiffB _MiffReadLineSkip(Miff * const miff)
 {
    MiffN1 byte;
 
@@ -62,12 +62,12 @@ MiffBool _MiffReadLineSkip(Miff * const miff)
 /******************************************************************************
 func: _MiffReadPart
 ******************************************************************************/
-MiffBool _MiffReadPart(Miff * const miff, MiffBool const trimLeadingTabs)
+MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
 {
    MiffN4   index;
    MiffN1   byte;
    MiffN1  *bufTemp;
-   MiffBool trimTabs;
+   MiffB trimTabs;
 
    // Nothing left to read for this record.
    returnFalseIf(
@@ -105,7 +105,7 @@ MiffBool _MiffReadPart(Miff * const miff, MiffBool const trimLeadingTabs)
       }
       else
       {
-         trimTabs = miffBoolFALSE;
+         trimTabs = miffFALSE;
       }
 
       // End of line or part, we are done reading.
@@ -122,103 +122,8 @@ MiffBool _MiffReadPart(Miff * const miff, MiffBool const trimLeadingTabs)
 
    if (byte == '\n')
    {
-      miff->readRecordIsDone = miffBoolTRUE;
+      miff->readRecordIsDone = miffTRUE;
    }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _MiffReadArrayCount
-******************************************************************************/
-MiffBool _MiffReadArrayCount(Miff * const miff, MiffN * const count)
-{
-   returnFalseIf(!count);
-
-   *count = 0;
-
-   returnFalseIf(!miff);
-
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
-
-   if (miff->readByteData[0] == L'*')
-   {
-      miff->currentRecord.arrayCount = miffArrayCountUNKNOWN;
-      returnTrue;
-   }
-
-   miff->currentRecord.arrayCount = (MiffN4) _MiffStrToN(
-      miff->readByteCount, 
-      (MiffStr *) miff->readByteData);
-
-   *count = miff->currentRecord.arrayCount;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _MiffReadKey
-******************************************************************************/
-MiffBool _MiffReadKey(Miff * const miff, MiffStr * const key)
-{
-   MiffN keySize;
-
-   returnFalseIf(!key);
-
-   _MiffMemClearTypeArray(miffKeySIZE, MiffStr, key);
-
-   returnFalseIf(!miff);
-
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
-
-   _MiffMemClearTypeArray(miffKeySIZE, MiffStr, miff->currentRecord.name);
-   _MiffStrToKey(
-      miff->readByteCount,
-      (MiffStr *) miff->readByteData,
-      &keySize,
-      miff->currentRecord.name);
-
-   _MiffMemCopyTypeArray(miffKeySIZE, MiffStr, key, miff->currentRecord.name);
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _MiffReadType
-******************************************************************************/
-MiffBool _MiffReadType(Miff * const miff, MiffType * const type, MiffStr * const typeName)
-{
-   MiffN index;
-   MiffN count;
-
-   returnFalseIf(!type);
-
-   *type = miffTypeNONE;
-
-   returnFalseIf(!miff);
-
-   returnFalseIf(!_MiffReadPart(miff, miffBoolTRUE));
-
-   returnFalseIf(miff->readByteCount == 0);
-
-   // Get the name of the type just in case it is a user type.
-   _MiffStrToKey(miff->readByteCount, (MiffStr *) miff->readByteData, &count, typeName);
-
-   forCount (index, miffTypeCOUNT)
-   {
-      continueIf(_MiffTypeGetNameSize(index) == 0);
-
-      if (_MiffMemIsEqual(
-            _MiffTypeGetNameSize(index), (MiffN1 *) _MiffTypeGetName(index),
-            miff->readByteCount,         miff->readByteData))
-      {
-         *type = index;
-
-         returnTrue;
-      }
-   }
-
-   *type = miffTypeOTHER;
 
    returnTrue;
 }
@@ -226,11 +131,11 @@ MiffBool _MiffReadType(Miff * const miff, MiffType * const type, MiffStr * const
 /******************************************************************************
 func: _MiffReadR
 ******************************************************************************/
-MiffBool _MiffReadR(Miff * const miff, MiffValue * const value)
+MiffB _MiffReadR(Miff * const miff, MiffValue * const value)
 {
    MiffBase64Data data;
 
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
+   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
 
    data = _MiffBase64Restart(miff->readByteData);
 
@@ -274,7 +179,7 @@ MiffBool _MiffReadR(Miff * const miff, MiffValue * const value)
 /******************************************************************************
 func: _MiffReadR4S
 ******************************************************************************/
-MiffBool _MiffReadR4S(Miff * const miff, MiffValue * const value)
+MiffB _MiffReadR4S(Miff * const miff, MiffValue * const value)
 {
    MiffStr *ctemp;
 
@@ -288,7 +193,7 @@ MiffBool _MiffReadR4S(Miff * const miff, MiffValue * const value)
 /******************************************************************************
 func: _MiffReadR8S
 ******************************************************************************/
-MiffBool _MiffReadR8S(Miff * const miff, MiffValue * const value)
+MiffB _MiffReadR8S(Miff * const miff, MiffValue * const value)
 {
    MiffStr *ctemp;
 

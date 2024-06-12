@@ -76,7 +76,7 @@ func: _MiffMemIsEqual
 
 Compare two binary buffers for equality.
 ******************************************************************************/
-MiffBool _MiffMemIsEqual(MiffN const countA, MiffN1 const * const memA, MiffN const countB,
+MiffB _MiffMemIsEqual(MiffN const countA, MiffN1 const * const memA, MiffN const countB,
    MiffN1 const * const memB)
 {
    returnFalseIf(countA != countB);

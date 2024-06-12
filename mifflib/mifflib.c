@@ -42,12 +42,12 @@ include:
 local:
 variable:
 ******************************************************************************/
-static MiffBool   _isStarted = miffBoolFALSE;
+static MiffB   _isStarted = miffFALSE;
 
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffBool   _WriteStr(  Miff * const miff, MiffN const strLen, MiffStr const * const str);
+static MiffB   _WriteStr(  Miff * const miff, MiffN const strLen, MiffStr const * const str);
 
 /******************************************************************************
 global:
@@ -56,7 +56,7 @@ function:
 /******************************************************************************
 func: miffCreateReader
 ******************************************************************************/
-Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc,
+Miff *miffCreateReader(MiffB const isByteSwaping, MiffGetBuffer getBufferFunc,
    MiffStr * const subFormatName, MiffN * const subFormatVersion, void * const dataRepo)
 {
    Miff *miff;
@@ -87,12 +87,10 @@ Miff *miffCreateReader(MiffBool const isByteSwaping, MiffGetBuffer getBufferFunc
 /******************************************************************************
 func: miffCreateReaderContent
 ******************************************************************************/
-MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping,
+MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
    MiffGetBuffer getBufferFunc, MiffStr * const subFormatName, MiffN * const subFormatVersion,
    void * const dataRepo)
 {
-   MiffN ntemp;
-
    returnFalseIf(
       !_isStarted ||
       !miff       ||
@@ -113,32 +111,33 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
    returnFalseIf(!miff->readStrData);
 
    // Read the header.
-   miff->readRecordIsDone = miffBoolFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
+   miff->readRecordIsDone = miffFALSE;
+   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
    returnFalseIf(!_MiffMemIsEqual(
       miff->readByteCount, 
       miff->readByteData, 
       4, 
       (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
 
-   miff->readRecordIsDone = miffBoolFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
-   miff->version = _MiffStrToN(miff->readByteCount, (MiffStr *) miff->readByteData);
+   miff->readRecordIsDone = miffFALSE;
+   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   miff->version = _MiffPartToN(miff);
    returnFalseIf(!_MiffMemIsEqual(
       miff->readByteCount, 
       miff->readByteData, 
       1, 
       (MiffN1 *) MIFF_HEADER_VERSION_STR));
 
-   miff->readRecordIsDone = miffBoolFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
-   _MiffStrToKey(miff->readByteCount, (MiffStr *) miff->readByteData, &ntemp, miff->subFormatName);
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, subFormatName, miff->subFormatName);
+   miff->readRecordIsDone = miffFALSE;
+   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   _MiffPartToKey(miff);
+   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, subFormatName,       miff->currentName);
+   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, miff->subFormatName, miff->currentName);
 
-   miff->readRecordIsDone = miffBoolFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffBoolFALSE));
+   miff->readRecordIsDone = miffFALSE;
+   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
    miff->subFormatVersion =
-      *subFormatVersion   = _MiffStrToN(miff->readByteCount, (MiffStr *) miff->readByteData);
+      *subFormatVersion   = _MiffPartToN(miff);
 
    returnFalseIf(!miff->readRecordIsDone);
 
@@ -148,7 +147,7 @@ MiffBool miffCreateReaderContent(Miff * const miff, MiffBool const isByteSwaping
 /******************************************************************************
 func: miffCreateWriter
 ******************************************************************************/
-Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc,
+Miff *miffCreateWriter(MiffB const isByteSwaping, MiffSetBuffer setBufferFunc,
    MiffStr const * const subFormatName, MiffN const subFormatVersion, void * const dataRepo)
 {
    Miff *miff;
@@ -179,7 +178,7 @@ Miff *miffCreateWriter(MiffBool const isByteSwaping, MiffSetBuffer setBufferFunc
 /******************************************************************************
 func: miffCreateWriterContent
 ******************************************************************************/
-MiffBool miffCreateWriterContent(Miff * const miff, MiffBool const isByteSwaping,
+MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
    MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName, MiffN const subFormatVersion,
    void * const dataRepo)
 {
@@ -244,247 +243,90 @@ void miffDestroyContent(Miff * const miff)
 }
 
 /******************************************************************************
-func: miffGetValueBoolean
-******************************************************************************/
-MiffValue miffGetValueBoolean(Miff * const miff)
-{
-   MiffValue value;
-
-   value.type = miffTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeBOOL ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadPart(miff, miffBoolFALSE), value);
-
-   value.type = miffTypeBOOL;
-   value.b    = miffBoolFALSE;
-   if (miff->readByteData[0] == 'T')
-   {
-      value.b = miffBoolTRUE;
-   }
-
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValueI
-******************************************************************************/
-MiffValue miffGetValueI(Miff * const miff)
-{
-   MiffValue value;
-   char     *endPtr;
-
-   value.type = miffTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeI ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadPart(miff, miffBoolFALSE), value);
-
-   switch (miff->currentRecord.type)
-   {
-   case miffTypeI:
-      value.type = miff->currentRecord.type;
-      break;
-
-   default:
-      value.type = miffTypeI;
-      break;
-   }
-
-   value.i = (MiffI) _strtoi64((char *) miff->readByteData, &endPtr, 10);
-   
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValueN
-******************************************************************************/
-MiffValue miffGetValueN(Miff * const miff)
-{
-   MiffValue value;
-   char     *endPtr;
-
-   value.type = miffTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeN ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadPart(miff, miffBoolFALSE), value);
-
-   switch (miff->currentRecord.type)
-   {
-   case miffTypeN:
-      value.type = miff->currentRecord.type;
-      break;
-
-   default:
-      value.type = miffTypeN;
-      break;
-   }
-
-   value.n = (MiffN) _strtoui64((char *) miff->readByteData, &endPtr, 10);
-   
-   return value;
-}
-
-/******************************************************************************
-func: miffGetValueR
-******************************************************************************/
-MiffValue miffGetValueR(Miff * const miff)
-{
-   MiffValue value;
-
-   value.type = miffTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeR ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadR(miff, &value), value);
-
-   value.type = miffTypeR;
-
-   return value;
-}
-
-#if 0
-/******************************************************************************
-func: miffGetValueR_FIXED
-******************************************************************************/
-MiffValue miffGetValueR_FIXED(Miff * const miff)
-{
-   MiffValue value;
-
-   value.type = miffTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeR ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadRFixed(miff, &value), value);
-
-   value.type = miffTypeR_FIXED;
-
-   return value;
-}
-#endif
-
-/******************************************************************************
-func: miffGetValueStr
-
-value is not dynamic.  Caller must clone the string for persistence.
-******************************************************************************/
-MiffValue miffGetValueStr(Miff *const miff)
-{
-   MiffValue value;
-
-   value.type = miffTypeNONE;
-   value.str  = NULL;
-
-   returnIf(
-         !_isStarted ||
-         !miff       ||
-         !(miff->currentRecord.type == miffTypeSTR ||
-           miff->currentRecord.type == miffTypeOTHER),
-      value);
-
-   returnIf(!_MiffReadPart(miff, miffBoolFALSE), value);
-
-   _MiffStrEncodedToStr(&miff->readByteCount, (MiffStr *) miff->readByteData);
-
-   // Adjust the str buffer.
-   if (miff->readByteCount >= miff->readStrCountActual)
-   {
-      _MiffMemDestroy(miff->readStrData);
-
-      // Get the new buffer size.
-      miff->readStrCountActual = ((miff->readByteCount / 1024) + 2) * 1024;
-      miff->readStrData        = _MiffMemCreateTypeArray(miff->readStrCountActual, MiffStr);
-
-      // Ran out of memory.
-      returnIf(!miff->readStrData, value);
-   }
-
-   // Clear the string.
-   _MiffMemClearTypeArray(miff->readStrCountActual, MiffStr, miff->readStrData);
-   
-   // Copy the string over to the temporary string holder.
-   _MiffMemCopyTypeArray(miff->readStrCount, MiffStr, miff->readStrData, miff->readByteData);
-   miff->readStrCount = miff->readByteCount;
-
-   // Return string.
-   value.strLen = miff->readStrCount;
-   value.str    = miff->readStrData;
-
-   return value;
-}
-
-/******************************************************************************
 func: miffGetInfo
 
 key needs to be a buffer of size miffKeySIZE.
 ******************************************************************************/
-MiffBool miffGetInfo(Miff * const miff, MiffType * const type, MiffStr * const typeName,
-   MiffStr * const key, MiffN * const count)
+MiffB miffGetInfo(Miff * const miff, MiffRecType * const type, MiffN * const count,
+   MiffStr * const key)
 {
    returnFalseIf(
       !_isStarted ||
       !miff);
 
    // Reset the record reading.
-   miff->readRecordIsDone = miffBoolFALSE;
+   miff->readRecordIsDone = miffFALSE;
 
-   *type                  = miffTypeNONE;
+   *type                  = miffRecTypeNONE;
    *count                 = 0;
 
    // Clear the key.
    _MiffMemClearTypeArray(miffKeySIZE, MiffStr, key);
 
    // Read in the type.
-   returnFalseIf(!_MiffReadType(miff, &miff->currentRecord.type, typeName));
-   *type = miff->currentRecord.type;
+   returnFalseIf(!_MiffReadPart(miff, miffTRUE));
+
+   switch (miff->readByteData[0])
+   {
+   case '{':
+      miff->currentRecType    = miffRecTypeBLOCK_START;
+      break;
+
+   case '}':
+      miff->currentRecType    = miffRecTypeBLOCK_STOP;
+      miff->readRecordIsDone  = miffTRUE;
+      break;
+
+   case '*':
+      miff->currentRecType    = miffRecTypeVALUE;
+      miff->currentArrayCount = miffArrayCountUNKNOWN;
+      break;
+
+   default:
+      miff->currentRecType    = miffRecTypeVALUE;
+      miff->currentArrayCount = _MiffPartToN(miff);
+      break;
+   }
 
    // Special case block end
-   if (*type == miffTypeBLOCK_STOP)
+   if (miff->currentRecType == miffRecTypeBLOCK_STOP)
    {
-      return miff->readRecordIsDone;
+      returnTrue;
    }
 
    // Read in the name of the record
-   returnFalseIf(!_MiffReadKey(miff, miff->currentRecord.name));
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, key, miff->currentRecord.name);
+   returnFalseIf(!_MiffReadPart( miff, miffFALSE));
+   returnFalseIf(!_MiffPartToKey(miff));
 
    // Special case,
-   if (*type == miffTypeBLOCK_START)
+   if (miff->currentRecType == miffRecTypeBLOCK_START)
    {
-      return miff->readRecordIsDone;
+      miff->readRecordIsDone = miffTRUE;
+      returnTrue;
    }
 
-   // Read in the array count
-   returnFalseIf(!_MiffReadArrayCount(miff, &miff->currentRecord.arrayCount));
-   *count = miff->currentRecord.arrayCount;
-
    returnTrue;
+}
+
+/******************************************************************************
+func: miffGetValue
+******************************************************************************/
+MiffValue miffGetValue(Miff * const miff)
+{
+   MiffValue value;
+
+   value.type = miffValueTypeNONE;
+
+   returnIf(
+         !_isStarted ||
+         !miff,
+      value);
+
+   returnIf(!_MiffReadPart(miff, miffFALSE), value);
+
+   value = _MiffPartToValue(miff);
+   
+   return value;
 }
 
 /******************************************************************************
@@ -492,7 +334,7 @@ func: miffGetRecordEnd
 
 Skip to the end of the record if not at the end already.
 ******************************************************************************/
-MiffBool miffGetRecordEnd(Miff * const miff)
+MiffB miffGetRecordEnd(Miff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -502,32 +344,16 @@ MiffBool miffGetRecordEnd(Miff * const miff)
 
    returnFalseIf(!_MiffReadLineSkip(miff));
 
-   miff->readRecordIsDone = miffBoolTRUE;
+   miff->readRecordIsDone = miffTRUE;
 
    returnTrue;
 }
 
 /******************************************************************************
-func: miffSetRecordEnd
-******************************************************************************/
-MiffBool miffSetRecordEnd(Miff * const miff)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // The current type should end up being NONE.  It if isn't then the caller didn't
-   // fullfill the record requirements.
-   miff->currentRecord.type = miffTypeNONE;
-
-   return _MiffWriteStr(miff, 1, "\n");
-}
-
-/******************************************************************************
 func: miffSetInfo
 ******************************************************************************/
-MiffBool miffSetInfo(Miff * const miff, MiffType const type, MiffStr const * const typeName, 
-   MiffStr const * const key, MiffN const count)
+MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count, 
+   MiffStr const * const key)
 {
    MiffN index;
 
@@ -536,7 +362,7 @@ MiffBool miffSetInfo(Miff * const miff, MiffType const type, MiffStr const * con
       !miff);
 
    // Adjust the scope level before we indent.
-   if (type == miffTypeBLOCK_STOP)
+   if (type == miffRecTypeBLOCK_STOP)
    {
       if (miff->currentScopeLevel != 0)
       {
@@ -547,62 +373,82 @@ MiffBool miffSetInfo(Miff * const miff, MiffType const type, MiffStr const * con
    // Add indents to the current scope level.
    forCount(index, miff->currentScopeLevel)
    {
-      returnFalseIf(!_MiffWriteStr(miff, 1, "\t"));
+      returnFalseIf(!_MiffWriteStr(miff, 1, " "));
    }
 
    // Write the type for the record.  Common for all cases.
-   if      (type == miffTypeOTHER)
+   miff->currentRecType    = type;
+   miff->currentArrayCount = count;
+   miff->currentArrayIndex = 0;
+
+   if      (type == miffRecTypeBLOCK_START)
    {
-      returnFalseIf(!_MiffWriteStr(miff, _MiffStrGetCount(typeName), typeName));
+      returnFalseIf(!_MiffWriteStr(miff, 1, "{"));
    }
-   else if (type == miffTypeNONE)
+   else if (type == miffRecTypeBLOCK_STOP)
    {
-      returnFalse;
+      returnFalseIf(!_MiffWriteStr(miff, 1, "}"));
+   }
+   else if (count == miffArrayCountUNKNOWN)
+   {
+      returnFalseIf(!_MiffWriteStr(miff, 1, "*"));
    }
    else
    {
-      returnFalseIf(!_MiffWriteStr(miff, _MiffTypeGetNameSize(type), _MiffTypeGetName(type)));
+      returnFalseIf(!_MiffWriteN(miff, count));
    }
 
    // We are ending a key value block.
-   if (type == miffTypeBLOCK_STOP)
+   if (type == miffRecTypeBLOCK_STOP)
    {
       // TODO key value block stack pop.
-      returnFalseIf(!miffSetRecordEnd(miff));
       returnTrue;
    }
 
    returnFalseIf(!key);
 
    // Copy the key.
-   miff->currentArrayIndex        = 0;
-   miff->currentRecord.type       = type;
-   miff->currentRecord.arrayCount = count;
-   _MiffMemClearTypeArray(miffKeySIZE,           MiffStr, miff->currentRecord.name);
-   _MiffMemCopyTypeArray( _MiffStrGetCount(key), MiffStr, miff->currentRecord.name, key);
+   _MiffMemClearTypeArray(miffKeySIZE,           MiffStr, miff->currentName);
+   _MiffMemCopyTypeArray( _MiffStrGetCount(key), MiffStr, miff->currentName, key);
 
    returnFalseIf(!miffSetSeparator(miff));
-   returnFalseIf(!_MiffWriteStr(   miff, _MiffStrGetCount(miff->currentRecord.name), miff->currentRecord.name));
+   returnFalseIf(!_MiffWriteStr(
+      miff, 
+      miff->currentNameCount, 
+      miff->currentName));
+   
    // We are starting a new key value block.
-   if (type == miffTypeBLOCK_START)
+   if (type == miffRecTypeBLOCK_START)
    {
       miff->currentScopeLevel++;
 
       // TODO key value block stack push.
-      return miffSetRecordEnd(miff);
+      returnTrue;
    }
-
-   // Write out the record.
-   returnFalseIf(!miffSetSeparator(miff));
-   returnFalseIf(!_MiffWriteN(     miff, count));
 
    returnTrue;
 }
 
 /******************************************************************************
+func: miffSetRecordEnd
+******************************************************************************/
+MiffB miffSetRecordEnd(Miff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // The current type should end up being NONE.  It if isn't then the caller didn't
+   // fullfill the record requirements.
+   miff->currentRecType = miffRecTypeNONE;
+
+   return _MiffWriteStr(miff, 1, "\n");
+}
+
+/******************************************************************************
 func: miffSetSeparator
 ******************************************************************************/
-MiffBool miffSetSeparator(Miff * const miff)
+MiffB miffSetSeparator(Miff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -614,90 +460,17 @@ MiffBool miffSetSeparator(Miff * const miff)
 /******************************************************************************
 func: miffSetValue
 ******************************************************************************/
-MiffBool miffSetValue(Miff * const miff, MiffValue const value)
+MiffB miffSetValue(Miff * const miff, MiffValue const value)
 {
-   MiffStr *str;
-
    returnFalseIf(
       !_isStarted ||
       !miff);
 
    miffSetSeparator(miff);
 
-   switch (value.type)
-   {
-   case miffTypeBOOL:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeBOOL ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      str = ((value.b) ? "T" : "F");
-
-      returnFalseIf(!_MiffWriteStr(miff, 1, str));
-      break;
-
-   case miffTypeI:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeI ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      returnFalseIf(!_MiffWriteI(miff, value.i));
-      break;
-
-   case miffTypeN:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeN ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      returnFalseIf(!_MiffWriteN(miff, value.n));
-      break;
-
-   case miffTypeR:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeR ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      if (value.rType == 4)
-      {
-         returnFalseIf(!_MiffWriteR4(miff, value.r4));
-      }
-      else
-      {
-         returnFalseIf(!_MiffWriteR8(miff, value.r8));
-      }
-      break;
-
-#if 0
-   case miffTypeR_FIXED:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeR8 ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      returnFalseIf(!_MiffWriteI(  miff, value.rFixedWhole));
-      if (value.rFixedDecimal != 0)
-      {
-         returnFalseIf(!_MiffWriteStr(miff, 1, "."));
-         returnFalseIf(!_MiffWriteN(  miff, value.rFixedWhole));
-      }
-      break;
-#endif
-
-   case miffTypeSTR:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeSTR ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      returnFalseIf(!_WriteStr(miff, value.strLen, value.str));
-      break;
-
-   case miffTypeTYPE:
-      returnFalseIf(
-         !(miff->currentRecord.type == miffTypeTYPE ||
-           miff->currentRecord.type == miffTypeOTHER));
-
-      returnFalseIf(!_MiffWriteStr(miff, _MiffTypeGetNameSize(value.t), _MiffTypeGetName(value.t)));
-      break;
-   }
+   _MiffWriteValue(miff);
+   
+   miff->currentArrayIndex++;
 
    returnTrue;
 }
@@ -705,7 +478,7 @@ MiffBool miffSetValue(Miff * const miff, MiffValue const value)
 /******************************************************************************
 func: miffValueGetValueType
 ******************************************************************************/
-MiffType miffValueGetValueType(MiffValue value)
+MiffValueType miffValueGetValueType(MiffValue value)
 {
    return value.type;
 }
@@ -713,9 +486,9 @@ MiffType miffValueGetValueType(MiffValue value)
 /******************************************************************************
 func: miffValueGetBool
 ******************************************************************************/
-MiffBool miffValueGetBool(MiffValue value)
+MiffB miffValueGetB(MiffValue value)
 {
-   returnFalseIf(value.type != miffTypeBOOL);
+   returnFalseIf(value.type != miffValueTypeB);
    return value.b;
 }
 
@@ -724,8 +497,8 @@ func: miffValueGetI
 ******************************************************************************/
 MiffI miffValueGetI(MiffValue value)
 {
-   return0If(value.type != miffTypeI);
-   return value.i;
+   return0If(value.type != miffValueTypeI);
+   return value.inr.i;
 }
 
 /******************************************************************************
@@ -733,22 +506,22 @@ func: miffValueGetN
 ******************************************************************************/
 MiffN miffValueGetN(MiffValue value)
 {
-   return0If(value.type != miffTypeN);
-   return value.n;
+   return0If(value.type != miffValueTypeN);
+   return value.inr.n;
 }
 
 /******************************************************************************
-func: miffValueGetRType
+func: miffValueIsR4
 
 Return the Real value byte count.
 4 for MiffR4
 8 for MiffR8
 ******************************************************************************/
-MiffN miffValueGetRType(MiffValue value)
+MiffB miffValueIsR4(MiffValue value)
 {
-   return0If(value.type != miffTypeR);
+   return0If(value.type != miffValueTypeR);
 
-   return value.rType;
+   return value.isR4;
 }
 
 /******************************************************************************
@@ -756,66 +529,57 @@ func: miffValueGetR4
 ******************************************************************************/
 MiffR4 miffValueGetR4(MiffValue value)
 {
-   return0If(value.type != miffTypeR);
+   return0If(value.type != miffValueTypeR);
 
-   if (value.rType == 0)
+   if (value.isR4)
    {
-      return value.r4;
+      return value.inr4.r;
    }
  
-   return (MiffR4) value.r8;
+   return (MiffR4) value.inr.r;
 }
 
 /******************************************************************************
 func: miffValueGetR8
 ******************************************************************************/
-MiffR8 miffValueGetR8(MiffValue value)
+MiffR miffValueGetR(MiffValue value)
 {
-   return0If(value.type != miffTypeR);
+   return0If(value.type != miffTypeValueR);
 
-   if (value.rType == 8)
+   if (value.isR4)
    {
-      return value.r8;
+      return (MiffR) value.inr4.r;
    }
 
-   return (MiffR8) value.r4;
+   return value.inr.r;
 }
 
 /******************************************************************************
 func: miffValueGetStr
 ******************************************************************************/
-MiffStr const *miffValueGetStr(MiffValue value)
+MiffStr const *miffValueGetStrBuffer(MiffValue value)
 {
-   returnNullIf(value.type != miffTypeSTR);
-   return value.str;
+   returnNullIf(value.type != miffValueTypeSTR);
+   return value.strBuffer;
 }
 
 /******************************************************************************
 func: miffValueGetStrLen
 ******************************************************************************/
-MiffN miffValueGetStrLen(MiffValue value)
+MiffN miffValueGetStrCount(MiffValue value)
 {
-   return0If(value.type != miffTypeSTR);
-   return value.strLen;
+   return0If(value.type != miffValueTypeSTR);
+   return value.strCount;
 }
 
 /******************************************************************************
-func: miffValueGetType
+func: miffValueSetB
 ******************************************************************************/
-MiffType MiffValueGetType(MiffValue value)
-{
-   returnIf(value.type != miffTypeTYPE, miffTypeNONE);
-   return value.t;
-}
-
-/******************************************************************************
-func: miffValueSetBoolean
-******************************************************************************/
-MiffValue miffValueSetBoolean(MiffBool const ivalue)
+MiffValue miffValueSetB(MiffB const ivalue)
 {
    MiffValue value;
 
-   value.type = miffTypeBOOL;
+   value.type = miffValueTypeB;
    value.b    = ivalue;
 
    return value;
@@ -828,8 +592,8 @@ MiffValue miffValueSetI(MiffI const ivalue)
 {
    MiffValue value;
 
-   value.type = miffTypeI;
-   value.i    = ivalue;
+   value.type  = miffValueTypeI;
+   value.inr.i = ivalue;
 
    return value;
 }
@@ -841,7 +605,7 @@ MiffValue miffValueSetN(MiffN const ivalue)
 {
    MiffValue value;
 
-   value.type = miffTypeN;
+   value.type = miffValueTypeN;
    value.n    = ivalue;
 
    return value;
@@ -854,50 +618,37 @@ MiffValue miffValueSetR4(MiffR4 const ivalue)
 {
    MiffValue value;
 
-   value.type  = miffTypeR;
-   value.rType = 4;
-   value.r4    = ivalue;
+   value.type   = miffValueTypeR4;
+   value.isR4   = miffTRUE;
+   value.inr4.r = ivalue;
 
    return value;
 }
 
 /******************************************************************************
-func: miffValueSetR8
+func: miffValueSetR
 ******************************************************************************/
-MiffValue miffValueSetR8(MiffR8 const ivalue)
+MiffValue miffValueSetR(MiffR const ivalue)
 {
    MiffValue value;
 
-   value.type  = miffTypeR;
-   value.rType = 8;
-   value.r8    = ivalue;
+   value.type  = miffValueTypeR;
+   value.irR4  = miffFALSE;
+   value.inr.r = ivalue;
 
    return value;
 }
 
 /******************************************************************************
-func: miffValueSetStr
+func: miffValueSetStrBuffer
 ******************************************************************************/
-MiffValue miffValueSetStr(MiffN const strLen, MiffStr const * const str)
+MiffValue miffValueSetStrBuffer(MiffN const strCount, MiffStr const * const strBuffer)
 {
    MiffValue value;
 
-   value.type   = miffTypeSTR;
-   value.strLen = strLen;
-   value.str    = str;
-
-   return value;
-}
-
-/******************************************************************************
-func: miffValueSetType
-******************************************************************************/
-MiffValue miffValueSetType(MiffType const ivalue)
-{
-   MiffValue value;
-
-   value.type = miffTypeTYPE;
-   value.t    = ivalue;
+   value.type      = miffValueTypeSTR;
+   value.strCount  = strCount;
+   value.strBuffer = strBuffer;
 
    return value;
 }
@@ -905,7 +656,7 @@ MiffValue miffValueSetType(MiffType const ivalue)
 /******************************************************************************
 func: miffStart
 ******************************************************************************/
-MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
+MiffB miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
 {
    returnTrueIf(_isStarted);
 
@@ -917,7 +668,7 @@ MiffBool miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDe
 
    _MiffMemStart(memCreateFunc, memDestroyFunc);
 
-   _isStarted = miffBoolTRUE;
+   _isStarted = miffTRUE;
 
    _MiffBase64Start();
 
@@ -935,21 +686,13 @@ void miffStop(void)
 
    _MiffMemStop();
 
-   _isStarted = miffBoolFALSE;
+   _isStarted = miffFALSE;
 }
 
 /******************************************************************************
 func: miffTypeGetStr
 ******************************************************************************/
-MiffStr const *miffTypeGetStr(MiffType const type)
-{
-   return _MiffTypeGetName(type);
-}
-
-/******************************************************************************
-func: miffTypeGetC2
-******************************************************************************/
-MiffStr const *miffTypeGetC2(MiffType const type)
+MiffStr const *miffTypeGetStrBuffer(MiffType const type)
 {
    return _MiffTypeGetName(type);
 }
@@ -961,21 +704,21 @@ function:
 /******************************************************************************
 func: _WriteStr
 ******************************************************************************/
-static MiffBool _WriteStr(Miff * const miff, MiffN const strLen, MiffStr const * const str)
+static MiffB _WriteStr(Miff * const miff, MiffN const strLen, MiffStr const * const str)
 {
    MiffStr  *strEncoded;
    MiffN     strEncodedLen;
-   MiffBool  result;
+   MiffB  result;
 
    strEncoded = NULL;
-   result     = miffBoolFALSE;
+   result     = miffFALSE;
    once
    {
       breakIf(!_MiffStrToStrEncoded(strLen, str, &strEncodedLen, &strEncoded));
 
       breakIf(!_MiffWriteStr(miff, strEncodedLen, strEncoded));
 
-      result = miffBoolTRUE;
+      result = miffTRUE;
    }
 
    _MiffMemDestroy(strEncoded);

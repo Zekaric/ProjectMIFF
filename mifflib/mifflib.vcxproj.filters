@@ -42,6 +42,9 @@
     <ClCompile Include="read.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="part.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mifflib.h">

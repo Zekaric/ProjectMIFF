@@ -45,7 +45,7 @@ function
 /******************************************************************************
 func: _MiffWriteStr
 ******************************************************************************/
-MiffBool _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
+MiffB _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
 {
    assert(strLen < MiffN4_MAX);
    return miff->setBuffer(miff->dataRepo, (MiffN4) strLen, str);
@@ -54,7 +54,7 @@ MiffBool _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr cons
 /******************************************************************************
 func: _MiffWriteI
 ******************************************************************************/
-MiffBool _MiffWriteI(Miff * const miff, MiffI const value)
+MiffB _MiffWriteI(Miff * const miff, MiffI const value)
 {
    MiffN ntemp;
 
@@ -75,7 +75,7 @@ MiffBool _MiffWriteI(Miff * const miff, MiffI const value)
 /******************************************************************************
 func: _MiffWriteN
 ******************************************************************************/
-MiffBool _MiffWriteN(Miff * const miff, MiffN const value)
+MiffB _MiffWriteN(Miff * const miff, MiffN const value)
 {
    int    index,
           count,
@@ -106,7 +106,7 @@ MiffBool _MiffWriteN(Miff * const miff, MiffN const value)
 /******************************************************************************
 func: _MiffWriteR4
 ******************************************************************************/
-MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
+MiffB _MiffWriteR4(Miff * const miff, MiffR4 const value)
 {
    Miff4          vtemp;
    MiffBase64Data data;
@@ -129,7 +129,7 @@ MiffBool _MiffWriteR4(Miff * const miff, MiffR4 const value)
 /******************************************************************************
 func: _MiffWriteR8
 ******************************************************************************/
-MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
+MiffB _MiffWriteR8(Miff * const miff, MiffR8 const value)
 {
    Miff8          vtemp;
    MiffBase64Data data;
@@ -157,7 +157,7 @@ MiffBool _MiffWriteR8(Miff * const miff, MiffR8 const value)
 /******************************************************************************
 func: _MiffWriteR4S
 ******************************************************************************/
-MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
+MiffB _MiffWriteR4S(Miff * const miff, MiffR4 const value)
 {
    MiffStr ctemp[80];
 
@@ -169,7 +169,7 @@ MiffBool _MiffWriteR4S(Miff * const miff, MiffR4 const value)
 /******************************************************************************
 func: _MiffWriteR8S
 ******************************************************************************/
-MiffBool _MiffWriteR8S(Miff * const miff, MiffR8 const value)
+MiffB _MiffWriteR8S(Miff * const miff, MiffR8 const value)
 {
    MiffStr ctemp[80];
 

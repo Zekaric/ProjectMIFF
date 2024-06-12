@@ -65,7 +65,7 @@ MiffBase64Data _MiffBase64Restart(MiffN1 * const value)
 /******************************************************************************
 func: _MiffBase64Get
 ******************************************************************************/
-MiffBool _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
+MiffB _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
 {
    *byte = 0;
    
@@ -127,7 +127,7 @@ MiffBool _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
 /******************************************************************************
 func: _MiffBase64Set
 ******************************************************************************/
-MiffBool _MiffBase64Set(MiffBase64Data * const data, MiffN1 const byte)
+MiffB _MiffBase64Set(MiffBase64Data * const data, MiffN1 const byte)
 {
    MiffN1 btemp;
    MiffN1 sixbit;
@@ -192,7 +192,7 @@ func: _MiffBase64SetEnd
 
 Send out the remainder bits.
 ******************************************************************************/
-MiffBool _MiffBase64SetEnd(MiffBase64Data * const data)
+MiffB _MiffBase64SetEnd(MiffBase64Data * const data)
 {
    MiffN1 sixbit;
 

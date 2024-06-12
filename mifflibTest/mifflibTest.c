@@ -471,24 +471,24 @@ static MiffStr              *_strings[10] =
       "No one expects the Spanish Inquisition!",
       "And now for something completely different."
 };
-static MiffBool             _bools[100] =
+static MiffB             _bools[100] =
 {
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
-      miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolTRUE, miffBoolTRUE, miffBoolFALSE, miffBoolFALSE, miffBoolFALSE, miffBoolTRUE, miffBoolFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
+      miffTRUE, miffTRUE, miffFALSE, miffTRUE, miffTRUE, miffFALSE, miffFALSE, miffFALSE, miffTRUE, miffFALSE,
 };
 
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffBool _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr       * const byteData);
+static MiffB _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr       * const byteData);
 static void    *_JsonMemCreate(     JsonN4 const memByteCount);
 static void     _JsonMemDestroy(    void * const mem);
 static JsonBool _JsonTestRead(      JsonStr const * const fileName);
@@ -496,12 +496,12 @@ static JsonBool _JsonTestReadObject(Json * const json);
 static JsonBool _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr const * const byteData);
 static JsonBool _JsonTestWrite(     JsonStr const * const fileName);
 
-static MiffBool _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr       * const byteData);
+static MiffB _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr       * const byteData);
 static void    *_MiffMemCreate(     MiffN4 const memByteCount);
 static void     _MiffMemDestroy(    void * const mem);
-static MiffBool _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData);
-static MiffBool _MiffTestRead(      MiffStr const * const fileName);
-static MiffBool _MiffTestWrite(     MiffStr const * const fileName);
+static MiffB _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData);
+static MiffB _MiffTestRead(      MiffStr const * const fileName);
+static MiffB _MiffTestWrite(     MiffStr const * const fileName);
 
 /******************************************************************************
 global:
@@ -565,7 +565,7 @@ static JsonBool _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, Js
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffBool _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr * const byteData)
+static MiffB _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -604,7 +604,7 @@ static JsonBool _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, Js
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffBool _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData)
+static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -876,11 +876,11 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 /******************************************************************************
 func: _MiffTestRead
 ******************************************************************************/
-static MiffBool _MiffTestRead(MiffStr const * const fileName)
+static MiffB _MiffTestRead(MiffStr const * const fileName)
 {
    FILE           *file;
    Miff           *miff;
-   MiffBool        result;
+   MiffB        result;
    MiffStr         subFormatName[miffKeySIZE];
    MiffStr         typeName[miffKeySIZE];
    MiffN           subFormatVersion;
@@ -893,7 +893,7 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
 
    file   = NULL;
    miff   = NULL;
-   result = miffBoolFALSE;
+   result = miffFALSE;
 
    for (;;)
    {
@@ -904,7 +904,7 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
 
       // Set Miff up for reading.
       miff = miffCreateReader(
-         miffBoolTRUE,
+         miffTRUE,
          _MiffGetBuffer,
          subFormatName,
          &subFormatVersion,
@@ -1002,8 +1002,8 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
 
       // Unless you are in full control of the format, do not assume that there will be an order
       // to the values.
-      TEST_B("True");      TEST_B_VALUE(miffBoolTRUE);            TEST_NEXT();
-      TEST_B("False");     TEST_B_VALUE(miffBoolFALSE);           TEST_NEXT();
+      TEST_B("True");      TEST_B_VALUE(miffTRUE);            TEST_NEXT();
+      TEST_B("False");     TEST_B_VALUE(miffFALSE);           TEST_NEXT();
 
       TEST_I("I_0");       TEST_I_VALUE(0);                       TEST_NEXT();
       TEST_I("I_1");       TEST_I_VALUE(1);                       TEST_NEXT();
@@ -1094,8 +1094,8 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
 
          miffSetBlockStart(     miff, "KeyValueBlock");
          {
-            miffSetBoolean(        miff, "True",     miffBoolTRUE);
-            miffSetBoolean(        miff, "False",    miffBoolFALSE);
+            miffSetBoolean(        miff, "True",     miffTRUE);
+            miffSetBoolean(        miff, "False",    miffFALSE);
                              
             miffSetI(              miff, "I_0",      0);
             miffSetI(              miff, "I_1",      1);
@@ -1225,7 +1225,7 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
                   wprintf(L"ERROR\n");
                   break;
                }
-               wprintf(L"%c ", (miffValueGetBool(value) == miffBoolTRUE) ? L'T' : L'F');
+               wprintf(L"%c ", (miffValueGetBool(value) == miffTRUE) ? L'T' : L'F');
             }
             wprintf(L"\n");
          }
@@ -1296,7 +1296,7 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
          }
       }
 
-      result = miffBoolTRUE;
+      result = miffTRUE;
       break;
    }
 
@@ -1309,15 +1309,15 @@ static MiffBool _MiffTestRead(MiffStr const * const fileName)
 /******************************************************************************
 func: _MiffTestWrite
 ******************************************************************************/
-static MiffBool _MiffTestWrite(MiffStr const * const fileName)
+static MiffB _MiffTestWrite(MiffStr const * const fileName)
 {
    FILE     *file;
    Miff     *miff;
-   MiffBool  result;
+   MiffB  result;
 
    file   = NULL;
    miff   = NULL;
-   result = miffBoolFALSE;
+   result = miffFALSE;
 
    for (;;)
    {
@@ -1327,14 +1327,14 @@ static MiffBool _MiffTestWrite(MiffStr const * const fileName)
       }
 
       // Create a miff file.
-      miff = miffCreateWriter(miffBoolTRUE, _MiffSetBuffer, "MiffTestFile", 1, (void *) file);
+      miff = miffCreateWriter(miffTRUE, _MiffSetBuffer, "MiffTestFile", 1, (void *) file);
       if (!miff)
       {
          break;
       }
 
-      miffSetBoolean(        miff, "True",     miffBoolTRUE);
-      miffSetBoolean(        miff, "False",    miffBoolFALSE);
+      miffSetBoolean(        miff, "True",     miffTRUE);
+      miffSetBoolean(        miff, "False",    miffFALSE);
                              
       miffSetI(              miff, "I_0",      0);
       miffSetI(              miff, "I_1",      1);
@@ -1379,8 +1379,8 @@ static MiffBool _MiffTestWrite(MiffStr const * const fileName)
 
       miffSetBlockStart(     miff, "KeyValueBlock");
       {
-         miffSetBoolean(        miff, "True",     miffBoolTRUE);
-         miffSetBoolean(        miff, "False",    miffBoolFALSE);
+         miffSetBoolean(        miff, "True",     miffTRUE);
+         miffSetBoolean(        miff, "False",    miffFALSE);
                              
          miffSetI(              miff, "I_0",      0);
          miffSetI(              miff, "I_1",      1);
@@ -1425,7 +1425,7 @@ static MiffBool _MiffTestWrite(MiffStr const * const fileName)
       }
       miffSetBlockStop(miff);
 
-      result = miffBoolTRUE;
+      result = miffTRUE;
       break;
    }
 

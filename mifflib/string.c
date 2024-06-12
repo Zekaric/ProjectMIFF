@@ -50,7 +50,7 @@ Unescape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-MiffBool _MiffStrEncodedToStr(MiffN * const strLen, MiffStr * const str)
+MiffB _MiffStrEncodedToStr(MiffN * const strLen, MiffStr * const str)
 {
    MiffN     index,
              eindex,
@@ -106,7 +106,7 @@ Escape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-MiffBool _MiffStrToStrEncoded(MiffN const strLen, MiffStr const * const str, 
+MiffB _MiffStrToStrEncoded(MiffN const strLen, MiffStr const * const str, 
    MiffN * const strEncodedLen, MiffStr ** const strEncoded)
 {
    MiffN     index,
@@ -155,56 +155,6 @@ MiffBool _MiffStrToStrEncoded(MiffN const strLen, MiffStr const * const str,
 }
 
 /******************************************************************************
-func: _MiffStrToI
-******************************************************************************/
-MiffI _MiffStrToI(MiffN const strLen, MiffStr const * const str)
-{
-   MiffBool isNegative;
-   MiffN    index;
-   MiffN    value;
-
-   isNegative = miffBoolFALSE;
-   value      = 0;
-   forCount(index, strLen)
-   {
-      if (index == 0)
-      {
-         if (str[index] == '-')
-         {
-            isNegative = miffBoolTRUE;
-            continue;
-         }
-      }
-
-      value = value * 10 + str[index] - '0';
-   }
-
-   if (isNegative)
-   {
-      return -((MiffI) value);
-   }
-
-   return value;
-}
-
-/******************************************************************************
-func: _MiffStrToN
-******************************************************************************/
-MiffN _MiffStrToN(MiffN const strLen, MiffStr const * const str)
-{
-   MiffN index;
-   MiffN value;
-
-   value = 0;
-   forCount(index, strLen)
-   {
-      value = value * 10 + str[index] - '0';
-   }
-
-   return value;
-}
-
-/******************************************************************************
 func: _MiffStrAppend
 ******************************************************************************/
 MiffStr *_MiffStrAppend(MiffStr const * const a, MiffStr const * const b, MiffStr const * const c)
@@ -246,20 +196,4 @@ MiffStr *_MiffStrClone(MiffN const strLen, MiffStr const * const str)
    _MiffMemCopyTypeArray(strLen, MiffStr, result, str);
 
    return result;
-}
-
-/******************************************************************************
-func: _MiffStrToKey
-******************************************************************************/
-MiffBool _MiffStrToKey(MiffN const strLen, MiffStr const * const str, MiffN * const keyLen,
-   MiffStr * const key)
-{
-   MiffN len;
-
-   len = min(256, strLen);
-   _MiffMemCopyTypeArray(len, MiffN1, key, str);
-   key[len] = 0;
-   *keyLen  = len - 1;
-
-   returnTrue;
 }

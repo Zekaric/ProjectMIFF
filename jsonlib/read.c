@@ -125,7 +125,7 @@ JsonBool _JsonReadPart(Json * const json)
    // Nothing left to read for this record.
    returnFalseIf(
       !json ||
-      json->readRecordIsDone);
+      json->isRecordDone);
 
    index = 0;
    loop
@@ -163,7 +163,7 @@ JsonBool _JsonReadPart(Json * const json)
 
    if (byte == '\n')
    {
-      json->readRecordIsDone = jsonBoolTRUE;
+      json->isRecordDone = jsonBoolTRUE;
    }
 
    returnTrue;

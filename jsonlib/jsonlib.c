@@ -349,7 +349,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
 
    if (byte == '\n')
    {
-      //json->readRecordIsDone = jsonBoolTRUE;
+      //json->isRecordDone = jsonBoolTRUE;
    }
 
    returnTrue;

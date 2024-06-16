@@ -369,3 +369,11 @@ void _MiffBase64Start(void)
    _base64ValueToLetter[index++] = '+';
    _base64ValueToLetter[index++] = '/';
 }
+
+/******************************************************************************
+func: _MiffBase64Stop
+******************************************************************************/
+void _MiffBase64Stop(void)
+{
+   // Nothing to do.
+}

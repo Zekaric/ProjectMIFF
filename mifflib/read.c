@@ -72,7 +72,7 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
    // Nothing left to read for this record.
    returnFalseIf(
       !miff ||
-      miff->readRecordIsDone);
+      miff->isRecordDone);
 
    trimTabs = trimLeadingTabs;
    index    = 0;
@@ -122,58 +122,12 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
 
    if (byte == '\n')
    {
-      miff->readRecordIsDone = miffTRUE;
+      miff->isRecordDone = miffTRUE;
    }
 
    returnTrue;
 }
 
-/******************************************************************************
-func: _MiffReadR
-******************************************************************************/
-MiffB _MiffReadR(Miff * const miff, MiffValue * const value)
-{
-   MiffBase64Data data;
-
-   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
-
-   data = _MiffBase64Restart(miff->readByteData);
-
-   if (miff->readByteCount == 6)
-   {
-      Miff4 vtemp;
-
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
-
-      _MiffByteSwap4(miff, &vtemp);
-
-      value->rType = 4;
-      value->r4    = vtemp.r;
-   }
-   else
-   {
-      Miff8 vtemp;
-
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[0]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[1]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[2]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[3]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[4]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[5]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[6]));
-      returnFalseIf(!_MiffBase64Get(&data, &vtemp.byte[7]));
-
-      _MiffByteSwap8(miff, &vtemp);
-
-      value->rType = 8;
-      value->r8    = vtemp.r;
-   }
-
-   returnTrue;
-}
 
 #if 0
 /******************************************************************************

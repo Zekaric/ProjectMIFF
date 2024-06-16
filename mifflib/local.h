@@ -141,6 +141,7 @@ MiffB           _MiffBase64Get(         MiffBase64Data * const buffer, MiffN1 * 
 MiffB           _MiffBase64Set(         MiffBase64Data * const buffer, MiffN1   const byte);
 MiffB           _MiffBase64SetEnd(      MiffBase64Data * const buffer);
 void            _MiffBase64Start(       void);
+void            _MiffBase64Stop(        void);
 
 void            _MiffByteSwap4(         Miff const * const miff, Miff4 * const value);
 void            _MiffByteSwap8(         Miff const * const miff, Miff8 * const value);
@@ -181,10 +182,11 @@ MiffN4          _MiffTypeGetNameSize(   MiffValueType const type);
 void            _MiffUtilStart(         void);
 void            _MiffUtilStop(          void);
 
-MiffB           _MiffWriteStr(          Miff const * const miff, MiffN  const strCount, MiffStr const * const strBuffer);
-MiffB           _MiffWriteI(            Miff       * const miff, MiffI  const value);
-MiffB           _MiffWriteN(            Miff       * const miff, MiffN  const value);
-MiffB           _MiffWriteR4(           Miff       * const miff, MiffR4 const value);
-MiffB           _MiffWriteR(            Miff       * const miff, MiffR  const value);
+MiffB           _MiffWriteStr(          Miff const * const miff, MiffN     const strCount, MiffStr const * const strBuffer);
+MiffB           _MiffWriteI(            Miff       * const miff, MiffI     const value);
+MiffB           _MiffWriteN(            Miff       * const miff, MiffN     const value);
+MiffB           _MiffWriteR4(           Miff       * const miff, MiffR4    const value);
+MiffB           _MiffWriteR(            Miff       * const miff, MiffR     const value);
+MiffB           _MiffWriteValue(        Miff       * const miff, MiffValue const value);
 
 #endif

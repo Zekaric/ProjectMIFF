@@ -111,7 +111,7 @@ tc	Close scope.  Denotes the end of a scope.
 
 t-
 tcx	[count]
-tc	This will be a number larger than 0 to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of complex objects, use scoped above and a separate count.
+tc	This will be a number 0 or larger to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of objects, use a count key value and a scope for each individual object in the array instead.  
 
 t-
 tcx	*
@@ -149,23 +149,19 @@ tc	The value data is unset/null.  Nothing else follows the header.
 
 t-
 tcx	T, F
-tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.
+tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.  Often, when dealing with just a single boolean value, the existance of a key is enough to indicate T and ommision would indicate F.  
 
 t-
-tcx	+, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
-tc	The value data will be a number of some sort.  An integer, real, or complex number, in human readable form.  The header is part of the number.
+tcx	x, n, o, b
+tc	A 4 or 8 byte natural number (0 or larger integer values).  |b |x| b| for hexadecimal (0123456789abcdef) values, |b |o| b| for human readable number, |b |o| b| for octal (01234567) values, and |b |b| b|for binary (01) values.  If you want to store an interger or real here then use unions Miff4 and Miff8 to get the natural number representing the bit pattern for the integer and real values.  Leading zeros will be trimmed from the number.  Values are store in Big Endian.
 
 t-
-tcx	x, o, b
-tc	The value data will be a number of some sort.  But encoded in |b |x| b| hexidecimal (0123456789abcdef), |b |o| b| octal (01234567), |b |b| b| binary (01) digits.  
+tcx	c, i, r
+tc	The value data will be a |b |c| b| complex number, an |b |i| b| integer number, or a |b |r| b| real number in human readable form.  If the value is a real number, it should be written using North American number format (E.G. 3.14159, 1.0e10.  Decimal/"." instead of comma/"," for the separation of the integer part and the fractional part.)  If the value is a complex number the is it written real number "+" imaginary number.  If the imaginary number is negative then it will include the "-" signe.  It will not change the "+" between the two numbers.
 
 t-
-tcx	I, R
-tc	The value data will be an |b |I| b| integer or a |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.
-
-t-
-tcx	n, N
-tc	The value data will be a big integer or big real number.  |b |n| b| will be in human readable format.  |b |N| b| will be in Base64 encoding.
+tcx	C, I, R
+tc	The value data will be a |b |C| b| complex number, an |b |I| b| integer number, or a |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact int ASCII form depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.  Complex numbers encode the two reals as one buffer for the Base64 conversion.  Values are stored in Big Endian.
 
 t-
 tcx	"
@@ -175,6 +171,10 @@ t-
 tcx	*
 tc	The value data is a binary chunk.  It will be two parts separated by a space.  First part immediately follows the * an it denotes the size of the binary chunk.  After the space will be the binary chunk in Base64 encoding.
 
+t-
+tcx	[Any other letter]
+tc	The value data is define by the subformat and decoded by an external to the library function.
+
 ]
 
 hh	Examples
@@ -182,31 +182,22 @@ hh	Examples
 .[
 - A null value.
 1|-->|Null|-->|~|<--|
+-
+- A boolean true without explicit setting.  If this was missing then isVisible is false.
+0|-->|isVisible|<--|
+-
 - A true and false array.
 2|-->|True And False|-->|T|-->|F|<--|
-- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
-7|-->|Numbers|-->|0|-->|1|-->|-1|-->|3.14159|-->|-3.14159|-->|RQEkP2w|-->|RQAkh+1RELRg|<--|
-- Some integers in different encoding..
-3|-->|Encoded Numbers|-->|xfeedface|-->|o12345670|-->|b0000111100110101|<--|
+-
+- Some integers, reals, and complex numbers.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
+7|-->|Numbers|-->|i0|-->|i1|-->|i-1|-->|r0|-->|r3.14159|-->|r-3.14159|-->|r1e-10|-->|c1|-->|c0+1|-->|c-1+-1|-->|RQEkP2w|-->|RQAkh+1RELRg|<--|
+-
+- Some natural numbers in different encoding.  Trim leading 0's.
+3|-->|Encoded Numbers|-->|xfeedface|-->|o12345670|-->|b111100110101|<--|
+-
 - Some strings.
 3|-->|Strings|-->|"The quick brown fox\njumped over the lazy dog.|-->|"Salut, c'est été.|-->|"你好马|<--|
+-
 - Some binary data.
 1|-->|binary buffer|-->|*32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg|<--|
-]
-
-	Same with removing the tabs and newlines to give you a better idea what you might see in an actual file.
-
-.[
-- A null value.
-1        Null             ~
-- A true and false array.
-2        True And False   T        F
-- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
-7        Numbers          0        1        -1        3.14159        -3.14159        RQEkP2w        RQAkh+1RELRg
-- Some integers in different encoding..
-3        Encoded Numbers  xfeedface        o12345670        b0000111100110101
-- Some strings.
-3        Strings          "The quick brown fox\njumped over the lazy dog.        "Salut, c'est été.        "你好马
-- Some binary data.
-1        binary buffer    *32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg
 ]

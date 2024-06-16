@@ -104,15 +104,15 @@ MiffB _MiffWriteN(Miff * const miff, MiffN const value)
 }
 
 /******************************************************************************
-func: _MiffWriteR4
+func: _MiffWrite4Base64
 ******************************************************************************/
-MiffB _MiffWriteR4(Miff * const miff, MiffR4 const value)
+MiffB _MiffWrite4Base64(Miff * const miff, Miff4 const value)
 {
    Miff4          vtemp;
    MiffBase64Data data;
-   MiffN1         buffer[16];
+   MiffN1         buffer[64];
 
-   vtemp.r = value;
+   vtemp.n = value.n;
    _MiffByteSwap4(miff, &vtemp);
 
    data = _MiffBase64Restart(buffer);
@@ -127,15 +127,15 @@ MiffB _MiffWriteR4(Miff * const miff, MiffR4 const value)
 }
 
 /******************************************************************************
-func: _MiffWriteR8
+func: _MiffWrite8Base64
 ******************************************************************************/
-MiffB _MiffWriteR8(Miff * const miff, MiffR8 const value)
+MiffB _MiffWrite8Base64(Miff * const miff, Miff8 const value)
 {
    Miff8          vtemp;
    MiffBase64Data data;
-   MiffN1         buffer[16];
+   MiffN1         buffer[64];
 
-   vtemp.r = value;
+   vtemp.n = value.n;
    _MiffByteSwap8(miff, &vtemp);
 
    data = _MiffBase64Restart(buffer);
@@ -148,6 +148,80 @@ MiffB _MiffWriteR8(Miff * const miff, MiffR8 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
+   returnFalseIf(!_MiffBase64SetEnd(&data));
+
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+}
+
+/******************************************************************************
+func: _MiffWriteCBase64
+******************************************************************************/
+MiffB _MiffWriteCBase64(Miff * const miff, MiffValue const value)
+{
+   Miff8          vtemp;
+   MiffBase64Data data;
+   MiffN1         buffer[64];
+
+   vtemp.n = value.inr.n;
+   _MiffByteSwap8(miff, &vtemp);
+
+   data = _MiffBase64Restart(buffer);
+
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
+
+   vtemp.n = value.imaginary.n;
+   _MiffByteSwap8(miff, &vtemp);
+
+   data = _MiffBase64Restart(buffer);
+
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
+   returnFalseIf(!_MiffBase64SetEnd(&data));
+
+   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+}
+
+/******************************************************************************
+func: _MiffWriteC4Base64
+******************************************************************************/
+MiffB _MiffWriteC4Base64(Miff * const miff, MiffValue const value)
+{
+   Miff4          vtemp;
+   MiffBase64Data data;
+   MiffN1         buffer[64];
+
+   vtemp.n = value.inr4.n;
+   _MiffByteSwap4(miff, &vtemp);
+
+   data = _MiffBase64Restart(buffer);
+
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+
+   vtemp.n = value.imaginary4.n;
+   _MiffByteSwap4(miff, &vtemp);
+
+   data = _MiffBase64Restart(buffer);
+
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
+   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
    return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
@@ -178,3 +252,107 @@ MiffB _MiffWriteR8S(Miff * const miff, MiffR8 const value)
    return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
 }
 #endif
+
+/******************************************************************************
+func: _MiffWriteValue
+******************************************************************************/
+MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
+{
+   switch (value.type)
+   {
+   case miffValueTypeB:
+      break;
+
+   case miffValueTypeBIN:
+      break;
+
+   case miffValueTypeC:
+      switch (value.formatCIR)
+      {
+      case miffValueFormatCIR_BASE64:
+         break;
+
+      case miffValueFormatCIR_HUMAN_READABLE:
+         break;
+      }
+      break;
+
+   case miffValueTypeC4:
+      switch (value.formatCIR)
+      {
+      case miffValueFormatCIR_BASE64:
+         break;
+
+      case miffValueFormatCIR_HUMAN_READABLE:
+         break;
+      }
+      break;
+
+   case miffValueTypeI:
+      switch (value.formatCIR)
+      {
+      case miffValueFormatCIR_BASE64:
+         break;
+
+      case miffValueFormatCIR_HUMAN_READABLE:
+         break;
+      }
+      break;
+
+   case miffValueTypeN:
+      switch (value.formatN)
+      {
+      case miffValueFormatN_B:
+         break;
+
+      case miffValueFormatN_HUMAN_READABLE:
+         break;
+
+      case miffValueFormatN_O:
+         break;
+
+      case miffValueFormatN_X:
+         break;
+      }
+      break;
+
+   case miffValueTypeNULL:
+      break;
+
+   case miffValueTypeR:
+      switch (value.formatCIR)
+      {
+      case miffValueFormatCIR_BASE64:
+         break;
+
+      case miffValueFormatCIR_HUMAN_READABLE:
+         break;
+      }
+      break;
+
+   case miffValueTypeR4:
+      switch (value.formatCIR)
+      {
+      case miffValueFormatCIR_BASE64:
+         break;
+
+      case miffValueFormatCIR_HUMAN_READABLE:
+         break;
+      }
+      break;
+
+   case miffValueTypeSTR:
+      break;
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: _MiffWriteValueOther
+******************************************************************************/
+MiffB _MiffWriteValueOther(Miff * const miff, MiffN const count, MiffStr const * const)
+{
+
+   returnTrue;
+}

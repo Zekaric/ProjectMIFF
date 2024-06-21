@@ -120,6 +120,9 @@ typedef float                          MiffR4;
 typedef char                           MiffStr;
 
 #define MiffN4_MAX                     UINT32_MAX
+#define MiffN8_MAX                     UINT64_MAX
+#define MiffI4_MAX                     INT32_MAX
+#define MiffI8_MAX                     INT64_MAX
 
 typedef struct
 {
@@ -160,8 +163,8 @@ typedef struct
    MiffValueType      type;
    MiffValueFormatN   formatN;
    MiffValueFormatCIR formatCIR;
+   MiffStr            header;
    MiffB              is4;
-   MiffB              isNegative;
    MiffB              b;
    Miff4              inr4;
    Miff8              inr;
@@ -232,7 +235,7 @@ void            miffDestroyContent(                Miff       * const miff);
 
 MiffB           miffGetInfo(                       Miff       * const miff, MiffRecType * const type, MiffN * const count, MiffStr       * const key);
 MiffB           miffGetRecordEnd(                  Miff       * const miff);
-MiffValue       miffGetValue(                      Miff       * const miff);
+MiffValue       miffGetValueHeader(                Miff       * const miff);
 MiffStr         miffGetValueData(                  Miff const * const miff);
 
 MiffB           miffSetInfo(                       Miff       * const miff, MiffRecType   const type, MiffN   const count, MiffStr const * const key);

@@ -40,11 +40,10 @@ include:
 lib local:
 prototype:
 ******************************************************************************/
+static MiffB       _PartAToC(       Miff const * const miff, MiffR * const real, MiffR * const imaginary);
+static MiffI       _PartAToI(       Miff const * const miff);
 static MiffN       _PartAToN(       Miff const * const miff);
-static MiffN       _PartAToNProcess(MiffN strCount, MiffN1 *strBuffer);
-static MiffValue   _PartAToValueC(  Miff const * const miff);
-static MiffValue   _PartAToValueI(  Miff const * const miff);
-static MiffValue   _PartAToValueR(  Miff const * const miff);
+static MiffR       _PartAToR(       Miff const * const miff);
 static MiffB       _PartBase64ToC(  Miff const * const miff, MiffN const count, MiffN1 const * const buffer, Miff8 * const real, Miff8 * const imaginary);
 static MiffB       _PartBase64ToC4( Miff const * const miff, MiffN const count, MiffN1 const * const buffer, Miff4 * const real, Miff4 * const imaginary);
 static MiffB       _PartBase64ToN(  Miff const * const miff, MiffN const count, MiffN1 const * const buffer, Miff8 * const value);
@@ -76,156 +75,131 @@ func: _MiffPartToN
 ******************************************************************************/
 MiffN _MiffPartToN(Miff const * const miff)
 {
-   return _PartAToNProcess(miff->readByteCount, miff->readByteData);
+   return _MiffAToN(miff->readByteCount, miff->readByteData);
 }
 
 /******************************************************************************
 func: _MiffPartToValue
+
+Read the know values that are of fixed size.
 ******************************************************************************/
-MiffValue _MiffPartToValue(Miff const * const miff)
+MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
 {
-   MiffValue value;
-
-   _MiffMemClearType(MiffValue, &value);
-
    // The header defines the data.
-   switch (miff->readByteData[0])
+   switch (value->type)
    {
-   case '~':
-      value.type = miffValueTypeNULL;
-      break;
-
-   case 'T':
-      value.type = miffValueTypeB;
-      value.b    = miffTRUE;
-      break;
-
-   case 'F':
-      value.type = miffValueTypeB;
-      value.b    = miffFALSE;
-      break;
-
-   case 'n':
-      value.type  = miffValueTypeN;
-      value.inr.n = _PartAToN(miff);
-      break;
-
-   case 'x':
-      value.type  = miffValueTypeN;
-      value.inr.n = _PartHexToN(miff);
-      break;
-
-   case 'o':
-      value.type  = miffValueTypeN;
-      value.inr.n = _PartOctToN(miff);
-      break;
-
-   case 'b':
-      value.type  = miffValueTypeN;
-      value.inr.n = _PartBinToN(miff);
-      break;
-
-   case 'c':
-      value = _PartAToValueC(miff);
-      break;
-
-   case 'i':
-      value = _PartAToValueI(miff);
-      break;
-
-   case 'r':
-      value = _PartAToValueR(miff);
-      break;
-
-   case 'N':
-      value.type = miffValueTypeN;
-      value.is4  = (miff->readByteCount < 8);
-      if (!value.is4)
+   case miffValueTypeN:
+      switch (value->formatN)
       {
-         _PartBase64ToN( miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr);
-      }
-      else
-      {
-         _PartBase64ToN4(miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr4);
-         value.inr.n = value.inr4.n;
+      case miffValueFormatN_HUMAN_READABLE:
+         value->inr.n = _PartAToN(miff);
+         break;
+
+      case miffValueFormatN_BASE64:
+         value->is4 = (miff->readByteCount < 8);
+         if (!value->is4)
+         {
+            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+         }
+         else
+         {
+            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
+
+            // Auto promotion yes.  Auto demotion no, caller needs to control that.
+            value->inr.n = value->inr4.n;
+         }
+         break;
+
+      case miffValueFormatN_X:
+         value->inr.n = _PartHexToN(miff);
+         break;
+
+      case miffValueFormatN_O:
+         value->inr.n = _PartOctToN(miff);
+         break;
+
+      case miffValueFormatN_B:
+         value->inr.n = _PartBinToN(miff);
+         break;
       }
       break;
 
-   case 'C':
-      value.type = miffValueTypeC;
-      value.is4  = (miff->readByteCount < 16);
-      if (!value.is4)
+   case miffValueTypeC:
+      switch (value->formatCIR)
       {
-         _PartBase64ToC( 
-            miff, 
-            miff->readByteCount, 
-            &(miff->readByteData[1]), 
-            &value.inr, 
-            &value.imaginary);
-      }
-      else
-      {
-         _PartBase64ToC4(
-            miff, 
-            miff->readByteCount,
-            &(miff->readByteData[1]),
-            &value.inr4, 
-            &value.imaginary4);
-         value.inr.r       = value.inr4.r;
-         value.imaginary.r = value.imaginary4.r;
+      case miffValueFormatCIR_HUMAN_READABLE:
+         _PartAToC(miff, &value->inr.r, &value->imaginary.r);
+         break;
+
+      case miffValueFormatCIR_BASE64:
+         value->is4 = (miff->readByteCount < 16);
+         if (!value->is4)
+         {
+            _PartBase64ToC( miff, miff->readByteCount, miff->readByteData, &value->inr,  &value->imaginary);
+         }
+         else
+         {
+            value->type = miffValueTypeC4;
+            _PartBase64ToC4(miff, miff->readByteCount, miff->readByteData, &value->inr4, &value->imaginary4);
+
+            // Auto promotion yes.  Auto demotion no, caller needs to control that.
+            value->inr.r       = value->inr4.r;
+            value->imaginary.r = value->imaginary4.r;
+         }
+         break;
       }
       break;
 
-   case 'I':
-      value.type = miffValueTypeI;
-      value.is4  = (miff->readByteCount < 8);
-      if (!value.is4)
+   case miffValueTypeI:
+      switch (value->formatCIR)
       {
-         _PartBase64ToN( miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr);
-      }
-      else
-      {
-         _PartBase64ToN4(miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr4);
-         value.inr.i  = value.inr4.i;
-      }
+      case miffValueFormatCIR_HUMAN_READABLE:
+         value->inr.i = _PartAToI(miff);
+         break;
 
-      if (value.inr.i < 0)
-      {
-         value.isNegative = miffTRUE;
-         value.inr.i  = -value.inr.i;
-         value.inr4.i = -value.inr4.i;
-      }
-      break;
+      case miffValueFormatCIR_BASE64:
+         value->is4  = (miff->readByteCount < 8);
+         if (!value->is4)
+         {
+            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+         }
+         else
+         {
+            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
 
-   case 'R':
-      value.type = miffValueTypeR;
-      value.is4  = (miff->readByteCount < 8);
-      if (!value.is4)
-      {
-         _PartBase64ToN( miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr);
-      }
-      else
-      {
-         _PartBase64ToN4(miff, miff->readByteCount - 1, &(miff->readByteData[1]), &value.inr4);
-         value.inr.r  = value.inr4.r;
+            // Auto promotion yes.  Auto demotion no, caller needs to control that.
+            value->inr.i = value->inr4.i;
+         }
+         break;
       }
       break;
 
-   case '*':
-      value = _PartAToValueBufferBin(miff);
-      break;
+   case miffValueTypeR:
+      switch (value->formatCIR)
+      {
+      case miffValueFormatCIR_HUMAN_READABLE:
+         value->inr.r = _PartAToR(miff);
+         break;
 
-   case '\"':
-      value = _PartAToValueBufferStr(miff);
-      break;
+      case miffValueFormatCIR_BASE64:
+         value->is4  = (miff->readByteCount < 8);
+         if (!value->is4)
+         {
+            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+         }
+         else
+         {
+            value->type = miffValueTypeR4;
+            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
 
-   default:
-      // New type not known by the default format.
-      value.type = miffValueTypeOTHER;
-      break;
+            // Auto promotion yes.  Auto demotion no, caller needs to control that.
+            value->inr.r = value->inr4.r;
+         }
+         break;
+      }
    }
 
-   return value;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -233,81 +207,43 @@ local:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _PartAToN
+func: _PartAToC
 ******************************************************************************/
-static MiffN _PartAToN(Miff const * const miff)
+static MiffB _PartAToC(Miff const * const miff, MiffR * const real, MiffR * const imaginary)
 {
-   return _PartAToNProcess(miff->readByteCount - 1, &(miff->readByteData[1]));
-}
-
-/******************************************************************************
-func: _PartAToNProcess
-******************************************************************************/
-static MiffN _PartAToNProcess(MiffN count, MiffN1 *buffer)
-{
-   MiffN index;
-   MiffN value;
-
-   value = 0;
-   forCount(index, count)
-   {
-      value = value * 10 + buffer[index] - '0';
-   }
-
-   return value;
-}
-
-/******************************************************************************
-func: _PartAToValueC
-******************************************************************************/
-static MiffValue _PartAToValueC(Miff const * const miff)
-{
-   MiffValue value;
-   MiffN1   *n1Temp;
-
-   _MiffMemClearType(MiffValue, &value);
-
-   value.type   = miffValueTypeC;
+   MiffN1 *n1Temp;
 
    // Get the real value of the complex number.
-   value.inr.r  = (MiffR) _strtod_l(
-      (char *)  &(miff->readByteData[1]), 
-      (char **) &n1Temp, 
-      _MiffLocaleGet());
-   value.inr4.r = (MiffR4) value.inr.r;
+   *real = _strtod_l((char *) miff->readByteData, (char **) &n1Temp, _MiffLocaleGet());
 
    // Check to see if the imaginary number exists.
    if ((MiffN) (n1Temp - miff->readByteData) < miff->readByteCount &&
        n1Temp[0] == '+')
    {
       // Get the imaginary value of the complex number.
-      value.imaginary.r  = (MiffR) _strtod_l(
-         (char *)  &(n1Temp[1]),
-         (char **) &n1Temp,
-         _MiffLocaleGet());
-      value.imaginary4.r = (MiffR4) value.imaginary.r;
+      *imaginary = _strtod_l((char *) &(n1Temp[1]), (char **) &n1Temp, _MiffLocaleGet());
    }
 
-   return value;
+   returnTrue;
 }
 
 /******************************************************************************
-func: _PartAToValueI
+func: _PartAToI
 ******************************************************************************/
-static MiffValue _PartAToValueI(Miff const * const miff)
+static MiffI _PartAToI(Miff const * const miff)
 {
+   MiffB     isPositive;
    MiffN     count;
    MiffN1   *npTemp;
-   MiffValue value;
+   MiffN     nTemp;
 
-   _MiffMemClearType(MiffValue, &value);
+   isPositive = miffTRUE;
 
-   value.type = miffValueTypeI;
    if (miff->readByteData[1] == '-')
    {
-      value.isNegative = miffTRUE;
-      count            = miff->readByteCount - 2;
-      npTemp           = &(miff->readByteData[2]);
+      isPositive = miffFALSE;
+      count      = miff->readByteCount - 2;
+      npTemp     = &(miff->readByteData[2]);
    }
    else
    {
@@ -315,29 +251,42 @@ static MiffValue _PartAToValueI(Miff const * const miff)
       npTemp = &(miff->readByteData[1]);
    }
 
-   value.inr.n = _PartAToNProcess(count, npTemp);
-
-   return value;
+   nTemp = _MiffAToN(count, npTemp);
+   // Out of range.  
+   // If positive, nTemp can't be larger than UINT64_MAX.
+   // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
+   if ((!isPositive && nTemp > ((MiffN) MiffI8_MAX) + 1) ||
+       ( isPositive && nTemp > ((MiffN) MiffI8_MAX)))
+   {
+      return 0;
+   }
+   
+   // Returning the negative.
+   if (!isPositive)
+   {
+      // WTF?  2's complement.  UINT64_MIN != -UINT64_MAX, it is one less.
+      return -((MiffI) nTemp - 1) - 1;
+   }
+   
+   return (MiffI) nTemp;
 }
 
 /******************************************************************************
-func: _PartAToValueR
+func: _PartAToN
 ******************************************************************************/
-static MiffValue _PartAToValueR(Miff const * const miff)
+static MiffN _PartAToN(Miff const * const miff)
 {
-   MiffValue value;
-   MiffN1   *n1Temp;
+   return _MiffAToN(miff->readByteCount - 1, &(miff->readByteData[1]));
+}
 
-   _MiffMemClearType(MiffValue, &value);
+/******************************************************************************
+func: _PartAToR
+******************************************************************************/
+static MiffR _PartAToR(Miff const * const miff)
+{
+   MiffN1 *n1Temp;
 
-   value.type   = miffValueTypeR;
-   value.inr.r  = (MiffR4) _strtod_l(
-      (char *)  &(miff->readByteData[1]), 
-      (char **) &n1Temp, 
-      _MiffLocaleGet());
-   value.inr4.r = (MiffR4) value.inr.r;
-
-   return value;
+   return _strtod_l((char *) miff->readByteData, (char **) &n1Temp, _MiffLocaleGet());
 }
 
 /******************************************************************************
@@ -347,6 +296,8 @@ static MiffB _PartBase64ToC(Miff const * const miff, MiffN const count, MiffN1 c
    Miff8 * const real, Miff8 * const imaginary)
 {
    MiffBase64Data data;
+
+   count;
 
    // cast safe.  We are not writing, just reading.
    data = _MiffBase64Restart((MiffN1 *) buffer);
@@ -384,6 +335,8 @@ static MiffB _PartBase64ToC4(Miff const * const miff, MiffN const count, MiffN1 
 {
    MiffBase64Data data;
 
+   count;
+
    // cast safe.  We are not writing, just reading.
    data = _MiffBase64Restart((MiffN1 *) buffer);
 
@@ -412,6 +365,8 @@ static MiffB _PartBase64ToN(Miff const * const miff, MiffN const count, MiffN1 c
 {
    MiffBase64Data data;
 
+   count;
+
    // cast safe.  We are not writing, just reading.
    data = _MiffBase64Restart((MiffN1 *) buffer);
 
@@ -436,6 +391,8 @@ static MiffN4 _PartBase64ToN4(Miff const * const miff, MiffN const count, MiffN1
    Miff4 * const value)
 {
    MiffBase64Data data;
+
+   count;
 
    // cast safe.  We are not writing, just reading.
    data = _MiffBase64Restart((MiffN1 *) buffer);
@@ -571,30 +528,6 @@ static MiffN _PartOctToN(Miff const * const miff)
 
       value += (value << 3) + letterValue;
    }
-
-   return value;
-}
-
-/******************************************************************************
-func: _PartToValueStrBuffer
-******************************************************************************/
-static MiffValue _PartToValueStrBuffer(Miff const * const miff)
-{
-   MiffValue value;
-
-   _MiffMemClearType(MiffValue, &value);
-
-   return value;
-}
-
-/******************************************************************************
-func: _PartToValueBinBuffer
-******************************************************************************/
-static MiffValue _PartToValueBinBuffer(Miff const * const miff)
-{
-   MiffValue value;
-
-   _MiffMemClearType(MiffValue, &value);
 
    return value;
 }

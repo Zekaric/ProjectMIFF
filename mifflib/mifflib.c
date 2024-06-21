@@ -299,29 +299,6 @@ MiffB miffGetInfo(Miff * const miff, MiffRecType * const type, MiffN * const cou
 }
 
 /******************************************************************************
-func: miffGetValue
-******************************************************************************/
-MiffValue miffGetValue(Miff * const miff)
-{
-   MiffValue value;
-
-   _MiffMemClearType(MiffValue, &value);
-
-   value.type = miffValueTypeNONE;
-
-   returnIf(
-         !_isStarted ||
-         !miff,
-      value);
-
-   returnIf(!_MiffReadPart(miff, miffFALSE), value);
-
-   value = _MiffPartToValue(miff);
-   
-   return value;
-}
-
-/******************************************************************************
 func: miffGetRecordEnd
 
 Skip to the end of the record if not at the end already.
@@ -339,6 +316,144 @@ MiffB miffGetRecordEnd(Miff * const miff)
    miff->isRecordDone = miffTRUE;
 
    returnTrue;
+}
+
+/******************************************************************************
+func: miffGetValueHeader
+******************************************************************************/
+MiffValue miffGetValueHeader(Miff * const miff)
+{
+   MiffStr   header;
+   MiffValue value;
+
+   _MiffMemClearType(MiffValue, &value);
+
+   value.type = miffValueTypeNONE;
+
+   returnIf(
+         !_isStarted ||
+         !miff,
+      value);
+
+   header = _MiffReadValueHeader(miff);
+   switch (header)
+   {
+   default:
+      value.type        = miffValueTypeOTHER;
+      value.header      = header;
+      // Reading the rest of the value is up to the caller.
+      break;
+
+   case 0:
+      break;
+
+   case '~':
+      value.type        = miffValueTypeNULL;
+      _MiffReadPartEnd(miff);
+      break;
+
+   case '"':
+      value.type        = miffValueTypeSTR;
+      value.bufferCount = _MiffReadValueBufferCount(miff);
+      // Reading the string is done with miffGetValueStr();
+      break;
+
+   case 'c':
+      value.type        = miffValueTypeC;
+      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'C':
+      value.type        = miffValueTypeC;
+      value.formatCIR   = miffValueFormatCIR_BASE64;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'T':
+      value.type        = miffValueTypeB;
+      value.b           = miffTRUE;
+      _MiffReadPartEnd(miff);
+      break;
+
+   case 'F':
+      value.type        = miffValueTypeB;
+      _MiffReadPartEnd(miff);
+      break;
+
+   case 'i':
+      value.type        = miffValueTypeI;
+      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'I':
+      value.type        = miffValueTypeI;
+      value.formatCIR   = miffValueFormatCIR_BASE64;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'n':
+      value.type        = miffValueTypeN;
+      value.formatN     = miffValueFormatN_HUMAN_READABLE;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'N':
+      value.type        = miffValueTypeN;
+      value.formatN     = miffValueFormatN_BASE64;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'x':
+      value.type        = miffValueTypeN;
+      value.formatN     = miffValueFormatN_X;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'o':
+      value.type        = miffValueTypeN;
+      value.formatN     = miffValueFormatN_O;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'b':
+      value.type        = miffValueTypeN;
+      value.formatN     = miffValueFormatN_B;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'r':
+      value.type        = miffValueTypeR;
+      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case 'R':
+      value.type        = miffValueTypeR;
+      value.formatCIR   = miffValueFormatCIR_BASE64;
+      _MiffReadPart(miff, miffFALSE);
+      _MiffPartToValue(miff, &value);
+      break;
+
+   case '*':
+      value.type        = miffValueTypeBIN;
+      value.bufferCount = _MiffReadValueBufferCount(miff);
+      // Reading the buffer is done with miffGetValueBin();
+      break;
+   }
+   
+   return value;
 }
 
 /******************************************************************************
@@ -484,6 +599,7 @@ func: miffValueGetBool
 MiffB miffValueGetB(MiffValue value)
 {
    returnFalseIf(value.type != miffValueTypeB);
+   
    return value.b;
 }
 
@@ -493,13 +609,8 @@ func: miffValueGetI
 MiffI miffValueGetI(MiffValue value)
 {
    return0If(value.type != miffValueTypeI);
-
-   if (value.isNegative)
-   {
-      return -((MiffI) value.inr.n);
-   }
-
-   return (MiffI) value.inr.n;
+   
+   return value.inr.i;
 }
 
 /******************************************************************************
@@ -508,9 +619,7 @@ func: miffValueGetN
 MiffN miffValueGetN(MiffValue value)
 {
    return0If(value.type != miffValueTypeI);
-
-   return0If(value.isNegative);
-
+   
    return value.inr.n;
 }
 
@@ -601,15 +710,7 @@ MiffValue miffValueSetI(MiffI const ivalue, MiffValueFormatCIR const format)
 
    value.type      = miffValueTypeI;
    value.formatCIR = format;
-   if (ivalue < 0)
-   {
-      value.isNegative = miffTRUE;
-      value.inr.n      = -ivalue;
-   }
-   else
-   {
-      value.inr.n      = ivalue;
-   }
+   value.inr.i     = ivalue;
 
    return value;
 }

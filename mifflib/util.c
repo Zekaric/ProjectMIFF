@@ -64,6 +64,23 @@ void _MiffUtilStop(void)
 }
 
 /******************************************************************************
+func: _MiffAToN
+******************************************************************************/
+MiffN _MiffAToN(MiffN count, MiffN1 *buffer)
+{
+   MiffN index;
+   MiffN value;
+
+   value = 0;
+   forCount(index, count)
+   {
+      value = value * 10 + buffer[index] - '0';
+   }
+
+   return value;
+}
+
+/******************************************************************************
 func: _MiffLocaleGet
 ******************************************************************************/
 _locale_t _MiffLocaleGet(void)

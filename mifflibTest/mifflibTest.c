@@ -404,7 +404,7 @@ static MiffR4               _reals4[300] =
       0.0, 1.0, -1.0, FLT_MAX, -FLT_MAX, (float) 3.141592653589793226535897932,
 };
 
-static MiffR8               _reals8[300] =
+static MiffR                _reals8[300] =
 {
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.141592653589793226535897932,
       0.0, 1.0, -1.0, DBL_MAX, -DBL_MAX, 3.141592653589793226535897932,
@@ -878,13 +878,14 @@ func: _MiffTestRead
 ******************************************************************************/
 static MiffB _MiffTestRead(MiffStr const * const fileName)
 {
+#if 0
    FILE           *file;
    Miff           *miff;
-   MiffB        result;
+   MiffB           result;
    MiffStr         subFormatName[miffKeySIZE];
    MiffStr         typeName[miffKeySIZE];
    MiffN           subFormatVersion;
-   MiffType        type;
+   MiffValueType   type;
    MiffStr         key[miffKeySIZE];
    MiffN           arrayIndex;
    MiffN           arrayCount;
@@ -1304,6 +1305,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
    fclose(file);
 
    return result;
+#endif
 }
 
 /******************************************************************************

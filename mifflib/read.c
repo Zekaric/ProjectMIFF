@@ -67,7 +67,7 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
    MiffN4   index;
    MiffN1   byte;
    MiffN1  *bufTemp;
-   MiffB trimTabs;
+   MiffB    trimTabs;
 
    // Nothing left to read for this record.
    returnFalseIf(
@@ -128,33 +128,70 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
    returnTrue;
 }
 
-
-#if 0
 /******************************************************************************
-func: _MiffReadR4S
+func: _MiffReadPartEnd
+
+Skip to the next tab or newline.
 ******************************************************************************/
-MiffB _MiffReadR4S(Miff * const miff, MiffValue * const value)
+MiffB _MiffReadPartEnd(Miff * const miff)
 {
-   MiffStr *ctemp;
+   MiffN4   index;
+   MiffN1   byte;
 
-   returnFalseIf(!_MiffReadPart(miff));
+   // Nothing left to read for this record.
+   returnFalseIf(
+      !miff ||
+      miff->isRecordDone);
 
-   value->r4 = (MiffR4) strtod((char *) miff->readByteData, (char **) &ctemp);
+   index = 0;
+   byte  = 0;
+   loop
+   {
+      // End of file?
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+
+      // End of line or part, we are done reading.
+      breakIf(byte == '\n' ||
+              byte == '\t');
+   }
+
+   if (byte == '\n')
+   {
+      miff->isRecordDone = miffTRUE;
+   }
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffReadR8S
+func: _MiffReadValueHeader
 ******************************************************************************/
-MiffB _MiffReadR8S(Miff * const miff, MiffValue * const value)
+MiffStr _MiffReadValueHeader(Miff * const miff)
 {
-   MiffStr *ctemp;
+   MiffN1 byte;
 
-   returnFalseIf(!_MiffReadPart(miff));
+   return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
 
-   value->r8 = strtod((char *) miff->readByteData, (char **) &ctemp);
-
-   returnTrue;
+   return (MiffStr) byte;
 }
-#endif
+
+/******************************************************************************
+func: _MiffReadValueBufferCount
+******************************************************************************/
+MiffN _MiffReadValueBufferCount(Miff * const miff)
+{
+   MiffN   index;
+   MiffStr buffer[32];
+
+   forCount(index, 32)
+   {
+      return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &buffer[index]));
+      if (buffer[index] == ' ')
+      {
+         buffer[index] = 0;
+         break;
+      }
+   }
+
+   return _MiffAToN(index, (MiffN1 *) buffer);
+}

@@ -91,7 +91,7 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
    case miffValueTypeN:
       switch (value->formatN)
       {
-      case miffValueFormatN_HUMAN_READABLE:
+      case miffValueFormatN_TEXT:
          value->inr.n = _PartAToN(miff);
          break;
 
@@ -127,7 +127,7 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
    case miffValueTypeC:
       switch (value->formatCIR)
       {
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          _PartAToC(miff, &value->inr.r, &value->imaginary.r);
          break;
 
@@ -153,7 +153,7 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
    case miffValueTypeI:
       switch (value->formatCIR)
       {
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          value->inr.i = _PartAToI(miff);
          break;
 
@@ -177,7 +177,7 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
    case miffValueTypeR:
       switch (value->formatCIR)
       {
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          value->inr.r = _PartAToR(miff);
          break;
 

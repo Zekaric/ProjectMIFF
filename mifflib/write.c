@@ -474,7 +474,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(    miff, 1, "C"));
          return         _MiffWriteCBase64(miff, value);
 
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
          returnFalseIf(!_MiffWriteR(  miff, value.inr.r));
          if (value.imaginary.r != 0.0)
@@ -493,7 +493,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(     miff, 1, "C"));
          return         _MiffWriteC4Base64(miff, value);
 
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
          returnFalseIf(!_MiffWriteR4( miff, value.inr4.r));
          if (value.imaginary4.r != 0.0)
@@ -512,7 +512,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(    miff, 1, "I"));
          return         _MiffWrite8Base64(miff, value.inr);
 
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "i"));
          return _MiffWriteI(miff, (MiffN) -value.inr.i);
       }
@@ -529,7 +529,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(    miff, 1, "N"));
          return         _MiffWrite8Base64(miff, value.inr);
 
-      case miffValueFormatN_HUMAN_READABLE:
+      case miffValueFormatN_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "n"));
          return         _MiffWriteN(  miff, value.inr.n);
 
@@ -549,7 +549,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
          return         _MiffWrite8Base64(miff, value.inr);
 
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
          return         _MiffWriteR(  miff, value.inr.r);
       }
@@ -562,7 +562,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
          returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
          return         _MiffWrite4Base64(miff, value.inr4);
 
-      case miffValueFormatCIR_HUMAN_READABLE:
+      case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
          return         _MiffWriteR4( miff, value.inr4.r);
       }

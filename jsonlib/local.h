@@ -65,9 +65,9 @@ constant:
 #define min(A, B)                                  (((A) < (B)) ? (A) : (B))
 #define max(A, B)                                  (((A) < (B)) ? (B) : (A))
 
-#define returnFalse                                return jsonBoolFALSE
+#define returnFalse                                return jsonFALSE
 #define returnNull                                 return NULL
-#define returnTrue                                 return jsonBoolTRUE
+#define returnTrue                                 return jsonTRUE
 #define returnIf(     EXP, VALUE)                  if (EXP) { return (VALUE); }
 #define return0If(    EXP)                         if (EXP) { return 0;       }
 #define returnFalseIf(EXP)                         if (EXP) { returnFalse;    }

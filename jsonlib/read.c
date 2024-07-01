@@ -163,7 +163,7 @@ JsonBool _JsonReadPart(Json * const json)
 
    if (byte == '\n')
    {
-      json->isRecordDone = jsonBoolTRUE;
+      json->isRecordDone = jsonTRUE;
    }
 
    returnTrue;
@@ -216,7 +216,7 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
       !json       ||
       !string);
 
-   isFound       = jsonBoolFALSE;
+   isFound       = jsonFALSE;
    unicode[0]    =
       unicode[1] = 
       unicode[2] =
@@ -268,7 +268,7 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
       // End of string
       if (byte == jsonSTRING_QUOTE_STR[0])
       {
-         isFound = jsonBoolTRUE;
+         isFound = jsonTRUE;
          break;
       }
 

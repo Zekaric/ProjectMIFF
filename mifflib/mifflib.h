@@ -69,17 +69,22 @@ typedef enum
 
 typedef enum
 {
-   miffValueFormatN_HUMAN_READABLE,
+   miffValueFormatN_TEXT,
    miffValueFormatN_B,
    miffValueFormatN_BASE64,
    miffValueFormatN_O,
-   miffValueFormatN_X
+   miffValueFormatN_X,
+
+   miffValueFormatN_DEFAULT = miffValueFormatN_TEXT
 } MiffValueFormatN;
 
 typedef enum
 {
-   miffValueFormatCIR_HUMAN_READABLE,
-   miffValueFormatCIR_BASE64
+   miffValueFormatCIR_TEXT,
+   miffValueFormatCIR_BASE64,
+
+   miffValueFormatI_DEFAULT = miffValueFormatCIR_TEXT,
+   miffValueFormatR_DEFAULT = miffValueFormatCIR_BASE64
 } MiffValueFormatCIR;
 
 typedef enum
@@ -268,33 +273,36 @@ MiffB           miffStart(                         MiffMemCreate const memCreate
 void            miffStop(                          void);
 
 // Convenience macroes
-#define miffValueSetString(         VALUE)                       miffValueSetStr(strlen(VALUE), VALUE)
+#define miffValueSetStr(            VALUE)                       miffValueSetStrBuffer(strlen(VALUE), VALUE)
+#define miffValueSetIDefault(       VALUE)                       miffValueSetI( VALUE, miffValueFormatI_DEFAULT)
+#define miffValueSetNDefault(       VALUE)                       miffValueSetN( VALUE, miffValueFormatN_DEFAULT)
+#define miffValueSetRDefault(       VALUE)                       miffValueSetR( VALUE, miffValueFormatR_DEFAULT)
+#define miffValueSetR4Default(      VALUE)                       miffValueSetR4(VALUE, miffValueFormatR_DEFAULT)
 
-#define miffSetBlockStart(          MIFF, NAME)                  miffSetInfo(MIFF, miffTypeBLOCK_START, NULL, NAME, miffArrayCountUNKNOWN)
-#define miffSetBlockStop(           MIFF)                        miffSetInfo(MIFF, miffTypeBLOCK_STOP,  NULL, NULL, miffArrayCountUNKNOWN)
+#define miffSetBlockStart(          MIFF, NAME)                { miffSetInfo(MIFF, miffRecTypeBLOCK_START, 0, NAME); miffSetRecordEnd(MIFF); }
+#define miffSetBlockStop(           MIFF)                      { miffSetInfo(MIFF, miffRecTypeBLOCK_STOP,  0, NULL); miffSetRecordEnd(MIFF); }
 
-#define miffSetBool(                MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeBOOL,        NULL, NAME,     1); miffSetValue(MIFF, miffValueSetBool(       VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetI(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeI,           NULL, NAME,     1); miffSetValue(MIFF, miffValueSetI( (MiffI)  VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetN(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeN,           NULL, NAME,     1); miffSetValue(MIFF, miffValueSetN( (MiffN)  VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetR4(                  MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeR,           NULL, NAME,     1); miffSetValue(MIFF, miffValueSetR4((MiffR4) VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetR8(                  MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeR,           NULL, NAME,     1); miffSetValue(MIFF, miffValueSetR8((MiffR8) VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetType(                MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeTYPE,        NULL, NAME,     1); miffSetValue(MIFF, miffValueSetType(       VALUE)); miffSetRecordEnd(MIFF); }
-#define miffSetStr(                 MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffTypeSTR,         NULL, NAME,     1); miffSetValue(MIFF, miffValueSetString(     VALUE)); miffSetRecordEnd(MIFF); }
+#define miffSetBool(                MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetB(          VALUE));        miffSetRecordEnd(MIFF); }
+#define miffSetI(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetIDefault( (MiffI)  VALUE)); miffSetRecordEnd(MIFF); }
+#define miffSetN(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetNDefault( (MiffN)  VALUE)); miffSetRecordEnd(MIFF); }
+#define miffSetR(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetRDefault( (MiffR)  VALUE)); miffSetRecordEnd(MIFF); }
+#define miffSetR4(                  MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetR4Default((MiffR4) VALUE)); miffSetRecordEnd(MIFF); }
+#define miffSetStr(                 MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetStr(        VALUE));        miffSetRecordEnd(MIFF); }
+#define miffSetOtherStart(          MIFF,       NAME)            miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME);
 
-#define miffSetBoolArrayStart(      MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeBOOL,        NULL, NAME, COUNT)
-#define miffSetIArrayStart(         MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeI,           NULL, NAME, COUNT)
-#define miffSetNArrayStart(         MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeN,           NULL, NAME, COUNT)
-#define miffSetR4ArrayStart(        MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeR,           NULL, NAME, COUNT)
-#define miffSetR8ArrayStart(        MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeR,           NULL, NAME, COUNT)
-#define miffSetTypeArrayStart(      MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeTYPE,        NULL, NAME, COUNT)
-#define miffSetStrArrayStart(       MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffTypeSTR,         NULL, NAME, COUNT)
+#define miffSetBoolArrayStart(      MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetIArrayStart(         MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetNArrayStart(         MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetRArrayStart(         MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetR4ArrayStart(        MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetStrArrayStart(       MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
+#define miffSetOtherArrayStart(     MIFF,       NAME, COUNT)     miffSetInfo(MIFF, miffRecTypeVALUE, COUNT, NAME)
 
-#define miffSetBoolArray(           MIFF, NAME, COUNT, ARRAY)  { miffSetBoolArrayStart(MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetBool(       ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetIArray(              MIFF, NAME, COUNT, ARRAY)  { miffSetIArrayStart(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetI( (MiffI)  ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetNArray(              MIFF, NAME, COUNT, ARRAY)  { miffSetNArrayStart(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetN( (MiffN)  ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetR4Array(             MIFF, NAME, COUNT, ARRAY)  { miffSetR4ArrayStart(  MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetR4((MiffR4) ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetR8Array(             MIFF, NAME, COUNT, ARRAY)  { miffSetR8ArrayStart(  MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetR8((MiffR8) ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetTypeArray(           MIFF, NAME, COUNT, ARRAY)  { miffSetTypeArrayStart(MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetType(       ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
-#define miffSetStrArray(            MIFF, NAME, COUNT, ARRAY)  { miffSetStrArrayStart( MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetString(     ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
+#define miffSetBoolArray(           MIFF, NAME, COUNT, ARRAY)  { miffSetBoolArrayStart(MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetB(          ARRAY[__index__]));        } miffSetRecordEnd(MIFF); }
+#define miffSetIArray(              MIFF, NAME, COUNT, ARRAY)  { miffSetIArrayStart(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetIDefault( (MiffI)  ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
+#define miffSetNArray(              MIFF, NAME, COUNT, ARRAY)  { miffSetNArrayStart(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetNDefault( (MiffN)  ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
+#define miffSetRArray(              MIFF, NAME, COUNT, ARRAY)  { miffSetRArrayStart(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetRDefault( (MiffR)  ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
+#define miffSetR4Array(             MIFF, NAME, COUNT, ARRAY)  { miffSetR4ArrayStart(  MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetR4Default((MiffR4) ARRAY[__index__])); } miffSetRecordEnd(MIFF); }
+#define miffSetStrArray(            MIFF, NAME, COUNT, ARRAY)  { miffSetStrArrayStart( MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { miffSetValue(MIFF, miffValueSetStr(        ARRAY[__index__]));        } miffSetRecordEnd(MIFF); }
 
 #endif

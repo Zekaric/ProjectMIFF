@@ -49,8 +49,8 @@ constant:
 
 typedef enum
 {
-   jsonBoolFALSE,
-   jsonBoolTRUE
+   jsonFALSE,
+   jsonTRUE
 } JsonBool;
 
 typedef enum
@@ -115,9 +115,9 @@ typedef char                             JsonStr;
 typedef void    *(*JsonMemCreate)(        JsonN4 const memByteCount);
 typedef void     (*JsonMemDestroy)(       void * const mem);
 
-typedef JsonBool (*JsonGetBuffer)(        void * const dataRepo, JsonN4 const byteCount, JsonStr       * const data);
+typedef JsonBool (*JsonGetBuffer)(        void * const dataRepo, JsonN4 const byteCount, JsonN1       * const data);
 
-typedef JsonBool (*JsonSetBuffer)(        void * const dataRepo, JsonN4 const byteCount, JsonStr const * const data);
+typedef JsonBool (*JsonSetBuffer)(        void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const data);
 
 typedef struct
 {

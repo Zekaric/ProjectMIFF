@@ -46,7 +46,7 @@ macro:
 /******************************************************************************
 variable:
 ******************************************************************************/
-static JsonBool _isStarted = jsonBoolFALSE;
+static JsonBool _isStarted = jsonFALSE;
 
 /******************************************************************************
 global:
@@ -187,7 +187,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
    {
       loop
       {
-         breakIf(!json->getBuffer(json->dataRepo, 1, (JsonStr *) &byte));
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
          continueIf(jsonIS_SPACE(byte));
@@ -216,7 +216,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
    {
       loop
       {
-         breakIf(!json->getBuffer(json->dataRepo, 1, (JsonStr *) &byte));
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
          continueIf(jsonIS_SPACE(byte));
@@ -272,7 +272,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
    {
       loop
       {
-         breakIf(!json->getBuffer(json->dataRepo, 1, (JsonStr *) &byte));
+         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
          // Skip over white space.
          continueIf(jsonIS_SPACE(byte));
@@ -334,7 +334,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
       }
 
       // End of file?
-      breakIf(!json->getBuffer(json->dataRepo, 1, (JsonStr *) &byte));
+      breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
       // End of line or part, we done reading.
       breakIf(byte == '\n' ||
               byte == '\t');
@@ -349,7 +349,7 @@ JsonBool jsonRead(Json * const json, JsonReadType * const type)
 
    if (byte == '\n')
    {
-      //json->isRecordDone = jsonBoolTRUE;
+      //json->isRecordDone = jsonTRUE;
    }
 
    returnTrue;
@@ -435,7 +435,7 @@ JsonBool jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDe
 
    returnFalseIf(!_JsonReadStart());
 
-   _isStarted = jsonBoolTRUE;
+   _isStarted = jsonTRUE;
 
    returnTrue;
 }
@@ -450,7 +450,7 @@ void jsonStop(void)
    _JsonReadStop();
    _JsonMemStop();
 
-   _isStarted = jsonBoolFALSE;
+   _isStarted = jsonFALSE;
 }
 
 /******************************************************************************
@@ -460,7 +460,7 @@ JsonBool jsonWriteArrayStart(Json * const json)
 {
    json->scopeType[json->scope] = jsonScopeARRAY;
    json->scope++;
-   json->isFirstItem            = jsonBoolTRUE;
+   json->isFirstItem            = jsonTRUE;
 
    returnFalseIf(!_JsonWriteStr(json, jsonARRAY_START_STR));
    returnTrue;
@@ -473,7 +473,7 @@ JsonBool jsonWriteArrayStop(Json * const json)
 {
    json->scope--;
    json->scopeType[json->scope] = jsonScopeNONE;
-   json->isFirstItem            = jsonBoolFALSE;
+   json->isFirstItem            = jsonFALSE;
 
    returnFalseIf(!_JsonWriteStr(    json, "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
@@ -490,7 +490,7 @@ JsonBool jsonWriteKey(Json * const json, JsonStr const * const key)
    returnFalseIf(!_JsonWriteStr(          json, "\n"));
    returnFalseIf(!_JsonWriteIndent(       json));
    
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
 
    //returnFalseIf(!jsonWriteValueStr(      json, key));
    returnFalseIf(!_JsonWriteStr(          json, jsonKEY_VALUE_SEPARATOR_STR));
@@ -504,7 +504,7 @@ JsonBool jsonWriteObjectStart(Json * const json)
 {
    json->scopeType[json->scope] = jsonScopeOBJECT;
    json->scope++;
-   json->isFirstItem            = jsonBoolTRUE;
+   json->isFirstItem            = jsonTRUE;
 
    returnFalseIf(!_JsonWriteStr(json, jsonOBJECT_START_STR));
    returnTrue;
@@ -517,7 +517,7 @@ JsonBool jsonWriteObjectStop(Json * const json)
 {
    json->scope--;
    json->scopeType[json->scope] = jsonScopeNONE;
-   json->isFirstItem            = jsonBoolFALSE;
+   json->isFirstItem            = jsonFALSE;
 
    returnFalseIf(!_JsonWriteStr(    json, "\n"));
    returnFalseIf(!_JsonWriteIndent(json));
@@ -548,9 +548,9 @@ JsonBool jsonWriteValueBoolean(Json * const json, JsonBool const value)
       returnFalseIf(!_JsonWriteStr(          json, "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
    
-   returnFalseIf(!_JsonWriteStr(json, ((value == jsonBoolTRUE) ? "\"true\"" : "\"false\"")));
+   returnFalseIf(!_JsonWriteStr(json, ((value == jsonTRUE) ? "\"true\"" : "\"false\"")));
    returnTrue;
 }
 
@@ -565,7 +565,7 @@ JsonBool jsonWriteValueI(Json * const json, JsonI8 const value)
       returnFalseIf(!_JsonWriteStr(          json, "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
    
    return _JsonWriteI(json, value);
 }
@@ -581,7 +581,7 @@ JsonBool jsonWriteValueN(Json * const json, JsonN8 const value)
       returnFalseIf(!_JsonWriteStr(          json, "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
    
    return _JsonWriteN(json, value);
 }
@@ -597,7 +597,7 @@ JsonBool jsonWriteValueR4(Json * const json, JsonR4 const value)
       returnFalseIf(!_JsonWriteStr(          json, "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
    
    return _JsonWriteR4(json, value);
 }
@@ -613,7 +613,7 @@ JsonBool jsonWriteValueR8(Json * const json, JsonR8 const value)
       returnFalseIf(!_JsonWriteStr(          json, "\n"));
       returnFalseIf(!_JsonWriteIndent(      json));
    }
-   json->isFirstItem = jsonBoolFALSE;
+   json->isFirstItem = jsonFALSE;
    
    return _JsonWriteR8(json, value);
 }

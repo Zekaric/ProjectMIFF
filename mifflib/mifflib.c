@@ -360,7 +360,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
 
    case 'c':
       value.type        = miffValueTypeC;
-      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      value.formatCIR   = miffValueFormatCIR_TEXT;
       _MiffReadPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
@@ -385,7 +385,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
 
    case 'i':
       value.type        = miffValueTypeI;
-      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      value.formatCIR   = miffValueFormatCIR_TEXT;
       _MiffReadPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
@@ -399,7 +399,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
 
    case 'n':
       value.type        = miffValueTypeN;
-      value.formatN     = miffValueFormatN_HUMAN_READABLE;
+      value.formatN     = miffValueFormatN_TEXT;
       _MiffReadPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
@@ -434,7 +434,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
 
    case 'r':
       value.type        = miffValueTypeR;
-      value.formatCIR   = miffValueFormatCIR_HUMAN_READABLE;
+      value.formatCIR   = miffValueFormatCIR_TEXT;
       _MiffReadPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
@@ -518,8 +518,9 @@ MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count,
    returnFalseIf(!key);
 
    // Copy the key.
-   _MiffMemClearTypeArray(miffKeySIZE,           MiffStr, miff->currentName);
-   _MiffMemCopyTypeArray( _MiffStrGetCount(key), MiffStr, miff->currentName, key);
+   miff->currentNameCount = min(256, _MiffStrGetCount(key));
+   _MiffMemClearTypeArray(miffKeySIZE,            MiffStr, miff->currentName);
+   _MiffMemCopyTypeArray( miff->currentNameCount, MiffStr, miff->currentName, key);
 
    returnFalseIf(!miffSetSeparator(miff));
    returnFalseIf(!_MiffWriteStr(

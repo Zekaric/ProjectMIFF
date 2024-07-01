@@ -174,7 +174,7 @@ JsonI8 _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
    JsonN4   c1Index;
    JsonN8   value;
 
-   isNegative = jsonBoolFALSE;
+   isNegative = jsonFALSE;
    value      = 0;
    forCount(c1Index, strLen)
    {
@@ -182,7 +182,7 @@ JsonI8 _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
       {
          if (str[c1Index] == '-')
          {
-            isNegative = jsonBoolTRUE;
+            isNegative = jsonTRUE;
             continue;
          }
       }

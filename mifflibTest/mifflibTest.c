@@ -614,6 +614,8 @@ func: _JsonTestRead
 ******************************************************************************/
 static JsonBool _JsonTestRead(JsonStr const * const fileName)
 {
+   return jsonFALSE;
+#if 0
    FILE           *file;
    Json           *json;
    JsonBool        result;
@@ -621,7 +623,7 @@ static JsonBool _JsonTestRead(JsonStr const * const fileName)
 
    file   = NULL;
    json   = NULL;
-   result = jsonBoolFALSE;
+   result = jsonFALSE;
 
    for (;;)
    {
@@ -658,7 +660,7 @@ static JsonBool _JsonTestRead(JsonStr const * const fileName)
          }
       }
 
-      result = jsonBoolTRUE;
+      result = jsonTRUE;
       break;
    }
 
@@ -666,6 +668,7 @@ static JsonBool _JsonTestRead(JsonStr const * const fileName)
    fclose(file);
 
    return result;
+#endif
 }
 
 /******************************************************************************
@@ -690,11 +693,11 @@ static JsonBool _JsonTestReadObject(Json * const json)
       else
       {
          // We got something we were not expecting.
-         return jsonBoolFALSE;
+         return jsonFALSE;
       }
    }
 
-   return jsonBoolTRUE;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -709,7 +712,7 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 
    file   = NULL;
    json   = NULL;
-   result = jsonBoolFALSE;
+   result = jsonFALSE;
 
    for (;;)
    {
@@ -727,8 +730,8 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 
       jsonWriteObjectStart(json);
 
-      jsonWriteKey1Boolean(      json, "True",  jsonBoolTRUE);
-      jsonWriteKey1Boolean(      json, "False", jsonBoolFALSE);
+      jsonWriteKey1Boolean(      json, "True",  jsonTRUE);
+      jsonWriteKey1Boolean(      json, "False", jsonFALSE);
 
       jsonWriteKey1I1(           json, "I1_0",     0);
       jsonWriteKey1I1(           json, "I1_1",     1);
@@ -809,8 +812,8 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
       jsonWriteKey(        json, "KeyValueBlock");
       jsonWriteObjectStart(json);
       {
-         jsonWriteKey1Boolean( json, "True",     jsonBoolTRUE);
-         jsonWriteKey1Boolean( json, "False",    jsonBoolFALSE);
+         jsonWriteKey1Boolean( json, "True",     jsonTRUE);
+         jsonWriteKey1Boolean( json, "False",    jsonFALSE);
 
          jsonWriteKey1I1(      json, "I1_0",     0);
          jsonWriteKey1I1(      json, "I1_1",     1);
@@ -861,7 +864,7 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 
       jsonWriteObjectStop(json);
 
-      result = jsonBoolTRUE;
+      result = jsonTRUE;
       break;
    }
 
@@ -870,7 +873,173 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
 
    return result;
 #endif
-   return jsonBoolFALSE;
+   return jsonFALSE;
+}
+
+void TEST_KEY(Miff *miff, MiffStr *KEY, MiffRecType *recType, MiffN *arrayCount)
+{
+   MiffStr key[miffKeySIZE];
+
+   memset(key, 0, miffKeySIZE);
+
+   printf("%s\t", KEY);
+   if (!miffGetInfo(miff, recType, arrayCount, key)) 
+   {
+      printf("ERROR, no record.\t"); 
+   }
+   else 
+   {
+      if (*recType != miffRecTypeVALUE || !streq(key, KEY)) 
+      {
+         printf("key ERROR\t"); 
+      }
+      else 
+      {
+         printf("key OK\t"); 
+      }
+   }
+}
+
+void TEST_NULL_VALUE(Miff *miff)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeNULL) 
+   {
+      printf("null ERROR\n"); 
+   }
+   else 
+   {
+      printf("null OK\n");
+   }
+}
+
+void TEST_B_VALUE(Miff *miff, MiffB testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeB || 
+       miffValueGetB(   value) != testValue) 
+   {
+      printf("b ERROR\n"); 
+   }
+   else 
+   {
+      printf("b OK\n");
+   }
+}
+
+void TEST_I_VALUE(Miff *miff, MiffI testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeI || 
+       miffValueGetI(   value) != testValue) 
+   {
+      printf("i ERROR\n"); 
+   }
+   else
+   {
+      printf("i OK\n"); 
+   }
+}
+
+void TEST_N_VALUE(Miff *miff, MiffN testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeN || 
+       miffValueGetN(   value) != testValue) 
+   {
+      printf("n ERROR\n"); 
+   }
+   else
+   {
+      printf("n OK\n");
+   }
+}
+
+void TEST_R_VALUE(Miff *miff, MiffR testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeR || 
+       !miffValueIs4(   value)                   ||
+       miffValueGetR(   value) != testValue) 
+   {
+      printf("r ERROR\n");
+   }
+   else
+   {
+      printf("r OK\n");
+   }
+}
+
+void TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+   
+   if (miffValueGetType(value) != miffValueTypeR ||  
+       miffValueIs4(    value)                   || 
+       miffValueGetR4(  value) != testValue)
+   {
+      printf("r ERROR\n"); 
+   }
+   else
+   {
+      printf("r OK\n");
+   }
+}
+
+void TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
+{
+   MiffValue value;
+
+   value = miffGetValueHeader(miff);
+
+#if 0
+   if (miffValueGetType(value) != miffValueTypeSTR || 
+       !streq(miffValueGetStr(value), testValue)) 
+   {
+      printf("ERROR\n"); 
+   }
+   else 
+   {
+      printf("OK\n"); 
+   }
+#endif
+}
+
+void TEST_COUNT(MiffN COUNT, MiffN arrayCount)
+{
+   if (COUNT != arrayCount) 
+   {
+      printf("count ERROR\t"); 
+   } 
+   else 
+   { 
+      printf("count OK\t"); 
+   }
+}
+
+void TEST_NEXT(Miff *miff) 
+{
+   if (!miffGetRecordEnd(miff)) 
+   {
+      printf("ERROR, No Next Record\n"); 
+   }
 }
 
 /******************************************************************************
@@ -878,18 +1047,14 @@ func: _MiffTestRead
 ******************************************************************************/
 static MiffB _MiffTestRead(MiffStr const * const fileName)
 {
-#if 0
    FILE           *file;
    Miff           *miff;
    MiffB           result;
    MiffStr         subFormatName[miffKeySIZE];
-   MiffStr         typeName[miffKeySIZE];
    MiffN           subFormatVersion;
-   MiffValueType   type;
-   MiffStr         key[miffKeySIZE];
+   MiffRecType     recType;
    MiffN           arrayIndex;
    MiffN           arrayCount;
-   MiffValue       value;
    MiffN           index;
 
    file   = NULL;
@@ -918,180 +1083,90 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
       // Read in the header information.
       wprintf(L"%S\t%d\n", (char *) subFormatName, (int) subFormatVersion);
 
-
-#define TEST_B(KEY)                                                                                            \
-      printf("b\t%s\t", KEY);                                                                                  \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeBOOL || !streq(key, KEY)) { printf("ERROR\t"); }                                  \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_B_VALUE(VALUE)                                                                                    \
-      value = miffGetValueBoolean(miff);                                                                       \
-      if (miffValueGetValueType(value) != miffTypeBOOL || miffValueGetBool(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_I(KEY)                                                                                            \
-      printf("i\t%s\t", KEY);                                                                                  \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeI || !streq(key, KEY) { printf("ERROR\t"); }                                      \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_I_VALUE(VALUE)                                                                                    \
-      value = miffGetValueI(miff);                                                                             \
-      if (miffValueGetValueType(value) != miffTypeI || miffValueGetI(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_N(KEY)                                                                                            \
-      printf("n\t%s\t", KEY);                                                                                  \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeN || !streq(key, KEY)) { printf("ERROR\t"); }                                     \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_N_VALUE(VALUE)                                                                                    \
-      value = miffGetValueN(miff);                                                                             \
-      if (miffValueGetValueType(value) != miffTypeN || miffValueGetN(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_R(KEY)                                                                                            \
-      printf("r\t%s\t", KEY);                                                                                  \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeR || !streq(key, KEY)) { printf("ERROR\t"); }                                     \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_R4_VALUE(VALUE)                                                                                   \
-      value = miffGetValueR(miff);                                                                             \
-      if (miffValueGetValueType(value) != miffTypeR || miffValueGetRType(value) == 4 || miffValueGetR4(value) != VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
-#define TEST_R8_VALUE(VALUE)                                                                                   \
-      value = miffGetValueR(miff);                                                                             \
-      if (miffValueGetValueType(value) != miffTypeR || miffValueGetRType(value) == 8 || miffValueGetR4(value) != VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_TYPE(KEY)                                                                                         \
-      printf("t\t%s\t", KEY);                                                                                  \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeTYPE || !streq(key, KEY)) { printf("ERROR\t"); }                                  \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_TYPE_VALUE(VALUE)                                                                                 \
-      value = miffGetValueType(miff);                                                                          \
-      if (miffValueGetValueType(value) != miffTypeTYPE || miffValueGetType(value) != VALUE) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_STR(KEY)                                                                                          \
-      printf("\"\t%s\t", KEY);                                                                                 \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeSTR || !streq(key, KEY)) { printf("ERROR\t"); }                                   \
-         else { printf("OK\t"); }                                                                              \
-      }
-#define TEST_STR_VALUE(VALUE)                                                                                  \
-      value = miffGetValueStr(miff);                                                                           \
-      if (miffValueGetValueType(value) != miffTypeSTR || !streq(miffValueGetStr(value), VALUE)) { printf("ERROR\n"); } else { printf("OK\n"); }
-
-#define TEST_COUNT(COUNT) if (COUNT != count) { printf("ERROR\t"); } else { printf("OK\t"); }
-
-#define TEST_NEXT() if (!miffGetRecordEnd(miff)) { printf("ERROR, No Next Record\n"); }
-
-#define TEST_VAR(KEY, TYPE)                                                                                    \
-      printf("\"\t%s\t", KEY);                                                                                 \
-      if (!miffGetInfo(miff, &type, typeName, key, &arrayCount)) { printf("ERROR, no record.\t"); }            \
-      else {                                                                                                   \
-         if (type != miffTypeOTHER || !streq(key, KEY) || !streq(typeName, TYPE)) { printf("ERROR\t"); }       \
-         else { printf("OK\t"); }                                                                              \
-      }
-
-
       // Unless you are in full control of the format, do not assume that there will be an order
       // to the values.
-      TEST_B("True");      TEST_B_VALUE(miffTRUE);            TEST_NEXT();
-      TEST_B("False");     TEST_B_VALUE(miffFALSE);           TEST_NEXT();
-
-      TEST_I("I_0");       TEST_I_VALUE(0);                       TEST_NEXT();
-      TEST_I("I_1");       TEST_I_VALUE(1);                       TEST_NEXT();
-      TEST_I("I_-1");      TEST_I_VALUE(-1);                      TEST_NEXT();
-      TEST_I("I_127");     TEST_I_VALUE(127);                     TEST_NEXT();
-      TEST_I("I_-128");    TEST_I_VALUE(-128);                    TEST_NEXT();
-                             
-      TEST_N("N_0");       TEST_N_VALUE(0);                       TEST_NEXT();
-      TEST_N("N_1");       TEST_N_VALUE(1);                       TEST_NEXT();
-      TEST_N("N_255");     TEST_N_VALUE(255);                     TEST_NEXT();
-                             
-      TEST_R("R4_0");      TEST_R4_VALUE(0.0);                    TEST_NEXT();
-      TEST_R("R4_1");      TEST_R4_VALUE(1.0);                    TEST_NEXT();
-      TEST_R("R4_-1");     TEST_R4_VALUE(-1.0);                   TEST_NEXT();
-      TEST_R("R4_PI");     TEST_R4_VALUE(3.1415926535897932f);    TEST_NEXT();
+      TEST_KEY(miff, "Null",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_NULL_VALUE(miff);                      TEST_NEXT(miff);
+      TEST_KEY(miff, "True",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_B_VALUE(   miff, miffTRUE);            TEST_NEXT(miff);
+      TEST_KEY(miff, "False",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_B_VALUE(   miff, miffFALSE);           TEST_NEXT(miff);
+      TEST_KEY(miff, "I_0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 0);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "I_1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 1);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "I_-1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, -1);                  TEST_NEXT(miff);
+      TEST_KEY(miff, "I_127",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 127);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "I_-128", &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, -128);                TEST_NEXT(miff);
+      TEST_KEY(miff, "N_0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 0);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "N_1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 1);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "N_255",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 255);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R_0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 0.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R_1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 1.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R_-1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, -1.0);                TEST_NEXT(miff);
+      TEST_KEY(miff, "R_PI",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 3.1415926535897932);  TEST_NEXT(miff);
+      TEST_KEY(miff, "R4_0",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 0.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R4_1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 1.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R4_-1",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, -1.0);                TEST_NEXT(miff);
+      TEST_KEY(miff, "R4_PI",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 3.1415926535897932f); TEST_NEXT(miff);
       
-      TEST_R("R8_0");      TEST_R8_VALUE(0.0);                    TEST_NEXT();
-      TEST_R("R8_1");      TEST_R8_VALUE(1.0);                    TEST_NEXT();
-      TEST_R("R8_-1");     TEST_R8_VALUE(-1.0);                   TEST_NEXT();
-      TEST_R("R8_PI");     TEST_R8_VALUE(3.1415926535897932);     TEST_NEXT();
-                             
-      TEST_TYPE("TypeBool"); TEST_TYPE_VALUE(miffTypeBOOL);       TEST_NEXT();
-      TEST_TYPE("TypeKey");  TEST_TYPE_VALUE(miffTypeTYPE);       TEST_NEXT();
-                             
-      TEST_STR("String");    TEST_STR_VALUE("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-                                                                  TEST_NEXT();
-                             
-      TEST_B("Bool_Array"); TEST_COUNT(100);
-      forCount(index, count)
+#if 0
+      TEST_KEY("String");    TEST_COUNT(1); TEST_STR_VALUE("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+                                                                                   TEST_NEXT();
+      TEST_KEY("Bool_Array"); TEST_COUNT(100);
+      forCount(index, arrayCount)
       {
          value = miffGetValueBoolean(miff);
          if (miffValueGetBool(value) != _bools[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
       }
-      if (index == count) { printf("OK\n"); }
+      if (index == arrayCount) { printf("OK\n"); }
       TEST_NEXT();
 
-      TEST_I("I_Array"); TEST_COUNT(256);,
-      forCount(index, count)
+      TEST_KEY("I_Array"); TEST_COUNT(256);,
+      forCount(index, arrayCount)
       {
          value = miffGetValueI(miff);
          if (miffValueGetI(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
       }
-      if (index == count) { printf("OK\n"); }
+      if (index == arrayCount) { printf("OK\n"); }
       TEST_NEXT();
 
-      TEST_N("N_Array"); TEST_COUNT(256(, );
-      forCount(index, count)
+      TEST_KEY("N_Array"); TEST_COUNT(256(, );
+      forCount(index, arrayCount)
       {
          value = miffGetValueI(miff);
          if (miffValueGetN(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
       }
-      if (index == count) { printf("OK\n"); }
+      if (index == arrayCount) { printf("OK\n"); }
       TEST_NEXT();
 
-      TEST_R("R4_Array"); TEST_COUNT(300);
-      forCount(index, count)
-      {
-         value = miffGetValueR(miff);
-         if (miffValueGetRType(value) != 4 || miffValueGetR4(value) != _reals4[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == count) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_R("R8_Array"); TEST_COUNT(300);
-      forCount(index, count)
+      TEST_KEY("R_Array"); TEST_COUNT(300);
+      forCount(index, arrayCount)
       {
          value = miffGetValueR(miff);
          if (miffValueGetRType(value) != 8 || miffValueGetR8(value) != _reals8[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
       }
-      if (index == count) { printf("OK\n"); }
+      if (index == arrayCount) { printf("OK\n"); }
       TEST_NEXT();
 
-      TEST_STR("String_Array"); TEST_COUNT(10);
-      forCount(index, count)
+      TEST_KEY("R4_Array"); TEST_COUNT(300);
+      forCount(index, arrayCount)
+      {
+         value = miffGetValueR(miff);
+         if (miffValueGetRType(value) != 4 || miffValueGetR4(value) != _reals4[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
+      }
+      if (index == arrayCount) { printf("OK\n"); }
+      TEST_NEXT();
+
+      TEST_KEY("String_Array"); TEST_COUNT(10);
+      forCount(index, arrayCount)
       {
          value = miffGetValueSTR(miff);
          if (!streq(miffValueGetSTR(value) _strings[index])) { printf("ERROR, value mismatch %d\n", (int) index); break; }
       }
-      if (index == count) { printf("OK\n"); }
+      if (index == arrayCount) { printf("OK\n"); }
       TEST_NEXT();
 
-      TEST_VAR("userTypeIntStrReal", "userVarIntStrReal");
-      value = miffGetValueI()
-         miffSetValue(          miff, miffValueSetI(42));
-         miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
-         miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
-         miffSetRecordEnd(      miff);
+      TEST_KEY("userTypeIntStrReal");
+         miffGetValue(          miff, miffValueSetI(42));
+         miffGetValue(          miff, miffValueSetStr("Yes, but what is the question?"));
+         miffGetValue(          miff, miffValueSetR8(3.1415926535897932));
+         miffGetRecordEnd(      miff);
 
          miffSetBlockStart(     miff, "KeyValueBlock");
          {
@@ -1135,7 +1210,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
 
             miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
             miffSetValue(          miff, miffValueSetI(42));
-            miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
+            miffSetValue(          miff, miffValueSetStr("Yes, but what is the question?"));
             miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
             miffSetRecordEnd(      miff);
          }
@@ -1170,7 +1245,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
                }
 
                value = miffGetValueStr(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1182,7 +1257,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
          else if (type == miffTypeOTHER)
          {
             value = miffGetValueI(miff);
-            if (miffValueGetValueType(value) == miffTypeI &&
+            if (miffValueGetType(value) == miffTypeI &&
                 miffValueGetI(        value) == 42)
             {
                wprintf(L"P1 ok, ");
@@ -1192,7 +1267,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
                wprintf(L"ERROR\n");
             }
             value = miffGetValueStr(miff);
-            if (miffValueGetValueType(value) == miffTypeSTR &&
+            if (miffValueGetType(value) == miffTypeSTR &&
                 memcmp(
                    (char *) miffValueGetStr(value), 
                    "Yes, but what is the question?", 
@@ -1205,7 +1280,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
                wprintf(L"ERROR\n");
             }
             value = miffGetValueR8(miff);
-            if (miffValueGetValueType(value) == miffTypeR &&
+            if (miffValueGetType(value) == miffTypeR &&
                 miffValueGetR8(       value) == 3.1415926535897932)
             {
                wprintf(L"P3 ok");
@@ -1221,7 +1296,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                value = miffGetValueBoolean(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1235,7 +1310,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                value = miffGetValueI(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1249,7 +1324,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                value = miffGetValueN(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1263,7 +1338,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                value = miffGetValueR4(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1277,7 +1352,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
             for (arrayIndex = 0; arrayIndex < arrayCount; arrayIndex++)
             {
                value = miffGetValueR8(miff);
-               if (miffValueGetValueType(value) == miffTypeNONE)
+               if (miffValueGetType(value) == miffTypeNONE)
                {
                   wprintf(L"ERROR\n");
                   break;
@@ -1297,6 +1372,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
          }
       }
 
+#endif
       result = miffTRUE;
       break;
    }
@@ -1305,7 +1381,6 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
    fclose(file);
 
    return result;
-#endif
 }
 
 /******************************************************************************
@@ -1335,8 +1410,10 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
          break;
       }
 
-      miffSetBoolean(        miff, "True",     miffTRUE);
-      miffSetBoolean(        miff, "False",    miffFALSE);
+      miffSetNull(           miff, "Null");
+
+      miffSetBool(           miff, "True",     miffTRUE);
+      miffSetBool(           miff, "False",    miffFALSE);
                              
       miffSetI(              miff, "I_0",      0);
       miffSetI(              miff, "I_1",      1);
@@ -1348,41 +1425,38 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
       miffSetN(              miff, "N_1",      1);
       miffSetN(              miff, "N_255",    255);
                              
+      miffSetR(              miff, "R_0",     0.0);
+      miffSetR(              miff, "R_1",     1.0);
+      miffSetR(              miff, "R_-1",    -1.0);
+      miffSetR(              miff, "R_PI",    3.1415926535897932);
+
       miffSetR4(             miff, "R4_0",     0.0);
       miffSetR4(             miff, "R4_1",     1.0);
       miffSetR4(             miff, "R4_-1",    -1.0);
       miffSetR4(             miff, "R4_PI",    3.1415926535897932f);
                              
-      miffSetR8(             miff, "R8_0",     0.0);
-      miffSetR8(             miff, "R8_1",     1.0);
-      miffSetR8(             miff, "R8_-1",    -1.0);
-      miffSetR8(             miff, "R8_PI",    3.1415926535897932);
-                             
-      miffSetType(           miff, "TypeBool", miffTypeBOOL);
-      miffSetType(           miff, "TypeKey",  miffTypeTYPE);
-                             
       miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
                              
-      miffSetBooleanArray(   miff, "Bool_Array",   100,  _bools);
+      miffSetBoolArray(      miff, "Bool_Array",   100,  _bools);
 
       miffSetIArray(         miff, "I_Array",      256,  _narray);
       miffSetNArray(         miff, "N_Array",      256,  _narray);
 
+      miffSetRArray(         miff, "R_Array",      300,  _reals8);
       miffSetR4Array(        miff, "R4_Array",     300,  _reals4);
-      miffSetR8Array(        miff, "R8_Array",     300,  _reals8);
 
       miffSetStrArray(       miff, "String_Array", 10,   _strings);
 
-      miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
-      miffSetValue(          miff, miffValueSetI(42));
-      miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
-      miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+      miffSetOtherStart(     miff, "userTypeIntStrReal");
+      miffSetValue(          miff, miffValueSetIDefault(42));
+      miffSetValue(          miff, miffValueSetStr(     "Yes, but what is the question?"));
+      miffSetValue(          miff, miffValueSetRDefault(3.1415926535897932));
       miffSetRecordEnd(      miff);
 
       miffSetBlockStart(     miff, "KeyValueBlock");
       {
-         miffSetBoolean(        miff, "True",     miffTRUE);
-         miffSetBoolean(        miff, "False",    miffFALSE);
+         miffSetBool(           miff, "True",     miffTRUE);
+         miffSetBool(           miff, "False",    miffFALSE);
                              
          miffSetI(              miff, "I_0",      0);
          miffSetI(              miff, "I_1",      1);
@@ -1394,35 +1468,32 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
          miffSetN(              miff, "N_1",      1);
          miffSetN(              miff, "N_255",    255);
                              
+         miffSetR(              miff, "R8_0",     0.0);
+         miffSetR(              miff, "R8_1",     1.0);
+         miffSetR(              miff, "R8_-1",    -1.0);
+         miffSetR(              miff, "R8_PI",    3.1415926535897932);
+                             
          miffSetR4(             miff, "R4_0",     0.0);
          miffSetR4(             miff, "R4_1",     1.0);
          miffSetR4(             miff, "R4_-1",    -1.0);
          miffSetR4(             miff, "R4_PI",    3.1415926535897932f);
                              
-         miffSetR8(             miff, "R8_0",     0.0);
-         miffSetR8(             miff, "R8_1",     1.0);
-         miffSetR8(             miff, "R8_-1",    -1.0);
-         miffSetR8(             miff, "R8_PI",    3.1415926535897932);
-                             
-         miffSetType(           miff, "TypeBool", miffTypeBOOL);
-         miffSetType(           miff, "TypeKey",  miffTypeTYPE);
-                             
          miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
                              
-         miffSetBooleanArray(   miff, "Bool_Array",   100,  _bools);
+         miffSetBoolArray(      miff, "Bool_Array",   100,  _bools);
 
          miffSetIArray(         miff, "I_Array",      256,  _narray);
          miffSetNArray(         miff, "N_Array",      256,  _narray);
 
+         miffSetRArray(         miff, "R8_Array",     300,  _reals8);
          miffSetR4Array(        miff, "R4_Array",     300,  _reals4);
-         miffSetR8Array(        miff, "R8_Array",     300,  _reals8);
 
          miffSetStrArray(       miff, "String_Array", 10,   _strings);
 
-         miffSetVariableStart(  miff, "userTypeIntStrReal", "userVarIntStrReal");
-         miffSetValue(          miff, miffValueSetI(42));
-         miffSetValue(          miff, miffValueSetString("Yes, but what is the question?"));
-         miffSetValue(          miff, miffValueSetR8(3.1415926535897932));
+         miffSetOtherStart(     miff, "userTypeIntStrReal");
+         miffSetValue(          miff, miffValueSetIDefault(42));
+         miffSetValue(          miff, miffValueSetStr(     "Yes, but what is the question?"));
+         miffSetValue(          miff, miffValueSetRDefault(3.1415926535897932));
          miffSetRecordEnd(      miff);
       }
       miffSetBlockStop(miff);

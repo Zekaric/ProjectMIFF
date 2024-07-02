@@ -152,24 +152,24 @@ tcx	T, F
 tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.  Often, when dealing with just a single boolean value, the existance of a key is enough to indicate T and ommision would indicate F.  
 
 t-
-tcx	x, n, o, b
-tc	A 4 or 8 byte natural number (0 or larger integer values).  |b |x| b| for hexadecimal (0123456789abcdef) values, |b |o| b| for human readable number, |b |o| b| for octal (01234567) values, and |b |b| b|for binary (01) values.  If you want to store an interger or real here then use unions Miff4 and Miff8 to get the natural number representing the bit pattern for the integer and real values.  Leading zeros will be trimmed from the number.  Values are store in Big Endian.
+tcx	x, b
+tc	A natural number (0 or larger integer values).  |b |x| b| for hexadecimal (0123456789abcdef) values and |b |b| b|for binary (01) values.  If you want to store an interger or real here then use unions Miff4 and Miff8 to get the natural number representing the bit pattern for the integer and real values.  Leading zeros will be trimmed from the number.  Values are store in Big Endian.  These are here because sometimes it makes sense to show values in hex or binary.  Leading 0's are stripped.  0 value will be just a singular 0.
 
 t-
-tcx	c, i, r
-tc	The value data will be a |b |c| b| complex number, an |b |i| b| integer number, or a |b |r| b| real number in human readable form.  If the value is a real number, it should be written using North American number format (E.G. 3.14159, 1.0e10.  Decimal/"." instead of comma/"," for the separation of the integer part and the fractional part.)  If the value is a complex number the is it written real number "+" imaginary number.  If the imaginary number is negative then it will include the "-" signe.  It will not change the "+" between the two numbers.
+tcx	c, i, n, r
+tc	The value data will be a |b |c| b| complex number, an |b |i| b| integer number, a |b |n| b| natural number, or a |b |r| b| real number in human readable form.  If the value is a real number, it should be written using North American number format (E.G. 3.14159, 1.0e10.  Decimal/"." instead of comma/"," for the separation of the integer part and the fractional part.)  If the value is a complex number the is it written real number "+" imaginary number.  If the imaginary number is negative then it will include the "-" sign.  It will not change the "+" between the two numbers.
 
 t-
-tcx	C, I, R
-tc	The value data will be a |b |C| b| complex number, an |b |I| b| integer number, or a |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact int ASCII form depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.  Complex numbers encode the two reals as one buffer for the Base64 conversion.  Values are stored in Big Endian.
+tcx	C, I, N, R
+tc	The value data will be a 4 or 8 byte |b |C| b| complex number, |b |I| b| integer number, |b |N| b| natural number, or |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact int ASCII form depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.  Complex numbers encode the two reals as one buffer for the Base64 conversion.  Values are stored in Big Endian.
 
 t-
 tcx	"
-tc	The value data will be a string.  There is no closing |b |"| b|.  Whatever follows the header |b |"| b| to the next |-->| or |<--| which ever is next, is the string.  The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  
+tc	The value data will be a string.  There is no closing |b |"| b|.  It will be in two parts separated by a space.  First part immediately follows the " and it denotes the size of the string in bytes.  After the space to the next |-->| or |<--| which ever is next, is the string.  The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  
 
 t-
 tcx	*
-tc	The value data is a binary chunk.  It will be two parts separated by a space.  First part immediately follows the * an it denotes the size of the binary chunk.  After the space will be the binary chunk in Base64 encoding.
+tc	The value data is a binary buffer.  It will be two parts separated by a space.  First part immediately follows the * and it denotes the size of the binary buffer in bytes.  After the space will be the binary buffer in Base64 encoding.
 
 t-
 tcx	[Any other letter]

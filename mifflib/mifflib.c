@@ -282,18 +282,22 @@ MiffB miffGetInfo(Miff * const miff, MiffRecType * const type, MiffN * const cou
 
    case '*':
       *type                   = miffRecTypeVALUE;
-      miff->currentArrayCount = miffArrayCountUNKNOWN;
+      miff->currentArrayCount =
+         *count               =  miffArrayCountUNKNOWN;
       break;
 
    default:
       *type                   = miffRecTypeVALUE;
-      miff->currentArrayCount = _MiffPartToN(miff);
+      miff->currentArrayCount = 
+         *count               = _MiffPartToN(miff);
       break;
    }
 
    // Read in the name of the record
    returnFalseIf(!_MiffReadPart( miff, miffFALSE));
    returnFalseIf(!_MiffPartToKey(miff));
+
+   _MiffMemCopyTypeArray(miff->currentNameCount, MiffStr, key, miff->currentName);
 
    returnTrue;
 }
@@ -587,14 +591,6 @@ MiffB miffSetValue(Miff * const miff, MiffValue const value)
 }
 
 /******************************************************************************
-func: miffValueGetValueType
-******************************************************************************/
-MiffValueType miffValueGetValueType(MiffValue value)
-{
-   return value.type;
-}
-
-/******************************************************************************
 func: miffValueGetBool
 ******************************************************************************/
 MiffB miffValueGetB(MiffValue value)
@@ -686,6 +682,26 @@ MiffN miffValueGetStrCount(MiffValue value)
 }
 
 /******************************************************************************
+func: miffValueGetType
+******************************************************************************/
+MiffValueType miffValueGetType(MiffValue const value)
+{
+   return value.type;
+}
+
+/******************************************************************************
+func: miffValueIs4
+******************************************************************************/
+MiffN miffValueGetIs4(MiffValue const value)
+{
+   return0If(
+      value.type != miffValueTypeR ||
+      value.type != miffValueTypeC);
+
+   return value.is4;
+}
+
+/******************************************************************************
 func: miffValueSetB
 ******************************************************************************/
 MiffValue miffValueSetB(MiffB const ivalue)
@@ -728,6 +744,20 @@ MiffValue miffValueSetN(MiffN const ivalue, MiffValueFormatN const format)
    value.type    = miffValueTypeN;
    value.formatN = format;
    value.inr.n   = ivalue;
+
+   return value;
+}
+
+/******************************************************************************
+func: miffValueSetNull
+******************************************************************************/
+MiffValue miffValueSetNull(void)
+{
+   MiffValue value;
+
+   _MiffMemClearType(MiffValue, &value);
+
+   value.type = miffValueTypeNULL;
 
    return value;
 }

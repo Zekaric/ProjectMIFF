@@ -65,7 +65,7 @@ MiffB _MiffPartToKey(Miff * const miff)
    len = min(256, miff->readByteCount);
    _MiffMemCopyTypeArray(len, MiffN1, miff->currentName, miff->readByteData);
    miff->currentName[len] = 0;
-   miff->currentNameCount = len - 1;
+   miff->currentNameCount = len;
 
    returnTrue;
 }
@@ -239,16 +239,16 @@ static MiffI _PartAToI(Miff const * const miff)
 
    isPositive = miffTRUE;
 
-   if (miff->readByteData[1] == '-')
+   if (miff->readByteData[0] == '-')
    {
       isPositive = miffFALSE;
-      count      = miff->readByteCount - 2;
-      npTemp     = &(miff->readByteData[2]);
+      count      = miff->readByteCount - 1;
+      npTemp     = &(miff->readByteData[1]);
    }
    else
    {
-      count  = miff->readByteCount - 1;
-      npTemp = &(miff->readByteData[1]);
+      count      = miff->readByteCount - 0;
+      npTemp     = miff->readByteData;
    }
 
    nTemp = _MiffAToN(count, npTemp);
@@ -276,7 +276,7 @@ func: _PartAToN
 ******************************************************************************/
 static MiffN _PartAToN(Miff const * const miff)
 {
-   return _MiffAToN(miff->readByteCount - 1, &(miff->readByteData[1]));
+   return _MiffAToN(miff->readByteCount, miff->readByteData);
 }
 
 /******************************************************************************

@@ -241,7 +241,6 @@ void            miffDestroyContent(                Miff       * const miff);
 MiffB           miffGetInfo(                       Miff       * const miff, MiffRecType * const type, MiffN * const count, MiffStr       * const key);
 MiffB           miffGetRecordEnd(                  Miff       * const miff);
 MiffValue       miffGetValueHeader(                Miff       * const miff);
-MiffStr         miffGetValueData(                  Miff const * const miff);
 
 MiffB           miffSetInfo(                       Miff       * const miff, MiffRecType   const type, MiffN   const count, MiffStr const * const key);
 MiffB           miffSetSeparator(                  Miff       * const miff);
@@ -253,7 +252,6 @@ MiffN1 const   *miffValueGetBinBuffer(             MiffValue const value);
 MiffN           miffValueGetByteCount(             MiffValue const value);
 MiffB           miffValueGetB(                     MiffValue const value);
 MiffI           miffValueGetI(                     MiffValue const value);
-MiffN           miffValueGetIs4(                   MiffValue const value);
 MiffN           miffValueGetN(                     MiffValue const value);
 MiffR           miffValueGetR(                     MiffValue const value);
 MiffR4          miffValueGetR4(                    MiffValue const value);
@@ -261,10 +259,13 @@ MiffStr const  *miffValueGetStrBuffer(             MiffValue const value);
 MiffN           miffValueGetStrCount(              MiffValue const value);
 MiffValueType   miffValueGetType(                  MiffValue const value);
 
+MiffB           miffValueIs4(                      MiffValue const value);
+
 MiffValue       miffValueSetB(                     MiffB  const value);
 MiffValue       miffValueSetBinBuffer(             MiffN  const binCount, MiffN1  * const binBuffer);
 MiffValue       miffValueSetI(                     MiffI  const value, MiffValueFormatCIR const format);
 MiffValue       miffValueSetN(                     MiffN  const value, MiffValueFormatN   const format);
+MiffValue       miffValueSetNull(                  void);
 MiffValue       miffValueSetR(                     MiffR  const value, MiffValueFormatCIR const format);
 MiffValue       miffValueSetR4(                    MiffR4 const value, MiffValueFormatCIR const format);
 MiffValue       miffValueSetStrBuffer(             MiffN  const strCount, MiffStr * const strBuffer);
@@ -282,6 +283,7 @@ void            miffStop(                          void);
 #define miffSetBlockStart(          MIFF, NAME)                { miffSetInfo(MIFF, miffRecTypeBLOCK_START, 0, NAME); miffSetRecordEnd(MIFF); }
 #define miffSetBlockStop(           MIFF)                      { miffSetInfo(MIFF, miffRecTypeBLOCK_STOP,  0, NULL); miffSetRecordEnd(MIFF); }
 
+#define miffSetNull(                MIFF,       NAME)          { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetNull());                    miffSetRecordEnd(MIFF); }
 #define miffSetBool(                MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetB(          VALUE));        miffSetRecordEnd(MIFF); }
 #define miffSetI(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetIDefault( (MiffI)  VALUE)); miffSetRecordEnd(MIFF); }
 #define miffSetN(                   MIFF,       NAME, VALUE)   { miffSetInfo(MIFF, miffRecTypeVALUE, 1,     NAME); miffSetValue(MIFF, miffValueSetNDefault( (MiffN)  VALUE)); miffSetRecordEnd(MIFF); }

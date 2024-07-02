@@ -514,7 +514,7 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
 
       case miffValueFormatCIR_TEXT:
          returnFalseIf(!_MiffWriteStr(miff, 1, "i"));
-         return _MiffWriteI(miff, (MiffN) -value.inr.i);
+         return         _MiffWriteI(  miff, (MiffN) value.inr.i);
       }
       break;
 

@@ -325,9 +325,9 @@ MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 
    MiffBase64Data data;
    MiffN1         buffer[5];
 
+   data = _MiffBase64Restart(buffer);
    forCount(index, bufferCount)
    {
-      data = _MiffBase64Restart(buffer);
 
       returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
       index++;
@@ -340,14 +340,16 @@ MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 
       returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
       index++;
 
-      returnFalseIf(_MiffBase64SetEnd(&data));
+      returnFalseIf(!_MiffBase64SetEnd(&data));
       returnFalseIf(!_MiffWriteStr(miff, 4, (MiffStr *) buffer));
 
       returnTrueIf(index == bufferCount);
+
+      data = _MiffBase64Restart(buffer);
    }
 
-   returnFalseIf(_MiffBase64SetEnd(&data));
-   return        _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   returnFalseIf(!_MiffBase64SetEnd(&data));
+   return         _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
 }
 
 /******************************************************************************
@@ -471,35 +473,37 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         returnFalseIf(!_MiffWriteStr(    miff, 1, "C"));
-         return         _MiffWriteCBase64(miff, value);
-
-      case miffValueFormatCIR_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
-         returnFalseIf(!_MiffWriteR(  miff, value.inr.r));
-         if (value.imaginary.r != 0.0)
+         if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
-            return         _MiffWriteR(  miff, value.imaginary.r);
+            returnFalseIf(!_MiffWriteStr(     miff, 1, "C"));
+            return         _MiffWriteC4Base64(miff, value);
          }
-         break;
-      }
-      break;
-
-   case miffValueTypeC4:
-      switch (value.formatCIR)
-      {
-      case miffValueFormatCIR_BASE64:
-         returnFalseIf(!_MiffWriteStr(     miff, 1, "C"));
-         return         _MiffWriteC4Base64(miff, value);
+         else
+         {
+            returnFalseIf(!_MiffWriteStr(    miff, 1, "C"));
+            return         _MiffWriteCBase64(miff, value);
+         }
 
       case miffValueFormatCIR_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
-         returnFalseIf(!_MiffWriteR4( miff, value.inr4.r));
-         if (value.imaginary4.r != 0.0)
+         if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
-            return         _MiffWriteR4( miff, value.imaginary4.r);
+            returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
+            returnFalseIf(!_MiffWriteR4( miff, value.inr4.r));
+            if (value.imaginary4.r != 0.0)
+            {
+               returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
+               return         _MiffWriteR4( miff, value.imaginary4.r);
+            }
+         }
+         else 
+         {
+            returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
+            returnFalseIf(!_MiffWriteR(  miff, value.inr.r));
+            if (value.imaginary.r != 0.0)
+            {
+               returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
+               return         _MiffWriteR(  miff, value.imaginary.r);
+            }
          }
          break;
       }
@@ -546,25 +550,28 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
-         return         _MiffWrite8Base64(miff, value.inr);
+         if (value.is4)
+         {
+            returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
+            return         _MiffWrite4Base64(miff, value.inr4);
+         }
+         else
+         {
+            returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
+            return         _MiffWrite8Base64(miff, value.inr);
+         }
 
       case miffValueFormatCIR_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
-         return         _MiffWriteR(  miff, value.inr.r);
-      }
-      break;
-
-   case miffValueTypeR4:
-      switch (value.formatCIR)
-      {
-      case miffValueFormatCIR_BASE64:
-         returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
-         return         _MiffWrite4Base64(miff, value.inr4);
-
-      case miffValueFormatCIR_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
-         return         _MiffWriteR4( miff, value.inr4.r);
+         if (value.is4)
+         {
+            returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
+            return         _MiffWriteR4( miff, value.inr4.r);
+         }
+         else
+         {
+            returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
+            return         _MiffWriteR(  miff, value.inr.r);
+         }
       }
       break;
 

@@ -164,6 +164,60 @@ MiffB _MiffReadPartEnd(Miff * const miff)
 }
 
 /******************************************************************************
+func: _MiffReadStrEscaped
+******************************************************************************/
+MiffB _MiffReadStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr * const str)
+{
+   MiffN   index;
+   MiffN   bufferIndex;
+   MiffStr letter;
+   MiffStr bufferData[66];
+
+   // Should be using a different function for reading.
+   returnFalseIf(strLen == miffCountUNKNOWN);
+
+   bufferIndex = 0;
+   _MiffMemClearTypeArray(66, MiffN1, bufferData);
+   forCount(index, strLen)
+   {
+      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &letter)); 
+
+      // Escape single character slash, tab, and newline characters.
+      switch (letter)
+      {
+      case '\t':
+      case '\n':
+         // An actual tab or cursor return character should never be inside a string.
+         returnFalse;
+
+      case '\\':
+         returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &letter));
+         switch (letter)
+         {
+         case '\\':
+            str[bufferIndex++] = '\\';
+            break;
+
+         case 't':
+            str[bufferIndex++] = '\t';
+            break;
+
+         case 'n':
+            str[bufferIndex++] = '\n';
+            break;
+         }
+         break;
+
+      default:
+         str[bufferIndex++] = letter;
+         break;
+      }
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _MiffReadValueHeader
 ******************************************************************************/
 MiffStr _MiffReadValueHeader(Miff * const miff)

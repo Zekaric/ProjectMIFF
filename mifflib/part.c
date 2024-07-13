@@ -139,7 +139,7 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          }
          else
          {
-            value->type = miffValueTypeC4;
+            value->type = miffValueTypeC;
             _PartBase64ToC4(miff, miff->readByteCount, miff->readByteData, &value->inr4, &value->imaginary4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
@@ -182,14 +182,13 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4  = (miff->readByteCount < 8);
+         value->is4 = (miff->readByteCount < 8);
          if (!value->is4)
          {
             _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
          }
          else
          {
-            value->type = miffValueTypeR4;
             _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.

@@ -176,6 +176,7 @@ MiffB           _MiffPartToValue(         Miff const * const miff, MiffValue * c
 MiffB           _MiffReadLineSkip(        Miff       * const miff);
 MiffB           _MiffReadPart(            Miff       * const miff, MiffB const trimLeadingTabs);
 MiffB           _MiffReadPartEnd(         Miff       * const miff);
+MiffB           _MiffReadStrEscaped(      Miff const * const miff, MiffN const strLen, MiffStr * const str);
 MiffStr         _MiffReadValueHeader(     Miff       * const miff);
 MiffN           _MiffReadValueBufferCount(Miff * const miff);
 

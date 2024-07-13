@@ -461,6 +461,25 @@ MiffValue miffGetValueHeader(Miff * const miff)
 }
 
 /******************************************************************************
+func: miffGetValueStr
+******************************************************************************/
+MiffB miffGetValueStr(Miff * const miff, MiffStr * const str)
+{
+   returnFalse; // _MiffRead
+}
+
+/******************************************************************************
+func: miffGetValueBin
+
+bin should be large enough for the bin data.  I.E. it should be of size from
+miffGetValueHeader() value.bufferCount
+******************************************************************************/
+MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1  * const binBuffer)
+{
+   returnFalse; // _MiffRead(miff, binCount, binBuffer);
+}
+
+/******************************************************************************
 func: miffSetInfo
 ******************************************************************************/
 MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count, 
@@ -615,7 +634,7 @@ func: miffValueGetN
 ******************************************************************************/
 MiffN miffValueGetN(MiffValue value)
 {
-   return0If(value.type != miffValueTypeI);
+   return0If(value.type != miffValueTypeN);
    
    return value.inr.n;
 }
@@ -717,6 +736,22 @@ MiffValue miffValueSetB(MiffB const ivalue)
 }
 
 /******************************************************************************
+func: miffValueSetBinBuffer
+******************************************************************************/
+MiffValue miffValueSetBinBuffer(MiffN  const binCount, MiffN1  * const binBuffer)
+{
+   MiffValue value;
+
+   _MiffMemClearType(MiffValue, &value);
+
+   value.type           = miffValueTypeBIN;
+   value.bufferCount    = binCount;
+   value.bufferData.bin = binBuffer;
+
+   return value;
+}
+
+/******************************************************************************
 func: miffValueSetI
 ******************************************************************************/
 MiffValue miffValueSetI(MiffI const ivalue, MiffValueFormatCIR const format)
@@ -771,7 +806,7 @@ MiffValue miffValueSetR4(MiffR4 const ivalue, MiffValueFormatCIR const format)
 
    _MiffMemClearType(MiffValue, &value);
 
-   value.type      = miffValueTypeR4;
+   value.type      = miffValueTypeR;
    value.formatCIR = format;
    value.is4       = miffTRUE;
    value.inr4.r    = ivalue;

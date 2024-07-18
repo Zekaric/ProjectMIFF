@@ -1003,27 +1003,62 @@ void TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
    }
 }
 
-void TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
+void TEST_BIN_VALUE(Miff *miff, MiffN testCount, MiffN1 *testValue)
 {
    MiffValue value;
-   MiffStr  *svalue;
+   MiffN1    svalue[256 * 3];
 
    value = miffGetValueHeader(miff);
 
-   if (miffValueGetType(value) != miffValueTypeSTR)
+   if (miffValueGetType(value) != miffValueTypeBIN &&
+       testCount               != value.bufferCount)
    {
       printf("ERROR\n"); 
    }
 
-   svalue = _MiffMemCreate(value.bufferCount);
-   //miffGetValueData()
-   //if (!streq(miffValueGetStr(value), testValue)) 
+   if (!miffGetValueBin(miff, value.bufferCount, svalue))
    {
+      printf("ERROR\n");
+   }
+   
+   if (memcmp(svalue, testValue, testCount) != 0)
+   {
+      printf("ERROR\n");
+   }
+   else 
+   {
+      printf("OK\n"); 
+   }
+}
+
+void TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
+{
+   MiffValue value;
+   MiffN     testValueLen;
+   MiffStr   svalue[256];
+
+   testValueLen = strlen(testValue);
+
+   value = miffGetValueHeader(miff);
+
+   if (miffValueGetType(value) != miffValueTypeSTR &&
+       testValueLen            != value.bufferCount)
+   {
+      printf("ERROR\n"); 
    }
 
-   //else 
+   if (!miffGetValueStr(miff, value.bufferCount, svalue))
    {
-      //printf("OK\n"); 
+      printf("ERROR\n"); 
+   }
+   
+   if (memcmp(testValue, svalue, testValueLen) != 0)
+   {
+      printf("ERROR\n"); 
+   }
+   else 
+   {
+      printf("OK\n"); 
    }
 }
 
@@ -1112,6 +1147,10 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
       
       TEST_KEY(miff, "String", &recType, &arrayCount); TEST_COUNT(1, arrayCount); 
       TEST_STR_VALUE(miff, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "Binary", &recType, &arrayCount); TEST_COUNT(1, arrayCount);
+      TEST_BIN_VALUE(miff, 256 * 3, _binary);
       TEST_NEXT(miff);
 #if 0
       TEST_KEY("Bool Array"); TEST_COUNT(100);

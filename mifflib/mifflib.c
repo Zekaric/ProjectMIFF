@@ -463,9 +463,15 @@ MiffValue miffGetValueHeader(Miff * const miff)
 /******************************************************************************
 func: miffGetValueStr
 ******************************************************************************/
-MiffB miffGetValueStr(Miff * const miff, MiffStr * const str)
+MiffB miffGetValueStr(Miff * const miff, MiffN const strLen, MiffStr * const str)
 {
-   returnFalse; // _MiffRead
+   returnFalseIf(
+      !_isStarted ||
+      !miff       ||
+      strLen == 0 ||
+      !str)
+
+   return _MiffReadStrEscaped(miff, strLen, str);
 }
 
 /******************************************************************************
@@ -476,7 +482,13 @@ miffGetValueHeader() value.bufferCount
 ******************************************************************************/
 MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1  * const binBuffer)
 {
-   returnFalse; // _MiffRead(miff, binCount, binBuffer);
+   returnFalseIf(
+      !_isStarted   ||
+      !miff         ||
+      binCount == 0 ||
+      !binBuffer);
+
+   return _MiffReadBufferBase64(miff, binCount, binBuffer);
 }
 
 /******************************************************************************

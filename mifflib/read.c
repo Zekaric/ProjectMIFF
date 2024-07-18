@@ -41,6 +41,53 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
+func: _MiffReadBufferBase64
+******************************************************************************/
+MiffB _MiffReadBufferBase64(Miff * const miff, MiffN const bufferCount, 
+   MiffN1 * const bufferData)
+{
+   MiffN             index,
+                     bufferIndex;
+   MiffBase64DataGet data;
+   MiffN1            byte,
+                     buffer[4];
+
+   bufferIndex = 0;
+   loop
+   {
+      // Get next base64 chunk.
+      forCount(index, 4)
+      {
+         returnFalseIf(miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+         breakIf(byte == '\t' || 
+                 byte == '\n');
+         buffer[index] = byte;
+      }
+
+      // Type cast safe.  We are not writing to bufferData.
+      data = _MiffBase64PrepGet((MiffN1 *) buffer);
+
+      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      breakIf(bufferIndex == bufferCount);
+
+      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      breakIf(bufferIndex == bufferCount);
+
+      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      breakIf(bufferIndex == bufferCount);
+
+      // No more data in the record part.  If we having read the whole buffer
+      // yet then there is a problem.
+      breakIf(byte == '\t' || byte == '\n');
+   }
+
+   // Something when wrong when the file was written.
+   returnFalseIf(bufferIndex != bufferCount);
+
+   returnTrue;
+}
+
+/******************************************************************************
 func: _MiffReadLineSkip
 ******************************************************************************/
 MiffB _MiffReadLineSkip(Miff * const miff)
@@ -166,7 +213,7 @@ MiffB _MiffReadPartEnd(Miff * const miff)
 /******************************************************************************
 func: _MiffReadStrEscaped
 ******************************************************************************/
-MiffB _MiffReadStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr * const str)
+MiffB _MiffReadStrEscaped(Miff * const miff, MiffN const strLen, MiffStr * const str)
 {
    MiffN   index;
    MiffN   bufferIndex;

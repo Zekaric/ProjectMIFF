@@ -48,16 +48,35 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffBase64Restart
+func: _MiffBase64PrepGet
+
+Prep the base 64 functions for reading.
 ******************************************************************************/
-MiffBase64Data _MiffBase64Restart(MiffN1 * const value)
+MiffBase64DataGet _MiffBase64PrepGet(MiffN1 const * const buffer)
 {
-   MiffBase64Data data;
+   MiffBase64DataGet data;
 
    data.state  = 0;
    data.byte   = 0;
    data.index  = 0;
-   data.buffer = value;
+   data.buffer = buffer;
+   
+   return data;
+}
+
+/******************************************************************************
+func: _MiffBase64PrepSet
+
+Prep the base 64 functions for Writing.
+******************************************************************************/
+MiffBase64DataSet _MiffBase64PrepSet(MiffN1 * const buffer)
+{
+   MiffBase64DataSet data;
+
+   data.state  = 0;
+   data.byte   = 0;
+   data.index  = 0;
+   data.buffer = buffer;
    
    return data;
 }
@@ -65,7 +84,7 @@ MiffBase64Data _MiffBase64Restart(MiffN1 * const value)
 /******************************************************************************
 func: _MiffBase64Get
 ******************************************************************************/
-MiffB _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
+MiffB _MiffBase64Get(MiffBase64DataGet * const data, MiffN1 * const byte)
 {
    *byte = 0;
    
@@ -127,7 +146,7 @@ MiffB _MiffBase64Get(MiffBase64Data * const data, MiffN1 * const byte)
 /******************************************************************************
 func: _MiffBase64Set
 ******************************************************************************/
-MiffB _MiffBase64Set(MiffBase64Data * const data, MiffN1 const byte)
+MiffB _MiffBase64Set(MiffBase64DataSet * const data, MiffN1 const byte)
 {
    MiffN1 btemp;
    MiffN1 sixbit;
@@ -192,7 +211,7 @@ func: _MiffBase64SetEnd
 
 Send out the remainder bits.
 ******************************************************************************/
-MiffB _MiffBase64SetEnd(MiffBase64Data * const data)
+MiffB _MiffBase64SetEnd(MiffBase64DataSet * const data)
 {
    MiffN1 sixbit;
 

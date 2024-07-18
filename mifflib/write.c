@@ -47,14 +47,14 @@ func: _MiffWriteCBase64
 ******************************************************************************/
 MiffB _MiffWriteCBase64(Miff * const miff, MiffValue const value)
 {
-   Miff8          vtemp;
-   MiffBase64Data data;
-   MiffN1         buffer[64];
+   Miff8             vtemp;
+   MiffBase64DataSet data;
+   MiffN1            buffer[64];
 
    vtemp.n = value.inr.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -68,7 +68,7 @@ MiffB _MiffWriteCBase64(Miff * const miff, MiffValue const value)
    vtemp.n = value.imaginary.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -88,14 +88,14 @@ func: _MiffWriteC4Base64
 ******************************************************************************/
 MiffB _MiffWriteC4Base64(Miff * const miff, MiffValue const value)
 {
-   Miff4          vtemp;
-   MiffBase64Data data;
-   MiffN1         buffer[64];
+   Miff4             vtemp;
+   MiffBase64DataSet data;
+   MiffN1             buffer[64];
 
    vtemp.n = value.inr4.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -105,7 +105,7 @@ MiffB _MiffWriteC4Base64(Miff * const miff, MiffValue const value)
    vtemp.n = value.imaginary4.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -271,14 +271,14 @@ func: _MiffWrite4Base64
 ******************************************************************************/
 MiffB _MiffWrite4Base64(Miff * const miff, Miff4 const value)
 {
-   Miff4          vtemp;
-   MiffBase64Data data;
-   MiffN1         buffer[64];
+   Miff4             vtemp;
+   MiffBase64DataSet data;
+   MiffN1            buffer[64];
 
    vtemp.n = value.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -294,14 +294,14 @@ func: _MiffWrite8Base64
 ******************************************************************************/
 MiffB _MiffWrite8Base64(Miff * const miff, Miff8 const value)
 {
-   Miff8          vtemp;
-   MiffBase64Data data;
-   MiffN1         buffer[64];
+   Miff8             vtemp;
+   MiffBase64DataSet data;
+   MiffN1            buffer[64];
 
    vtemp.n = value.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
 
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
@@ -321,11 +321,11 @@ func: _MiffWriteBufferBase64
 ******************************************************************************/
 MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 const * const bufferData)
 {
-   MiffN          index;
-   MiffBase64Data data;
-   MiffN1         buffer[5];
+   MiffN             index;
+   MiffBase64DataSet data;
+   MiffN1            buffer[5];
 
-   data = _MiffBase64Restart(buffer);
+   data = _MiffBase64PrepSet(buffer);
    forCount(index, bufferCount)
    {
 
@@ -345,7 +345,7 @@ MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 
 
       returnTrueIf(index == bufferCount);
 
-      data = _MiffBase64Restart(buffer);
+      data = _MiffBase64PrepSet(buffer);
    }
 
    returnFalseIf(!_MiffBase64SetEnd(&data));

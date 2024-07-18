@@ -294,12 +294,12 @@ func: _PartBase64ToC
 static MiffB _PartBase64ToC(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const real, Miff8 * const imaginary)
 {
-   MiffBase64Data data;
+   MiffBase64DataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64Restart((MiffN1 *) buffer);
+   data = _MiffBase64PrepGet((MiffN1 *) buffer);
 
    returnFalseIf(!_MiffBase64Get(&data, &real->byte[0]));
    returnFalseIf(!_MiffBase64Get(&data, &real->byte[1]));
@@ -332,12 +332,12 @@ func: _PartBase64ToC4
 static MiffB _PartBase64ToC4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const real, Miff4 * const imaginary)
 {
-   MiffBase64Data data;
+   MiffBase64DataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64Restart((MiffN1 *) buffer);
+   data = _MiffBase64PrepGet((MiffN1 *) buffer);
 
    returnFalseIf(!_MiffBase64Get(&data, &real->byte[0]));
    returnFalseIf(!_MiffBase64Get(&data, &real->byte[1]));
@@ -362,12 +362,12 @@ func: _PartBase64ToN
 static MiffB _PartBase64ToN(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const value)
 {
-   MiffBase64Data data;
+   MiffBase64DataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64Restart((MiffN1 *) buffer);
+   data = _MiffBase64PrepGet((MiffN1 *) buffer);
 
    returnFalseIf(!_MiffBase64Get(&data, &value->byte[0]));
    returnFalseIf(!_MiffBase64Get(&data, &value->byte[1]));
@@ -389,12 +389,12 @@ func: _PartBase64ToN4
 static MiffN4 _PartBase64ToN4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const value)
 {
-   MiffBase64Data data;
+   MiffBase64DataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64Restart((MiffN1 *) buffer);
+   data = _MiffBase64PrepGet((MiffN1 *) buffer);
 
    returnFalseIf(!_MiffBase64Get(&data, &value->byte[0]));
    returnFalseIf(!_MiffBase64Get(&data, &value->byte[1]));

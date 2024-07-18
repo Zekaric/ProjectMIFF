@@ -240,7 +240,7 @@ void            miffDestroyContent(                Miff       * const miff);
 MiffB           miffGetInfo(                       Miff       * const miff, MiffRecType * const type, MiffN * const count, MiffStr       * const key);
 MiffB           miffGetRecordEnd(                  Miff       * const miff);
 MiffValue       miffGetValueHeader(                Miff       * const miff);
-MiffB           miffGetValueStr(                   Miff       * const miff, MiffStr * const str);
+MiffB           miffGetValueStr(                   Miff       * const miff, MiffN const strLen, MiffStr * const str);
 MiffB           miffGetValueBin(                   Miff       * const miff, MiffN const binCount, MiffN1 * const binBuffer);
 
 MiffB           miffSetInfo(                       Miff       * const miff, MiffRecType   const type, MiffN   const count, MiffStr const * const key);

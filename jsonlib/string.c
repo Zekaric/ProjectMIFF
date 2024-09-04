@@ -50,7 +50,7 @@ Unescape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-JsonBool _JsonStrEncodedToStr(JsonN4 * const strLen, JsonStr * const str)
+JsonB _JsonStrEncodedToStr(JsonN4 * const strLen, JsonStr * const str)
 {
    JsonN4    index,
              eindex,
@@ -106,7 +106,7 @@ Escape certain characters
 \t - tab
 \\ - \
 ******************************************************************************/
-JsonBool _JsonStrToStrEncoded(JsonN4 const strLen, JsonStr const * const str, 
+JsonB _JsonStrToStrEncoded(JsonN4 const strLen, JsonStr const * const str, 
    JsonN4 * const strEncodedLen, JsonStr ** const strEncoded)
 {
    JsonN4    index,
@@ -168,11 +168,11 @@ void _JsonSTrToKey(JsonN4 const strLen, JsonStr const * const str, JsonN1 * cons
 /******************************************************************************
 func: _JsonStrToI
 ******************************************************************************/
-JsonI8 _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
+JsonI _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
 {
-   JsonBool isNegative;
-   JsonN4   c1Index;
-   JsonN8   value;
+   JsonB  isNegative;
+   JsonN4 c1Index;
+   JsonN  value;
 
    isNegative = jsonFALSE;
    value      = 0;
@@ -192,7 +192,7 @@ JsonI8 _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
 
    if (isNegative)
    {
-      return -((JsonI8) value);
+      return -((JsonI) value);
    }
 
    return value;
@@ -201,10 +201,10 @@ JsonI8 _JsonStrToI(JsonN4 const strLen, JsonStr const * const str)
 /******************************************************************************
 func: _JsonStrToN
 ******************************************************************************/
-JsonN8 _JsonStrToN(JsonN4 const strLen, JsonStr const * const str)
+JsonN _JsonStrToN(JsonN4 const strLen, JsonStr const * const str)
 {
    JsonN4   c1Index;
-   JsonN8   value;
+   JsonN   value;
 
    value = 0;
    forCount(c1Index, strLen)

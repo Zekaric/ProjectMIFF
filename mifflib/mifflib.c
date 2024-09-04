@@ -101,41 +101,39 @@ MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
    miff->dataRepo             = dataRepo;
    miff->isByteSwapping       = isByteSwaping;
    miff->getBuffer            = getBufferFunc;
-   miff->readByteCountActual  = 1024;
+   miff->readBinCountActual   = 1024;
    miff->readStrCountActual   = 1024;
-   miff->readByteCount        = 0;
-   miff->readStrCount         = 0;
-   miff->readByteData         = _MiffMemCreateTypeArray(1024, MiffN1);
-   miff->readStrData          = _MiffMemCreateTypeArray(1024, MiffStr);
-   returnFalseIf(!miff->readByteData);
+   miff->readBinData          = _MiffMemCreateTypeArray(miff->readBinCountActual, MiffN1);
+   miff->readStrData          = _MiffMemCreateTypeArray(miff->readStrCountActual, MiffStr);
+   returnFalseIf(!miff->readBinData);
    returnFalseIf(!miff->readStrData);
 
    // Read the header.
    miff->isRecordDone = miffFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    returnFalseIf(!_MiffMemIsEqual(
-      miff->readByteCount, 
-      miff->readByteData, 
+      miff->readBinCount, 
+      miff->readBinData, 
       4, 
       (MiffN1 *) MIFF_HEADER_FILETYPE_STR));
 
    miff->isRecordDone = miffFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    miff->version = _MiffPartToN(miff);
    returnFalseIf(!_MiffMemIsEqual(
-      miff->readByteCount, 
-      miff->readByteData, 
+      miff->readBinCount, 
+      miff->readBinData, 
       1, 
       (MiffN1 *) MIFF_HEADER_VERSION_STR));
 
    miff->isRecordDone = miffFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    _MiffPartToKey(miff);
    _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, subFormatName,       miff->currentName);
    _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, miff->subFormatName, miff->currentName);
 
    miff->isRecordDone = miffFALSE;
-   returnFalseIf(!_MiffReadPart(miff, miffFALSE));
+   returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    miff->subFormatVersion =
       *subFormatVersion   = _MiffPartToN(miff);
 
@@ -203,14 +201,14 @@ MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
    _MiffMemCopyTypeArray(count, MiffStr, miff->subFormatName, subFormatName);
 
    // Write the miff header.
-   _MiffWriteStr(   miff, MIFF_HEADER_FILETYPE_SIZE, MIFF_HEADER_FILETYPE_STR);
+   _MiffSetBuffer(  miff, MIFF_HEADER_FILETYPE_SIZE, (MiffN1 *) MIFF_HEADER_FILETYPE_STR);
    miffSetRecordEnd(miff);
-   _MiffWriteStr(   miff, MIFF_HEADER_VERSION_SIZE,  MIFF_HEADER_VERSION_STR);
+   _MiffSetBuffer(  miff, MIFF_HEADER_VERSION_SIZE,  (MiffN1 *) MIFF_HEADER_VERSION_STR);
    miffSetRecordEnd(miff);
 
-   _MiffWriteStr(   miff, _MiffStrGetCount(miff->subFormatName),    miff->subFormatName);
+   _MiffSetBuffer(  miff, _MiffStrGetCount(miff->subFormatName), (MiffN1 *) miff->subFormatName);
    miffSetRecordEnd(miff);
-   _MiffWriteN(     miff, miff->subFormatVersion);
+   _MiffSetN(       miff, miff->subFormatVersion);
    miffSetRecordEnd(miff);
 
    returnTrue;
@@ -237,7 +235,7 @@ void miffDestroyContent(Miff * const miff)
       !_isStarted ||
       !miff);
 
-   _MiffMemDestroy(miff->readByteData);
+   _MiffMemDestroy(miff->readBinData);
    _MiffMemDestroy(miff->readStrData);
    _MiffMemDestroy(miff);
 }
@@ -264,21 +262,19 @@ MiffB miffGetInfo(Miff * const miff, MiffRecType * const type, MiffN * const cou
    _MiffMemClearTypeArray(miffKeySIZE, MiffStr, key);
 
    // Read in the type.
-   returnFalseIf(!_MiffReadPart(miff, miffTRUE));
+   returnFalseIf(!_MiffGetPart(miff, miffTRUE));
 
-   switch (miff->readByteData[0])
+   switch (miff->readBinData[0])
    {
    case '{':
       *type                   = miffRecTypeBLOCK_START;
       miff->currentArrayCount = miffArrayCountBLOCK_START;
-      miff->isRecordDone      = miffTRUE;
       break;
 
    case '}':
       *type                   = miffRecTypeBLOCK_STOP;
       miff->currentArrayCount = miffArrayCountBLOCK_STOP;
-      miff->isRecordDone      = miffTRUE;
-      returnTrue;
+      break;
 
    case '*':
       *type                   = miffRecTypeVALUE;
@@ -293,11 +289,15 @@ MiffB miffGetInfo(Miff * const miff, MiffRecType * const type, MiffN * const cou
       break;
    }
 
+   returnTrueIf(miff->currentArrayCount == miffArrayCountBLOCK_STOP);
+
    // Read in the name of the record
-   returnFalseIf(!_MiffReadPart( miff, miffFALSE));
+   returnFalseIf(!_MiffGetPart( miff, miffFALSE));
    returnFalseIf(!_MiffPartToKey(miff));
 
    _MiffMemCopyTypeArray(miff->currentNameCount, MiffStr, key, miff->currentName);
+
+   returnTrueIf(miff->currentArrayCount == miffArrayCountBLOCK_START);
 
    returnTrue;
 }
@@ -315,7 +315,7 @@ MiffB miffGetRecordEnd(Miff * const miff)
 
    returnTrueIf(miff->isRecordDone);
 
-   returnFalseIf(!_MiffReadLineSkip(miff));
+   returnFalseIf(!_MiffGetLineSkip(miff));
 
    miff->isRecordDone = miffTRUE;
 
@@ -330,6 +330,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
    MiffStr   header;
    MiffValue value;
 
+   miff->isPartDone = miffFALSE;
    _MiffMemClearType(MiffValue, &value);
 
    value.type = miffValueTypeNONE;
@@ -339,7 +340,7 @@ MiffValue miffGetValueHeader(Miff * const miff)
          !miff,
       value);
 
-   header = _MiffReadValueHeader(miff);
+   header = _MiffGetValueHeader(miff);
    switch (header)
    {
    default:
@@ -353,106 +354,106 @@ MiffValue miffGetValueHeader(Miff * const miff)
 
    case '~':
       value.type        = miffValueTypeNULL;
-      _MiffReadPartEnd(miff);
+      _MiffGetPartEnd(miff);
       break;
 
    case '"':
       value.type        = miffValueTypeSTR;
-      value.bufferCount = _MiffReadValueBufferCount(miff);
+      value.bufferCount = _MiffGetValueBufferCount(miff);
       // Reading the string is done with miffGetValueStr();
       break;
 
    case 'c':
       value.type        = miffValueTypeC;
       value.formatCIR   = miffValueFormatCIR_TEXT;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'C':
       value.type        = miffValueTypeC;
       value.formatCIR   = miffValueFormatCIR_BASE64;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'T':
       value.type        = miffValueTypeB;
       value.b           = miffTRUE;
-      _MiffReadPartEnd(miff);
+      _MiffGetPartEnd(miff);
       break;
 
    case 'F':
       value.type        = miffValueTypeB;
-      _MiffReadPartEnd(miff);
+      _MiffGetPartEnd(miff);
       break;
 
    case 'i':
       value.type        = miffValueTypeI;
       value.formatCIR   = miffValueFormatCIR_TEXT;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'I':
       value.type        = miffValueTypeI;
       value.formatCIR   = miffValueFormatCIR_BASE64;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'n':
       value.type        = miffValueTypeN;
       value.formatN     = miffValueFormatN_TEXT;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'N':
       value.type        = miffValueTypeN;
       value.formatN     = miffValueFormatN_BASE64;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'x':
       value.type        = miffValueTypeN;
       value.formatN     = miffValueFormatN_X;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'o':
       value.type        = miffValueTypeN;
       value.formatN     = miffValueFormatN_O;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'b':
       value.type        = miffValueTypeN;
       value.formatN     = miffValueFormatN_B;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'r':
       value.type        = miffValueTypeR;
       value.formatCIR   = miffValueFormatCIR_TEXT;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case 'R':
       value.type        = miffValueTypeR;
       value.formatCIR   = miffValueFormatCIR_BASE64;
-      _MiffReadPart(miff, miffFALSE);
+      _MiffGetPart(miff, miffFALSE);
       _MiffPartToValue(miff, &value);
       break;
 
    case '*':
       value.type        = miffValueTypeBIN;
-      value.bufferCount = _MiffReadValueBufferCount(miff);
+      value.bufferCount = _MiffGetValueBufferCount(miff);
       // Reading the buffer is done with miffGetValueBin();
       break;
    }
@@ -471,7 +472,7 @@ MiffB miffGetValueStr(Miff * const miff, MiffN const strLen, MiffStr * const str
       strLen == 0 ||
       !str)
 
-   return _MiffReadStrEscaped(miff, strLen, str);
+   return _MiffGetStrEscaped(miff, strLen, str);
 }
 
 /******************************************************************************
@@ -488,7 +489,7 @@ MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1  * const b
       binCount == 0 ||
       !binBuffer);
 
-   return _MiffReadBufferBase64(miff, binCount, binBuffer);
+   return _MiffGetBufferBase64(miff, binCount, binBuffer);
 }
 
 /******************************************************************************
@@ -517,7 +518,7 @@ MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count,
    // Add indents to the current scope level.
    forCount(index, miff->currentScopeLevel)
    {
-      returnFalseIf(!_MiffWriteStr(miff, 1, " "));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) " "));
    }
 
    // Write the type for the record.  Common for all cases.
@@ -526,21 +527,21 @@ MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count,
 
    if      (type == miffRecTypeBLOCK_START)
    {
-      returnFalseIf(!_MiffWriteStr(miff, 1, "{"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "{"));
       miff->isRecordDone = miffTRUE;
    }
    else if (type == miffRecTypeBLOCK_STOP)
    {
-      returnFalseIf(!_MiffWriteStr(miff, 1, "}"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "}"));
       miff->isRecordDone = miffTRUE;
    }
    else if (count == miffArrayCountUNKNOWN)
    {
-      returnFalseIf(!_MiffWriteStr(miff, 1, "*"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "*"));
    }
    else
    {
-      returnFalseIf(!_MiffWriteN(miff, count));
+      returnFalseIf(!_MiffSetN(miff, count));
    }
 
    // We are ending a key value block.
@@ -558,10 +559,7 @@ MiffB miffSetInfo(Miff * const miff, MiffRecType const type, MiffN const count,
    _MiffMemCopyTypeArray( miff->currentNameCount, MiffStr, miff->currentName, key);
 
    returnFalseIf(!miffSetSeparator(miff));
-   returnFalseIf(!_MiffWriteStr(
-      miff, 
-      miff->currentNameCount, 
-      miff->currentName));
+   returnFalseIf(!_MiffSetBuffer(miff, miff->currentNameCount, (MiffN1 *) miff->currentName));
    
    // We are starting a new key value block.
    if (type == miffRecTypeBLOCK_START)
@@ -588,7 +586,7 @@ MiffB miffSetRecordEnd(Miff * const miff)
    // fullfill the record requirements.
    miff->isRecordDone = miffTRUE;
 
-   return _MiffWriteStr(miff, 1, "\n");
+   return _MiffSetBuffer(miff, 1, (MiffN1 *) "\n");
 }
 
 /******************************************************************************
@@ -600,7 +598,7 @@ MiffB miffSetSeparator(Miff * const miff)
       !_isStarted ||
       !miff);
 
-   return _MiffWriteStr(miff, 1, "\t");
+   return _MiffSetBuffer(miff, 1, (MiffN1 *) "\t");
 }
 
 /******************************************************************************
@@ -614,7 +612,7 @@ MiffB miffSetValue(Miff * const miff, MiffValue const value)
 
    miffSetSeparator(miff);
 
-   _MiffWriteValue(miff, value);
+   _MiffSetValue(miff, value);
    
    miff->currentArrayIndex++;
 
@@ -915,7 +913,7 @@ static MiffB _WriteStr(Miff * const miff, MiffN const strLen, MiffStr const * co
    {
       breakIf(!_MiffStrToStrEncoded(strLen, str, &strEncodedLen, &strEncoded));
 
-      breakIf(!_MiffWriteStr(miff, strEncodedLen, strEncoded));
+      breakIf(!_MiffSetBuffer(miff, strEncodedLen, (MiffN1 *) strEncoded));
 
       result = miffTRUE;
    }

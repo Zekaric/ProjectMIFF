@@ -50,9 +50,14 @@ function:
 /******************************************************************************
 func: _JsonMemCreate
 ******************************************************************************/
-void *_JsonMemCreate(JsonN4 const memByteCount)
+void *_JsonMemCreate(JsonN const memByteCount)
 {
-   return _memCreate(memByteCount);
+   if (memByteCount > JsonN4_MAX)
+   {
+      return NULL;
+   }
+
+   return _memCreate((JsonN4) memByteCount);
 }
 
 /******************************************************************************

@@ -62,8 +62,8 @@ MiffB _MiffPartToKey(Miff * const miff)
 {
    MiffN len;
 
-   len = min(256, miff->readByteCount);
-   _MiffMemCopyTypeArray(len, MiffN1, miff->currentName, miff->readByteData);
+   len = min(256, miff->readBinCount);
+   _MiffMemCopyTypeArray(len, MiffN1, miff->currentName, miff->readBinData);
    miff->currentName[len] = 0;
    miff->currentNameCount = len;
 
@@ -75,7 +75,7 @@ func: _MiffPartToN
 ******************************************************************************/
 MiffN _MiffPartToN(Miff const * const miff)
 {
-   return _MiffAToN(miff->readByteCount, miff->readByteData);
+   return _MiffStrToN(miff->readBinCount, miff->readBinData);
 }
 
 /******************************************************************************
@@ -96,14 +96,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatN_BASE64:
-         value->is4 = (miff->readByteCount < 8);
+         value->is4 = (miff->readBinCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.n = value->inr4.n;
@@ -132,15 +132,15 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4 = (miff->readByteCount < 16);
+         value->is4 = (miff->readBinCount < 16);
          if (!value->is4)
          {
-            _PartBase64ToC( miff, miff->readByteCount, miff->readByteData, &value->inr,  &value->imaginary);
+            _PartBase64ToC( miff, miff->readBinCount, miff->readBinData, &value->inr,  &value->imaginary);
          }
          else
          {
             value->type = miffValueTypeC;
-            _PartBase64ToC4(miff, miff->readByteCount, miff->readByteData, &value->inr4, &value->imaginary4);
+            _PartBase64ToC4(miff, miff->readBinCount, miff->readBinData, &value->inr4, &value->imaginary4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.r       = value->inr4.r;
@@ -158,14 +158,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4  = (miff->readByteCount < 8);
+         value->is4  = (miff->readBinCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.i = value->inr4.i;
@@ -182,14 +182,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4 = (miff->readByteCount < 8);
+         value->is4 = (miff->readBinCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readByteCount, miff->readByteData, &value->inr);
+            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readByteCount, miff->readByteData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.r = value->inr4.r;
@@ -213,10 +213,10 @@ static MiffB _PartAToC(Miff const * const miff, MiffR * const real, MiffR * cons
    MiffN1 *n1Temp;
 
    // Get the real value of the complex number.
-   *real = _strtod_l((char *) miff->readByteData, (char **) &n1Temp, _MiffLocaleGet());
+   *real = _strtod_l((char *) miff->readBinData, (char **) &n1Temp, _MiffLocaleGet());
 
    // Check to see if the imaginary number exists.
-   if ((MiffN) (n1Temp - miff->readByteData) < miff->readByteCount &&
+   if ((MiffN) (n1Temp - miff->readBinData) < miff->readBinCount &&
        n1Temp[0] == '+')
    {
       // Get the imaginary value of the complex number.
@@ -238,24 +238,24 @@ static MiffI _PartAToI(Miff const * const miff)
 
    isPositive = miffTRUE;
 
-   if (miff->readByteData[0] == '-')
+   if (miff->readBinData[0] == '-')
    {
       isPositive = miffFALSE;
-      count      = miff->readByteCount - 1;
-      npTemp     = &(miff->readByteData[1]);
+      count      = miff->readBinCount - 1;
+      npTemp     = &(miff->readBinData[1]);
    }
    else
    {
-      count      = miff->readByteCount - 0;
-      npTemp     = miff->readByteData;
+      count      = miff->readBinCount - 0;
+      npTemp     = miff->readBinData;
    }
 
-   nTemp = _MiffAToN(count, npTemp);
+   nTemp = _MiffStrToN(count, npTemp);
    // Out of range.  
    // If positive, nTemp can't be larger than UINT64_MAX.
    // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
-   if ((!isPositive && nTemp > ((MiffN) MiffI8_MAX) + 1) ||
-       ( isPositive && nTemp > ((MiffN) MiffI8_MAX)))
+   if ((!isPositive && nTemp > ((MiffN) MiffI_MAX) + 1) ||
+       ( isPositive && nTemp > ((MiffN) MiffI_MAX)))
    {
       return 0;
    }
@@ -275,7 +275,7 @@ func: _PartAToN
 ******************************************************************************/
 static MiffN _PartAToN(Miff const * const miff)
 {
-   return _MiffAToN(miff->readByteCount, miff->readByteData);
+   return _MiffStrToN(miff->readBinCount, miff->readBinData);
 }
 
 /******************************************************************************
@@ -285,7 +285,7 @@ static MiffR _PartAToR(Miff const * const miff)
 {
    MiffN1 *n1Temp;
 
-   return _strtod_l((char *) miff->readByteData, (char **) &n1Temp, _MiffLocaleGet());
+   return _strtod_l((char *) miff->readBinData, (char **) &n1Temp, _MiffLocaleGet());
 }
 
 /******************************************************************************
@@ -416,9 +416,9 @@ static MiffN _PartBinToN(Miff const * const miff)
    MiffN letterValue;
 
    value = 0;
-   forCount(index, miff->readByteCount)
+   forCount(index, miff->readBinCount)
    {
-      letterValue = miff->readByteData[index + 1];
+      letterValue = miff->readBinData[index + 1];
       switch (letterValue)
       {
       case '0':
@@ -447,9 +447,9 @@ static MiffN _PartHexToN(Miff const * const miff)
    MiffN letterValue;
 
    value = 0;
-   forCount(index, miff->readByteCount)
+   forCount(index, miff->readBinCount)
    {
-      letterValue = miff->readByteData[index + 1];
+      letterValue = miff->readBinData[index + 1];
       switch (letterValue)
       {
       case '0':
@@ -504,9 +504,9 @@ static MiffN _PartOctToN(Miff const * const miff)
    MiffN letterValue;
 
    value = 0;
-   forCount(index, miff->readByteCount)
+   forCount(index, miff->readBinCount)
    {
-      letterValue = miff->readByteData[index + 1];
+      letterValue = miff->readBinData[index + 1];
       switch (letterValue)
       {
       case '0':

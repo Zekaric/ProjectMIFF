@@ -123,10 +123,10 @@ typedef float                          MiffR4;
 // String (UTF8) type
 typedef char                           MiffStr;
 
+#define MiffN_MAX                      UINT64_MAX
 #define MiffN4_MAX                     UINT32_MAX
-#define MiffN8_MAX                     UINT64_MAX
+#define MiffI_MAX                      INT64_MAX
 #define MiffI4_MAX                     INT32_MAX
-#define MiffI8_MAX                     INT64_MAX
 
 typedef struct
 {
@@ -181,9 +181,9 @@ typedef struct
 typedef void *(*MiffMemCreate)(  MiffN4 const memByteCount);
 typedef void  (*MiffMemDestroy)( void * const mem);
 
-typedef MiffB (*MiffGetBuffer)(  void * const dataSource,      MiffN4 const byteCount, MiffStr       * const data);
+typedef MiffB (*MiffGetBuffer)(  void * const dataSource,      MiffN4 const byteCount, MiffN1       * const data);
 
-typedef MiffB (*MiffSetBuffer)(  void * const dataDestination, MiffN4 const byteCount, MiffStr const * const data);
+typedef MiffB (*MiffSetBuffer)(  void * const dataDestination, MiffN4 const byteCount, MiffN1 const * const data);
 
 typedef struct
 {
@@ -191,12 +191,13 @@ typedef struct
    MiffN                       version;
    MiffMethod                  method;
    MiffB                       isByteSwapping;
+   MiffB                       isPartDone;
    MiffB                       isRecordDone;
 
    MiffStr                     subFormatName[miffKeySIZE];
    MiffN                       subFormatVersion;
 
-   // The list of types, all types even the predefined base types.
+   // The current value information.
    MiffN                       currentScopeLevel;
    MiffStr                     currentName[miffKeySIZE];
    MiffN                       currentNameCount;
@@ -213,9 +214,9 @@ typedef struct
    void                       *memByteData;
 
    // Temporary storage for reading
-   MiffN                       readByteCountActual;
-   MiffN                       readByteCount;
-   MiffN1                     *readByteData;
+   MiffN                       readBinCountActual;
+   MiffN                       readBinCount;
+   MiffN1                     *readBinData;
 
    MiffN                       readStrCountActual;
    MiffN                       readStrCount;

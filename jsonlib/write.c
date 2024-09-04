@@ -43,19 +43,20 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _JsonWriteStr
+func: _JsonSetBuffer
 ******************************************************************************/
-JsonBool _JsonWriteStr(Json const * const json, JsonStr const * const value)
+JsonB _JsonSetBuffer(Json const * const json, JsonN const bufCount, JsonN1 const * const buf)
 {
-   return json->setBuffer(json->dataRepo, _JsonStrGetCount(value), (JsonN1 *) value);
+   assert(bufCount < JsonN4_MAX);
+   return json->setBuffer(json->dataRepo, (JsonN4) bufCount, buf);
 }
 
 /******************************************************************************
-func: _JsonWriteI
+func: _JsonSetI
 ******************************************************************************/
-JsonBool _JsonWriteI(Json * const json, JsonI8 const value)
+JsonB _JsonSetI(Json * const json, JsonI const value)
 {
-   JsonN8 ntemp;
+   JsonN ntemp;
 
    ntemp = 0;
    if (value < 0)
@@ -68,32 +69,35 @@ JsonBool _JsonWriteI(Json * const json, JsonI8 const value)
       ntemp =  value;
    }
 
-   return _JsonWriteN(json, ntemp);
+   return _JsonSetN(json, ntemp);
 }
 
 /******************************************************************************
-func: _JsonWriteIndent
+func: _JsonSetIndent
 ******************************************************************************/
-JsonBool _JsonWriteIndent(Json * const json)
+JsonB _JsonSetIndent(Json * const json)
 {
    JsonI4 index;
 
+   // No writing indents when in compact mode.
+   returnTrueIf(json->method == jsonMethodWRITING_COMPACT);
+
    forCount (index, json->scope)
    {
-      returnFalseIf(!_JsonWriteStr(json, "\t"));
+      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) "\t"));
    }
    returnTrue;
 }
 
 /******************************************************************************
-func: _JsonWriteN
+func: _JsonSetN
 ******************************************************************************/
-JsonBool _JsonWriteN(Json * const json, JsonN8 const value)
+JsonB _JsonSetN(Json * const json, JsonN const value)
 {
    int    index,
           count,
           digit;
-   JsonN8 temp;
+   JsonN  temp;
    JsonN1 string[32];
 
    temp = value;
@@ -110,98 +114,103 @@ JsonBool _JsonWriteN(Json * const json, JsonN8 const value)
    count = index + 1;
    forCountDown (index, count)
    {
-      returnFalseIf(!json->setBuffer(json->dataRepo, 1, &string[index]));
+      returnFalseIf(!json->setBuffer(json->dataRepo, 1, (JsonN1 *) &string[index]));
    }
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _JsonWriteR4S
+func: _JsonSetNewLine
 ******************************************************************************/
-JsonBool _JsonWriteR4(Json * const json, JsonR4 const value)
+JsonB _JsonSetNewLine(Json * const json)
 {
-   JsonStr ctemp[80];
+   // No writing new lines when in compact mode.
+   returnTrueIf(json->method == jsonMethodWRITING_COMPACT);
 
-   _sprintf_s_l((char *) ctemp, 80, "%.6g", _JsonLocaleGet(), value);
-   
-   return _JsonWriteStr(json, ctemp);
+   returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) "\n"));
+
+   returnTrue;
 }
 
 /******************************************************************************
-func: _JsonWriteR8S
+func: _JsonSetR
 ******************************************************************************/
-JsonBool _JsonWriteR8(Json * const json, JsonR8 const value)
+JsonB _JsonSetR(Json * const json, JsonR const value)
 {
    JsonStr ctemp[80];
 
    _sprintf_s_l((char *) ctemp, 80, "%.15g", _JsonLocaleGet(), value);
 
-   return _JsonWriteStr(json, ctemp);
+   return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
 }
 
 /******************************************************************************
-func: _JsonWriteString
+func: _JsonSetR4
 ******************************************************************************/
-JsonBool _JsonWriteString(Json * const json, JsonN const strLen, JsonStr const * const str)
+JsonB _JsonSetR4(Json * const json, JsonR4 const value)
+{
+   JsonStr ctemp[80];
+
+   _sprintf_s_l((char *) ctemp, 80, "%.6g", _JsonLocaleGet(), value);
+   
+   return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
+}
+
+/******************************************************************************
+func: _JsonSetStr
+******************************************************************************/
+JsonB _JsonSetStr(Json * const json, JsonN const strLen, JsonStr const * const str)
 {
    JsonN    index;
-   JsonStr  letter[2];
+   JsonN1   letter[2];
    
    letter[1] = 0;
 
-   returnFalseIf(!_JsonWriteStr(json, jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR));
    
    forCount(index, strLen)
    {
       if      (str[index] == '\"')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_QUOTE_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_QUOTE_STR));
       }
       else if (str[index] == '\\')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_SLASH_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_SLASH_STR));
       }
       else if (str[index] == '/')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_BACKSLASH_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACKSLASH_STR));
       }
       else if (str[index] == '\b')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_BACKSPACE_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACKSPACE_STR));
       }
       else if (str[index] == '\f')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_FORMFEED_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORMFEED_STR));
       }
       else if (str[index] == '\n')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_LINEFEED_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_LINEFEED_STR));
       }
       else if (str[index] == '\r')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
       }
       else if (str[index] == '\t')
       {
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_STR));
-         returnFalseIf(!_JsonWriteStr(json, jsonSTRING_ESCAPE_TAB_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_TAB_STR));
       }
       else
       {
          letter[0] = str[index];
-         returnFalseIf(!_JsonWriteStr(json, letter));
+         returnFalseIf(!_JsonSetBuffer(json, 1, letter));
       }
    }
 
-   returnFalseIf(!_JsonWriteStr(json, jsonSTRING_QUOTE_STR));
+   returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR));
 
    returnTrue;
 }

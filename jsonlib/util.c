@@ -76,7 +76,7 @@ func: _JsonMemIsEqual
 
 Compare two binary buffers for equality.
 ******************************************************************************/
-JsonBool _JsonMemIsEqual(JsonN const countA, JsonN1 const * const memA, JsonN const countB,
+JsonB _JsonMemIsEqual(JsonN const countA, JsonN1 const * const memA, JsonN const countB,
    JsonN1 const * const memB)
 {
    returnFalseIf(countA != countB);

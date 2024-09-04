@@ -64,17 +64,24 @@ void _MiffUtilStop(void)
 }
 
 /******************************************************************************
-func: _MiffAToN
+func: _MiffStrToN
 ******************************************************************************/
-MiffN _MiffAToN(MiffN count, MiffN1 *buffer)
+MiffN _MiffStrToN(MiffN const count, MiffN1 const * const str)
 {
    MiffN index;
    MiffN value;
 
    value = 0;
+
+   // Skip spaces.
    forCount(index, count)
    {
-      value = value * 10 + buffer[index] - '0';
+      breakIf(str[index] != ' ');
+   }
+
+   for (; index < count; index++)
+   {
+      value = value * 10 + str[index] - '0';
    }
 
    return value;

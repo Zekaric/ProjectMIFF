@@ -41,9 +41,9 @@ global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffReadBufferBase64
+func: _MiffGetBufferBase64
 ******************************************************************************/
-MiffB _MiffReadBufferBase64(Miff * const miff, MiffN const bufferCount, 
+MiffB _MiffGetBufferBase64(Miff * const miff, MiffN const bufferCount, 
    MiffN1 * const bufferData)
 {
    MiffN             index,
@@ -58,8 +58,8 @@ MiffB _MiffReadBufferBase64(Miff * const miff, MiffN const bufferCount,
       // Get next base64 chunk.
       forCount(index, 4)
       {
-         returnFalseIf(miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
-         breakIf(byte == '\t' || 
+         returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+         breakIf(byte == '\t' ||
                  byte == '\n');
          buffer[index] = byte;
       }
@@ -78,7 +78,21 @@ MiffB _MiffReadBufferBase64(Miff * const miff, MiffN const bufferCount,
 
       // No more data in the record part.  If we having read the whole buffer
       // yet then there is a problem.
-      breakIf(byte == '\t' || byte == '\n');
+      breakIf (byte == '\t' ||
+               byte == '\n');
+   }
+
+   if (byte == '\t')
+   {
+      miff->isPartDone = miffTRUE;
+   }
+   if (byte == '\n')
+   {
+      miff->isRecordDone = miffTRUE;
+   }
+   else
+   {
+      _MiffGetPartEnd(miff);
    }
 
    // Something when wrong when the file was written.
@@ -88,9 +102,9 @@ MiffB _MiffReadBufferBase64(Miff * const miff, MiffN const bufferCount,
 }
 
 /******************************************************************************
-func: _MiffReadLineSkip
+func: _MiffGetLineSkip
 ******************************************************************************/
-MiffB _MiffReadLineSkip(Miff * const miff)
+MiffB _MiffGetLineSkip(Miff * const miff)
 {
    MiffN1 byte;
 
@@ -99,7 +113,7 @@ MiffB _MiffReadLineSkip(Miff * const miff)
    // Ignoring everything till the next record or eof.
    loop
    {
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
       breakIf(byte == '\n');
    }
 
@@ -107,9 +121,9 @@ MiffB _MiffReadLineSkip(Miff * const miff)
 }
 
 /******************************************************************************
-func: _MiffReadPart
+func: _MiffGetPart
 ******************************************************************************/
-MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
+MiffB _MiffGetPart(Miff * const miff, MiffB const trimLeadingTabs)
 {
    MiffN4   index;
    MiffN1   byte;
@@ -126,24 +140,24 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
    loop
    {
       // Resize the internal buffer when we have exhausted it.
-      if (miff->readByteCountActual == index)
+      if (miff->readBinCountActual == index)
       {
          // Create a new buffer double the size.
-         bufTemp = _MiffMemCreateTypeArray(miff->readByteCountActual * 2, MiffN1);
+         bufTemp = _MiffMemCreateTypeArray(miff->readBinCountActual * 2, MiffN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _MiffMemCopyTypeArray(miff->readByteCountActual, MiffN1, bufTemp, miff->readByteData);
+         _MiffMemCopyTypeArray(miff->readBinCountActual, MiffN1, bufTemp, miff->readBinData);
          // Destroy the old buffer.
-         _MiffMemDestroy(miff->readByteData);
+         _MiffMemDestroy(miff->readBinData);
 
          // Reset the internal buffer to the new larger buffer.
-         miff->readByteCountActual = miff->readByteCountActual * 2;
-         miff->readByteData        = bufTemp;
+         miff->readBinCountActual = miff->readBinCountActual * 2;
+         miff->readBinData        = bufTemp;
       }
 
       // End of file?
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
 
       // Eating tabs at the start of the line.
       if (trimTabs && byte == '\t')
@@ -160,13 +174,14 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
               byte == '\t');
 
       // Add the letter to the byte array.
-      miff->readByteData[index++] = byte;
+      miff->readBinData[index++] = byte;
    }
 
    // Need NULL terminator.
-   miff->readByteCount       = index;
-   miff->readByteData[index] = 0;
+   miff->readBinCount       = index;
+   miff->readBinData[index] = 0;
 
+   miff->isPartDone = miffTRUE;
    if (byte == '\n')
    {
       miff->isRecordDone = miffTRUE;
@@ -176,18 +191,19 @@ MiffB _MiffReadPart(Miff * const miff, MiffB const trimLeadingTabs)
 }
 
 /******************************************************************************
-func: _MiffReadPartEnd
+func: _MiffGetPartEnd
 
 Skip to the next tab or newline.
 ******************************************************************************/
-MiffB _MiffReadPartEnd(Miff * const miff)
+MiffB _MiffGetPartEnd(Miff * const miff)
 {
    MiffN4   index;
    MiffN1   byte;
 
    // Nothing left to read for this record.
    returnFalseIf(
-      !miff ||
+      !miff            ||
+      miff->isPartDone ||
       miff->isRecordDone);
 
    index = 0;
@@ -195,13 +211,14 @@ MiffB _MiffReadPartEnd(Miff * const miff)
    loop
    {
       // End of file?
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
 
       // End of line or part, we are done reading.
       breakIf(byte == '\n' ||
               byte == '\t');
    }
 
+   miff->isPartDone = miffTRUE;
    if (byte == '\n')
    {
       miff->isRecordDone = miffTRUE;
@@ -211,9 +228,9 @@ MiffB _MiffReadPartEnd(Miff * const miff)
 }
 
 /******************************************************************************
-func: _MiffReadStrEscaped
+func: _MiffGetStrEscaped
 ******************************************************************************/
-MiffB _MiffReadStrEscaped(Miff * const miff, MiffN const strLen, MiffStr * const str)
+MiffB _MiffGetStrEscaped(Miff * const miff, MiffN const strLen, MiffStr * const str)
 {
    MiffN   index;
    MiffN   bufferIndex;
@@ -227,18 +244,22 @@ MiffB _MiffReadStrEscaped(Miff * const miff, MiffN const strLen, MiffStr * const
    _MiffMemClearTypeArray(66, MiffN1, bufferData);
    forCount(index, strLen)
    {
-      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &letter)); 
+      returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &letter)); 
 
       // Escape single character slash, tab, and newline characters.
       switch (letter)
       {
       case '\t':
+         miff->isPartDone = miffTRUE;
+         returnFalse;
+
       case '\n':
          // An actual tab or cursor return character should never be inside a string.
+         miff->isRecordDone = miffTRUE;
          returnFalse;
 
       case '\\':
-         returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, &letter));
+         returnFalseIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &letter));
          switch (letter)
          {
          case '\\':
@@ -261,32 +282,34 @@ MiffB _MiffReadStrEscaped(Miff * const miff, MiffN const strLen, MiffStr * const
       }
    }
 
+   _MiffGetPartEnd(miff);
+
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffReadValueHeader
+func: _MiffGetValueHeader
 ******************************************************************************/
-MiffStr _MiffReadValueHeader(Miff * const miff)
+MiffStr _MiffGetValueHeader(Miff * const miff)
 {
    MiffN1 byte;
 
-   return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &byte));
+   return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
 
    return (MiffStr) byte;
 }
 
 /******************************************************************************
-func: _MiffReadValueBufferCount
+func: _MiffGetValueBufferCount
 ******************************************************************************/
-MiffN _MiffReadValueBufferCount(Miff * const miff)
+MiffN _MiffGetValueBufferCount(Miff * const miff)
 {
    MiffN   index;
    MiffStr buffer[32];
 
    forCount(index, 32)
    {
-      return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffStr *) &buffer[index]));
+      return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &buffer[index]));
       if (buffer[index] == ' ')
       {
          buffer[index] = 0;
@@ -294,5 +317,5 @@ MiffN _MiffReadValueBufferCount(Miff * const miff)
       }
    }
 
-   return _MiffAToN(index, (MiffN1 *) buffer);
+   return _MiffStrToN(index, (MiffN1 *) buffer);
 }

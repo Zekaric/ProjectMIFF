@@ -43,9 +43,9 @@ global:
 function
 ******************************************************************************/
 /******************************************************************************
-func: _MiffWriteCBase64
+func: _MiffSetCBase64
 ******************************************************************************/
-MiffB _MiffWriteCBase64(Miff * const miff, MiffValue const value)
+MiffB _MiffSetCBase64(Miff * const miff, MiffValue const value)
 {
    Miff8             vtemp;
    MiffBase64DataSet data;
@@ -80,13 +80,13 @@ MiffB _MiffWriteCBase64(Miff * const miff, MiffValue const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 
 /******************************************************************************
-func: _MiffWriteC4Base64
+func: _MiffSetC4Base64
 ******************************************************************************/
-MiffB _MiffWriteC4Base64(Miff * const miff, MiffValue const value)
+MiffB _MiffSetC4Base64(Miff * const miff, MiffValue const value)
 {
    Miff4             vtemp;
    MiffBase64DataSet data;
@@ -113,20 +113,20 @@ MiffB _MiffWriteC4Base64(Miff * const miff, MiffValue const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 
 /******************************************************************************
-func: _MiffWriteI
+func: _MiffSetI
 ******************************************************************************/
-MiffB _MiffWriteI(Miff * const miff, MiffI const value)
+MiffB _MiffSetI(Miff * const miff, MiffI const value)
 {
    MiffN ntemp;
 
    ntemp = 0;
    if (value < 0)
    {
-      miff->setBuffer(miff->dataRepo, 1, "-");
+      _MiffSetBuffer(miff, 1, (MiffN1 *) "-");
       ntemp = -value;
    }
    else
@@ -134,13 +134,13 @@ MiffB _MiffWriteI(Miff * const miff, MiffI const value)
       ntemp =  value;
    }
 
-   return _MiffWriteN(miff, ntemp);
+   return _MiffSetN(miff, ntemp);
 }
 
 /******************************************************************************
-func: _MiffWriteN
+func: _MiffSetN
 ******************************************************************************/
-MiffB _MiffWriteN(Miff * const miff, MiffN const value)
+MiffB _MiffSetN(Miff * const miff, MiffN const value)
 {
    int    index,
           count,
@@ -162,16 +162,16 @@ MiffB _MiffWriteN(Miff * const miff, MiffN const value)
    count = index + 1;
    forCountDown (index, count)
    {
-      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, (MiffStr *) &string[index]));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) &string[index]));
    }
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffWriteNb
+func: _MiffSetNb
 ******************************************************************************/
-MiffB _MiffWriteNb(Miff * const miff, MiffN const value)
+MiffB _MiffSetNb(Miff * const miff, MiffN const value)
 {
    int      index,
             count,
@@ -184,7 +184,7 @@ MiffB _MiffWriteNb(Miff * const miff, MiffN const value)
 
    if (value == 0)
    {
-      return miff->setBuffer(miff->dataRepo, 1, "0");
+      return _MiffSetBuffer(miff, 1, (MiffN1 *) "0");
    }
 
    stringIndex = 0;
@@ -214,13 +214,13 @@ MiffB _MiffWriteNb(Miff * const miff, MiffN const value)
       shift--;
    }
 
-   return miff->setBuffer(miff->dataRepo, stringIndex, (MiffStr *) string);
+   return _MiffSetBuffer(miff, stringIndex, (MiffN1 *) string);
 }
 
 /******************************************************************************
-func: _MiffWriteNx
+func: _MiffSetNx
 ******************************************************************************/
-MiffB _MiffWriteNx(Miff * const miff, MiffN const value)
+MiffB _MiffSetNx(Miff * const miff, MiffN const value)
 {
    int      index,
             count,
@@ -233,7 +233,7 @@ MiffB _MiffWriteNx(Miff * const miff, MiffN const value)
 
    if (value == 0)
    {
-      return miff->setBuffer(miff->dataRepo, 1, "0");
+      return _MiffSetBuffer(miff, 1, (MiffN1 *) "0");
    }
 
    stringIndex = 0;
@@ -263,7 +263,7 @@ MiffB _MiffWriteNx(Miff * const miff, MiffN const value)
       shift -= 4;
    }
 
-   return miff->setBuffer(miff->dataRepo, stringIndex, (MiffStr *) string);
+   return _MiffSetBuffer(miff, stringIndex, (MiffN1 *) string);
 }
 
 /******************************************************************************
@@ -286,7 +286,7 @@ MiffB _MiffWrite4Base64(Miff * const miff, Miff4 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 
 /******************************************************************************
@@ -313,7 +313,7 @@ MiffB _MiffWrite8Base64(Miff * const miff, Miff8 const value)
    returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
    returnFalseIf(!_MiffBase64SetEnd(&data));
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 
 /******************************************************************************
@@ -338,10 +338,9 @@ MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 
       breakIf(index == bufferCount);
 
       returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
-      index++;
 
       returnFalseIf(!_MiffBase64SetEnd(&data));
-      returnFalseIf(!_MiffWriteStr(miff, 4, (MiffStr *) buffer));
+      returnFalseIf(!_MiffSetBuffer(miff, 4, (MiffN1 *) buffer));
 
       returnTrueIf(index == bufferCount);
 
@@ -349,46 +348,46 @@ MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 
    }
 
    returnFalseIf(!_MiffBase64SetEnd(&data));
-   return         _MiffWriteStr(miff, _MiffStrGetCount(buffer), (MiffStr *) buffer);
+   return         _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 
 /******************************************************************************
-func: _MiffWriteR
+func: _MiffSetR
 ******************************************************************************/
-MiffB _MiffWriteR(Miff * const miff, MiffR const value)
+MiffB _MiffSetR(Miff * const miff, MiffR const value)
 {
    MiffStr ctemp[80];
 
    _sprintf_s_l((char *) ctemp, 80, "%.15g", _MiffLocaleGet(), value);
 
-   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(ctemp), (MiffN1 *) ctemp);
 }
 
 /******************************************************************************
-func: _MiffWriteR4
+func: _MiffSetR4
 ******************************************************************************/
-MiffB _MiffWriteR4(Miff * const miff, MiffR4 const value)
+MiffB _MiffSetR4(Miff * const miff, MiffR4 const value)
 {
    MiffStr ctemp[80];
 
    _sprintf_s_l((char *) ctemp, 80, "%.6g", _MiffLocaleGet(), value);
    
-   return _MiffWriteStr(miff, _MiffStrGetCount(ctemp), ctemp);
+   return _MiffSetBuffer(miff, _MiffStrGetCount(ctemp), (MiffN1 *) ctemp);
 }
 
 /******************************************************************************
-func: _MiffWriteStr
+func: _MiffSetBuffer
 ******************************************************************************/
-MiffB _MiffWriteStr(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
+MiffB _MiffSetBuffer(Miff const * const miff, MiffN const bufCount, MiffN1 const * const buf)
 {
-   assert(strLen < MiffN4_MAX);
-   return miff->setBuffer(miff->dataRepo, (MiffN4) strLen, str);
+   assert(bufCount < MiffN4_MAX);
+   return miff->setBuffer(miff->dataRepo, (MiffN4) bufCount, buf);
 }
 
 /******************************************************************************
-func: _MiffWriteStrEscaped
+func: _MiffSetStrEscaped
 ******************************************************************************/
-MiffB _MiffWriteStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
+MiffB _MiffSetStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr const * const str)
 {
    MiffN   index;
    MiffN   bufferIndex;
@@ -432,7 +431,7 @@ MiffB _MiffWriteStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr 
       // Filled the buffer, write out and restart.
       if (bufferIndex >= 64)
       {
-         returnFalseIf(!_MiffWriteStr(miff, bufferIndex, bufferData));
+         returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (MiffN1 *) bufferData));
 
          bufferIndex = 0;
          _MiffMemClearTypeArray(66, MiffN1, bufferData);
@@ -442,31 +441,31 @@ MiffB _MiffWriteStrEscaped(Miff const * const miff, MiffN const strLen, MiffStr 
    // Write out the remainder.
    if (bufferIndex)
    {
-      returnFalseIf(!_MiffWriteStr(miff, bufferIndex, bufferData));
+      returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (MiffN1 *) bufferData));
    }
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _MiffWriteValue
+func: _MiffSetValue
 ******************************************************************************/
-MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
+MiffB _MiffSetValue(Miff * const miff, MiffValue const value)
 {
    switch (value.type)
    {
    case miffValueTypeB:
       if (value.b)
       {
-         return _MiffWriteStr(miff, 1, "T");
+         return _MiffSetBuffer(miff, 1, (MiffN1 *) "T");
       }
 
-      return _MiffWriteStr(miff, 1, "F");
+      return _MiffSetBuffer(miff, 1, (MiffN1 *) "F");
 
    case miffValueTypeBIN:
-      returnFalseIf(!_MiffWriteStr(miff, 1, "*"));
-      returnFalseIf(!_MiffWriteN(  miff, value.bufferCount));
-      returnFalseIf(!_MiffWriteStr(miff, 1, " "));
+      returnFalseIf(!_MiffSetBuffer(        miff, 1, (MiffN1 *) "*"));
+      returnFalseIf(!_MiffSetN(             miff, value.bufferCount));
+      returnFalseIf(!_MiffSetBuffer(        miff, 1, (MiffN1 *) " "));
       return         _MiffWriteBufferBase64(miff, value.bufferCount, value.bufferData.bin);
 
    case miffValueTypeC:
@@ -475,34 +474,34 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       case miffValueFormatCIR_BASE64:
          if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(     miff, 1, "C"));
-            return         _MiffWriteC4Base64(miff, value);
+            returnFalseIf(!_MiffSetBuffer(  miff, 1, (MiffN1 *) "C"));
+            return         _MiffSetC4Base64(miff, value);
          }
          else
          {
-            returnFalseIf(!_MiffWriteStr(    miff, 1, "C"));
-            return         _MiffWriteCBase64(miff, value);
+            returnFalseIf(!_MiffSetBuffer( miff, 1, (MiffN1 *) "C"));
+            return         _MiffSetCBase64(miff, value);
          }
 
       case miffValueFormatCIR_TEXT:
          if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
-            returnFalseIf(!_MiffWriteR4( miff, value.inr4.r));
+            returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "c"));
+            returnFalseIf(!_MiffSetR4(    miff, value.inr4.r));
             if (value.imaginary4.r != 0.0)
             {
-               returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
-               return         _MiffWriteR4( miff, value.imaginary4.r);
+               returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "+"));
+               return         _MiffSetR4(    miff, value.imaginary4.r);
             }
          }
          else 
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "c"));
-            returnFalseIf(!_MiffWriteR(  miff, value.inr.r));
+            returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "c"));
+            returnFalseIf(!_MiffSetR(     miff, value.inr.r));
             if (value.imaginary.r != 0.0)
             {
-               returnFalseIf(!_MiffWriteStr(miff, 1, "+"));
-               return         _MiffWriteR(  miff, value.imaginary.r);
+               returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "+"));
+               return         _MiffSetR(     miff, value.imaginary.r);
             }
          }
          break;
@@ -513,12 +512,12 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         returnFalseIf(!_MiffWriteStr(    miff, 1, "I"));
+         returnFalseIf(!_MiffSetBuffer(   miff, 1, (MiffN1 *) "I"));
          return         _MiffWrite8Base64(miff, value.inr);
 
       case miffValueFormatCIR_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "i"));
-         return         _MiffWriteI(  miff, (MiffN) value.inr.i);
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "i"));
+         return         _MiffSetI(     miff, (MiffN) value.inr.i);
       }
       break;
 
@@ -526,25 +525,25 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       switch (value.formatN)
       {
       case miffValueFormatN_B:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "b"));
-         return         _MiffWriteNb( miff, value.inr.n);
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "b"));
+         return         _MiffSetNb(    miff, value.inr.n);
 
       case miffValueFormatN_BASE64:
-         returnFalseIf(!_MiffWriteStr(    miff, 1, "N"));
+         returnFalseIf(!_MiffSetBuffer(   miff, 1, (MiffN1 *) "N"));
          return         _MiffWrite8Base64(miff, value.inr);
 
       case miffValueFormatN_TEXT:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "n"));
-         return         _MiffWriteN(  miff, value.inr.n);
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "n"));
+         return         _MiffSetN(     miff, value.inr.n);
 
       case miffValueFormatN_X:
-         returnFalseIf(!_MiffWriteStr(miff, 1, "x"));
-         return         _MiffWriteNx( miff, value.inr.n);
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "x"));
+         return         _MiffSetNx(    miff, value.inr.n);
       }
       break;
 
    case miffValueTypeNULL:
-      return _MiffWriteStr(miff, 1, "~");
+      return _MiffSetBuffer(miff, 1, (MiffN1 *) "~");
 
    case miffValueTypeR:
       switch (value.formatCIR)
@@ -552,34 +551,34 @@ MiffB _MiffWriteValue(Miff * const miff, MiffValue const value)
       case miffValueFormatCIR_BASE64:
          if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
+            returnFalseIf(!_MiffSetBuffer(   miff, 1, (MiffN1 *) "R"));
             return         _MiffWrite4Base64(miff, value.inr4);
          }
          else
          {
-            returnFalseIf(!_MiffWriteStr(    miff, 1, "R"));
+            returnFalseIf(!_MiffSetBuffer(   miff, 1, (MiffN1 *) "R"));
             return         _MiffWrite8Base64(miff, value.inr);
          }
 
       case miffValueFormatCIR_TEXT:
          if (value.is4)
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
-            return         _MiffWriteR4( miff, value.inr4.r);
+            returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "r"));
+            return         _MiffSetR4(    miff, value.inr4.r);
          }
          else
          {
-            returnFalseIf(!_MiffWriteStr(miff, 1, "r"));
-            return         _MiffWriteR(  miff, value.inr.r);
+            returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "r"));
+            return         _MiffSetR(     miff, value.inr.r);
          }
       }
       break;
 
    case miffValueTypeSTR:
-      returnFalseIf(!_MiffWriteStr(miff, 1, "\""));
-      returnFalseIf(!_MiffWriteN(  miff, value.bufferCount));
-      returnFalseIf(!_MiffWriteStr(miff, 1, " "));
-      return         _MiffWriteStrEscaped(miff, value.bufferCount, (MiffStr *) value.bufferData.str);
+      returnFalseIf(!_MiffSetBuffer(    miff, 1, (MiffN1 *) "\""));
+      returnFalseIf(!_MiffSetN(         miff, value.bufferCount));
+      returnFalseIf(!_MiffSetBuffer(    miff, 1, (MiffN1 *) " "));
+      return         _MiffSetStrEscaped(miff, value.bufferCount, (MiffStr *) value.bufferData.str);
    }
 
    returnTrue;

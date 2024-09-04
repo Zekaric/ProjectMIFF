@@ -49,6 +49,10 @@ include:
 local:
 macro
 ******************************************************************************/
+#if 0
+#define INCLUDE_BIN
+#endif
+
 #define streq(S1, S2)  (strcmp(S1, S2) == 0)
 
 /******************************************************************************
@@ -488,20 +492,20 @@ static MiffB             _bools[100] =
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffB _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr       * const byteData);
+static MiffB    _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1       * const byteData);
 static void    *_JsonMemCreate(     JsonN4 const memByteCount);
 static void     _JsonMemDestroy(    void * const mem);
-static JsonBool _JsonTestRead(      JsonStr const * const fileName);
-static JsonBool _JsonTestReadObject(Json * const json);
-static JsonBool _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonStr const * const byteData);
-static JsonBool _JsonTestWrite(     JsonStr const * const fileName);
+static JsonB    _JsonTestRead(      JsonStr const * const fileName);
+static JsonB    _JsonTestReadObject(Json * const json);
+static JsonB    _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData);
+static JsonB    _JsonTestWrite(     JsonStr const * const fileName);
 
-static MiffB _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr       * const byteData);
+static MiffB    _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
 static void    *_MiffMemCreate(     MiffN4 const memByteCount);
 static void     _MiffMemDestroy(    void * const mem);
-static MiffB _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData);
-static MiffB _MiffTestRead(      MiffStr const * const fileName);
-static MiffB _MiffTestWrite(     MiffStr const * const fileName);
+static MiffB    _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
+static MiffB    _MiffTestRead(      MiffStr const * const fileName);
+static MiffB    _MiffTestWrite(     MiffStr const * const fileName);
 
 /******************************************************************************
 global:
@@ -560,12 +564,12 @@ function:
 /******************************************************************************
 func: _GetBuffer
 ******************************************************************************/
-static JsonBool _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonStr * const byteData)
+static JsonB _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffB _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr * const byteData)
+static MiffB _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -599,12 +603,12 @@ void _MiffMemDestroy(void * const mem)
 /******************************************************************************
 func: _SetBuffer
 ******************************************************************************/
-static JsonBool _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonStr const * const byteData)
+static JsonB _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffStr const * const byteData)
+static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -612,13 +616,13 @@ static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffS
 /******************************************************************************
 func: _JsonTestRead
 ******************************************************************************/
-static JsonBool _JsonTestRead(JsonStr const * const fileName)
+static JsonB _JsonTestRead(JsonStr const * const fileName)
 {
    return jsonFALSE;
 #if 0
    FILE           *file;
    Json           *json;
-   JsonBool        result;
+   JsonB        result;
    JsonReadType    type;
 
    file   = NULL;
@@ -674,7 +678,7 @@ static JsonBool _JsonTestRead(JsonStr const * const fileName)
 /******************************************************************************
 func: _JsonTestReadObject
 ******************************************************************************/
-static JsonBool _JsonTestReadObject(Json * const json)
+static JsonB _JsonTestReadObject(Json * const json)
 {
    JsonReadType type;
 
@@ -703,12 +707,12 @@ static JsonBool _JsonTestReadObject(Json * const json)
 /******************************************************************************
 func: _JsonTestWrite
 ******************************************************************************/
-static JsonBool _JsonTestWrite(JsonStr const * const fileName)
+static JsonB _JsonTestWrite(JsonStr const * const fileName)
 {
-#if 0
    FILE     *file;
    Json     *json;
-   JsonBool  result;
+   JsonB     result;
+   JsonI4    index;
 
    file   = NULL;
    json   = NULL;
@@ -722,147 +726,349 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
       }
 
       // Create a json file.
-      json = jsonCreateWriter(_JsonSetBuffer, (void *) file);
+      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonTRUE);
       if (!json)
       {
          break;
       }
 
-      jsonWriteObjectStart(json);
+      jsonSetObjectStart(json);
 
-      jsonWriteKey1Boolean(      json, "True",  jsonTRUE);
-      jsonWriteKey1Boolean(      json, "False", jsonFALSE);
+      jsonSetKey(              json, "Null");
+      jsonSetValueNull(        json);
 
-      jsonWriteKey1I1(           json, "I1_0",     0);
-      jsonWriteKey1I1(           json, "I1_1",     1);
-      jsonWriteKey1I1(           json, "I1_-1",    -1);
-      jsonWriteKey1I1(           json, "I1_127",   127);
-      jsonWriteKey1I1(           json, "I1_-128",  -128);
+      jsonSetKey(              json, "True");
+      jsonSetValueBool(        json, jsonTRUE);
+      jsonSetKey(              json, "False");
+      jsonSetValueBool(        json, jsonFALSE);
+
+      jsonSetKey(              json, "I 0");
+      jsonSetValueI(           json, 0);
+      jsonSetKey(              json, "I 1");
+      jsonSetValueI(           json, 1);
+      jsonSetKey(              json, "I -1");
+      jsonSetValueI(           json, -1);
+      jsonSetKey(              json, "I 127");
+      jsonSetValueI(           json, 127);
+      jsonSetKey(              json, "I -128");
+      jsonSetValueI(           json, -128);
                     
-      jsonWriteKey1N1(           json, "N1_0",     0);
-      jsonWriteKey1N1(           json, "N1_1",     1);
-      jsonWriteKey1N1(           json, "N1_255",   255);
+      jsonSetKey(              json, "N 0");
+      jsonSetValueN(           json, 0);
+      jsonSetKey(              json, "N 1");
+      jsonSetValueN(           json, 1);
+      jsonSetKey(              json, "N 255");
+      jsonSetValueN(           json, 255);
 
-      jsonWriteKey1I2(           json, "I2_0",     0);
-      jsonWriteKey1I2(           json, "I2_1",     1);
-      jsonWriteKey1I2(           json, "I2_-1",    -1);
+      jsonSetKey(              json, "R 0");
+      jsonSetValueR(           json, 0.0);
+      jsonSetKey(              json, "R 1");
+      jsonSetValueR(           json, 1.0);
+      jsonSetKey(              json, "R -1");
+      jsonSetValueR(           json, -1.0);
+      jsonSetKey(              json, "R PI");
+      jsonSetValueR(           json, 3.1415926535897932);
 
-      jsonWriteKey1N2(           json, "N2_0",     0);
-      jsonWriteKey1N2(           json, "N2_1",     1);
+      jsonSetKey(              json, "R4 0");
+      jsonSetValueR4(          json, 0.0f);
+      jsonSetKey(              json, "R4 1");
+      jsonSetValueR4(          json, 1.0f);
+      jsonSetKey(              json, "R4 -1");
+      jsonSetValueR4(          json, -1.0f);
+      jsonSetKey(              json, "R4 PI");
+      jsonSetValueR4(          json, 3.1415926535897932f);
 
-      jsonWriteKey1I4(           json, "I4_0",     0);
-      jsonWriteKey1I4(           json, "I4_1",     1);
-      jsonWriteKey1I4(           json, "I4_-1",    -1);
+      jsonSetKey(              json, "String");
+      jsonSetValueStr(         json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
-      jsonWriteKey1N4(           json, "N4_0",     0);
-      jsonWriteKey1N4(           json, "N4_1",     1);
-
-      jsonWriteKey1R4(           json, "R4_0",     0.0);
-      jsonWriteKey1R4(           json, "R4_1",     1.0);
-      jsonWriteKey1R4(           json, "R4_-1",    -1.0);
-      jsonWriteKey1R4(           json, "R4_PI",    3.1415926535897932f);
-
-      jsonWriteKey1I8(           json, "I8_0",     0);
-      jsonWriteKey1I8(           json, "I8_1",     1);
-      jsonWriteKey1I8(           json, "I8_-1",    -1);
-
-      jsonWriteKey1N8(           json, "N8_0",     0);
-      jsonWriteKey1N8(           json, "N8_1",     1);
-
-      jsonWriteKey1R8(           json, "R8_0",     0.0);
-      jsonWriteKey1R8(           json, "R8_1",     1.0);
-      jsonWriteKey1R8(           json, "R8_-1",    -1.0);
-      jsonWriteKey1R8(           json, "R8_PI",    3.1415926535897932);
-
-      jsonWriteKey1StringC2(     json, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-      jsonWriteKey(              json, "variableIntStrReal");
-      jsonWriteArrayStart(       json);
-      jsonWriteValueI(           json, 42);
-      jsonWriteValueStringC2(    json, "Yes, but what is the question?");
-      jsonWriteValueR8(          json, 3.1415926535897932);
-      jsonWriteArrayStop(        json);
-
-      jsonWriteKeyNI1(           json, "I1_Array",     256,     (MiffI1 *) _n1array);
-      jsonWriteKeyNN1(           json, "N1_Array",     256,     _n1array);
-
-      jsonWriteKeyNI2(           json, "I2_Array",     256,     (MiffI2 *) _n2array);
-      jsonWriteKeyNN2(           json, "N2_Array",     256,     _n2array);
-
-      jsonWriteKeyNI4(           json, "I4_Array",     256,     (MiffI4 *) _n4array);
-      jsonWriteKeyNN4(           json, "N4_Array",     256,     _n4array);
-
-      jsonWriteKeyNI8(           json, "I8_Array",     256,     (MiffI8 *) _n8array);
-      jsonWriteKeyNN8(           json, "N8_Array",     256,     _n8array);
-
-      jsonWriteKeyNR4(           json, "R4_Array",     300,     _reals4);
-      jsonWriteKeyNR8(           json, "R8_Array",     300,     _reals8);
-
-      jsonWriteKeyNStringC2(     json, "String_Array", 10,      (JsonStr **) _strings);
-
-      jsonWriteKeyNBoolean(      json, "Bool_Array",   100,     (JsonBool *) _bools);
-
-      jsonWriteKey(              json, "userVarIntStrReal");
-      jsonWriteArrayStart(       json);
-      jsonWriteValueI(           json, 42);
-      jsonWriteValueStringC2(    json, "Yes, but what is the question?");
-      jsonWriteValueR8(          json, 3.1415926535897932);
-      jsonWriteArrayStop(        json);
-
-      jsonWriteKey(        json, "KeyValueBlock");
-      jsonWriteObjectStart(json);
+#if defined(INCLUDE_BIN)
+      jsonSetKey(              json, "Binary");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 256 * 3; index++)
       {
-         jsonWriteKey1Boolean( json, "True",     jsonTRUE);
-         jsonWriteKey1Boolean( json, "False",    jsonFALSE);
-
-         jsonWriteKey1I1(      json, "I1_0",     0);
-         jsonWriteKey1I1(      json, "I1_1",     1);
-         jsonWriteKey1I1(      json, "I1_-1",    -1);
-         jsonWriteKey1I1(      json, "I1_127",   127);
-         jsonWriteKey1I1(      json, "I1_-128",  -128);
-
-         jsonWriteKey1N1(      json, "N1_0",     0);
-         jsonWriteKey1N1(      json, "N1_1",     1);
-         jsonWriteKey1N1(      json, "N1_255",   255);
-
-         jsonWriteKey1I2(      json, "I2_0",     0);
-         jsonWriteKey1I2(      json, "I2_1",     1);
-         jsonWriteKey1I2(      json, "I2_-1",    -1);
-
-         jsonWriteKey1N2(      json, "N2_0",     0);
-         jsonWriteKey1N2(      json, "N2_1",     1);
-
-         jsonWriteKey1I4(      json, "I4_0",     0);
-         jsonWriteKey1I4(      json, "I4_1",     1);
-         jsonWriteKey1I4(      json, "I4_-1",    -1);
-
-         jsonWriteKey1N4(      json, "N4_0",     0);
-         jsonWriteKey1N4(      json, "N4_1",     1);
-
-         jsonWriteKey1R4(      json, "R4_0",     0.0);
-         jsonWriteKey1R4(      json, "R4_1",     1.0);
-         jsonWriteKey1R4(      json, "R4_-1",    -1.0);
-         jsonWriteKey1R4(      json, "R4_PI",    3.1415926535897932f);
-
-         jsonWriteKey1I8(      json, "I8_0",     0);
-         jsonWriteKey1I8(      json, "I8_1",     1);
-         jsonWriteKey1I8(      json, "I8_-1",    -1);
-
-         jsonWriteKey1N8(      json, "N8_0",     0);
-         jsonWriteKey1N8(      json, "N8_1",     1);
-
-         jsonWriteKey1R8(      json, "R8_0",     0.0);
-         jsonWriteKey1R8(      json, "R8_1",     1.0);
-         jsonWriteKey1R8(      json, "R8_-1",    -1.0);
-         jsonWriteKey1R8(      json, "R8_PI",    3.1415926535897932);
-
-         jsonWriteKey1StringC2(json, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-
-         jsonWriteKeyNStringC2(json, "String_Array", 10,      _strings);
+         jsonSetValueN(json, _binary[index]);
       }
-      jsonWriteObjectStop(json);
+      jsonSetArrayStop(        json);
+#endif
 
-      jsonWriteObjectStop(json);
+      jsonSetKey(              json, "Bool Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 100; index++)
+      {
+         jsonSetValueBool(json, _bools[index]);
+      }
+      jsonSetArrayStop(        json);
+      
+      jsonSetKey(              json, "I Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 256; index++)
+      {
+         jsonSetValueI(json, _narray[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetKey(              json, "N Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 256; index++)
+      {
+         jsonSetValueN(json, _narray[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetKey(              json, "R Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 300; index++)
+      {
+         jsonSetValueR(json, _reals8[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetKey(              json, "R4 Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 300; index++)
+      {
+         jsonSetValueR4(json, _reals4[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetKey(              json, "String Array");
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 10; index++)
+      {
+         jsonSetValueStr(json, _strings[index]);
+      }
+      jsonSetArrayStop(        json);
+
+#if defined(INCLUDE_BIN)
+      jsonSetKey(              json, "Binary Array");
+      jsonSetArrayStart(       json);
+
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 3 * 256; index++)
+      {
+         jsonSetValueN(json, _binary[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 3 * 256; index++)
+      {
+         jsonSetValueN(json, _binary[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStart(       json);
+      for (index = 0; index < 3 * 256; index++)
+      {
+         jsonSetValueN(json, _binary[index]);
+      }
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStop(        json);
+#endif
+
+      jsonSetKey(              json, "User Type IntStrReal");
+      jsonSetArrayStart(       json);
+      jsonSetValueI(           json, 42);
+      jsonSetValueStr(         json, "Yes, but what is the question?");
+      jsonSetValueR(           json, 3.1415926535897932);
+      jsonSetArrayStop(        json);
+
+
+      jsonSetKey(              json, "User Type IntStrReal Array");
+      jsonSetArrayStart(       json);
+
+      jsonSetArrayStart(       json);
+      jsonSetValueI(           json, 42);
+      jsonSetValueStr(         json, "Yes, but what is the question?");
+      jsonSetValueR(           json, 3.1415926535897932);
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStart(       json);
+      jsonSetValueI(           json, 42);
+      jsonSetValueStr(         json, "Yes, but what is the question?");
+      jsonSetValueR(           json, 3.1415926535897932);
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStart(       json);
+      jsonSetValueI(           json, 42);
+      jsonSetValueStr(         json, "Yes, but what is the question?");
+      jsonSetValueR(           json, 3.1415926535897932);
+      jsonSetArrayStop(        json);
+
+      jsonSetArrayStop(        json);
+
+
+      jsonSetKey(        json, "Block");
+      jsonSetObjectStart(json);
+      {
+         jsonSetKey(              json, "Null");
+         jsonSetValueNull(        json);
+
+         jsonSetKey(              json, "True");
+         jsonSetValueBool(        json, jsonTRUE);
+         jsonSetKey(              json, "False");
+         jsonSetValueBool(        json, jsonFALSE);
+
+         jsonSetKey(              json, "I 0");
+         jsonSetValueI(           json, 0);
+         jsonSetKey(              json, "I 1");
+         jsonSetValueI(           json, 1);
+         jsonSetKey(              json, "I -1");
+         jsonSetValueI(           json, -1);
+         jsonSetKey(              json, "I 127");
+         jsonSetValueI(           json, 127);
+         jsonSetKey(              json, "I -128");
+         jsonSetValueI(           json, -128);
+                    
+         jsonSetKey(              json, "N 0");
+         jsonSetValueN(           json, 0);
+         jsonSetKey(              json, "N 1");
+         jsonSetValueN(           json, 1);
+         jsonSetKey(              json, "N 255");
+         jsonSetValueN(           json, 255);
+
+         jsonSetKey(              json, "R 0");
+         jsonSetValueR(           json, 0.0);
+         jsonSetKey(              json, "R 1");
+         jsonSetValueR(           json, 1.0);
+         jsonSetKey(              json, "R -1");
+         jsonSetValueR(           json, -1.0);
+         jsonSetKey(              json, "R PI");
+         jsonSetValueR(           json, 3.1415926535897932);
+
+         jsonSetKey(              json, "R4 0");
+         jsonSetValueR4(          json, 0.0f);
+         jsonSetKey(              json, "R4 1");
+         jsonSetValueR4(          json, 1.0f);
+         jsonSetKey(              json, "R4 -1");
+         jsonSetValueR4(          json, -1.0f);
+         jsonSetKey(              json, "R4 PI");
+         jsonSetValueR4(          json, 3.1415926535897932f);
+
+         jsonSetKey(              json, "String");
+         jsonSetValueStr(         json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+#if defined(INCLUDE_BIN)
+         jsonSetKey(              json, "Binary");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 256 * 3; index++)
+         {
+            jsonSetValueN(json, _binary[index]);
+         }
+         jsonSetArrayStop(        json);
+#endif
+
+         jsonSetKey(              json, "Bool Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 100; index++)
+         {
+            jsonSetValueBool(json, _bools[index]);
+         }
+         jsonSetArrayStop(        json);
+      
+         jsonSetKey(              json, "I Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 256; index++)
+         {
+            jsonSetValueI(json, _narray[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetKey(              json, "N Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 256; index++)
+         {
+            jsonSetValueN(json, _narray[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetKey(              json, "R Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 300; index++)
+         {
+            jsonSetValueR(json, _reals8[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetKey(              json, "R4 Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 300; index++)
+         {
+            jsonSetValueR4(json, _reals4[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetKey(              json, "String Array");
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 10; index++)
+         {
+            jsonSetValueStr(json, _strings[index]);
+         }
+         jsonSetArrayStop(        json);
+
+#if defined(INCLUDE_BIN)
+         jsonSetKey(              json, "Binary Array");
+         jsonSetArrayStart(       json);
+
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 3 * 256; index++)
+         {
+            jsonSetValueN(json, _binary[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 3 * 256; index++)
+         {
+            jsonSetValueN(json, _binary[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStart(       json);
+         for (index = 0; index < 3 * 256; index++)
+         {
+            jsonSetValueN(json, _binary[index]);
+         }
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStop(        json);
+#endif
+
+         jsonSetKey(              json, "User Type IntStrReal");
+         jsonSetArrayStart(       json);
+         jsonSetValueI(           json, 42);
+         jsonSetValueStr(         json, "Yes, but what is the question?");
+         jsonSetValueR(           json, 3.1415926535897932);
+         jsonSetArrayStop(        json);
+
+
+         jsonSetKey(              json, "User Type IntStrReal Array");
+         jsonSetArrayStart(       json);
+
+         jsonSetArrayStart(       json);
+         jsonSetValueI(           json, 42);
+         jsonSetValueStr(         json, "Yes, but what is the question?");
+         jsonSetValueR(           json, 3.1415926535897932);
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStart(       json);
+         jsonSetValueI(           json, 42);
+         jsonSetValueStr(         json, "Yes, but what is the question?");
+         jsonSetValueR(           json, 3.1415926535897932);
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStart(       json);
+         jsonSetValueI(           json, 42);
+         jsonSetValueStr(         json, "Yes, but what is the question?");
+         jsonSetValueR(           json, 3.1415926535897932);
+         jsonSetArrayStop(        json);
+
+         jsonSetArrayStop(        json);
+      }
+      jsonSetObjectStop(json);
+
+      jsonSetObjectStop(json);
 
       result = jsonTRUE;
       break;
@@ -872,8 +1078,6 @@ static JsonBool _JsonTestWrite(JsonStr const * const fileName)
    fclose(file);
 
    return result;
-#endif
-   return jsonFALSE;
 }
 
 void TEST_KEY(Miff *miff, MiffStr *KEY, MiffRecType *recType, MiffN *arrayCount)
@@ -889,7 +1093,7 @@ void TEST_KEY(Miff *miff, MiffStr *KEY, MiffRecType *recType, MiffN *arrayCount)
    }
    else 
    {
-      if (*recType != miffRecTypeVALUE || !streq(key, KEY)) 
+      if (!streq(key, KEY)) 
       {
          printf("key ERROR\t"); 
       }
@@ -900,7 +1104,7 @@ void TEST_KEY(Miff *miff, MiffStr *KEY, MiffRecType *recType, MiffN *arrayCount)
    }
 }
 
-void TEST_NULL_VALUE(Miff *miff)
+MiffB TEST_NULL_VALUE(Miff *miff)
 {
    MiffValue value;
 
@@ -908,15 +1112,15 @@ void TEST_NULL_VALUE(Miff *miff)
    
    if (miffValueGetType(value) != miffValueTypeNULL) 
    {
-      printf("null ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else 
-   {
-      printf("null OK\n");
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_B_VALUE(Miff *miff, MiffB testValue)
+MiffB TEST_B_VALUE(Miff *miff, MiffB testValue)
 {
    MiffValue value;
 
@@ -925,15 +1129,15 @@ void TEST_B_VALUE(Miff *miff, MiffB testValue)
    if (miffValueGetType(value) != miffValueTypeB || 
        miffValueGetB(   value) != testValue) 
    {
-      printf("b ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else 
-   {
-      printf("b OK\n");
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_I_VALUE(Miff *miff, MiffI testValue)
+MiffB TEST_I_VALUE(Miff *miff, MiffI testValue)
 {
    MiffValue value;
 
@@ -942,15 +1146,15 @@ void TEST_I_VALUE(Miff *miff, MiffI testValue)
    if (miffValueGetType(value) != miffValueTypeI || 
        miffValueGetI(   value) != testValue) 
    {
-      printf("i ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else
-   {
-      printf("i OK\n"); 
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_N_VALUE(Miff *miff, MiffN testValue)
+MiffB TEST_N_VALUE(Miff *miff, MiffN testValue)
 {
    MiffValue value;
 
@@ -959,15 +1163,15 @@ void TEST_N_VALUE(Miff *miff, MiffN testValue)
    if (miffValueGetType(value) != miffValueTypeN || 
        miffValueGetN(   value) != testValue) 
    {
-      printf("n ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else
-   {
-      printf("n OK\n");
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_R_VALUE(Miff *miff, MiffR testValue)
+MiffB TEST_R_VALUE(Miff *miff, MiffR testValue)
 {
    MiffValue value;
 
@@ -977,15 +1181,15 @@ void TEST_R_VALUE(Miff *miff, MiffR testValue)
        miffValueIs4(    value)                   ||
        miffValueGetR(   value) != testValue) 
    {
-      printf("r ERROR\n");
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else
-   {
-      printf("r OK\n");
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
+MiffB TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
 {
    MiffValue value;
 
@@ -995,15 +1199,15 @@ void TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
        !miffValueIs4(   value)                   || 
        miffValueGetR4(  value) != testValue)
    {
-      printf("r ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else
-   {
-      printf("r OK\n");
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_BIN_VALUE(Miff *miff, MiffN testCount, MiffN1 *testValue)
+MiffB TEST_BIN_VALUE(Miff *miff, MiffN testCount, MiffN1 *testValue)
 {
    MiffValue value;
    MiffN1    svalue[256 * 3];
@@ -1013,25 +1217,27 @@ void TEST_BIN_VALUE(Miff *miff, MiffN testCount, MiffN1 *testValue)
    if (miffValueGetType(value) != miffValueTypeBIN &&
        testCount               != value.bufferCount)
    {
-      printf("ERROR\n"); 
+      printf("type ERROR\t"); 
+      return miffFALSE;
    }
 
    if (!miffGetValueBin(miff, value.bufferCount, svalue))
    {
-      printf("ERROR\n");
+      printf("bin read ERROR\t");
+      return miffFALSE;
    }
    
    if (memcmp(svalue, testValue, testCount) != 0)
    {
-      printf("ERROR\n");
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else 
-   {
-      printf("OK\n"); 
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
-void TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
+MiffB TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
 {
    MiffValue value;
    MiffN     testValueLen;
@@ -1044,22 +1250,24 @@ void TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
    if (miffValueGetType(value) != miffValueTypeSTR &&
        testValueLen            != value.bufferCount)
    {
-      printf("ERROR\n"); 
+      printf("type ERROR\t"); 
+      return miffFALSE;
    }
 
    if (!miffGetValueStr(miff, value.bufferCount, svalue))
    {
-      printf("ERROR\n"); 
+      printf("str read ERROR\t"); 
+      return miffFALSE;
    }
    
    if (memcmp(testValue, svalue, testValueLen) != 0)
    {
-      printf("ERROR\n"); 
+      printf("val ERROR\t"); 
+      return miffFALSE;
    }
-   else 
-   {
-      printf("OK\n"); 
-   }
+
+   printf("val OK\t");
+   return miffTRUE;
 }
 
 void TEST_COUNT(MiffN COUNT, MiffN arrayCount)
@@ -1080,6 +1288,7 @@ void TEST_NEXT(Miff *miff)
    {
       printf("ERROR, No Next Record\n"); 
    }
+   printf("\n");
 }
 
 /******************************************************************************
@@ -1093,7 +1302,6 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
    MiffStr         subFormatName[miffKeySIZE];
    MiffN           subFormatVersion;
    MiffRecType     recType;
-   MiffN           arrayIndex;
    MiffN           arrayCount;
    MiffN           index;
 
@@ -1125,102 +1333,284 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
 
       // Unless you are in full control of the format, do not assume that there will be an order
       // to the values.
-      TEST_KEY(miff, "Null",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_NULL_VALUE(miff);                      TEST_NEXT(miff);
-      TEST_KEY(miff, "True",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_B_VALUE(   miff, miffTRUE);            TEST_NEXT(miff);
-      TEST_KEY(miff, "False",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_B_VALUE(   miff, miffFALSE);           TEST_NEXT(miff);
-      TEST_KEY(miff, "I 0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 0);                   TEST_NEXT(miff);
-      TEST_KEY(miff, "I 1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 1);                   TEST_NEXT(miff);
-      TEST_KEY(miff, "I -1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, -1);                  TEST_NEXT(miff);
-      TEST_KEY(miff, "I 127",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, 127);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "I -128", &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_I_VALUE(   miff, -128);                TEST_NEXT(miff);
-      TEST_KEY(miff, "N 0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 0);                   TEST_NEXT(miff);
-      TEST_KEY(miff, "N 1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 1);                   TEST_NEXT(miff);
-      TEST_KEY(miff, "N 255",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_N_VALUE(   miff, 255);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "R 0",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 0.0);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "R 1",    &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 1.0);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "R -1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, -1.0);                TEST_NEXT(miff);
-      TEST_KEY(miff, "R PI",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R_VALUE(   miff, 3.1415926535897932);  TEST_NEXT(miff);
-      TEST_KEY(miff, "R4 0",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 0.0);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "R4 1",   &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 1.0);                 TEST_NEXT(miff);
-      TEST_KEY(miff, "R4 -1",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, -1.0);                TEST_NEXT(miff);
-      TEST_KEY(miff, "R4 PI",  &recType, &arrayCount); TEST_COUNT(1, arrayCount); TEST_R4_VALUE(  miff, 3.1415926535897932f); TEST_NEXT(miff);
+      TEST_KEY(miff, "Null",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_NULL_VALUE(miff);                      TEST_NEXT(miff);
+      TEST_KEY(miff, "True",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_B_VALUE(   miff, miffTRUE);            TEST_NEXT(miff);
+      TEST_KEY(miff, "False",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_B_VALUE(   miff, miffFALSE);           TEST_NEXT(miff);
+      TEST_KEY(miff, "I 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 0);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "I 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 1);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "I -1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, -1);                  TEST_NEXT(miff);
+      TEST_KEY(miff, "I 127",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 127);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "I -128", &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, -128);                TEST_NEXT(miff);
+      TEST_KEY(miff, "N 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 0);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "N 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 1);                   TEST_NEXT(miff);
+      TEST_KEY(miff, "N 255",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 255);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 0.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 1.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R -1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, -1.0);                TEST_NEXT(miff);
+      TEST_KEY(miff, "R PI",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 3.1415926535897932);  TEST_NEXT(miff);
+      TEST_KEY(miff, "R4 0",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 0.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R4 1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 1.0);                 TEST_NEXT(miff);
+      TEST_KEY(miff, "R4 -1",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, -1.0);                TEST_NEXT(miff);
+      TEST_KEY(miff, "R4 PI",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 3.1415926535897932f); TEST_NEXT(miff);
       
-      TEST_KEY(miff, "String", &recType, &arrayCount); TEST_COUNT(1, arrayCount); 
+      TEST_KEY(miff, "String", &recType, &arrayCount);
+      TEST_COUNT(  1, arrayCount); 
       TEST_STR_VALUE(miff, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
       TEST_NEXT(miff);
 
-      TEST_KEY(miff, "Binary", &recType, &arrayCount); TEST_COUNT(1, arrayCount);
+#if defined(INCLUDE_BIN)
+      TEST_KEY(miff, "Binary", &recType, &arrayCount);
+      TEST_COUNT(  1, arrayCount);
       TEST_BIN_VALUE(miff, 256 * 3, _binary);
       TEST_NEXT(miff);
-#if 0
-      TEST_KEY("Bool Array"); TEST_COUNT(100);
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueBoolean(miff);
-         if (miffValueGetBool(value) != _bools[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("I Array"); TEST_COUNT(256);,
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueI(miff);
-         if (miffValueGetI(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("N Array"); TEST_COUNT(256(, );
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueI(miff);
-         if (miffValueGetN(value) != _narray[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("R Array"); TEST_COUNT(300);
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueR(miff);
-         if (miffValueGetRType(value) != 8 || miffValueGetR8(value) != _reals8[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("R4 Array"); TEST_COUNT(300);
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueR(miff);
-         if (miffValueGetRType(value) != 4 || miffValueGetR4(value) != _reals4[index]) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("String Array"); TEST_COUNT(10);
-      forCount(index, arrayCount)
-      {
-         value = miffGetValueSTR(miff);
-         if (!streq(miffValueGetSTR(value) _strings[index])) { printf("ERROR, value mismatch %d\n", (int) index); break; }
-      }
-      if (index == arrayCount) { printf("OK\n"); }
-      TEST_NEXT();
-
-      TEST_KEY("User Type IntStrReal");
-         miffGetValue(          miff, miffValueSetI(42));
-         miffGetValue(          miff, miffValueSetStr("Yes, but what is the question?"));
-         miffGetValue(          miff, miffValueSetR8(3.1415926535897932));
-         miffGetRecordEnd(      miff);
-
-
-      miffSetBlockStart(miff, "Block");
-      {
-      }
-      miffSetBlockStop();
-
 #endif
-      result = miffTRUE;
+
+      TEST_KEY(miff, "Bool Array", &recType, &arrayCount);
+      TEST_COUNT(100, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_B_VALUE(miff, _bools[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "I Array", &recType, &arrayCount);
+      TEST_COUNT(256, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_I_VALUE(miff, (int) _narray[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "N Array", &recType, &arrayCount);
+      TEST_COUNT(256, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_N_VALUE(miff, _narray[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "R Array", &recType, &arrayCount);
+      TEST_COUNT(300, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_R_VALUE(miff, _reals8[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "R4 Array", &recType, &arrayCount);
+      TEST_COUNT(300, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_R4_VALUE(miff, _reals4[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "String Array", &recType, &arrayCount); 
+      TEST_COUNT(10, arrayCount);
+      for (index = 0; index < arrayCount; index++)
+      {
+         if (!TEST_STR_VALUE(miff, _strings[index]))
+         {
+            break;
+         }
+      }
+      TEST_NEXT(miff);
+
+#if defined(INCLUDE_BIN)
+      TEST_KEY(miff, "Binary Array", &recType, &arrayCount); 
+      TEST_COUNT(3, arrayCount);
+      TEST_BIN_VALUE(miff, 3 * 256, _binary);
+      TEST_BIN_VALUE(miff, 3 * 256, _binary);
+      TEST_BIN_VALUE(miff, 3 * 256, _binary);
+      TEST_NEXT(miff);
+#endif
+
+      TEST_KEY(miff, "User Type IntStrReal", &recType, &arrayCount); 
+      TEST_COUNT(1, arrayCount);
+      TEST_I_VALUE(  miff, 42);
+      TEST_STR_VALUE(miff, "Yes, but what is the question?");
+      TEST_R_VALUE(  miff, 3.1415926535897932);
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "User Type IntStrReal Array", &recType, &arrayCount); 
+      TEST_COUNT(3, arrayCount);
+      TEST_I_VALUE(  miff, 42);
+      TEST_STR_VALUE(miff, "Yes, but what is the question?");
+      TEST_R_VALUE(  miff, 3.1415926535897932);
+      TEST_I_VALUE(  miff, 42);
+      TEST_STR_VALUE(miff, "Yes, but what is the question?");
+      TEST_R_VALUE(  miff, 3.1415926535897932);
+      TEST_I_VALUE(  miff, 42);
+      TEST_STR_VALUE(miff, "Yes, but what is the question?");
+      TEST_R_VALUE(  miff, 3.1415926535897932);
+      TEST_NEXT(miff);
+
+      TEST_KEY(miff, "Block", &recType, &arrayCount);
+      if (recType != miffRecTypeBLOCK_START)
+      {
+         printf("block start ERROR\n");
+      }
+      else
+      {
+         printf("block start OK\t");
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "Null",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_NULL_VALUE(miff);                      TEST_NEXT(miff);
+         TEST_KEY(miff, "True",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_B_VALUE(   miff, miffTRUE);            TEST_NEXT(miff);
+         TEST_KEY(miff, "False",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_B_VALUE(   miff, miffFALSE);           TEST_NEXT(miff);
+         TEST_KEY(miff, "I 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 0);                   TEST_NEXT(miff);
+         TEST_KEY(miff, "I 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 1);                   TEST_NEXT(miff);
+         TEST_KEY(miff, "I -1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, -1);                  TEST_NEXT(miff);
+         TEST_KEY(miff, "I 127",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, 127);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "I -128", &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_I_VALUE(   miff, -128);                TEST_NEXT(miff);
+         TEST_KEY(miff, "N 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 0);                   TEST_NEXT(miff);
+         TEST_KEY(miff, "N 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 1);                   TEST_NEXT(miff);
+         TEST_KEY(miff, "N 255",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_N_VALUE(   miff, 255);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "R 0",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 0.0);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "R 1",    &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 1.0);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "R -1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, -1.0);                TEST_NEXT(miff);
+         TEST_KEY(miff, "R PI",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R_VALUE(   miff, 3.1415926535897932);  TEST_NEXT(miff);
+         TEST_KEY(miff, "R4 0",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 0.0);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "R4 1",   &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 1.0);                 TEST_NEXT(miff);
+         TEST_KEY(miff, "R4 -1",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, -1.0);                TEST_NEXT(miff);
+         TEST_KEY(miff, "R4 PI",  &recType, &arrayCount);      TEST_COUNT(  1, arrayCount); TEST_R4_VALUE(  miff, 3.1415926535897932f); TEST_NEXT(miff);
+      
+         TEST_KEY(miff, "String", &recType, &arrayCount);
+         TEST_COUNT(  1, arrayCount); 
+         TEST_STR_VALUE(miff, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+         TEST_NEXT(miff);
+
+#if defined(INCLUDE_BIN)
+         TEST_KEY(miff, "Binary", &recType, &arrayCount);
+         TEST_COUNT(  1, arrayCount);
+         TEST_BIN_VALUE(miff, 256 * 3, _binary);
+         TEST_NEXT(miff);
+#endif
+
+         TEST_KEY(miff, "Bool Array", &recType, &arrayCount);
+         TEST_COUNT(100, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_B_VALUE(miff, _bools[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "I Array", &recType, &arrayCount);
+         TEST_COUNT(256, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_I_VALUE(miff, (int) _narray[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "N Array", &recType, &arrayCount);
+         TEST_COUNT(256, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_N_VALUE(miff, _narray[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "R Array", &recType, &arrayCount);
+         TEST_COUNT(300, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_R_VALUE(miff, _reals8[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "R4 Array", &recType, &arrayCount);
+         TEST_COUNT(300, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_R4_VALUE(miff, _reals4[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "String Array", &recType, &arrayCount); 
+         TEST_COUNT(10, arrayCount);
+         for (index = 0; index < arrayCount; index++)
+         {
+            if (!TEST_STR_VALUE(miff, _strings[index]))
+            {
+               break;
+            }
+         }
+         TEST_NEXT(miff);
+
+#if defined(INCLUDE_BIN)
+         TEST_KEY(miff, "Binary Array", &recType, &arrayCount); 
+         TEST_COUNT(3, arrayCount);
+         TEST_BIN_VALUE(miff, 3 * 256, _binary);
+         TEST_BIN_VALUE(miff, 3 * 256, _binary);
+         TEST_BIN_VALUE(miff, 3 * 256, _binary);
+         TEST_NEXT(miff);
+#endif
+
+         TEST_KEY(miff, "User Type IntStrReal", &recType, &arrayCount); 
+         TEST_COUNT(1, arrayCount);
+         TEST_I_VALUE(  miff, 42);
+         TEST_STR_VALUE(miff, "Yes, but what is the question?");
+         TEST_R_VALUE(  miff, 3.1415926535897932);
+         TEST_NEXT(miff);
+
+         TEST_KEY(miff, "User Type IntStrReal Array", &recType, &arrayCount); 
+         TEST_COUNT(3, arrayCount);
+         TEST_I_VALUE(  miff, 42);
+         TEST_STR_VALUE(miff, "Yes, but what is the question?");
+         TEST_R_VALUE(  miff, 3.1415926535897932);
+         TEST_I_VALUE(  miff, 42);
+         TEST_STR_VALUE(miff, "Yes, but what is the question?");
+         TEST_R_VALUE(  miff, 3.1415926535897932);
+         TEST_I_VALUE(  miff, 42);
+         TEST_STR_VALUE(miff, "Yes, but what is the question?");
+         TEST_R_VALUE(  miff, 3.1415926535897932);
+         TEST_NEXT(miff);
+      
+         TEST_KEY(miff, "", &recType, &arrayCount);
+         if (recType != miffRecTypeBLOCK_STOP)
+         {
+            printf("block stop ERROR\n");
+         }
+         else 
+         {
+            printf("block stop OK\t");
+            TEST_NEXT(miff);
+
+            result = miffTRUE;
+         }
+      }
+
       break;
    }
 
@@ -1283,7 +1673,9 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
       miffSetR4(             miff, "R4 PI",    3.1415926535897932f);
                              
       miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+#if defined(INCLUDE_BIN)
       miffSetBinBuffer(      miff, "Binary",   256 * 3, _binary);
+#endif
                              
       miffSetBoolArray(      miff, "Bool Array",   100,  _bools);
 
@@ -1295,11 +1687,13 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
 
       miffSetStrArray(       miff, "String Array", 10,   _strings);
 
+#if defined(INCLUDE_BIN)
       miffSetBinArrayStart(  miff, "Binary Array", 3);
       miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
       miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
       miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
       miffSetRecordEnd(      miff);
+#endif
 
       miffSetValueStart(     miff, "User Type IntStrReal");
       miffSetValue(          miff, miffValueSetIDefault(42));
@@ -1349,7 +1743,9 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
          miffSetR4(             miff, "R4 PI",    3.1415926535897932f);
                              
          miffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+#if defined(INCLUDE_BIN)
          miffSetBinBuffer(      miff, "Binary",   256 * 3, _binary);
+#endif
                              
          miffSetBoolArray(      miff, "Bool Array",   100,  _bools);
 
@@ -1361,11 +1757,13 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
 
          miffSetStrArray(       miff, "String Array", 10,   _strings);
 
+#if defined(INCLUDE_BIN)
          miffSetBinArrayStart(  miff, "Binary Array", 3);
          miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
          miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
          miffSetValue(          miff, miffValueSetBinBuffer(3 * 256, _binary));
          miffSetRecordEnd(      miff);
+#endif
 
          miffSetValueStart(     miff, "User Type IntStrReal");
          miffSetValue(          miff, miffValueSetIDefault(42));

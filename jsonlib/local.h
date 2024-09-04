@@ -75,9 +75,6 @@ constant:
 #define returnTrueIf( EXP)                         if (EXP) { returnTrue;     }
 #define returnVoidIf( EXP)                         if (EXP) { return;         }
 
-#define U_LITERAL_HELP(STR)                        L ## STR
-#define U_LITERAL(     STR)                        U_LITERAL_HELP(STR)
-
 #define jsonARRAY_START_STR                        "["
 #define jsonARRAY_STOP_STR                         "]"
 #define jsonOBJECT_START_STR                       "{"
@@ -86,15 +83,15 @@ constant:
 #define jsonKEY_VALUE_SEPARATOR_STR                ":"
 #define jsonSTRING_QUOTE_STR                       "\""
 #define jsonSTRING_ESCAPE_STR                      "\\"
-#define jsonSTRING_ESCAPE_QUOTE_STR                "\""
-#define jsonSTRING_ESCAPE_SLASH_STR                "\\"
-#define jsonSTRING_ESCAPE_BACKSLASH_STR            "/"
-#define jsonSTRING_ESCAPE_BACKSPACE_STR            "b"
-#define jsonSTRING_ESCAPE_FORMFEED_STR             "f"
-#define jsonSTRING_ESCAPE_LINEFEED_STR             "n"
-#define jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR      "r"
-#define jsonSTRING_ESCAPE_UNICODE_STR              "u"
-#define jsonSTRING_ESCAPE_TAB_STR                  "t"
+#define jsonSTRING_ESCAPE_QUOTE_STR                "\\\""
+#define jsonSTRING_ESCAPE_SLASH_STR                "\\\\"
+#define jsonSTRING_ESCAPE_BACKSLASH_STR            "\\/"
+#define jsonSTRING_ESCAPE_BACKSPACE_STR            "\\b"
+#define jsonSTRING_ESCAPE_FORMFEED_STR             "\\f"
+#define jsonSTRING_ESCAPE_LINEFEED_STR             "\\n"
+#define jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR      "\\r"
+#define jsonSTRING_ESCAPE_UNICODE_STR              "\\u"
+#define jsonSTRING_ESCAPE_TAB_STR                  "\\t"
 #define jsonNUMBER_EXPONENT_1_STR                  "E"
 #define jsonNUMBER_EXPONENT_2_STR                  "e"
 #define jsonNUMBER_PLUS_STR                        "+"
@@ -110,22 +107,22 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-_locale_t _JsonLocaleGet(         void);
+_locale_t _JsonLocaleGet(        void);
 
-JsonBool  _JsonStrEncodedToStr(   JsonN4  * const strLen, JsonStr       * const str);
-JsonBool  _JsonStrToStrEncoded(   JsonN4    const strLen, JsonStr const * const str, JsonN4 * const strEncodedLen, JsonStr ** const strEncoded);
-JsonI8    _JsonStrToI(            JsonN4    const strLen, JsonStr const * const str);
-JsonN8    _JsonStrToN(            JsonN4    const strLen, JsonStr const * const str);
+JsonB     _JsonStrEncodedToStr(  JsonN4  * const strLen, JsonStr       * const str);
+JsonB     _JsonStrToStrEncoded(  JsonN4    const strLen, JsonStr const * const str, JsonN4 * const strEncodedLen, JsonStr ** const strEncoded);
+JsonI     _JsonStrToI(           JsonN4    const strLen, JsonStr const * const str);
+JsonN     _JsonStrToN(           JsonN4    const strLen, JsonStr const * const str);
 //JsonStr   *_JsonC2Append(          JsonStr const * const a, JsonStr const * const b, JsonStr const * const c);
 //JsonStr   *_JsonC2Clone(           JsonN4    const c2Count, JsonStr const * const c2);
 
 #define   _JsonStrGetCount(STR)   ((JsonN4) strlen((char const *)    STR))
 
-void     *_JsonMemCreate(         JsonN4 const memByteCount);
-void      _JsonMemDestroy(        void * const mem);
-JsonBool  _JsonMemIsEqual(        JsonN const countA, JsonN1 const * const memA, JsonN const countB, JsonN1 const * const memB);
-void      _JsonMemStart(          JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc);
-void      _JsonMemStop(           void);
+void     *_JsonMemCreate(        JsonN const memByteCount);
+void      _JsonMemDestroy(       void * const mem);
+JsonB     _JsonMemIsEqual(       JsonN const countA, JsonN1 const * const memA, JsonN const countB, JsonN1 const * const memB);
+void      _JsonMemStart(         JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc);
+void      _JsonMemStop(          void);
 
 #define   _JsonMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
 #define   _JsonMemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
@@ -133,29 +130,27 @@ void      _JsonMemStop(           void);
 #define   _JsonMemCreateType(            TYPE)           (TYPE *) _JsonMemCreate(                    sizeof(TYPE))
 #define   _JsonMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _JsonMemCreate(          (COUNT) * sizeof(TYPE))
 
-JsonBool  _JsonReadLine(          Json       * const json);
-JsonBool  _JsonReadLineSkip(      Json       * const json);
-JsonBool  _JsonReadPart(          Json       * const json);
-JsonBool  _JsonReadArrayCount(    Json       * const json, JsonN4   * const count);
-JsonBool  _JsonReadC2Key(         Json       * const json, JsonStr   * const key);
-JsonBool  _JsonReadR4(            Json       * const json, JsonR4   * const value);
-JsonBool  _JsonReadR4S(           Json       * const json, JsonR4   * const value);
-JsonBool  _JsonReadR8(            Json       * const json, JsonR8   * const value);
-JsonBool  _JsonReadR8S(           Json       * const json, JsonR8   * const value);
+JsonB     _JsonGetLine(          Json       * const json);
+JsonB     _JsonGetLineSkip(      Json       * const json);
+JsonB     _JsonGetPart(          Json       * const json);
+JsonB     _JsonGetR(             Json       * const json, JsonR   * const value);
+JsonB     _JsonGetRS(            Json       * const json, JsonR   * const value);
+JsonB     _JsonGetR4(            Json       * const json, JsonR4  * const value);
+JsonB     _JsonGetR4S(           Json       * const json, JsonR4  * const value);
+JsonB     _JsonGetStr(           Json       * const json, JsonStr ** const string);
+JsonB     _JsonGetStart(         void);
+void      _JsonGetStop(          void);
 
-JsonBool  _JsonReadC2String(      Json       * const json, JsonStr ** const string);
-JsonBool  _JsonReadStart(         void);
-void      _JsonReadStop(          void);
+void      _JsonUtilStart(        void);
+void      _JsonUtilStop(         void);
 
-void      _JsonUtilStart(         void);
-void      _JsonUtilStop(          void);
-
-JsonBool  _JsonWriteStr(          Json const * const json, JsonStr const * const value);
-JsonBool  _JsonWriteI(            Json       * const json, JsonI8 const value);
-JsonBool  _JsonWriteIndent(       Json       * const json);
-JsonBool  _JsonWriteN(            Json       * const json, JsonN8 const value);
-JsonBool  _JsonWriteR4(           Json       * const json, JsonR4 const value);
-JsonBool  _JsonWriteR8(           Json       * const json, JsonR8 const value);
-
+JsonB     _JsonSetBuffer(        Json const * const json, JsonN const bufCount, JsonN1 const * const buf);
+JsonB     _JsonSetI(             Json       * const json, JsonI const value);
+JsonB     _JsonSetIndent(        Json       * const json);
+JsonB     _JsonSetN(             Json       * const json, JsonN const value);
+JsonB     _JsonSetNewLine(       Json       * const json);
+JsonB     _JsonSetR(             Json       * const json, JsonR const value);
+JsonB     _JsonSetR4(            Json       * const json, JsonR4 const value);
+JsonB     _JsonSetStr(           Json       * const json, JsonN const strLen, JsonStr const * const value);
 
 #endif

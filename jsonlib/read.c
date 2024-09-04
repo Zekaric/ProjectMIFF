@@ -48,9 +48,9 @@ function:
 ******************************************************************************/
 #if 0
 /******************************************************************************
-func: _JsonReadLine
+func: _JsonGetLine
 ******************************************************************************/
-JsonBool _JsonReadLine(Json * const json)
+JsonB _JsonGetLine(Json * const json)
 {
    JsonN4  index;
    JsonN1  byte;
@@ -62,20 +62,20 @@ JsonBool _JsonReadLine(Json * const json)
    loop
    {
       // Resize the internal buffer when we have exhausted it.
-      if (json->readByteCountActual == index)
+      if (json->readBinCountActual == index)
       {
          // Create a new buffer double the size.
-         bufTemp = _JsonMemCreateTypeArray(json->readByteCountActual * 2, JsonN1);
+         bufTemp = _JsonMemCreateTypeArray(json->readBinCountActual * 2, JsonN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _JsonMemCopyTypeArray(json->readByteCountActual, JsonN1, bufTemp, json->readByteData);
+         _JsonMemCopyTypeArray(json->readBinCountActual, JsonN1, bufTemp, json->readBinData);
          // Destroy the old buffer.
-         _JsonMemDestroy(json->readByteData);
+         _JsonMemDestroy(json->readBinData);
 
          // Reset the internal buffer to the new larger buffer.
-         json->readByteCountActual = json->readByteCountActual * 2;
-         json->readByteData        = bufTemp;
+         json->readBinCountActual = json->readBinCountActual * 2;
+         json->readBinData        = bufTemp;
       }
 
       // End of file?
@@ -84,20 +84,20 @@ JsonBool _JsonReadLine(Json * const json)
       breakIf(byte == '\n');
 
       // Add the letter to the byte array.
-      json->readByteData[index++] = byte;
+      json->readBinData[index++] = byte;
    }
 
    // Need NULL terminator.
-   json->readByteCount       = index;
-   json->readByteData[index] = 0;
+   json->readBinCount       = index;
+   json->readBinData[index] = 0;
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _JsonReadLineSkip
+func: _JsonGetLineSkip
 ******************************************************************************/
-JsonBool _JsonReadLineSkip(Json * const json)
+JsonB _JsonGetLineSkip(Json * const json)
 {
    JsonN1 byte;
 
@@ -114,9 +114,9 @@ JsonBool _JsonReadLineSkip(Json * const json)
 }
 
 /******************************************************************************
-func: _JsonReadPart
+func: _JsonGetPart
 ******************************************************************************/
-JsonBool _JsonReadPart(Json * const json)
+JsonB _JsonGetPart(Json * const json)
 {
    JsonN4  index;
    JsonN1  byte;
@@ -131,20 +131,20 @@ JsonBool _JsonReadPart(Json * const json)
    loop
    {
       // Resize the internal buffer when we have exhausted it.
-      if (json->readByteCountActual == index)
+      if (json->readBinCountActual == index)
       {
          // Create a new buffer double the size.
-         bufTemp = _JsonMemCreateTypeArray(json->readByteCountActual * 2, JsonN1);
+         bufTemp = _JsonMemCreateTypeArray(json->readBinCountActual * 2, JsonN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _JsonMemCopyTypeArray(json->readByteCountActual, JsonN1, bufTemp, json->readByteData);
+         _JsonMemCopyTypeArray(json->readBinCountActual, JsonN1, bufTemp, json->readBinData);
          // Destroy the old buffer.
-         _JsonMemDestroy(json->readByteData);
+         _JsonMemDestroy(json->readBinData);
 
          // Reset the internal buffer to the new larger buffer.
-         json->readByteCountActual = json->readByteCountActual * 2;
-         json->readByteData        = bufTemp;
+         json->readBinCountActual = json->readBinCountActual * 2;
+         json->readBinData        = bufTemp;
       }
 
       // End of file?
@@ -154,12 +154,12 @@ JsonBool _JsonReadPart(Json * const json)
               byte == '\t');
 
       // Add the letter to the byte array.
-      json->readByteData[index++] = byte;
+      json->readBinData[index++] = byte;
    }
 
    // Need NULL terminator.
-   json->readByteCount       = index;
-   json->readByteData[index] = 0;
+   json->readBinCount       = index;
+   json->readBinData[index] = 0;
 
    if (byte == '\n')
    {
@@ -170,9 +170,9 @@ JsonBool _JsonReadPart(Json * const json)
 }
 
 /******************************************************************************
-func: _JsonReadArrayCount
+func: _JsonGetArrayCount
 ******************************************************************************/
-JsonBool _JsonReadArrayCount(Json * const json, JsonN4 * const count)
+JsonB _JsonGetArrayCount(Json * const json, JsonN4 * const count)
 {
    returnFalseIf(!count);
 
@@ -180,15 +180,15 @@ JsonBool _JsonReadArrayCount(Json * const json, JsonN4 * const count)
 
    returnFalseIf(!json);
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   if (json->readByteData[0] == L'*')
+   if (json->readBinData[0] == L'*')
    {
       json->currentRecord.arrayCount = jsonArrayCountUNKNOWN;
       returnTrue;
    }
 
-   json->currentRecord.arrayCount = (JsonN4) _JsonStrToN(json->readByteCount, json->readByteData);
+   json->currentRecord.arrayCount = (JsonN4) _JsonStrToN(json->readBinCount, json->readBinData);
 
    *count = json->currentRecord.arrayCount;
 
@@ -198,9 +198,9 @@ JsonBool _JsonReadArrayCount(Json * const json, JsonN4 * const count)
 
 #if 0
 /******************************************************************************
-func: _JsonReadC2String
+func: _JsonGetStr
 ******************************************************************************/
-JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
+JsonB _JsonGetStr(Json * const json, JsonStr ** const string)
 {
    JsonI4    index;
    JsonN4    keyCount;
@@ -210,7 +210,7 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
    JsonStr    str[4];
    JsonN4    ccount;
    JsonN1   *bufTemp;
-   JsonBool  isFound;
+   JsonB  isFound;
 
    returnFalseIf(
       !json       ||
@@ -243,21 +243,21 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
    loop
    {
       // Resize the internal buffer when we have exhausted it.
-      if (json->readByteCountActual <= index)
+      if (json->readBinCountActual <= index)
       {
          // Create a new buffer double the size.
          // + 4 to handle the edge case of a unicode escape sequence.
-         bufTemp = _JsonMemCreateTypeArray(json->readByteCountActual * 2 + 4, JsonN1);
+         bufTemp = _JsonMemCreateTypeArray(json->readBinCountActual * 2 + 4, JsonN1);
          returnFalseIf(!bufTemp);
 
          // Copy over the olde buffer to the new buffer.
-         _JsonMemCopyTypeArray(json->readByteCountActual, JsonN1, bufTemp, json->readByteData);
+         _JsonMemCopyTypeArray(json->readBinCountActual, JsonN1, bufTemp, json->readBinData);
          // Destroy the old buffer.
-         _JsonMemDestroy(json->readByteData);
+         _JsonMemDestroy(json->readBinData);
 
          // Reset the internal buffer to the new larger buffer.
-         json->readByteCountActual = json->readByteCountActual * 2;
-         json->readByteData        = bufTemp;
+         json->readBinCountActual = json->readBinCountActual * 2;
+         json->readBinData        = bufTemp;
       }
 
       // End of file?
@@ -278,35 +278,35 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
 
          if      (byte == jsonSTRING_ESCAPE_BACKSLASH_STR[0])
          {
-            json->readByteData[index++] = jsonSTRING_ESCAPE_BACKSLASH_STR[0];
+            json->readBinData[index++] = jsonSTRING_ESCAPE_BACKSLASH_STR[0];
          }
          else if (byte == jsonSTRING_ESCAPE_BACKSPACE_STR[0])
          {
-            json->readByteData[index++] = '\b';
+            json->readBinData[index++] = '\b';
          }
          else if (byte == jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR[0])
          {
-            json->readByteData[index++] = '\r';
+            json->readBinData[index++] = '\r';
          }
          else if (byte == jsonSTRING_ESCAPE_FORMFEED_STR[0])
          {
-            json->readByteData[index++] = '\f';
+            json->readBinData[index++] = '\f';
          }
          else if (byte == jsonSTRING_ESCAPE_LINEFEED_STR[0])
          {
-            json->readByteData[index++] = '\n';
+            json->readBinData[index++] = '\n';
          }
          else if (byte == jsonSTRING_ESCAPE_QUOTE_STR[0])
          {
-            json->readByteData[index++] = jsonSTRING_ESCAPE_QUOTE_STR[0];
+            json->readBinData[index++] = jsonSTRING_ESCAPE_QUOTE_STR[0];
          }
          else if (byte == jsonSTRING_ESCAPE_SLASH_STR[0])
          {
-            json->readByteData[index++] = jsonSTRING_ESCAPE_SLASH_STR[0];
+            json->readBinData[index++] = jsonSTRING_ESCAPE_SLASH_STR[0];
          }
          else if (byte == jsonSTRING_ESCAPE_TAB_STR[0])
          {
-            json->readByteData[index++] = '\t';
+            json->readBinData[index++] = '\t';
          }
          else if (byte == jsonSTRING_ESCAPE_UNICODE_STR[0])
          {
@@ -324,13 +324,13 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
 
             loop
             {
-               json->readByteData[index++] = str[0];
+               json->readBinData[index++] = str[0];
                breakIf(ccount == 1);
-               json->readByteData[index++] = str[1];
+               json->readBinData[index++] = str[1];
                breakIf(ccount == 2);
-               json->readByteData[index++] = str[2];
+               json->readBinData[index++] = str[2];
                breakIf(ccount == 3);
-               json->readByteData[index++] = str[3];
+               json->readBinData[index++] = str[3];
                break;
             }
          }
@@ -338,7 +338,7 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
       else
       {
          // Add the letter to the byte array.
-         json->readByteData[index++] = byte;
+         json->readBinData[index++] = byte;
       }
    }
 
@@ -348,15 +348,15 @@ JsonBool _JsonReadC2String(Json * const json, JsonStr ** const string)
    // Convert the UTF8 to UTF16
    *string = _JsonMemCreateTypeArray(index + 1, JsonStr);
    returnFalseIf(!*string);
-   _JsonC1ToC2(index, json->readByteData, &keyCount, *string);
+   _JsonC1ToC2(index, json->readBinData, &keyCount, *string);
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _JsonReadC2Key
+func: _JsonGetC2Key
 ******************************************************************************/
-JsonBool _JsonReadC2Key(Json * const json, JsonStr * const key)
+JsonB _JsonGetC2Key(Json * const json, JsonStr * const key)
 {
    JsonN1 keySize;
 
@@ -366,12 +366,12 @@ JsonBool _JsonReadC2Key(Json * const json, JsonStr * const key)
 
    returnFalseIf(!json);
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
    _JsonMemClearTypeArray(jsonKeySIZE, JsonStr, json->currentRecord.name);
    _JsonSTrToKey(
-      json->readByteCount,
-      json->readByteData,
+      json->readBinCount,
+      json->readBinData,
       &keySize,
       json->currentRecord.name);
 
@@ -383,7 +383,7 @@ JsonBool _JsonReadC2Key(Json * const json, JsonStr * const key)
 /******************************************************************************
 func: _JsonReadType
 ******************************************************************************/
-JsonBool _JsonReadType(Json * const json, JsonType * const type, JsonStr * const typeName)
+JsonB _JsonReadType(Json * const json, JsonType * const type, JsonStr * const typeName)
 {
    JsonN4 index;
    JsonN1 count;
@@ -394,12 +394,12 @@ JsonBool _JsonReadType(Json * const json, JsonType * const type, JsonStr * const
 
    returnFalseIf(!json);
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   returnFalseIf(json->readByteCount == 0);
+   returnFalseIf(json->readBinCount == 0);
 
    // Get the name of the type just in case it is a user type.
-   _JsonSTrToKey(json->readByteCount, json->readByteData, &count, typeName);
+   _JsonSTrToKey(json->readBinCount, json->readBinData, &count, typeName);
 
    forCount (index, jsonTypeCOUNT)
    {
@@ -407,7 +407,7 @@ JsonBool _JsonReadType(Json * const json, JsonType * const type, JsonStr * const
 
       if (_JsonMemIsEqual(
             _JsonTypeGetNameSize(index), (JsonN1 *) _JsonTypeGetNameC1(index),
-            json->readByteCount,     json->readByteData))
+            json->readBinCount,     json->readBinData))
       {
          *type = index;
 
@@ -421,16 +421,16 @@ JsonBool _JsonReadType(Json * const json, JsonType * const type, JsonStr * const
 }
 
 /******************************************************************************
-func: _JsonReadR4
+func: _JsonGetR4
 ******************************************************************************/
-JsonBool _JsonReadR4(Json * const json, JsonR4 * const value)
+JsonB _JsonGetR4(Json * const json, JsonR4 * const value)
 {
    Json4      vtemp;
    JsonBase64Data data;
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   data = _JsonBase64Restart(json->readByteData);
+   data = _JsonBase64Restart(json->readBinData);
 
    returnFalseIf(!_JsonBase64Get(&data, &vtemp.byte[0]));
    returnFalseIf(!_JsonBase64Get(&data, &vtemp.byte[1]));
@@ -445,30 +445,30 @@ JsonBool _JsonReadR4(Json * const json, JsonR4 * const value)
 }
 
 /******************************************************************************
-func: _JsonReadR4S
+func: _JsonGetR4S
 ******************************************************************************/
-JsonBool _JsonReadR4S(Json * const json, JsonR4 * const value)
+JsonB _JsonGetR4S(Json * const json, JsonR4 * const value)
 {
    JsonStr *ctemp;
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   *value = (JsonR4) strtod((char *) json->readByteData, (char **) &ctemp);
+   *value = (JsonR4) strtod((char *) json->readBinData, (char **) &ctemp);
 
    returnTrue;
 }
 
 /******************************************************************************
-func: _JsonReadR8
+func: _JsonGetR
 ******************************************************************************/
-JsonBool _JsonReadR8(Json * const json, JsonR8 * const value)
+JsonB _JsonGetR(Json * const json, JsonR8 * const value)
 {
    Json8      vtemp;
    JsonBase64Data data;
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   data = _JsonBase64Restart(json->readByteData);
+   data = _JsonBase64Restart(json->readBinData);
 
    returnFalseIf(!_JsonBase64Get(&data, &vtemp.byte[0]));
    returnFalseIf(!_JsonBase64Get(&data, &vtemp.byte[1]));
@@ -487,24 +487,24 @@ JsonBool _JsonReadR8(Json * const json, JsonR8 * const value)
 }
 
 /******************************************************************************
-func: _JsonReadR8S
+func: _JsonGetRS
 ******************************************************************************/
-JsonBool _JsonReadR8S(Json * const json, JsonR8 * const value)
+JsonB _JsonGetRS(Json * const json, JsonR8 * const value)
 {
    JsonStr *ctemp;
 
-   returnFalseIf(!_JsonReadPart(json));
+   returnFalseIf(!_JsonGetPart(json));
 
-   *value = strtod((char *) json->readByteData, (char **) &ctemp);
+   *value = strtod((char *) json->readBinData, (char **) &ctemp);
 
    returnTrue;
 }
 #endif
 
 /******************************************************************************
-func: _JsonReadStart
+func: _JsonGetStart
 ******************************************************************************/
-JsonBool _JsonReadStart(void)
+JsonB _JsonGetStart(void)
 {
    _hex['0']    = 0x0;
    _hex['1']    = 0x1;
@@ -533,9 +533,9 @@ JsonBool _JsonReadStart(void)
 }
 
 /******************************************************************************
-func: _JsonReadStop
+func: _JsonGetStop
 ******************************************************************************/
-void _JsonReadStop(void)
+void _JsonGetStop(void)
 {
    return;
 }

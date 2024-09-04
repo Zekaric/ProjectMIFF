@@ -873,7 +873,7 @@ MiffB miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestr
 
    _isStarted = miffTRUE;
 
-   _MiffBase64Start();
+   bsfStart();
    _MiffUtilStart();
 
    returnTrue;
@@ -887,7 +887,7 @@ void miffStop(void)
    returnVoidIf(!_isStarted);
 
    _MiffUtilStop();
-   _MiffBase64Stop();
+   bsfStop();
 
    _MiffMemStop();
 

@@ -47,38 +47,38 @@ func: _MiffSetCBase64
 ******************************************************************************/
 MiffB _MiffSetCBase64(Miff * const miff, MiffValue const value)
 {
-   Miff8             vtemp;
-   MiffBase64DataSet data;
-   MiffN1            buffer[64];
+   Miff8        vtemp;
+   BsfDataSet   data;
+   MiffN1       buffer[64];
 
    vtemp.n = value.inr.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[4]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[5]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[6]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[7]));
 
    vtemp.n = value.imaginary.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
-   returnFalseIf(!_MiffBase64SetEnd(&data));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[4]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[5]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[6]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[7]));
+   returnFalseIf(!bsfSetEnd(&data));
 
    return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
@@ -88,30 +88,30 @@ func: _MiffSetC4Base64
 ******************************************************************************/
 MiffB _MiffSetC4Base64(Miff * const miff, MiffValue const value)
 {
-   Miff4             vtemp;
-   MiffBase64DataSet data;
-   MiffN1             buffer[64];
+   Miff4        vtemp;
+   BsfDataSet   data;
+   MiffN1       buffer[64];
 
    vtemp.n = value.inr4.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
 
    vtemp.n = value.imaginary4.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64SetEnd(&data));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
+   returnFalseIf(!bsfSetEnd(&data));
 
    return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
@@ -271,20 +271,20 @@ func: _MiffWrite4Base64
 ******************************************************************************/
 MiffB _MiffWrite4Base64(Miff * const miff, Miff4 const value)
 {
-   Miff4             vtemp;
-   MiffBase64DataSet data;
-   MiffN1            buffer[64];
+   Miff4        vtemp;
+   BsfDataSet   data;
+   MiffN1       buffer[64];
 
    vtemp.n = value.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64SetEnd(&data));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
+   returnFalseIf(!bsfSetEnd(&data));
 
    return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
@@ -294,24 +294,24 @@ func: _MiffWrite8Base64
 ******************************************************************************/
 MiffB _MiffWrite8Base64(Miff * const miff, Miff8 const value)
 {
-   Miff8             vtemp;
-   MiffBase64DataSet data;
-   MiffN1            buffer[64];
+   Miff8        vtemp;
+   BsfDataSet   data;
+   MiffN1       buffer[64];
 
    vtemp.n = value.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
 
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[0]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[1]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[2]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[3]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[4]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[5]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[6]));
-   returnFalseIf(!_MiffBase64Set(   &data, vtemp.byte[7]));
-   returnFalseIf(!_MiffBase64SetEnd(&data));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[0]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[1]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[2]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[3]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[4]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[5]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[6]));
+   returnFalseIf(!bsfSet(&data, vtemp.byte[7]));
+   returnFalseIf(!bsfSetEnd(&data));
 
    return _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
@@ -321,33 +321,33 @@ func: _MiffWriteBufferBase64
 ******************************************************************************/
 MiffB _MiffWriteBufferBase64(Miff * const miff, MiffN const bufferCount, MiffN1 const * const bufferData)
 {
-   MiffN             index;
-   MiffBase64DataSet data;
-   MiffN1            buffer[5];
+   MiffN        index;
+   BsfDataSet   data;
+   MiffN1       buffer[5];
 
-   data = _MiffBase64PrepSet(buffer);
+   data = bsfPrepSet(buffer);
    forCount(index, bufferCount)
    {
 
-      returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
+      returnFalseIf(!bsfSet(&data, bufferData[index]));
       index++;
       breakIf(index == bufferCount);
 
-      returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
+      returnFalseIf(!bsfSet(&data, bufferData[index]));
       index++;
       breakIf(index == bufferCount);
 
-      returnFalseIf(!_MiffBase64Set(&data, bufferData[index]));
+      returnFalseIf(!bsfSet(&data, bufferData[index]));
 
-      returnFalseIf(!_MiffBase64SetEnd(&data));
+      returnFalseIf(!bsfSetEnd(&data));
       returnFalseIf(!_MiffSetBuffer(miff, 4, (MiffN1 *) buffer));
 
       returnTrueIf(index == bufferCount);
 
-      data = _MiffBase64PrepSet(buffer);
+      data = bsfPrepSet(buffer);
    }
 
-   returnFalseIf(!_MiffBase64SetEnd(&data));
+   returnFalseIf(!bsfSetEnd(&data));
    return         _MiffSetBuffer(miff, _MiffStrGetCount(buffer), (MiffN1 *) buffer);
 }
 

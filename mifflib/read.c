@@ -46,11 +46,11 @@ func: _MiffGetBufferBase64
 MiffB _MiffGetBufferBase64(Miff * const miff, MiffN const bufferCount, 
    MiffN1 * const bufferData)
 {
-   MiffN             index,
-                     bufferIndex;
-   MiffBase64DataGet data;
-   MiffN1            byte,
-                     buffer[4];
+   MiffN        index,
+                bufferIndex;
+   BsfDataGet   data;
+   MiffN1       byte,
+                buffer[4];
 
    bufferIndex = 0;
    loop
@@ -65,15 +65,15 @@ MiffB _MiffGetBufferBase64(Miff * const miff, MiffN const bufferCount,
       }
 
       // Type cast safe.  We are not writing to bufferData.
-      data = _MiffBase64PrepGet((MiffN1 *) buffer);
+      data = bsfPrepGet((BsfN1 *) buffer);
 
-      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      returnFalseIf(!bsfGet(&data, &bufferData[bufferIndex++]));
       breakIf(bufferIndex == bufferCount);
 
-      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      returnFalseIf(!bsfGet(&data, &bufferData[bufferIndex++]));
       breakIf(bufferIndex == bufferCount);
 
-      returnFalseIf(!_MiffBase64Get(&data, &bufferData[bufferIndex++]));
+      returnFalseIf(!bsfGet(&data, &bufferData[bufferIndex++]));
       breakIf(bufferIndex == bufferCount);
 
       // No more data in the record part.  If we having read the whole buffer

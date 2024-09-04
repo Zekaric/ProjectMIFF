@@ -294,32 +294,32 @@ func: _PartBase64ToC
 static MiffB _PartBase64ToC(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const real, Miff8 * const imaginary)
 {
-   MiffBase64DataGet data;
+   BsfDataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64PrepGet((MiffN1 *) buffer);
+   data = bsfPrepGet((BsfN1 *) buffer);
 
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[3]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[4]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[5]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[6]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[7]));
+   returnFalseIf(!bsfGet(&data, &real->byte[0]));
+   returnFalseIf(!bsfGet(&data, &real->byte[1]));
+   returnFalseIf(!bsfGet(&data, &real->byte[2]));
+   returnFalseIf(!bsfGet(&data, &real->byte[3]));
+   returnFalseIf(!bsfGet(&data, &real->byte[4]));
+   returnFalseIf(!bsfGet(&data, &real->byte[5]));
+   returnFalseIf(!bsfGet(&data, &real->byte[6]));
+   returnFalseIf(!bsfGet(&data, &real->byte[7]));
 
    _MiffByteSwap8(miff, real);
 
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[3]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[4]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[5]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[6]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[7]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[0]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[1]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[2]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[3]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[4]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[5]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[6]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[7]));
 
    _MiffByteSwap8(miff, imaginary);
 
@@ -332,24 +332,24 @@ func: _PartBase64ToC4
 static MiffB _PartBase64ToC4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const real, Miff4 * const imaginary)
 {
-   MiffBase64DataGet data;
+   BsfDataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64PrepGet((MiffN1 *) buffer);
+   data = bsfPrepGet((BsfN1 *) buffer);
 
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &real->byte[3]));
+   returnFalseIf(!bsfGet(&data, &real->byte[0]));
+   returnFalseIf(!bsfGet(&data, &real->byte[1]));
+   returnFalseIf(!bsfGet(&data, &real->byte[2]));
+   returnFalseIf(!bsfGet(&data, &real->byte[3]));
 
    _MiffByteSwap4(miff, real);
 
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &imaginary->byte[3]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[0]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[1]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[2]));
+   returnFalseIf(!bsfGet(&data, &imaginary->byte[3]));
 
    _MiffByteSwap4(miff, imaginary);
 
@@ -362,21 +362,21 @@ func: _PartBase64ToN
 static MiffB _PartBase64ToN(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const value)
 {
-   MiffBase64DataGet data;
+   BsfDataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64PrepGet((MiffN1 *) buffer);
+   data = bsfPrepGet((BsfN1 *) buffer);
 
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[3]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[4]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[5]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[6]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[7]));
+   returnFalseIf(!bsfGet(&data, &value->byte[0]));
+   returnFalseIf(!bsfGet(&data, &value->byte[1]));
+   returnFalseIf(!bsfGet(&data, &value->byte[2]));
+   returnFalseIf(!bsfGet(&data, &value->byte[3]));
+   returnFalseIf(!bsfGet(&data, &value->byte[4]));
+   returnFalseIf(!bsfGet(&data, &value->byte[5]));
+   returnFalseIf(!bsfGet(&data, &value->byte[6]));
+   returnFalseIf(!bsfGet(&data, &value->byte[7]));
 
    _MiffByteSwap8(miff, value);
 
@@ -389,17 +389,17 @@ func: _PartBase64ToN4
 static MiffN4 _PartBase64ToN4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const value)
 {
-   MiffBase64DataGet data;
+   BsfDataGet data;
 
    count;
 
    // cast safe.  We are not writing, just reading.
-   data = _MiffBase64PrepGet((MiffN1 *) buffer);
+   data = bsfPrepGet((BsfN1 *) buffer);
 
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[0]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[1]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[2]));
-   returnFalseIf(!_MiffBase64Get(&data, &value->byte[3]));
+   returnFalseIf(!bsfGet(&data, &value->byte[0]));
+   returnFalseIf(!bsfGet(&data, &value->byte[1]));
+   returnFalseIf(!bsfGet(&data, &value->byte[2]));
+   returnFalseIf(!bsfGet(&data, &value->byte[3]));
 
    _MiffByteSwap4(miff, value);
 

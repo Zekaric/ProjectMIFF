@@ -24,9 +24,6 @@
     <ClCompile Include="byteSwap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="base64.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="string.c">
       <Filter>Source Files</Filter>
     </ClCompile>

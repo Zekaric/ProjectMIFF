@@ -43,6 +43,7 @@ include:
 #include <stdlib.h>
 #include <locale.h>
 
+#include "b64lib.h"
 #include "mifflib.h"
 
 /******************************************************************************
@@ -121,21 +122,6 @@ constant:
 /******************************************************************************
 type:
 ******************************************************************************/
-typedef struct
-{
-   MiffN4          state;
-   MiffN1          byte;
-   MiffN4          index;
-   MiffN1 const   *buffer;
-} MiffBase64DataGet;
-
-typedef struct
-{
-   MiffN4          state;
-   MiffN1          byte;
-   MiffN4          index;
-   MiffN1         *buffer;
-} MiffBase64DataSet;
 
 /******************************************************************************
 variable:
@@ -144,15 +130,6 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-
-MiffBase64DataGet  _MiffBase64PrepGet(       MiffN1 const * const buffer);
-MiffBase64DataSet  _MiffBase64PrepSet(       MiffN1       * const buffer);
-MiffB              _MiffBase64Get(           MiffBase64DataGet * const buffer, MiffN1 * const byte);
-MiffB              _MiffBase64Set(           MiffBase64DataSet * const buffer, MiffN1   const byte);
-MiffB              _MiffBase64SetEnd(        MiffBase64DataSet * const buffer);
-void               _MiffBase64Start(         void);
-void               _MiffBase64Stop(          void);
-
 void               _MiffByteSwap4(           Miff const * const miff, Miff4 * const value);
 void               _MiffByteSwap8(           Miff const * const miff, Miff8 * const value);
 

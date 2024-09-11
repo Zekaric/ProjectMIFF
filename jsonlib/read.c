@@ -88,6 +88,8 @@ JsonType _JsonGetFalse(Json * const json)
       breakIf(!_JsonGetChar(json));
       breakIf(json->lastByte != 'e');
 
+      json->lastByte = 0;
+
       return jsonTypeFileCONSTANT_FALSE;
    }
 
@@ -109,6 +111,8 @@ JsonType _JsonGetNull(Json * const json)
 
       breakIf(!_JsonGetChar(json));
       breakIf(json->lastByte != 'l');
+
+      json->lastByte = 0;
 
       return jsonTypeFileCONSTANT_NULL;
    }
@@ -291,6 +295,7 @@ JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
       json->value.r  = (JsonR)  json->value.i;
       json->value.r4 = (JsonR4) json->value.i;
 
+      json->value.type = type;
       return type;
    }
 
@@ -344,6 +349,8 @@ JsonType _JsonGetTrue(Json * const json)
 
       breakIf(!_JsonGetChar(json));
       breakIf(json->lastByte != 'e');
+
+      json->lastByte = 0;
 
       return jsonTypeFileCONSTANT_TRUE;
    }

@@ -185,7 +185,6 @@ JsonType jsonGetTypeFile(Json * const json)
       jsonTypeNONE);
 
    // Reset the value type.
-   json->lastByte   = 0;
    json->value.type = jsonTypeNONE;
 
    // Eat space.
@@ -196,13 +195,16 @@ JsonType jsonGetTypeFile(Json * const json)
    {
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->lastByte = 0;
       return jsonTypeFileOBJECT_START;
 
    case jsonARRAY_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->lastByte = 0;
       return jsonTypeFileARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
+      json->lastByte = 0;
       return jsonTypeFileSTRING_START;
 
    case '0':
@@ -242,7 +244,6 @@ JsonType jsonGetTypeObj(Json * const json)
       jsonTypeNONE);
 
    // Reset the value type.
-   json->lastByte   = 0;
    json->value.type = jsonTypeNONE;
 
    // Eat space.
@@ -253,23 +254,29 @@ JsonType jsonGetTypeObj(Json * const json)
    {
    case jsonOBJECT_STOP_CHAR:
       json->scope--;
+      json->lastByte = 0;
       return jsonTypeObj_OBJECT_STOP;
 
    case jsonKEY_VALUE_SEPARATOR_CHAR:
+      json->lastByte = 0;
       return jsonTypeObj_KEY_VALUE_SEPARATOR;
 
    case jsonSEPARATOR_CHAR:
+      json->lastByte = 0;
       return jsonTypeObj_SEPARATOR;
 
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->lastByte = 0;
       return jsonTypeObj_OBJECT_START;
 
    case jsonARRAY_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->lastByte = 0;
       return jsonTypeObj_ARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
+      json->lastByte = 0;
       return jsonTypeObj_STRING_START;
 
    case '0':
@@ -345,9 +352,9 @@ JsonB jsonGetN(Json * const json, JsonN *  const value)
 
    // Return is false if the type of the number is no a natural or if it is a negative integer.
    returnFalseIf(
-      json->value.type != jsonTypeNUMBER_NATURAL ||
-      (json->value.type == jsonTypeNUMBER_INTEGER &&
-       json->value.i    != (JsonI) json->value.n));
+      !(json->value.type == jsonTypeNUMBER_NATURAL    ||
+        (json->value.type == jsonTypeNUMBER_INTEGER &&
+         json->value.i    == (JsonI) json->value.n)));
 
    return jsonTRUE;
 }
@@ -485,6 +492,8 @@ JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
    {
       if (json->lastByte == '\"')
       {
+         json->lastByte = 0;
+
          return jsonStrLetterDONE;
       }
 

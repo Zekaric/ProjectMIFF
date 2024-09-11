@@ -643,6 +643,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
    JsonB    result;
    JsonType type;
    JsonStr  key[32];
+   JsonI    itemp;
+   JsonN    ntemp;
+   JsonR    rtemp;
+   JsonR4   r4temp;
 
    file   = NULL;
    json   = NULL;
@@ -662,30 +666,119 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
          break;
       }
 
+#define JSON_TEST_KEY(JSON, KEY) \
+   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeSTRING_START,                        KEY " key start")) break;\
+   if (!JSON_TEST(jsonGetStr(    json, 32, key) && memcmp(key, KEY, strlen(KEY)) == 0, KEY " key value")) break;\
+   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeKEY_VALUE_SEPARATOR,                 KEY " val start")) break;
+
+#define JSON_TEST_CONST(JSON, KEY, VALUE) \
+   if (!JSON_TEST(jsonGetTypeObj(json) == VALUE,                                       KEY " val test")) break;
+
+#define JSON_TEST_INT(JSON, KEY, VALUE) \
+   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeNUMBER_INTEGER,                      KEY " val type"))  break;\
+   if (!JSON_TEST(jsonGetI(      json, &itemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(itemp == VALUE,                                                      KEY " val value")) break;
+
+#define JSON_TEST_NAT(JSON, KEY, VALUE) \
+   type = jsonGetTypeObj(json);\
+   if (!JSON_TEST(type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL,    KEY " val type"))  break;\
+   if (!JSON_TEST(jsonGetN(      json, &ntemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(ntemp == VALUE,                                                      KEY " val value")) break;
+
+#define JSON_TEST_REAL(JSON, KEY, VALUE) \
+   type = jsonGetTypeObj(json);\
+   if (!JSON_TEST(type == jsonTypeNUMBER_REAL || type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL, KEY " val type"))  break;\
+   if (!JSON_TEST(jsonGetR(      json, &rtemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(rtemp == VALUE,                                                      KEY " val value")) break;
+
+#define JSON_TEST_REAL4(JSON, KEY, VALUE) \
+   type = jsonGetTypeObj(json);\
+   if (!JSON_TEST(type == jsonTypeNUMBER_REAL || type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL, KEY " val type"))  break;\
+   if (!JSON_TEST(jsonGetR4(     json, &r4temp),                                       KEY " val get"))   break;\
+   if (!JSON_TEST(r4temp == VALUE,                                                     KEY " val value")) break;
+
+#define JSON_TEST_NEXT(JSON) \
+   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeSEPARATOR, "   next")) break;
+
+
       // Start of an object.
       if (!JSON_TEST(jsonGetTypeFile(json) == jsonTypeFileOBJECT_START,          "File start"))       break;
 
-      // Null
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key Null start"))   break;
-      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "Null", 4) == 0,   "Key Null key"))     break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val Null start"))   break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_NULL,          "Val Null val"))     break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+      JSON_TEST_KEY(  json, "Null");
+      JSON_TEST_CONST(json, "Null", jsonTypeObj_CONSTANT_NULL);
+      JSON_TEST_NEXT( json);
 
-      // True
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key True start"))   break;
-      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "True", 4) == 0,   "Key True key"))     break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val True start"))   break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_TRUE,          "Val True val"))     break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+      JSON_TEST_KEY(  json, "True");
+      JSON_TEST_CONST(json, "True", jsonTypeObj_CONSTANT_TRUE);
+      JSON_TEST_NEXT( json);
 
-      // False
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key False start"))  break;
-      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "False", 5) == 0,  "Key False key"))    break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val False start"))  break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_FALSE,         "Val False val"))    break;
-      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+      JSON_TEST_KEY(  json, "False");
+      JSON_TEST_CONST(json, "False", jsonTypeObj_CONSTANT_FALSE);
+      JSON_TEST_NEXT( json);
 
+      JSON_TEST_KEY(  json, "I 0");
+      JSON_TEST_INT(  json, "I 0", 0);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "I 1");
+      JSON_TEST_INT(  json, "I 1", 1);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "I -1");
+      JSON_TEST_INT(  json, "I -1", -1);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "I 127");
+      JSON_TEST_INT(  json, "I 127", 127);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "I -128");
+      JSON_TEST_INT(  json, "I -128", -128);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "N 0");
+      JSON_TEST_NAT(  json, "N 0", 0);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "N 1");
+      JSON_TEST_NAT(  json, "N 1", 1);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "N 255");
+      JSON_TEST_NAT(  json, "N 255", 255);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R 0");
+      JSON_TEST_REAL( json, "R 0", 0.0);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R 1");
+      JSON_TEST_REAL( json, "R 1", 1.0);
+      JSON_TEST_NEXT( json);
+      
+      JSON_TEST_KEY(  json, "R -1");
+      JSON_TEST_REAL( json, "R -1", -1.0);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R PI");
+      JSON_TEST_REAL( json, "R PI", 3.1415926535897932);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R4 0");
+      JSON_TEST_REAL4(json, "R4 0", 0.0f);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R4 1");
+      JSON_TEST_REAL4(json, "R4 1", 1.0f);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R4 -1");
+      JSON_TEST_REAL4(json, "R4 -1", -1.0f);
+      JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "R4 PI");
+      JSON_TEST_REAL4(json, "R4 PI", 3.1415926535897932f);
+      JSON_TEST_NEXT( json);
 
       result = jsonTRUE;
       break;

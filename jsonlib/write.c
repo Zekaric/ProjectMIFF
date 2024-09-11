@@ -140,7 +140,7 @@ JsonB _JsonSetR(Json * const json, JsonR const value)
 {
    JsonStr ctemp[80];
 
-   _sprintf_s_l((char *) ctemp, 80, "%.15g", _JsonLocaleGet(), value);
+   _sprintf_s_l((char *) ctemp, 80, "%.17g", _JsonLocaleGet(), value);
 
    return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
 }
@@ -152,7 +152,7 @@ JsonB _JsonSetR4(Json * const json, JsonR4 const value)
 {
    JsonStr ctemp[80];
 
-   _sprintf_s_l((char *) ctemp, 80, "%.6g", _JsonLocaleGet(), value);
+   _sprintf_s_l((char *) ctemp, 80, "%.8g", _JsonLocaleGet(), value);
    
    return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
 }

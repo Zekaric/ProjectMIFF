@@ -549,6 +549,12 @@ int main(int acount, char **alist)
       goto DONE;
    }
 
+   if (!_JsonTestRead("FileTest.json"))
+   {
+      result = 16;
+      goto DONE;
+   }
+
 DONE:
    // Stop miff library.
    miffStop();
@@ -613,17 +619,30 @@ static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
+static JsonB JSON_TEST(int const expression, JsonStr const * const str)
+{
+   printf(str); 
+   printf("\t");
+   if (expression)
+   {
+      printf("OK\n");
+      return jsonTRUE;
+   }
+
+   printf("ERROR\n");
+   return jsonFALSE;
+}
+
 /******************************************************************************
 func: _JsonTestRead
 ******************************************************************************/
 static JsonB _JsonTestRead(JsonStr const * const fileName)
 {
-   return jsonFALSE;
-#if 0
-   FILE           *file;
-   Json           *json;
-   JsonB        result;
-   JsonReadType    type;
+   FILE    *file;
+   Json    *json;
+   JsonB    result;
+   JsonType type;
+   JsonStr  key[32];
 
    file   = NULL;
    json   = NULL;
@@ -643,26 +662,30 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
          break;
       }
 
-      for (;;)
-      {
-         if (!jsonRead(json, &type))
-         {
-            break;
-         }
+      // Start of an object.
+      if (!JSON_TEST(jsonGetTypeFile(json) == jsonTypeFileOBJECT_START,          "File start"))       break;
 
-         if (type == jsonReadTypeOBJECT_START)
-         {
-            wprintf(L"Object Start {\n");
-            if (!_JsonTestReadObject(json))
-            {
-               break;
-            }
-         }
-         else
-         {
-            break;
-         }
-      }
+      // Null
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key Null start"))   break;
+      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "Null", 4) == 0,   "Key Null key"))     break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val Null start"))   break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_NULL,          "Val Null val"))     break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+
+      // True
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key True start"))   break;
+      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "True", 4) == 0,   "Key True key"))     break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val True start"))   break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_TRUE,          "Val True val"))     break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+
+      // False
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_STRING_START,           "Key False start"))  break;
+      if (!JSON_TEST(jsonGetStr(json, 32, key) && memcmp(key, "False", 5) == 0,  "Key False key"))    break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_KEY_VALUE_SEPARATOR,    "Val False start"))  break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_CONSTANT_FALSE,         "Val False val"))    break;
+      if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeObj_SEPARATOR,              "next"))             break;
+
 
       result = jsonTRUE;
       break;
@@ -672,36 +695,6 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
    fclose(file);
 
    return result;
-#endif
-}
-
-/******************************************************************************
-func: _JsonTestReadObject
-******************************************************************************/
-static JsonB _JsonTestReadObject(Json * const json)
-{
-   JsonReadType type;
-
-   for (;;)
-   {
-      if (!jsonRead(json, &type))
-      {
-         break;
-      }
-
-      if (type == jsonReadTypeOBJECT_STOP)
-      {
-         wprintf(L"} Object Stop \n");
-         continue;
-      }
-      else
-      {
-         // We got something we were not expecting.
-         return jsonFALSE;
-      }
-   }
-
-   return jsonTRUE;
 }
 
 /******************************************************************************

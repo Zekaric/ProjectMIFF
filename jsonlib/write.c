@@ -177,11 +177,11 @@ JsonB _JsonSetStr(Json * const json, JsonN const strLen, JsonStr const * const s
       }
       else if (str[index] == '\\')
       {
-         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_SLASH_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACK_SLASH_STR));
       }
       else if (str[index] == '/')
       {
-         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACKSLASH_STR));
+         returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORWARD_SLASH_STR));
       }
       else if (str[index] == '\b')
       {

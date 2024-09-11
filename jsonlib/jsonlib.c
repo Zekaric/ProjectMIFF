@@ -91,16 +91,8 @@ JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
    json->method               = jsonMethodREADING;
    json->dataRepo             = dataRepo;
    json->getBuffer            = getBufferFunc;
-   json->readBinCountActual   = 1024;
-   json->readStrCountActual   = 1024;
-   json->readBinData          = _JsonMemCreateTypeArray(json->readBinCountActual, JsonN1);
-   json->readStrData          = _JsonMemCreateTypeArray(json->readStrCountActual, JsonStr);
-   returnFalseIf(!json->readBinData);
-   returnFalseIf(!json->readStrData);
 
-   returnFalseIf(!json->readBinData);
-
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -148,10 +140,11 @@ JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
       json->method   = jsonMethodWRITING_COMPACT;
    }
 
-   json->dataRepo  = dataRepo;
-   json->setBuffer = setBufferFunc;
+   json->dataRepo    = dataRepo;
+   json->setBuffer   = setBufferFunc;
+   json->isFirstItem = jsonTRUE;
 
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -175,203 +168,140 @@ void jsonDestroyContent(Json * const json)
       !_isStarted ||
       !json);
 
-   _JsonMemDestroy(json->readBinData);
-   _JsonMemDestroy(json->readStrData);
    _JsonMemDestroy(json);
 }
 
 /******************************************************************************
-func: jsonRead
+func: jsonGetTypeFile
+
+The first function you should be calling to obtain the value initial start of
+the JSON file.
 ******************************************************************************/
-JsonB jsonRead(Json * const json, JsonReadType * const type)
+JsonType jsonGetTypeFile(Json * const json)
 {
-#if 0
-   JsonN4  index;
-   JsonN1  byte;
-   JsonN1 *bufTemp;
+   returnIf(
+         !_isStarted ||
+         !json,
+      jsonTypeNONE);
 
-   returnFalseIf(
-      !_isStarted ||
-      !json       ||
-      !type);
+   // Reset the value type.
+   json->lastByte   = 0;
+   json->value.type = jsonTypeNONE;
 
-   // Start of a Json object.
-   if (json->readState == jsonReadStateEXPECTING_OBJECT_START)
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
    {
-      loop
-      {
-         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
+   case jsonOBJECT_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      return jsonTypeFileOBJECT_START;
 
-         // Skip over white space.
-         continueIf(jsonIS_SPACE(byte));
-         
-         // Found the object start.
-         if (byte == jsonOBJECT_START_STR[0])
-         {
-            json->readState                = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
-            json->scopeType[json->scope++] = jsonScopeOBJECT;
-            json->scope++;
+   case jsonARRAY_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeARRAY;
+      return jsonTypeFileARRAY_START;
 
-            *type = jsonReadTypeOBJECT_START;
-            returnTrue;
-         }
+   case jsonSTRING_QUOTE_CHAR:
+      return jsonTypeFileSTRING_START;
 
-         // Anything else is an error.
-         break;
-      }
+   case '0':
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+   case '-':
+      return _JsonGetNumber(json);
 
-      *type = jsonReadTypeNONE;
-      returnFalse;
+   case 't':
+      return _JsonGetTrue(json);
+
+   case 'f':
+      return _JsonGetFalse(json);
+
+   case 'n':
+      return _JsonGetNull(json);
    }
 
-   // Inside an object scope.  Looking for a key or a close object scope.
-   if (json->readState == jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP)
-   {
-      loop
-      {
-         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
-
-         // Skip over white space.
-         continueIf(jsonIS_SPACE(byte));
-
-         // Found the object stop
-         if (byte == jsonOBJECT_STOP_STR[0])
-         {
-            json->scope--;
-            json->scopeType[json->scope] = jsonScopeNONE;
-
-            if (json->scope)
-            {
-               if      (json->scopeType[json->scope - 1] == jsonScopeARRAY)
-               {
-                  json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
-               }
-               else if (json->scopeType[json->scope - 1] == jsonScopeOBJECT)
-               {
-                  json->readState = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
-               }
-               else
-               {
-                  // Should never happening.  Butt flapping.
-                  break;
-               }
-            }
-            else
-            {
-               json->readState = jsonReadStateEXPECTING_OBJECT_START;
-            }
-            
-            *type = jsonReadTypeOBJECT_STOP;
-            returnTrue;
-         }
-
-         // Found a comma so there is another key value.
-         if (byte == jsonSEPARATOR_STR[0])
-         {
-            // Read in the key value.
-            //_JsonReadStr(json, &json->key);
-
-            *type = jsonReadTypeKEY;
-            returnTrue;
-         }
-      }
-
-      *type = jsonReadTypeNONE;
-      returnFalse;
-   }
-
-   // Getting a value inside an array.
-   if (json->readState == jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP)
-   {
-      loop
-      {
-         breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
-
-         // Skip over white space.
-         continueIf(jsonIS_SPACE(byte));
-
-         // Found the array stop
-         if (byte == jsonARRAY_STOP_STR[0])
-         {
-            json->scope--;
-            json->scopeType[json->scope] = jsonScopeNONE;
-
-            if      (json->scopeType[json->scope - 1] == jsonScopeARRAY)
-            {
-               json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
-            }
-            else if (json->scopeType[json->scope - 1] == jsonScopeOBJECT)
-            {
-               json->readState = jsonReadStateEXPECTING_KEY_OR_OBJECT_STOP;
-            }
-            else
-            {
-               // Should never happening.  Butt flapping.
-               break;
-            }
-
-            *type = jsonReadTypeARRAY_STOP;
-            returnTrue;
-         }
-
-         // Found a comma so there is another value.
-         if (byte == jsonSEPARATOR_STR[0])
-         {
-            *type = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY_OR_ARRAY_STOP;
-         }
-      }
-
-      *type = jsonReadTypeNONE;
-      returnFalse;
-   }
-
-
-   index = 0;
-   loop
-   {
-      // Resize the internal buffer when we have exhausted it.
-      if (json->readBinCountActual == index)
-      {
-         // Create a new buffer double the size.
-         bufTemp = _JsonMemCreateTypeArray(json->readBinCountActual * 2, JsonN1);
-         returnFalseIf(!bufTemp);
-
-         // Copy over the olde buffer to the new buffer.
-         _JsonMemCopyTypeArray(json->readBinCountActual, JsonN1, bufTemp, json->readBinData);
-         // Destroy the old buffer.
-         _JsonMemDestroy(json->readBinData);
-
-         // Reset the internal buffer to the new larger buffer.
-         json->readBinCountActual = json->readBinCountActual * 2;
-         json->readBinData        = (JsonStr *) bufTemp;
-      }
-
-      // End of file?
-      breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
-      // End of line or part, we done reading.
-      breakIf(byte == '\n' ||
-              byte == '\t');
-
-      // Add the letter to the byte array.
-      json->readBinData[index++] = byte;
-   }
-
-   // Need NULL terminator.
-   json->readBinCount       = index;
-   json->readBinData[index] = 0;
-
-   if (byte == '\n')
-   {
-      //json->isRecordDone = jsonTRUE;
-   }
-#endif
-   returnTrue;
+   return jsonTypeERROR_UNEXPECTED_CHAR;
 }
 
 /******************************************************************************
-func: jsonReadKey
+func: jsonGetTypeObj
 ******************************************************************************/
-JsonB jsonReadKey(Json * const json, JsonStr ** const key)
+JsonType jsonGetTypeObj(Json * const json)
+{
+   returnIf(
+         !_isStarted ||
+         !json,
+      jsonTypeNONE);
+
+   // Reset the value type.
+   json->lastByte   = 0;
+   json->value.type = jsonTypeNONE;
+
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
+   {
+   case jsonOBJECT_STOP_CHAR:
+      json->scope--;
+      return jsonTypeObj_OBJECT_STOP;
+
+   case jsonKEY_VALUE_SEPARATOR_CHAR:
+      return jsonTypeObj_KEY_VALUE_SEPARATOR;
+
+   case jsonSEPARATOR_CHAR:
+      return jsonTypeObj_SEPARATOR;
+
+   case jsonOBJECT_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      return jsonTypeObj_OBJECT_START;
+
+   case jsonARRAY_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeARRAY;
+      return jsonTypeObj_ARRAY_START;
+
+   case jsonSTRING_QUOTE_CHAR:
+      return jsonTypeObj_STRING_START;
+
+   case '0':
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+   case '-':
+      return _JsonGetNumber(json);
+
+   case 't':
+      return _JsonGetTrue(json);
+
+   case 'f':
+      return _JsonGetFalse(json);
+
+   case 'n':
+      return _JsonGetNull(json);
+   }
+
+   return jsonTypeERROR_UNEXPECTED_CHAR;
+}
+
+/******************************************************************************
+func: jsonGetKey
+******************************************************************************/
+JsonB jsonGetKey(Json * const json, JsonStr ** const key)
 {
    returnFalseIf(
       !_isStarted ||
@@ -380,90 +310,209 @@ JsonB jsonReadKey(Json * const json, JsonStr ** const key)
 
    *key = json->key;
 
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
-func: jsonReadI
+func: jsonGetI
 ******************************************************************************/
-JsonB jsonReadI(Json * const json, JsonI * const value)
+JsonB jsonGetI(Json * const json, JsonI * const value)
 {
-   returnTrue;
-}
+   *value = 0;
 
-/******************************************************************************
-func: jsonReadN
-******************************************************************************/
-JsonB jsonReadN(Json * const json, JsonN *  const value)
-{
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonReadR
-******************************************************************************/
-JsonB jsonReadR(Json * const json, JsonR *  const value)
-{
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonReadR4
-******************************************************************************/
-JsonB jsonReadR4(Json * const json, JsonR4 *  const value)
-{
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonReadStr
-******************************************************************************/
-JsonB jsonReadStr(Json * const json, JsonStr ** const value)
-{
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonReadStringC2Letter
-******************************************************************************/
-JsonB jsonReadStringC2Letter(Json * const json, JsonStr *  const value)
-{
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonStart
-******************************************************************************/
-JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc)
-{
-   returnTrueIf(_isStarted);
-
-   // We can live without compress. (sometimes)
-   // we can't live without dynamic memory.
    returnFalseIf(
-      !memCreateFunc ||
-      !memDestroyFunc)
+      !_isStarted ||
+      !json       ||
+      json->value.type != jsonTypeNUMBER_INTEGER);
 
-   _JsonMemStart(memCreateFunc, memDestroyFunc);
+   *value = json->value.i;
 
-   returnFalseIf(!_JsonGetStart());
-
-   _isStarted = jsonTRUE;
-
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
-func: jsonStop
+func: jsonGetN
 ******************************************************************************/
-void jsonStop(void)
+JsonB jsonGetN(Json * const json, JsonN *  const value)
 {
-   returnVoidIf(!_isStarted);
+   *value = 0;
 
-   _JsonGetStop();
-   _JsonMemStop();
+   returnFalseIf(
+      !_isStarted ||
+      !json);
 
-   _isStarted = jsonFALSE;
+   *value = json->value.n;
+
+   // Return is false if the type of the number is no a natural or if it is a negative integer.
+   returnFalseIf(
+      json->value.type != jsonTypeNUMBER_NATURAL ||
+      (json->value.type == jsonTypeNUMBER_INTEGER &&
+       json->value.i    != (JsonI) json->value.n));
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonGetR
+
+All numbers can be real.  However not all integers or naturals can be propely
+or accurately be represented in real.  Up to the caller to determine if they
+are doing something right in that situation.
+******************************************************************************/
+JsonB jsonGetR(Json * const json, JsonR *  const value)
+{
+   *value = json->value.r;
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonGetR4
+******************************************************************************/
+JsonB jsonGetR4(Json * const json, JsonR4 *  const value)
+{
+   *value = json->value.r4;
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonGetStr
+******************************************************************************/
+JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
+{
+   JsonI4        index;
+   JsonStrLetter letterType;
+
+   // Get the letters.
+   for (index = 0; index < maxCount; index++)
+   {
+      letterType = jsonGetStrLetter(json, &value[index]);
+      breakIf(letterType == jsonStrLetterDONE);
+
+      // Convert Unicode letter to UTF8
+      if (letterType == jsonStrLetterHEX)
+      {
+         // todo
+      }
+      returnFalseIf(letterType == jsonStrLetterERROR);
+   }
+
+   // Null terminate
+   if (index != maxCount)
+   {
+      value[index] = 0;
+   }
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonGetStrLetter
+
+Returns...
+jsonStrLetterNORMAL when is it just a regular UTF8 letter or letter part.
+jsonStrLetterHEX    when it is a \u[hex][hex][hex][hex] esscaped sequence.
+jsonStrLetterDONE   when the string was fully read.
+jsonStrLetterERROR  when there was a problem reading the string.
+******************************************************************************/
+JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
+{
+   *value = 0;
+
+   returnIf(!_JsonGetChar(json), jsonStrLetterERROR);
+
+   // Escaped letter
+   if (json->lastByte == '\\')
+   {
+      returnIf(!_JsonGetChar(json), jsonStrLetterERROR);
+
+      switch (json->lastByte)
+      {
+      case jsonSTRING_QUOTE_CHAR:
+         *value = jsonSTRING_QUOTE_CHAR;
+         break;
+
+      case jsonBACK_SLASH_CHAR:
+         *value = jsonBACK_SLASH_CHAR;
+         break;
+
+      case jsonFOREWARD_SLASH_CHAR:
+         *value = jsonFOREWARD_SLASH_CHAR;
+         break;
+
+      case 'b':
+         *value = '\b';
+         break;
+
+      case 'f':
+         *value = '\f';
+         break;
+
+      case 'n':
+         *value = '\n';
+         break;
+
+      case 'r':
+         *value = '\r';
+         break;
+
+      case 't':
+         *value = '\t';
+         break;
+
+      case 'u':
+         *value = 0;
+         returnFalseIf(!_JsonGetChar(json));
+         json->hex[0] = _JsonStrToHex(json->lastByte);
+
+         returnFalseIf(!_JsonGetChar(json));
+         json->hex[1] = _JsonStrToHex(json->lastByte);
+         
+         returnFalseIf(!_JsonGetChar(json));
+         json->hex[1] = _JsonStrToHex(json->lastByte);
+         
+         returnFalseIf(!_JsonGetChar(json));
+         json->hex[1] = _JsonStrToHex(json->lastByte);
+         return jsonStrLetterHEX;
+
+      default:
+         // Unknow excape sequence.
+         return jsonStrLetterERROR;
+      }
+   }
+   else
+   {
+      if (json->lastByte == '\"')
+      {
+         return jsonStrLetterDONE;
+      }
+
+      *value = (JsonStr) json->lastByte;
+   }
+
+   return jsonStrLetterNORMAL;
+}
+
+/******************************************************************************
+func: jsonGetStrHex
+******************************************************************************/
+JsonB jsonGetStrHex(Json * const json, JsonStr * const h1, JsonStr * const h2, JsonStr * const h3, JsonStr * const h4)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json       ||
+      !h1         ||
+      !h2         ||
+      !h3         ||
+      !h4);
+
+   *h1 = json->hex[0];
+   *h2 = json->hex[1];
+   *h3 = json->hex[2];
+   *h4 = json->hex[3];
+
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -489,7 +538,7 @@ JsonB jsonSetArrayStart(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
 
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -509,7 +558,7 @@ JsonB jsonSetArrayStop(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonARRAY_STOP_STR));
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -517,6 +566,8 @@ func: jsonSetKey
 ******************************************************************************/
 JsonB jsonSetKey(Json * const json, JsonStr const * const key)
 {
+   JsonI4 index;
+
    returnFalseIf(
       !_isStarted ||
       !json       ||
@@ -526,9 +577,17 @@ JsonB jsonSetKey(Json * const json, JsonStr const * const key)
    
    json->isFirstItem = jsonFALSE;
 
-   returnFalseIf(!jsonSetValueStr(json, key));
+   returnFalseIf(!jsonSetValueStrStart(json));
+   for (index = 0; ; index++)
+   {
+      breakIf(key[index] == 0);
+
+      returnFalseIf(!jsonSetValueStrLetter(json, key[index]));
+   }
+   returnFalseIf(!jsonSetValueStrStop(json));
+
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonKEY_VALUE_SEPARATOR_STR));
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -554,7 +613,7 @@ JsonB jsonSetObjectStart(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
 
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -574,7 +633,7 @@ JsonB jsonSetObjectStop(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonOBJECT_STOP_STR));
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -593,7 +652,7 @@ JsonB jsonSetSeparator(Json * const json)
       returnFalseIf(!_JsonSetIndent(  json));
    }
    json->isFirstItem = jsonFALSE;
-   returnTrue;
+   return jsonTRUE;
 }
 
 /******************************************************************************
@@ -710,10 +769,33 @@ func: jsonSetValueStr
 ******************************************************************************/
 JsonB jsonSetValueStr(Json * const json, JsonStr const * const str)
 {
+   JsonI4 index;
+
    returnFalseIf(
       !_isStarted ||
       !json       ||
       !str);
+
+   returnFalseIf(!jsonSetValueStrStart(json));
+   for (index = 0; ; index++)
+   {
+      breakIf(str[index] == 0);
+
+      returnFalseIf(!jsonSetValueStrLetter(json, str[index]));
+   }
+   returnFalseIf(!jsonSetValueStrStop(json));
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonSetValueStrStart
+******************************************************************************/
+JsonB jsonSetValueStrStart(Json * const json)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
 
    if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
    {
@@ -721,5 +803,103 @@ JsonB jsonSetValueStr(Json * const json, JsonStr const * const str)
    }
    json->isFirstItem = jsonFALSE;
    
-   return _JsonSetStr(json, strlen(str), str);
+   return _JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR);
+}
+
+/******************************************************************************
+func: jsonSetValueStrLetter
+******************************************************************************/
+JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
+
+   switch (value)
+   {
+   case jsonSTRING_QUOTE_CHAR:
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_QUOTE_STR));
+      break;
+      
+   case jsonBACK_SLASH_CHAR:
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACK_SLASH_STR));
+      break;
+
+   case jsonFOREWARD_SLASH_CHAR:
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORWARD_SLASH_STR));
+      break;
+
+   case '\b':
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACKSPACE_STR));
+      break;
+
+   case '\f':
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORMFEED_STR));
+      break;
+
+   case '\n':
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_LINEFEED_STR));
+      break;
+
+   case '\r':
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
+      break;
+
+   case '\t':
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_TAB_STR));
+      break;
+
+   default:
+      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) &value));
+   }
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonSetValueStrStop
+******************************************************************************/
+JsonB jsonSetValueStrStop(Json * const json)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
+
+   return _JsonSetBuffer(json, 1, (JsonN1 *) "\"");
+}
+
+/******************************************************************************
+func: jsonStart
+******************************************************************************/
+JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc)
+{
+   returnTrueIf(_isStarted);
+
+   // We can live without compress. (sometimes)
+   // we can't live without dynamic memory.
+   returnFalseIf(
+      !memCreateFunc ||
+      !memDestroyFunc)
+
+   _JsonMemStart(memCreateFunc, memDestroyFunc);
+   _JsonStrStart();
+   _JsonUtilStart();
+
+   _isStarted = jsonTRUE;
+
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: jsonStop
+******************************************************************************/
+void jsonStop(void)
+{
+   returnVoidIf(!_isStarted);
+
+   _JsonUtilStop();
+   _JsonStrStop();
+   _JsonMemStop();
+
+   _isStarted = jsonFALSE;
 }

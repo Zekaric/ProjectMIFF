@@ -40,12 +40,332 @@ include:
 local:
 variable:
 ******************************************************************************/
-static JsonN1 _hex[128];
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
+/******************************************************************************
+func: _JsonEatSpace
+******************************************************************************/
+JsonB _JsonEatSpace(Json * const json)
+{
+   returnTrueIf(!_JsonIsSpace(json))
+
+   loop
+   {
+      returnFalseIf(!_JsonGetChar(json));
+
+      returnTrueIf(!_JsonIsSpace(json));
+   }
+}
+
+/******************************************************************************
+func: _JsonGetChar
+******************************************************************************/
+JsonB _JsonGetChar(Json * const json)
+{
+   returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
+   return jsonTRUE;
+}
+
+/******************************************************************************
+func: _JsonGetFalse
+******************************************************************************/
+JsonType _JsonGetFalse(Json * const json)
+{
+   loop
+   {
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'a');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'l');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 's');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'e');
+
+      return jsonTypeFileCONSTANT_FALSE;
+   }
+
+   return jsonTypeERROR_CONSTANT_FALSE_EXPECTED;
+}
+
+/******************************************************************************
+func: _JsonGetNull
+******************************************************************************/
+JsonType _JsonGetNull(Json * const json)
+{
+   loop
+   {
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'u');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'l');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'l');
+
+      return jsonTypeFileCONSTANT_NULL;
+   }
+
+   return jsonTypeERROR_CONSTANT_NULL_EXPECTED;
+}
+
+/******************************************************************************
+func: _JsonGetNumber
+******************************************************************************/
+JsonType _JsonGetNumber(Json * const json)
+{
+   JsonB   isIntegerNumberFound,
+           isFractionalNumberFound,
+           isExponentNumberFound;
+   // Current doulbe maxes out a 10^+/-308, 400 characters is large enough.
+   JsonStr numberStr[400];
+   int     index;
+
+   // Reset the number string.
+   forCount(index, 400)
+   {
+      numberStr[index] = 0;
+   }
+
+   // Read in the integer part.
+   isIntegerNumberFound = jsonFALSE;
+   numberStr[0]        = json->lastByte;
+   if ('0' <= json->lastByte && json->lastByte <= '9')
+   {
+      isIntegerNumberFound = jsonTRUE;
+   }
+
+   for (index = 1; ; index++)
+   {
+      // End of file.
+      if (!_JsonGetChar(json))
+      {
+         returnIf(isIntegerNumberFound, _JsonGetNumberInteger(json, numberStr));
+         return jsonTypeERROR_NUMBER_EXPECTED;
+      }
+
+      // Number is a Real
+      if (json->lastByte == '.')
+      {
+         gotoIf(isIntegerNumberFound, GET_FRACTION);
+         return jsonTypeERROR_NUMBER_EXPECTED;
+      }
+      // Number is Real with an exponent
+      if (json->lastByte == 'e' ||
+          json->lastByte == 'E')
+      {
+         gotoIf(isIntegerNumberFound, GET_EXPONENT);
+         return jsonTypeERROR_NUMBER_EXPECTED;
+      }
+         
+      // Add to the integer portion.
+      if ('0' <= json->lastByte && json->lastByte <= '9')
+      {
+         numberStr[index]     = (JsonStr) json->lastByte;
+         isIntegerNumberFound = jsonTRUE;
+      }
+      // Assuming this is the end of the number.
+      else
+      {
+         returnIf(isIntegerNumberFound, _JsonGetNumberInteger(json, numberStr));
+         return jsonTypeERROR_NUMBER_EXPECTED;
+      }
+   }
+
+GET_FRACTION:
+   // Decimal was found.
+   isFractionalNumberFound = jsonFALSE;
+   numberStr[index++]      = '.';
+   for (;; index++)
+   {
+      // End of file
+      if (!_JsonGetChar(json))
+      {
+         returnIf(isFractionalNumberFound, _JsonGetNumberReal(json, numberStr));
+         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+      }
+
+      // Exponent defined
+      if (json->lastByte == 'e' ||
+          json->lastByte == 'E')
+      {
+         gotoIf(isFractionalNumberFound, GET_EXPONENT);
+         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+      }
+
+      // Add to the fractional portion.
+      if ('0' <= json->lastByte && json->lastByte <= '9')
+      {
+         numberStr[index]        = (JsonStr) json->lastByte;
+         isFractionalNumberFound = jsonTRUE;
+      }
+      // Assuming this is the end of the number.
+      else
+      {
+         returnIf(isFractionalNumberFound, _JsonGetNumberReal(json, numberStr));
+         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+      }
+   }
+
+GET_EXPONENT:
+   // Exponent was found
+   isExponentNumberFound = jsonFALSE;
+   numberStr[index++]    = 'e';
+
+   // End of file in the middle of a number!
+   returnIf(!_JsonGetChar(json), jsonTypeERROR_NUMBER_REAL_EXPECTED);
+
+   // Get the sign.
+   if      ('0' <= json->lastByte && json->lastByte <= '9')
+   {
+      numberStr[index++]    = (JsonStr) json->lastByte;
+      isExponentNumberFound = jsonTRUE;
+   }
+   // Negative exponent.
+   else if (json->lastByte == '-')
+   {
+      numberStr[index++] = (JsonStr) json->lastByte;
+   }
+   // Wasn't a sign or a digit after the 'e'.
+   else if (json->lastByte != '+')
+   {
+      return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+   }
+   // If it was a "+" sign we just eat it.  Unnecessary.
+
+   // Get the exponent
+   for (;; index++)
+   {
+      if (!_JsonGetChar(json))
+      {
+         returnIf(isExponentNumberFound, _JsonGetNumberReal(json, numberStr));
+         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+      }
+
+      if ('0' <= json->lastByte && json->lastByte <= '9')
+      {
+         numberStr[index]      = (JsonStr) json->lastByte;
+         isExponentNumberFound = jsonTRUE;
+      }
+      else
+      {
+         break;
+      }
+   }
+
+   returnIf(isExponentNumberFound, _JsonGetNumberReal(json, numberStr));
+   return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+}
+
+/******************************************************************************
+func: _JsonGetNumberInteger
+******************************************************************************/
+JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
+{
+   JsonType type;
+
+   // Default number type.
+   type = jsonTypeNUMBER_INTEGER;
+
+   // This is a negative number.  Definitely not a natural number.
+   if (numberStr[0] == '-')
+   {
+      json->value.n = _JsonStrToN(&numberStr[1]);
+      if      (json->value.n == ((JsonN) JsonI_MAX) + 1)
+      {
+         json->value.i = jsonI_MIN;
+      }
+      else if (json->value.n <= JsonI_MAX)
+      {
+         json->value.i = - (JsonI) json->value.n;
+      }
+
+      json->value.n  = 0;
+      json->value.r  = (JsonR)  json->value.i;
+      json->value.r4 = (JsonR4) json->value.i;
+
+      return type;
+   }
+
+   json->value.n = _JsonStrToN(numberStr);
+   // This unsigned integer is small enough to be a signed integer.
+   if (json->value.n <= JsonI_MAX)
+   {
+      json->value.i = json->value.n;
+   }
+   // Special case.  Not all unsigned integers can be represented as a signed integer.
+   else
+   {
+      json->value.i = 0;
+      type          = jsonTypeNUMBER_NATURAL;
+   }
+
+   json->value.r  = (JsonR)  json->value.n;
+   json->value.r4 = (JsonR4) json->value.n;
+
+   // Set the type of the value.
+   json->value.type = type;
+   return type;
+}
+
+/******************************************************************************
+func: _JsonGetNumberReal
+******************************************************************************/
+JsonType _JsonGetNumberReal(Json * const json, JsonStr * const str)
+{
+   json->value.i    = 0;
+   json->value.n    = 0;
+   json->value.r    = _atof_l(str, _JsonLocaleGet());
+   json->value.r4   = (float) json->value.r;
+   json->value.type = jsonTypeNUMBER_REAL;
+
+   return jsonTypeNUMBER_REAL;
+}
+
+/******************************************************************************
+func: _JsonGetTrue
+******************************************************************************/
+JsonType _JsonGetTrue(Json * const json)
+{
+   loop
+   {
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'r');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'u');
+
+      breakIf(!_JsonGetChar(json));
+      breakIf(json->lastByte != 'e');
+
+      return jsonTypeFileCONSTANT_TRUE;
+   }
+
+   return jsonTypeERROR_CONSTANT_TRUE_EXPECTED;
+}
+
+/******************************************************************************
+func: _JsonIsSpace
+******************************************************************************/
+JsonB _JsonIsSpace(Json * const json)
+{
+   returnTrueIf(
+      json->lastByte == 0    ||
+      json->lastByte == 0x09 ||
+      json->lastByte == 0x0A ||
+      json->lastByte == 0x0D ||
+      json->lastByte == 0x20);
+
+   return jsonFALSE;
+}
+
 #if 0
 /******************************************************************************
 func: _JsonGetLine
@@ -276,9 +596,9 @@ JsonB _JsonGetStr(Json * const json, JsonStr ** const string)
       {
          breakIf(!json->getBuffer(json->dataRepo, 1, &byte));
 
-         if      (byte == jsonSTRING_ESCAPE_BACKSLASH_STR[0])
+         if      (byte == jsonSTRING_ESCAPE_FORWARD_SLASH_STR[0])
          {
-            json->readBinData[index++] = jsonSTRING_ESCAPE_BACKSLASH_STR[0];
+            json->readBinData[index++] = jsonSTRING_ESCAPE_FORWARD_SLASH_STR[0];
          }
          else if (byte == jsonSTRING_ESCAPE_BACKSPACE_STR[0])
          {
@@ -300,9 +620,9 @@ JsonB _JsonGetStr(Json * const json, JsonStr ** const string)
          {
             json->readBinData[index++] = jsonSTRING_ESCAPE_QUOTE_STR[0];
          }
-         else if (byte == jsonSTRING_ESCAPE_SLASH_STR[0])
+         else if (byte == jsonSTRING_ESCAPE_BACK_SLASH_STR[0])
          {
-            json->readBinData[index++] = jsonSTRING_ESCAPE_SLASH_STR[0];
+            json->readBinData[index++] = jsonSTRING_ESCAPE_BACK_SLASH_STR[0];
          }
          else if (byte == jsonSTRING_ESCAPE_TAB_STR[0])
          {
@@ -343,7 +663,7 @@ JsonB _JsonGetStr(Json * const json, JsonStr ** const string)
    }
 
    // Set the state to be expecting a value of some sort.
-   json->readState = jsonReadStateEXPECTING_VALUE_OBJECT_ARRAY;
+   json->readState = jsonGetStateEXPECTING_VALUE_OBJECT_ARRAY;
 
    // Convert the UTF8 to UTF16
    *string = _JsonMemCreateTypeArray(index + 1, JsonStr);
@@ -501,41 +821,3 @@ JsonB _JsonGetRS(Json * const json, JsonR8 * const value)
 }
 #endif
 
-/******************************************************************************
-func: _JsonGetStart
-******************************************************************************/
-JsonB _JsonGetStart(void)
-{
-   _hex['0']    = 0x0;
-   _hex['1']    = 0x1;
-   _hex['2']    = 0x2;
-   _hex['3']    = 0x3;
-   _hex['4']    = 0x4;
-   _hex['5']    = 0x5;
-   _hex['6']    = 0x6;
-   _hex['7']    = 0x7;
-   _hex['8']    = 0x8;
-   _hex['9']    = 0x9;
-   _hex['a']    = 
-      _hex['A'] = 0xa;
-   _hex['b']    =
-      _hex['B'] = 0xb;
-   _hex['c']    =
-      _hex['C'] = 0xc;
-   _hex['d']    =
-      _hex['D'] = 0xd;
-   _hex['e']    =
-      _hex['E'] = 0xe;
-   _hex['f']    =
-      _hex['F'] = 0xf;
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: _JsonGetStop
-******************************************************************************/
-void _JsonGetStop(void)
-{
-   return;
-}

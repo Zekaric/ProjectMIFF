@@ -647,6 +647,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
    JsonN    ntemp;
    JsonR    rtemp;
    JsonR4   r4temp;
+   JsonStr  stemp[256];
+   JsonI    sindex;
+   JsonStrLetter jletter;
+   JsonStr       sletter;
 
    file   = NULL;
    json   = NULL;
@@ -667,35 +671,47 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       }
 
 #define JSON_TEST_KEY(JSON, KEY) \
-   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeSTRING_START,                        KEY " key start")) break;\
-   if (!JSON_TEST(jsonGetStr(    json, 32, key) && memcmp(key, KEY, strlen(KEY)) == 0, KEY " key value")) break;\
-   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeKEY_VALUE_SEPARATOR,                 KEY " val start")) break;
+   if (!JSON_TEST(jsonGetTypeObj(JSON) == jsonTypeSTRING_START,                        KEY " key start")) break;\
+   if (!JSON_TEST(jsonGetStr(    JSON, 32, key) && memcmp(key, KEY, strlen(KEY)) == 0, KEY " key value")) break;\
+   if (!JSON_TEST(jsonGetTypeObj(JSON) == jsonTypeKEY_VALUE_SEPARATOR,                 KEY " val start")) break;
 
 #define JSON_TEST_CONST(JSON, KEY, VALUE) \
-   if (!JSON_TEST(jsonGetTypeObj(json) == VALUE,                                       KEY " val test")) break;
+   if (!JSON_TEST(jsonGetTypeObj(JSON) == VALUE,                                       KEY " val test")) break;
 
 #define JSON_TEST_INT(JSON, KEY, VALUE) \
-   if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeNUMBER_INTEGER,                      KEY " val type"))  break;\
-   if (!JSON_TEST(jsonGetI(      json, &itemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(jsonGetTypeObj(JSON) == jsonTypeNUMBER_INTEGER,                      KEY " val type"))  break;\
+   if (!JSON_TEST(jsonGetI(      JSON, &itemp),                                        KEY " val get"))   break;\
    if (!JSON_TEST(itemp == VALUE,                                                      KEY " val value")) break;
 
 #define JSON_TEST_NAT(JSON, KEY, VALUE) \
-   type = jsonGetTypeObj(json);\
+   type = jsonGetTypeObj(JSON);\
    if (!JSON_TEST(type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL,    KEY " val type"))  break;\
-   if (!JSON_TEST(jsonGetN(      json, &ntemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(jsonGetN(      JSON, &ntemp),                                        KEY " val get"))   break;\
    if (!JSON_TEST(ntemp == VALUE,                                                      KEY " val value")) break;
 
 #define JSON_TEST_REAL(JSON, KEY, VALUE) \
-   type = jsonGetTypeObj(json);\
+   type = jsonGetTypeObj(JSON);\
    if (!JSON_TEST(type == jsonTypeNUMBER_REAL || type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL, KEY " val type"))  break;\
-   if (!JSON_TEST(jsonGetR(      json, &rtemp),                                        KEY " val get"))   break;\
+   if (!JSON_TEST(jsonGetR(      JSON, &rtemp),                                        KEY " val get"))   break;\
    if (!JSON_TEST(rtemp == VALUE,                                                      KEY " val value")) break;
 
 #define JSON_TEST_REAL4(JSON, KEY, VALUE) \
-   type = jsonGetTypeObj(json);\
+   type = jsonGetTypeObj(JSON);\
    if (!JSON_TEST(type == jsonTypeNUMBER_REAL || type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL, KEY " val type"))  break;\
-   if (!JSON_TEST(jsonGetR4(     json, &r4temp),                                       KEY " val get"))   break;\
+   if (!JSON_TEST(jsonGetR4(     JSON, &r4temp),                                       KEY " val get"))   break;\
    if (!JSON_TEST(r4temp == VALUE,                                                     KEY " val value")) break;
+
+#define JSON_TEST_STR(JSON, KEY, VALUE) \
+   if (!JSON_TEST(jsonGetTypeObj(JSON) == jsonTypeSTRING_START,                        KEY " val type"))  break;\
+   for (sindex = 0; ; sindex++) {\
+      jletter = jsonGetStrLetter(JSON, &sletter); \
+      if (jletter == jsonStrLetterDONE)  break;\
+      if (jletter == jsonStrLetterERROR) break;\
+      stemp[sindex] = sletter;\
+   } \
+   if (!JSON_TEST(jletter != jsonStrLetterERROR,                                       KEY " val get"))   break; \
+   stemp[sindex] = 0; \
+   if (!JSON_TEST(memcmp(stemp, VALUE, sindex) == 0,                                   KEY " val value")) break;
 
 #define JSON_TEST_NEXT(JSON) \
    if (!JSON_TEST(jsonGetTypeObj(json) == jsonTypeSEPARATOR, "   next")) break;
@@ -779,6 +795,9 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       JSON_TEST_KEY(  json, "R4 PI");
       JSON_TEST_REAL4(json, "R4 PI", 3.1415926535897932f);
       JSON_TEST_NEXT( json);
+
+      JSON_TEST_KEY(  json, "String");
+      JSON_TEST_STR(  json, "String", "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
       result = jsonTRUE;
       break;

@@ -35,7 +35,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "local.h"
+#include "json_local.h"
 #include "jsonlib.h"
 
 /******************************************************************************
@@ -172,6 +172,74 @@ void jsonDestroyContent(Json * const json)
 }
 
 /******************************************************************************
+func: jsonGetTypeElem
+******************************************************************************/
+JsonType jsonGetTypeElem(Json * const json)
+{
+   returnIf(
+         !_isStarted ||
+         !json,
+      jsonTypeNONE);
+
+   // Reset the value type.
+   json->value.type = jsonTypeNONE;
+
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
+   {
+   case jsonARRAY_STOP_CHAR:
+      json->scope--;
+      json->lastByte = 0;
+      return jsonTypeARRAY_STOP;
+
+   case jsonSEPARATOR_CHAR:
+      json->lastByte = 0;
+      return jsonTypeSEPARATOR;
+
+   case jsonOBJECT_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->lastByte = 0;
+      return jsonTypeOBJECT_START;
+
+   case jsonARRAY_START_CHAR:
+      json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->lastByte = 0;
+      return jsonTypeARRAY_START;
+
+   case jsonSTRING_QUOTE_CHAR:
+      json->lastByte = 0;
+      return jsonTypeSTRING_START;
+
+   case '0':
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+   case '-':
+      return _JsonGetNumber(json);
+
+   case 't':
+      return _JsonGetTrue(json);
+
+   case 'f':
+      return _JsonGetFalse(json);
+
+   case 'n':
+      return _JsonGetNull(json);
+   }
+
+   return jsonTypeERROR_UNEXPECTED_CHAR;
+}
+
+/******************************************************************************
 func: jsonGetTypeFile
 
 The first function you should be calling to obtain the value initial start of
@@ -196,16 +264,16 @@ JsonType jsonGetTypeFile(Json * const json)
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeOBJECT;
       json->lastByte = 0;
-      return jsonTypeFileOBJECT_START;
+      return jsonTypeOBJECT_START;
 
    case jsonARRAY_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeARRAY;
       json->lastByte = 0;
-      return jsonTypeFileARRAY_START;
+      return jsonTypeARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
       json->lastByte = 0;
-      return jsonTypeFileSTRING_START;
+      return jsonTypeSTRING_START;
 
    case '0':
    case '1':
@@ -255,29 +323,29 @@ JsonType jsonGetTypeObj(Json * const json)
    case jsonOBJECT_STOP_CHAR:
       json->scope--;
       json->lastByte = 0;
-      return jsonTypeObj_OBJECT_STOP;
+      return jsonTypeOBJECT_STOP;
 
    case jsonKEY_VALUE_SEPARATOR_CHAR:
       json->lastByte = 0;
-      return jsonTypeObj_KEY_VALUE_SEPARATOR;
+      return jsonTypeKEY_VALUE_SEPARATOR;
 
    case jsonSEPARATOR_CHAR:
       json->lastByte = 0;
-      return jsonTypeObj_SEPARATOR;
+      return jsonTypeSEPARATOR;
 
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeOBJECT;
       json->lastByte = 0;
-      return jsonTypeObj_OBJECT_START;
+      return jsonTypeOBJECT_START;
 
    case jsonARRAY_START_CHAR:
       json->scopeType[json->scope++] = jsonScopeARRAY;
       json->lastByte = 0;
-      return jsonTypeObj_ARRAY_START;
+      return jsonTypeARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
       json->lastByte = 0;
-      return jsonTypeObj_STRING_START;
+      return jsonTypeSTRING_START;
 
    case '0':
    case '1':

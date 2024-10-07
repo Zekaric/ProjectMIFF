@@ -164,15 +164,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="jsonlib.h" />
-    <ClInclude Include="local.h" />
+    <ClInclude Include="json_local.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="jsonlib.c" />
-    <ClCompile Include="mem.c" />
-    <ClCompile Include="read.c" />
-    <ClCompile Include="string.c" />
-    <ClCompile Include="util.c" />
-    <ClCompile Include="write.c" />
+    <ClCompile Include="json_mem.c" />
+    <ClCompile Include="json_read.c" />
+    <ClCompile Include="json_string.c" />
+    <ClCompile Include="json_util.c" />
+    <ClCompile Include="json_write.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

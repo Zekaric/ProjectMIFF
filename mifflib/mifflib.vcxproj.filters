@@ -18,28 +18,22 @@
     <ClCompile Include="mifflib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="write.c">
+    <ClCompile Include="miff_write.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="byteSwap.c">
+    <ClCompile Include="miff_byteSwap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="string.c">
+    <ClCompile Include="miff_util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.c">
+    <ClCompile Include="miff_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mem.c">
+    <ClCompile Include="miff_read.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="type.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="read.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="part.c">
+    <ClCompile Include="miff_part.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,7 +41,7 @@
     <ClInclude Include="mifflib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="local.h">
+    <ClInclude Include="miff_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

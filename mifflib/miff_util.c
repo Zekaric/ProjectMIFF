@@ -1,10 +1,11 @@
 /******************************************************************************
-file:       mem
+file:       util
 author:     Robbert de Groot
+company:
 copyright:  2021, Robbert de Groot
 
 description:
-memory functions
+General utils
 ******************************************************************************/
 
 /******************************************************************************
@@ -34,54 +35,75 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "local.h"
+#include "miff_local.h"
 
 /******************************************************************************
 local:
 variable:
 ******************************************************************************/
-static MiffMemCreate    _memCreate  = NULL;
-static MiffMemDestroy   _memDestroy = NULL;
+static _locale_t  _locale;
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffMemCreate
+func: _MiffUtilStart
 ******************************************************************************/
-void *_MiffMemCreate(MiffN const memByteCount)
+void _MiffUtilStart(void)
 {
-   if (memByteCount > MiffN4_MAX)
+   _locale = _create_locale(LC_ALL, "C");
+}
+
+/******************************************************************************
+func: _MiffUtilStop
+******************************************************************************/
+void _MiffUtilStop(void)
+{
+   // Nothing to do.
+}
+
+/******************************************************************************
+func: _MiffStrToN
+******************************************************************************/
+MiffN _MiffStrToN(MiffN const count, MiffN1 const * const str)
+{
+   MiffN index;
+   MiffN value;
+
+   value = 0;
+
+   // Skip spaces.
+   forCount(index, count)
    {
-      return NULL;
+      breakIf(str[index] != ' ');
    }
 
-   return _memCreate((MiffN4) memByteCount);
+   for (; index < count; index++)
+   {
+      value = value * 10 + str[index] - '0';
+   }
+
+   return value;
 }
 
 /******************************************************************************
-func: _MiffMemDestroy
+func: _MiffLocaleGet
 ******************************************************************************/
-void _MiffMemDestroy(void * const mem)
+_locale_t _MiffLocaleGet(void)
 {
-   _memDestroy(mem);
+   return _locale;
 }
 
 /******************************************************************************
-func: _MiffMemStart
-******************************************************************************/
-void _MiffMemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
-{
-   _memCreate        = memCreateFunc;
-   _memDestroy       = memDestroyFunc;
-}
+func: _MiffMemIsEqual
 
-/******************************************************************************
-func: _MiffMemStop
+Compare two binary buffers for equality.
 ******************************************************************************/
-void _MiffMemStop(void)
+MiffB _MiffMemIsEqual(MiffN const countA, MiffN1 const * const memA, MiffN const countB,
+   MiffN1 const * const memB)
 {
-   _memCreate        = NULL;
-   _memDestroy       = NULL;
+   returnFalseIf(countA != countB);
+   returnFalseIf(memcmp(memA, memB, countA) != 0);
+   returnTrue;
 }

@@ -34,7 +34,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "local.h"
+#include "json_local.h"
 
 /******************************************************************************
 local:
@@ -90,7 +90,7 @@ JsonType _JsonGetFalse(Json * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeFileCONSTANT_FALSE;
+      return jsonTypeCONSTANT_FALSE;
    }
 
    return jsonTypeERROR_CONSTANT_FALSE_EXPECTED;
@@ -114,7 +114,7 @@ JsonType _JsonGetNull(Json * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeFileCONSTANT_NULL;
+      return jsonTypeCONSTANT_NULL;
    }
 
    return jsonTypeERROR_CONSTANT_NULL_EXPECTED;
@@ -352,7 +352,7 @@ JsonType _JsonGetTrue(Json * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeFileCONSTANT_TRUE;
+      return jsonTypeCONSTANT_TRUE;
    }
 
    return jsonTypeERROR_CONSTANT_TRUE_EXPECTED;

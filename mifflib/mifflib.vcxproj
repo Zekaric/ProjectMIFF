@@ -169,18 +169,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="byteSwap.c" />
-    <ClCompile Include="mem.c" />
+    <ClCompile Include="miff_byteSwap.c" />
+    <ClCompile Include="miff_mem.c" />
     <ClCompile Include="mifflib.c" />
-    <ClCompile Include="part.c" />
-    <ClCompile Include="read.c" />
-    <ClCompile Include="string.c" />
-    <ClCompile Include="type.c" />
-    <ClCompile Include="util.c" />
-    <ClCompile Include="write.c" />
+    <ClCompile Include="miff_part.c" />
+    <ClCompile Include="miff_read.c" />
+    <ClCompile Include="miff_util.c" />
+    <ClCompile Include="miff_write.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="local.h" />
+    <ClInclude Include="miff_local.h" />
     <ClInclude Include="mifflib.h" />
   </ItemGroup>
   <ItemGroup>

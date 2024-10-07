@@ -34,7 +34,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "local.h"
+#include "miff_local.h"
 
 /******************************************************************************
 lib local:
@@ -50,7 +50,6 @@ static MiffB       _PartBase64ToN(  Miff const * const miff, MiffN const count, 
 static MiffN4      _PartBase64ToN4( Miff const * const miff, MiffN const count, MiffN1 const * const buffer, Miff4 * const value);
 static MiffN       _PartBinToN(     Miff const * const miff);
 static MiffN       _PartHexToN(     Miff const * const miff);
-static MiffN       _PartOctToN(     Miff const * const miff);
 
 /******************************************************************************
 function:
@@ -60,12 +59,9 @@ func: _MiffPartToKey
 ******************************************************************************/
 MiffB _MiffPartToKey(Miff * const miff)
 {
-   MiffN len;
+   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffN1, miff->currentName, miff->readData);
 
-   len = min(256, miff->readBinCount);
-   _MiffMemCopyTypeArray(len, MiffN1, miff->currentName, miff->readBinData);
-   miff->currentName[len] = 0;
-   miff->currentNameCount = len;
+   miff->currentNameCount = miff->readCount;
 
    returnTrue;
 }
@@ -75,7 +71,7 @@ func: _MiffPartToN
 ******************************************************************************/
 MiffN _MiffPartToN(Miff const * const miff)
 {
-   return _MiffStrToN(miff->readBinCount, miff->readBinData);
+   return _MiffStrToN(miff->readCount, miff->readData);
 }
 
 /******************************************************************************
@@ -96,14 +92,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatN_BASE64:
-         value->is4 = (miff->readBinCount < 8);
+         value->is4 = (miff->readCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
+            _PartBase64ToN( miff, miff->readCount, miff->readData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readCount, miff->readData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.n = value->inr4.n;
@@ -112,10 +108,6 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
 
       case miffValueFormatN_X:
          value->inr.n = _PartHexToN(miff);
-         break;
-
-      case miffValueFormatN_O:
-         value->inr.n = _PartOctToN(miff);
          break;
 
       case miffValueFormatN_B:
@@ -132,15 +124,15 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4 = (miff->readBinCount < 16);
+         value->is4 = (miff->readCount < 16);
          if (!value->is4)
          {
-            _PartBase64ToC( miff, miff->readBinCount, miff->readBinData, &value->inr,  &value->imaginary);
+            _PartBase64ToC( miff, miff->readCount, miff->readData, &value->inr,  &value->imaginary);
          }
          else
          {
             value->type = miffValueTypeC;
-            _PartBase64ToC4(miff, miff->readBinCount, miff->readBinData, &value->inr4, &value->imaginary4);
+            _PartBase64ToC4(miff, miff->readCount, miff->readData, &value->inr4, &value->imaginary4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.r       = value->inr4.r;
@@ -158,14 +150,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4  = (miff->readBinCount < 8);
+         value->is4  = (miff->readCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
+            _PartBase64ToN( miff, miff->readCount, miff->readData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readCount, miff->readData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.i = value->inr4.i;
@@ -182,14 +174,14 @@ MiffB _MiffPartToValue(Miff const * const miff, MiffValue * const value)
          break;
 
       case miffValueFormatCIR_BASE64:
-         value->is4 = (miff->readBinCount < 8);
+         value->is4 = (miff->readCount < 8);
          if (!value->is4)
          {
-            _PartBase64ToN( miff, miff->readBinCount, miff->readBinData, &value->inr);
+            _PartBase64ToN( miff, miff->readCount, miff->readData, &value->inr);
          }
          else
          {
-            _PartBase64ToN4(miff, miff->readBinCount, miff->readBinData, &value->inr4);
+            _PartBase64ToN4(miff, miff->readCount, miff->readData, &value->inr4);
 
             // Auto promotion yes.  Auto demotion no, caller needs to control that.
             value->inr.r = value->inr4.r;
@@ -213,10 +205,10 @@ static MiffB _PartAToC(Miff const * const miff, MiffR * const real, MiffR * cons
    MiffN1 *n1Temp;
 
    // Get the real value of the complex number.
-   *real = _strtod_l((char *) miff->readBinData, (char **) &n1Temp, _MiffLocaleGet());
+   *real = _strtod_l((char *) miff->readData, (char **) &n1Temp, _MiffLocaleGet());
 
    // Check to see if the imaginary number exists.
-   if ((MiffN) (n1Temp - miff->readBinData) < miff->readBinCount &&
+   if ((MiffN) (n1Temp - miff->readData) < miff->readCount &&
        n1Temp[0] == '+')
    {
       // Get the imaginary value of the complex number.
@@ -231,23 +223,23 @@ func: _PartAToI
 ******************************************************************************/
 static MiffI _PartAToI(Miff const * const miff)
 {
-   MiffB     isPositive;
-   MiffN     count;
-   MiffN1   *npTemp;
-   MiffN     nTemp;
+   MiffB         isPositive;
+   MiffN         count;
+   MiffN1 const *npTemp;
+   MiffN         nTemp;
 
    isPositive = miffTRUE;
 
-   if (miff->readBinData[0] == '-')
+   if (miff->readData[0] == '-')
    {
       isPositive = miffFALSE;
-      count      = miff->readBinCount - 1;
-      npTemp     = &(miff->readBinData[1]);
+      count      = miff->readCount - 1;
+      npTemp     = &(miff->readData[1]);
    }
    else
    {
-      count      = miff->readBinCount - 0;
-      npTemp     = miff->readBinData;
+      count      = miff->readCount - 0;
+      npTemp     = miff->readData;
    }
 
    nTemp = _MiffStrToN(count, npTemp);
@@ -275,7 +267,7 @@ func: _PartAToN
 ******************************************************************************/
 static MiffN _PartAToN(Miff const * const miff)
 {
-   return _MiffStrToN(miff->readBinCount, miff->readBinData);
+   return _MiffStrToN(miff->readCount, miff->readData);
 }
 
 /******************************************************************************
@@ -285,7 +277,7 @@ static MiffR _PartAToR(Miff const * const miff)
 {
    MiffN1 *n1Temp;
 
-   return _strtod_l((char *) miff->readBinData, (char **) &n1Temp, _MiffLocaleGet());
+   return _strtod_l((char *) miff->readData, (char **) &n1Temp, _MiffLocaleGet());
 }
 
 /******************************************************************************
@@ -294,32 +286,32 @@ func: _PartBase64ToC
 static MiffB _PartBase64ToC(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const real, Miff8 * const imaginary)
 {
-   BsfDataGet data;
+   BsfI    bsfIndex,
+           byteIndex;
+   BsfData data;
 
    count;
 
-   // cast safe.  We are not writing, just reading.
-   data = bsfPrepGet((BsfN1 *) buffer);
+   returnFalseIf(!bsfPrep(&data));
 
-   returnFalseIf(!bsfGet(&data, &real->byte[0]));
-   returnFalseIf(!bsfGet(&data, &real->byte[1]));
-   returnFalseIf(!bsfGet(&data, &real->byte[2]));
-   returnFalseIf(!bsfGet(&data, &real->byte[3]));
-   returnFalseIf(!bsfGet(&data, &real->byte[4]));
-   returnFalseIf(!bsfGet(&data, &real->byte[5]));
-   returnFalseIf(!bsfGet(&data, &real->byte[6]));
-   returnFalseIf(!bsfGet(&data, &real->byte[7]));
+   bsfIndex  = 0;
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(real->byte[bsfIndex]));
+      breakIf(byteIndex == 8);
+   }
 
    _MiffByteSwap8(miff, real);
 
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[0]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[1]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[2]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[3]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[4]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[5]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[6]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[7]));
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(imaginary->byte[bsfIndex]));
+      breakIf(byteIndex == 8);
+   }
 
    _MiffByteSwap8(miff, imaginary);
 
@@ -332,24 +324,32 @@ func: _PartBase64ToC4
 static MiffB _PartBase64ToC4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const real, Miff4 * const imaginary)
 {
-   BsfDataGet data;
+   BsfI    bsfIndex,
+           byteIndex;
+   BsfData data;
 
    count;
 
-   // cast safe.  We are not writing, just reading.
-   data = bsfPrepGet((BsfN1 *) buffer);
+   returnFalseIf(!bsfPrep(&data));
 
-   returnFalseIf(!bsfGet(&data, &real->byte[0]));
-   returnFalseIf(!bsfGet(&data, &real->byte[1]));
-   returnFalseIf(!bsfGet(&data, &real->byte[2]));
-   returnFalseIf(!bsfGet(&data, &real->byte[3]));
+   bsfIndex  = 0;
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(real->byte[bsfIndex]));
+      breakIf(byteIndex == 4);
+   }
 
    _MiffByteSwap4(miff, real);
 
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[0]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[1]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[2]));
-   returnFalseIf(!bsfGet(&data, &imaginary->byte[3]));
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(imaginary->byte[bsfIndex]));
+      breakIf(byteIndex == 4);
+   }
 
    _MiffByteSwap4(miff, imaginary);
 
@@ -362,21 +362,22 @@ func: _PartBase64ToN
 static MiffB _PartBase64ToN(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff8 * const value)
 {
-   BsfDataGet data;
+   BsfI    bsfIndex,
+           byteIndex;
+   BsfData data;
 
    count;
 
-   // cast safe.  We are not writing, just reading.
-   data = bsfPrepGet((BsfN1 *) buffer);
+   returnFalseIf(!bsfPrep(&data));
 
-   returnFalseIf(!bsfGet(&data, &value->byte[0]));
-   returnFalseIf(!bsfGet(&data, &value->byte[1]));
-   returnFalseIf(!bsfGet(&data, &value->byte[2]));
-   returnFalseIf(!bsfGet(&data, &value->byte[3]));
-   returnFalseIf(!bsfGet(&data, &value->byte[4]));
-   returnFalseIf(!bsfGet(&data, &value->byte[5]));
-   returnFalseIf(!bsfGet(&data, &value->byte[6]));
-   returnFalseIf(!bsfGet(&data, &value->byte[7]));
+   bsfIndex  = 0;
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[bsfIndex]));
+      breakIf(byteIndex == 8);
+   }
 
    _MiffByteSwap8(miff, value);
 
@@ -389,17 +390,22 @@ func: _PartBase64ToN4
 static MiffN4 _PartBase64ToN4(Miff const * const miff, MiffN const count, MiffN1 const * const buffer,
    Miff4 * const value)
 {
-   BsfDataGet data;
+   BsfI    bsfIndex,
+           byteIndex;
+   BsfData data;
 
    count;
 
-   // cast safe.  We are not writing, just reading.
-   data = bsfPrepGet((BsfN1 *) buffer);
+   returnFalseIf(!bsfPrep(&data));
 
-   returnFalseIf(!bsfGet(&data, &value->byte[0]));
-   returnFalseIf(!bsfGet(&data, &value->byte[1]));
-   returnFalseIf(!bsfGet(&data, &value->byte[2]));
-   returnFalseIf(!bsfGet(&data, &value->byte[3]));
+   bsfIndex  = 0;
+   byteIndex = 0;
+
+   loop
+   {
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[bsfIndex]));
+      breakIf(byteIndex == 4);
+   }
 
    _MiffByteSwap4(miff, value);
 
@@ -416,9 +422,9 @@ static MiffN _PartBinToN(Miff const * const miff)
    MiffN letterValue;
 
    value = 0;
-   forCount(index, miff->readBinCount)
+   forCount(index, miff->readCount)
    {
-      letterValue = miff->readBinData[index + 1];
+      letterValue = miff->readData[index + 1];
       switch (letterValue)
       {
       case '0':
@@ -447,9 +453,9 @@ static MiffN _PartHexToN(Miff const * const miff)
    MiffN letterValue;
 
    value = 0;
-   forCount(index, miff->readBinCount)
+   forCount(index, miff->readCount)
    {
-      letterValue = miff->readBinData[index + 1];
+      letterValue = miff->readData[index + 1];
       switch (letterValue)
       {
       case '0':
@@ -489,43 +495,6 @@ static MiffN _PartHexToN(Miff const * const miff)
       }
 
       value += (value << 4) + letterValue;
-   }
-
-   return value;
-}
-
-/******************************************************************************
-func: _PartOctToN
-******************************************************************************/
-static MiffN _PartOctToN(Miff const * const miff)
-{
-   MiffN index;
-   MiffN value;
-   MiffN letterValue;
-
-   value = 0;
-   forCount(index, miff->readBinCount)
-   {
-      letterValue = miff->readBinData[index + 1];
-      switch (letterValue)
-      {
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-         letterValue = letterValue - '0';
-         break;
-
-      default:
-         letterValue = 0;
-         break;
-      }
-
-      value += (value << 3) + letterValue;
    }
 
    return value;

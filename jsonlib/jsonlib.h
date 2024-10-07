@@ -84,52 +84,18 @@ typedef enum
 
    // Reading the first json file value 
    jsonTypeOBJECT_START,
-   jsonTypeFileOBJECT_START               = jsonTypeOBJECT_START,
-   jsonTypeObj_OBJECT_START               = jsonTypeOBJECT_START,
-
    jsonTypeARRAY_START,
-   jsonTypeFileARRAY_START                = jsonTypeARRAY_START,
-   jsonTypeObj_ARRAY_START                = jsonTypeARRAY_START,
-
    jsonTypeSTRING_START,
-   jsonTypeFileSTRING_START               = jsonTypeSTRING_START,
-   jsonTypeObj_STRING_START               = jsonTypeSTRING_START,
-
    jsonTypeOBJECT_STOP,
-   jsonTypeObj_OBJECT_STOP                = jsonTypeOBJECT_STOP,
-
    jsonTypeARRAY_STOP,
-   jsonTypeElemARRAY_STOP                 = jsonTypeARRAY_STOP,
-
    jsonTypeKEY_VALUE_SEPARATOR,
-   jsonTypeObj_KEY_VALUE_SEPARATOR        = jsonTypeKEY_VALUE_SEPARATOR,
-
    jsonTypeSEPARATOR,
-   jsonTypeObj_SEPARATOR                  = jsonTypeSEPARATOR,
-
    jsonTypeNUMBER_INTEGER,
-   jsonTypeFileNUMBER_INTEGER             = jsonTypeNUMBER_INTEGER,
-   jsonTypeObj_NUMBER_INTEGER             = jsonTypeNUMBER_INTEGER,
-
    jsonTypeNUMBER_NATURAL,
-   jsonTypeFileNUMBER_NATURAL             = jsonTypeNUMBER_NATURAL,
-   jsonTypeObj_NUMBER_NATURAL             = jsonTypeNUMBER_NATURAL,
-
    jsonTypeNUMBER_REAL,
-   jsonTypeFileNUMBER_REAL                = jsonTypeNUMBER_REAL,
-   jsonTypeObj_NUMBER_REAL                = jsonTypeNUMBER_REAL,
-
    jsonTypeCONSTANT_FALSE,
-   jsonTypeFileCONSTANT_FALSE             = jsonTypeCONSTANT_FALSE,
-   jsonTypeObj_CONSTANT_FALSE             = jsonTypeCONSTANT_FALSE,
-
    jsonTypeCONSTANT_NULL,
-   jsonTypeFileCONSTANT_NULL              = jsonTypeCONSTANT_NULL,
-   jsonTypeObj_CONSTANT_NULL              = jsonTypeCONSTANT_NULL,
-
    jsonTypeCONSTANT_TRUE,
-   jsonTypeFileCONSTANT_TRUE              = jsonTypeCONSTANT_TRUE,
-   jsonTypeObj_CONSTANT_TRUE              = jsonTypeCONSTANT_TRUE,
 
    // Error returns
    jsonTypeERROR_UNEXPECTED_CHAR          = 100,
@@ -215,6 +181,7 @@ JsonB           jsonCreateWriterContent(  Json       * const json, JsonSetBuffer
 void            jsonDestroy(              Json       * const json);
 void            jsonDestroyContent(       Json       * const json);
 
+JsonType        jsonGetTypeElem(          Json       * const json);
 JsonType        jsonGetTypeFile(          Json       * const json);
 JsonType        jsonGetTypeObj(           Json       * const json);
 

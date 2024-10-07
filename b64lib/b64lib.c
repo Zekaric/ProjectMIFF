@@ -48,6 +48,7 @@ static BsfN1  _ValueToLetter[64];
 global:
 function:
 ******************************************************************************/
+#if 0
 /******************************************************************************
 func: bsfGet
 ******************************************************************************/
@@ -59,7 +60,13 @@ BsfB bsfGet(BsfDataGet * const data, BsfN1 * const byte)
    }
 
    *byte = 0;
-   
+
+   // Nothing valid left in the buffer.
+   if (data->buffer[data->index] == 0)
+   {
+      return bsfFALSE;
+   }
+
    switch (data->state)
    {
    case 0:
@@ -257,6 +264,7 @@ BsfB bsfSetEnd(BsfDataSet * const data)
 
    return bsfTRUE;
 }
+#endif
 
 /******************************************************************************
 func: bsfStart
@@ -413,4 +421,205 @@ void bsfStop(void)
 {
    // Nothing to do.
    _isStarted = bsfFALSE;
+}
+
+/******************************************************************************
+func: bsfPrep
+******************************************************************************/
+BsfB bsfPrep(BsfData * const data)
+{
+   if (!_isStarted ||
+       !data)
+   {
+      return bsfFALSE;
+   }
+
+   data->byte  = 0;
+   data->state = 0;
+
+   return bsfTRUE;
+}
+
+/******************************************************************************
+func: bsfToBsf
+
+To convert a binary byte stream to base64.
+
+byte     - The next byte to convert to base64.  
+bsfByte1 - The first byte related to this new byte.
+bsfByte2 - The potential second byte related to this new byte.
+return   - The number of bytes being returned by this call.  1 or 2.  0 error.
+******************************************************************************/
+BsfI bsfToBsf(BsfData * const data, BsfN1 const byte, BsfN1 * const bsfByte1, BsfN1 * const bsfByte2)
+{
+   BsfN1 sixbit;
+
+   if (!_isStarted ||
+       !bsfByte1   ||
+       !bsfByte2)
+   {
+      return 0;
+   }
+
+   if (data->state == 0)
+   {
+      // sixbit      Remainder byte  Incoming byte
+      // [......]    [........]      [xxxxxxyy]
+      
+      // [xxxxxx] <----------------- [xxxxxx..]
+      sixbit    = ((byte >> 2) &0x3F);
+      *bsfByte1 = _ValueToLetter[sixbit];
+
+      // [xxxxxx]    [..yy....] <--- [......yy]
+      data->byte = (byte & 0x04) << 4;
+
+      data->state++;
+      return 1;
+   }
+
+   if (data->state == 1)
+   {
+      // sixbit      Remainder byte  Incoming byte
+      // [......]    [..rr....]      [xxxxyyyy]
+
+      // [rr....] <- [..rr....]
+      // [rrxxxx] <----------------- [xxxx....]
+      sixbit    = data->byte | ((byte >> 4) & 0x0F);
+      *bsfByte1 = _ValueToLetter[sixbit];
+
+      // [rrxxxx]    [..yyyy..] <--- [....yyyy]
+      data->byte  = ((byte & 0x0F) << 2);
+      
+      data->state++;
+      return 1;
+   }
+
+   //if (data->state == 2)
+   // sixbit      Remainder byte  Incoming byte
+   // [......]    [..rrrr..]      [xxyyyyyy]
+
+   // [rrrr..] <- [..rrrr..]
+   // [rrrrxx] <----------------- [xx......]
+   sixbit    = data->byte | ((byte >> 6)  & 0x03);
+   *bsfByte1 = _ValueToLetter[sixbit];
+
+   // [yyyyyy] <----------------- [..yyyyyy]
+   sixbit    = byte & 0x3F;
+   *bsfByte2 = _ValueToLetter[sixbit];
+
+   // [rrrrxx]    [........]      [........]
+   data->byte  = 0;
+
+   data->state = 0;
+   return 2;
+}
+
+/******************************************************************************
+func: bsfToBsfEnd
+
+To close the binary byte stream to base 64.  
+
+bsfByte - The last byte to be written out.
+return  - The number of bytes being returned by this call.  0 or 1.
+******************************************************************************/
+BsfN1 bsfToBsfEnd(BsfData * const data, BsfN1 * const bsfByte)
+{
+   BsfN1 sixbit;
+
+   if (!_isStarted ||
+       !bsfByte    ||
+       data->state == 0)
+   {
+      return 0;
+   }
+
+   // Remainder byte
+   // [..xx....]
+   // [..xxxx..]
+
+   sixbit   = data->byte;
+   *bsfByte = _ValueToLetter[sixbit];
+
+   data->byte  = 0;
+   data->state = 0;
+   
+   return 1;
+}
+
+/******************************************************************************
+func: bsfToByte
+
+To convert a base64 stream to binary bytes.
+
+bsfByte - The next Base64 byte to convert to bytes.
+byte    - The resulting byte value from the input.
+return  - The number of bytes being returned.  0 or 1.  0 can happen when a 
+          byte is not fully realized by the input base64 byte.
+******************************************************************************/
+BsfI bsfToByte(BsfData * const data, BsfN1 const bsfByte, BsfN1 * const byte)
+{
+   if (!_isStarted ||
+       !data       ||
+       !bsfByte    ||
+       !byte)
+   {
+      return 0;
+   }
+
+   if (data->state == 0)
+   {
+      // byte to fill      Incoming base64 bits
+      // [........]        [......]
+
+      // [111111..]        [111111]
+      data->byte = _LetterToValue[bsfByte] << 2;
+      data->state++;
+      return 0;
+   }
+
+   if (data->state == 1)
+   {
+      // [111111..]
+      *byte = data->byte;
+
+      // [11111122]        [22 2222]
+      data->byte = _LetterToValue[bsfByte];
+      *byte |= (data->byte >> 4);
+
+      // [2222....]
+      data->byte = data->byte << 2;
+
+      data->state++;
+      return 1;
+   }
+
+   if (data->state == 2)
+   {
+      // [2222....]
+      *byte = data->byte;
+
+      // [22223333]        [3333 33]
+      data->byte = _LetterToValue[bsfByte];
+      *byte |= (data->byte >> 2);
+
+      // [33......]
+      data->byte = data->byte << 4;
+
+      data->state++;
+      return 1;
+   }
+
+   // data->state == 3
+   // [33......]
+   *byte = data->byte;
+
+   // [33444444]        [444444]
+   data->byte = _LetterToValue[bsfByte];
+   *byte |= data->byte;
+
+   // [........]
+   data->byte  = 0;
+
+   data->state = 0;
+   return 1;
 }

@@ -18,7 +18,7 @@
     <ClInclude Include="jsonlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="local.h">
+    <ClInclude Include="json_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,19 +26,19 @@
     <ClCompile Include="jsonlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mem.c">
+    <ClCompile Include="json_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="string.c">
+    <ClCompile Include="json_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="write.c">
+    <ClCompile Include="json_write.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="read.c">
+    <ClCompile Include="json_read.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="util.c">
+    <ClCompile Include="json_util.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -161,13 +161,13 @@ MiffB              _MiffPartToKey(           Miff       * const miff);
 MiffN              _MiffPartToN(             Miff const * const miff);
 MiffB              _MiffPartToValue(         Miff const * const miff, MiffValue * const value);
 
-MiffData           _MiffSetBinByte(          Miff       * const miff, MiffN1 const binByte);
+MiffB              _MiffSetBinByte(          Miff       * const miff, MiffN1 const binByte);
 MiffB              _MiffSetBinByteEnd(       Miff       * const miff);
 MiffB              _MiffSetBuffer(           Miff const * const miff, MiffN     const bufCount, MiffN1 const * const buf);
 MiffB              _MiffSetN(                Miff       * const miff, MiffN     const value);
 MiffB              _MiffSetStr(              Miff       * const miff, MiffN     const strCount, MiffStr const * const strBuffer);
-MiffB              _MiffSetValueHeader(      Miff       * const miff, MiffValue const * const value);
-MiffB              _MiffSetValueData(        Miff       * const miff, MiffValue const * const value);
+MiffB              _MiffSetValueHeader(      Miff       * const miff, MiffValue const value);
+MiffB              _MiffSetValueData(        Miff       * const miff, MiffValue const value);
 MiffN              _MiffStrToN(              MiffN        const strLen, MiffN1  const * const str);
 
 #define            _MiffStrGetCount(STR)                          ((MiffN4) strlen((char const *)    STR))

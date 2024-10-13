@@ -471,7 +471,7 @@ BsfI bsfToBsf(BsfData * const data, BsfN1 const byte, BsfN1 * const bsfByte1, Bs
       *bsfByte1 = _ValueToLetter[sixbit];
 
       // [xxxxxx]    [..yy....] <--- [......yy]
-      data->byte = (byte & 0x04) << 4;
+      data->byte = (byte & 0x03) << 4;
 
       data->state++;
       return 1;
@@ -587,7 +587,7 @@ BsfI bsfToByte(BsfData * const data, BsfN1 const bsfByte, BsfN1 * const byte)
       *byte |= (data->byte >> 4);
 
       // [2222....]
-      data->byte = data->byte << 2;
+      data->byte = data->byte << 4;
 
       data->state++;
       return 1;
@@ -603,7 +603,7 @@ BsfI bsfToByte(BsfData * const data, BsfN1 const bsfByte, BsfN1 * const byte)
       *byte |= (data->byte >> 2);
 
       // [33......]
-      data->byte = data->byte << 4;
+      data->byte = data->byte << 6;
 
       data->state++;
       return 1;

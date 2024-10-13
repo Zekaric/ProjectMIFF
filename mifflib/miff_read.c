@@ -181,8 +181,8 @@ MiffData _MiffGetBinByteEnd(Miff * const miff)
       _MiffGetPartEnd(miff);
    }
 
-   returnIf(miff->isPartDone,   miffDataIS_PART_DONE);
    returnIf(miff->isRecordDone, miffDataIS_RECORD_DONE);
+   returnIf(miff->isPartDone,   miffDataIS_PART_DONE);
    return                       miffDataERROR;
 }
 
@@ -272,8 +272,9 @@ MiffB _MiffGetPartEnd(Miff * const miff)
    MiffN1   byte;
 
    // Nothing left to read for this record.
-   returnFalseIf(
-      !miff            ||
+   returnFalseIf(!miff);
+
+   returnTrueIf(
       miff->isPartDone ||
       miff->isRecordDone);
 

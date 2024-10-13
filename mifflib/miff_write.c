@@ -45,8 +45,8 @@ prototype:
 static MiffB _Set4Base64(  Miff       * const miff, Miff4 const value);
 static MiffB _Set8Base64(  Miff       * const miff, Miff8 const value);
 static MiffB _SetBinBase64(Miff       * const miff, MiffN const bufferCount, MiffN1 const * const bufferData);
-static MiffB _SetCBase64(  Miff       * const miff, MiffValue const * const value);
-static MiffB _SetC4Base64( Miff       * const miff, MiffValue const * const value);
+static MiffB _SetCBase64(  Miff       * const miff, MiffValue const value);
+static MiffB _SetC4Base64( Miff       * const miff, MiffValue const value);
 static MiffB _SetI(        Miff       * const miff, MiffI     const value);
 static MiffB _SetNb(       Miff       * const miff, MiffN     const value);
 static MiffB _SetNx(       Miff       * const miff, MiffN     const value);
@@ -60,7 +60,7 @@ function
 /******************************************************************************
 func: _MiffSetBinByte
 ******************************************************************************/
-MiffData _MiffSetBinByte(Miff * const miff, MiffN1 const binByte)
+MiffB _MiffSetBinByte(Miff * const miff, MiffN1 const binByte)
 {
    BsfI  count;
    BsfN1 bsf[2];
@@ -68,24 +68,24 @@ MiffData _MiffSetBinByte(Miff * const miff, MiffN1 const binByte)
    // Time to write out the buffer chunk
    if (miff->valueIndex == 0)
    {
-      returnIf(!bsfPrep(&miff->bsfData), miffDataERROR);
+      returnFalseIf(!bsfPrep(&miff->bsfData));
    }
 
    // Add a new binByte.
    count = bsfToBsf(&miff->bsfData, binByte, &bsf[0], &bsf[1]);
-   returnIf(count == 0, miffDataERROR);
+   returnFalseIf(count == 0);
 
    if (count == 1)
    {
-      returnIf(!_MiffSetBuffer(miff, 1, bsf), miffDataERROR);
+      returnFalseIf(!_MiffSetBuffer(miff, 1, bsf));
       miff->valueIndex++;
-      return miffDataIS_DATA;
+      returnTrue;
    }
 
    //if (count == 2)
-   returnIf(!_MiffSetBuffer(miff, 2, bsf), miffDataERROR);
+   returnFalseIf(!_MiffSetBuffer(miff, 2, bsf));
    miff->valueIndex++;
-   return miffDataIS_DATA;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -216,14 +216,14 @@ MiffB _MiffSetStr(Miff * const miff, MiffN const strLen, MiffStr const * const s
 /******************************************************************************
 func: _MiffSetValueHeader
 ******************************************************************************/
-MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
+MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const value)
 {
    miff->valueIndex = 0;
 
-   switch (value->type)
+   switch (value.type)
    {
    case miffValueTypeB:
-      if (value->b)
+      if (value.b)
       {
          return _MiffSetBuffer(miff, 1, (MiffN1 *) "T");
       }
@@ -232,11 +232,11 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
 
    case miffValueTypeBIN:
       returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "*"));
-      returnFalseIf(!_MiffSetN(     miff, value->bufferCount));
+      returnFalseIf(!_MiffSetN(     miff, value.bufferCount));
       return         _MiffSetBuffer(miff, 1, (MiffN1 *) " ");
 
    case miffValueTypeC:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
          return _MiffSetBuffer(  miff, 1, (MiffN1 *) "C");
@@ -247,7 +247,7 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
       break;
 
    case miffValueTypeI:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
          return _MiffSetBuffer(miff, 1, (MiffN1 *) "I");
@@ -258,7 +258,7 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
       break;
 
    case miffValueTypeN:
-      switch (value->formatN)
+      switch (value.formatN)
       {
       case miffValueFormatN_B:
          return _MiffSetBuffer(miff, 1, (MiffN1 *) "b");
@@ -278,7 +278,7 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
       return _MiffSetBuffer(miff, 1, (MiffN1 *) "~");
 
    case miffValueTypeR:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
          return _MiffSetBuffer(miff, 1, (MiffN1 *) "R");
@@ -290,7 +290,7 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
 
    case miffValueTypeSTR:
       returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "\""));
-      returnFalseIf(!_MiffSetN(     miff, value->bufferCount));
+      returnFalseIf(!_MiffSetN(     miff, value.bufferCount));
       return         _MiffSetBuffer(miff, 1, (MiffN1 *) " ");
    }
 
@@ -300,24 +300,24 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const * const value)
 /******************************************************************************
 func: _MiffSetValueData
 ******************************************************************************/
-MiffB _MiffSetValueData(Miff * const miff, MiffValue const * const value)
+MiffB _MiffSetValueData(Miff * const miff, MiffValue const value)
 {
-   switch (value->type)
+   switch (value.type)
    {
    case miffValueTypeB:
       break;
 
    case miffValueTypeBIN:
       returnFalseIf(
-         value->bufferCount == miffBufferCountUNKNOWN ||
-         !value->bufferData.bin);
-      return _SetBinBase64(miff, value->bufferCount, value->bufferData.bin);
+         value.bufferCount == miffBufferCountUNKNOWN ||
+         !value.bufferData.bin);
+      return _SetBinBase64(miff, value.bufferCount, value.bufferData.bin);
 
    case miffValueTypeC:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         if (value->is4)
+         if (value.is4)
          {
             return _SetC4Base64(miff, value);
          }
@@ -327,22 +327,22 @@ MiffB _MiffSetValueData(Miff * const miff, MiffValue const * const value)
          }
 
       case miffValueFormatCIR_TEXT:
-         if (value->is4)
+         if (value.is4)
          {
-            returnFalseIf(!_SetR4(miff, value->inr4.r));
-            if (value->imaginary4.r != 0.0)
+            returnFalseIf(!_SetR4(miff, value.inr4.r));
+            if (value.imaginary4.r != 0.0)
             {
                returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "+"));
-               return         _SetR4(        miff, value->imaginary4.r);
+               return         _SetR4(        miff, value.imaginary4.r);
             }
          }
          else 
          {
-            returnFalseIf(!_SetR(miff, value->inr.r));
-            if (value->imaginary.r != 0.0)
+            returnFalseIf(!_SetR(miff, value.inr.r));
+            if (value.imaginary.r != 0.0)
             {
                returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "+"));
-               return         _SetR(         miff, value->imaginary.r);
+               return         _SetR(         miff, value.imaginary.r);
             }
          }
          break;
@@ -350,30 +350,30 @@ MiffB _MiffSetValueData(Miff * const miff, MiffValue const * const value)
       break;
 
    case miffValueTypeI:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         return _Set8Base64(miff, value->inr);
+         return _Set8Base64(miff, value.inr);
 
       case miffValueFormatCIR_TEXT:
-         return _SetI(miff, (MiffN) value->inr.i);
+         return _SetI(miff, (MiffN) value.inr.i);
       }
       break;
 
    case miffValueTypeN:
-      switch (value->formatN)
+      switch (value.formatN)
       {
       case miffValueFormatN_B:
-         return _SetNb(miff, value->inr.n);
+         return _SetNb(miff, value.inr.n);
 
       case miffValueFormatN_BASE64:
-         return _Set8Base64(miff, value->inr);
+         return _Set8Base64(miff, value.inr);
 
       case miffValueFormatN_TEXT:
-         return _MiffSetN(miff, value->inr.n);
+         return _MiffSetN(miff, value.inr.n);
 
       case miffValueFormatN_X:
-         return _SetNx(miff, value->inr.n);
+         return _SetNx(miff, value.inr.n);
       }
       break;
 
@@ -381,35 +381,35 @@ MiffB _MiffSetValueData(Miff * const miff, MiffValue const * const value)
       break;
 
    case miffValueTypeR:
-      switch (value->formatCIR)
+      switch (value.formatCIR)
       {
       case miffValueFormatCIR_BASE64:
-         if (value->is4)
+         if (value.is4)
          {
-            return _Set4Base64(miff, value->inr4);
+            return _Set4Base64(miff, value.inr4);
          }
          else
          {
-            return _Set8Base64(miff, value->inr);
+            return _Set8Base64(miff, value.inr);
          }
 
       case miffValueFormatCIR_TEXT:
-         if (value->is4)
+         if (value.is4)
          {
-            return _SetR4(miff, value->inr4.r);
+            return _SetR4(miff, value.inr4.r);
          }
          else
          {
-            return _SetR(miff, value->inr.r);
+            return _SetR(miff, value.inr.r);
          }
       }
       break;
 
    case miffValueTypeSTR:
       returnFalseIf(
-         value->bufferCount == miffBufferCountUNKNOWN ||
-         !value->bufferData.str);
-      return _MiffSetStr(miff, value->bufferCount, value->bufferData.str);
+         value.bufferCount == miffBufferCountUNKNOWN ||
+         !value.bufferData.str);
+      return _MiffSetStr(miff, value.bufferCount, value.bufferData.str);
    }
 
    returnTrue;
@@ -431,7 +431,7 @@ static MiffB _Set4Base64(Miff * const miff, Miff4 const value)
    vtemp.n = value.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   returnFalseIf(bsfPrep(&miff->bsfData));
+   returnFalseIf(!bsfPrep(&miff->bsfData));
 
    index = 0;
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);
@@ -455,7 +455,7 @@ static MiffB _Set8Base64(Miff * const miff, Miff8 const value)
    vtemp.n = value.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   returnFalseIf(bsfPrep(&miff->bsfData));
+   returnFalseIf(!bsfPrep(&miff->bsfData));
 
    index = 0;
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);
@@ -484,6 +484,8 @@ static MiffB _SetBinBase64(Miff * const miff, MiffN const bufferCount,
    {
       returnFalseIf(!miffSetValueBinData(miff, bufferData[index]));
    }
+   returnFalseIf(!miffSetValueBinDataEnd(miff));
+
    return miffSetValueStop(miff);
 #else
    BsfDataSet   data;
@@ -519,16 +521,16 @@ static MiffB _SetBinBase64(Miff * const miff, MiffN const bufferCount,
 /******************************************************************************
 func: _SetCBase64
 ******************************************************************************/
-static MiffB _SetCBase64(Miff * const miff, MiffValue const  * const value)
+static MiffB _SetCBase64(Miff * const miff, MiffValue const value)
 {
    Miff8 vtemp;
    BsfI  index;
    BsfN1 buffer[64];
 
-   vtemp.n = value->inr.n;
+   vtemp.n = value.inr.n;
    _MiffByteSwap8(miff, &vtemp);
 
-   returnFalseIf(bsfPrep(&miff->bsfData));
+   returnFalseIf(!bsfPrep(&miff->bsfData));
 
    index = 0;
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);
@@ -540,7 +542,7 @@ static MiffB _SetCBase64(Miff * const miff, MiffValue const  * const value)
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[6], &buffer[index], &buffer[index + 1]);
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[7], &buffer[index], &buffer[index + 1]);
 
-   vtemp.n = value->imaginary.n;
+   vtemp.n = value.imaginary.n;
    _MiffByteSwap8(miff, &vtemp);
 
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);
@@ -559,16 +561,16 @@ static MiffB _SetCBase64(Miff * const miff, MiffValue const  * const value)
 /******************************************************************************
 func: _SetC4Base64
 ******************************************************************************/
-static MiffB _SetC4Base64(Miff * const miff, MiffValue const * const value)
+static MiffB _SetC4Base64(Miff * const miff, MiffValue const value)
 {
    Miff4 vtemp;
    BsfI  index;
    BsfN1 buffer[64];
 
-   vtemp.n = value->inr4.n;
+   vtemp.n = value.inr4.n;
    _MiffByteSwap4(miff, &vtemp);
 
-   returnFalseIf(bsfPrep(&miff->bsfData));
+   returnFalseIf(!bsfPrep(&miff->bsfData));
 
    index = 0;
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);
@@ -576,7 +578,7 @@ static MiffB _SetC4Base64(Miff * const miff, MiffValue const * const value)
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[2], &buffer[index], &buffer[index + 1]);
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[3], &buffer[index], &buffer[index + 1]);
 
-   vtemp.n = value->imaginary4.n;
+   vtemp.n = value.imaginary4.n;
    _MiffByteSwap4(miff, &vtemp);
 
    index += bsfToBsf(   &miff->bsfData, vtemp.byte[0], &buffer[index], &buffer[index + 1]);

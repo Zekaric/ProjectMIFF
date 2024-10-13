@@ -284,7 +284,7 @@ JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
       json->value.n = _JsonStrToN(&numberStr[1]);
       if      (json->value.n == ((JsonN) JsonI_MAX) + 1)
       {
-         json->value.i = jsonI_MIN;
+         json->value.i = JsonI_MIN;
       }
       else if (json->value.n <= JsonI_MAX)
       {

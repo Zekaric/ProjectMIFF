@@ -92,7 +92,7 @@ JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
    json->dataRepo             = dataRepo;
    json->getBuffer            = getBufferFunc;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -144,7 +144,7 @@ JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
    json->setBuffer   = setBufferFunc;
    json->isFirstItem = jsonTRUE;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -385,7 +385,7 @@ JsonB jsonGetKey(Json * const json, JsonStr ** const key)
 
    *key = json->key;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -402,7 +402,7 @@ JsonB jsonGetI(Json * const json, JsonI * const value)
 
    *value = json->value.i;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -424,7 +424,7 @@ JsonB jsonGetN(Json * const json, JsonN *  const value)
         (json->value.type == jsonTypeNUMBER_INTEGER &&
          json->value.i    == (JsonI) json->value.n)));
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -438,7 +438,7 @@ JsonB jsonGetR(Json * const json, JsonR *  const value)
 {
    *value = json->value.r;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -448,7 +448,68 @@ JsonB jsonGetR4(Json * const json, JsonR4 *  const value)
 {
    *value = json->value.r4;
 
-   return jsonTRUE;
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonGetBinByte
+******************************************************************************/
+JsonB jsonGetBinByte(Json * const json, JsonN1 * const value)
+{
+   int count;
+
+   returnFalseIf(!json);
+
+   returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
+
+   returnFalseIf(json->lastByte == '\"');
+
+   count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) &value);
+   if (count == 0)
+   {
+      returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
+
+      returnFalseIf(json->lastByte == '\"');
+
+      count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) &value);
+
+      returnFalseIf(count == 0);
+   }
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonGetBinStart
+******************************************************************************/
+JsonB jsonGetBinStart(Json * const json)
+{
+   returnFalseIf(!json);
+
+   returnFalseIf(!bsfPrep(&json->bsfData));
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonGetBinStop
+******************************************************************************/
+JsonB jsonGetBinStop(Json * const json)
+{
+   returnFalseIf(!json);
+
+   // Read in the next character(s) until "
+   if (json->lastByte != '\"')
+   {
+      loop
+      {
+         returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
+
+         breakIf(json->lastByte == '\"');
+      }
+   }
+
+   returnTrue;
 }
 
 /******************************************************************************
@@ -479,7 +540,7 @@ JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
       value[index] = 0;
    }
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -589,7 +650,7 @@ JsonB jsonGetStrHex(Json * const json, JsonStr * const h1, JsonStr * const h2, J
    *h3 = json->hex[2];
    *h4 = json->hex[3];
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -615,7 +676,7 @@ JsonB jsonSetArrayStart(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -635,7 +696,7 @@ JsonB jsonSetArrayStop(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonARRAY_STOP_STR));
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -664,7 +725,7 @@ JsonB jsonSetKey(Json * const json, JsonStr const * const key)
    returnFalseIf(!jsonSetValueStrStop(json));
 
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonKEY_VALUE_SEPARATOR_STR));
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -690,7 +751,7 @@ JsonB jsonSetObjectStart(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -710,7 +771,7 @@ JsonB jsonSetObjectStop(Json * const json)
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonOBJECT_STOP_STR));
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
@@ -729,7 +790,31 @@ JsonB jsonSetSeparator(Json * const json)
       returnFalseIf(!_JsonSetIndent(  json));
    }
    json->isFirstItem = jsonFALSE;
-   return jsonTRUE;
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonSetValueBin
+******************************************************************************/
+JsonB jsonSetValueBin(Json * const json, JsonN const count, JsonN1 const * const value)
+{
+   JsonI4 index;
+
+   returnFalseIf(
+      !_isStarted ||
+      !json       ||
+      !value);
+
+   returnFalseIf(!jsonSetValueStrStart(json));
+   returnFalseIf(!jsonSetValueStrBinStart(json));
+   for (index = 0; index < count; index++)
+   {
+      returnFalseIf(!jsonSetValueStrBinByte(json, value[index]));
+   }
+   returnFalseIf(!jsonSetValueStrBinStop(json));
+   returnFalseIf(!jsonSetValueStrStop(json));
+
+   returnTrue;
 }
 
 /******************************************************************************
@@ -862,25 +947,62 @@ JsonB jsonSetValueStr(Json * const json, JsonStr const * const str)
    }
    returnFalseIf(!jsonSetValueStrStop(json));
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************
-func: jsonSetValueStrStart
+func: jsonSetValueStrBinByte
 ******************************************************************************/
-JsonB jsonSetValueStrStart(Json * const json)
+JsonB jsonSetValueStrBinByte(Json * const json, JsonN1 const value)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !json);
+   BsfN1 letter[2];
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   returnFalseIf(!json);
+
+   switch (bsfToBsf(&json->bsfData, (BsfN1) value, &letter[0], &letter[1]))
    {
-      returnFalseIf(!jsonSetSeparator(json));
+   case 0:
+      returnFalse;
+
+   case 1:
+      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) letter));
+      break;
+
+   case 2:
+      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) letter));
+      break;
    }
-   json->isFirstItem = jsonFALSE;
-   
-   return _JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR);
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonSetValueStrBinStart
+******************************************************************************/
+JsonB jsonSetValueStrBinStart(Json * const json)
+{
+   returnFalseIf(!json);
+
+   returnFalseIf(!bsfPrep(&json->bsfData));
+
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonSetValueStrBinStop
+******************************************************************************/
+JsonB jsonSetValueStrBinStop(Json * const json)
+{
+   BsfN1 letter;
+
+   returnFalseIf(!json);
+
+   if (bsfToBsfEnd(&json->bsfData, &letter) == 1)
+   {
+      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) &letter));
+   }
+
+   returnTrue;
 }
 
 /******************************************************************************
@@ -930,7 +1052,25 @@ JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
       returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) &value));
    }
 
-   return jsonTRUE;
+   returnTrue;
+}
+
+/******************************************************************************
+func: jsonSetValueStrStart
+******************************************************************************/
+JsonB jsonSetValueStrStart(Json * const json)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
+
+   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   {
+      returnFalseIf(!jsonSetSeparator(json));
+   }
+   json->isFirstItem = jsonFALSE;
+   
+   return _JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR);
 }
 
 /******************************************************************************
@@ -964,7 +1104,7 @@ JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestr
 
    _isStarted = jsonTRUE;
 
-   return jsonTRUE;
+   returnTrue;
 }
 
 /******************************************************************************

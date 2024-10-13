@@ -375,7 +375,7 @@ static MiffB _PartBase64ToN(Miff const * const miff, MiffN const count, MiffN1 c
 
    loop
    {
-      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[bsfIndex]));
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[byteIndex]));
       breakIf(byteIndex == 8);
    }
 
@@ -403,7 +403,7 @@ static MiffN4 _PartBase64ToN4(Miff const * const miff, MiffN const count, MiffN1
 
    loop
    {
-      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[bsfIndex]));
+      byteIndex += bsfToByte(&data, buffer[bsfIndex++], &(value->byte[byteIndex]));
       breakIf(byteIndex == 4);
    }
 

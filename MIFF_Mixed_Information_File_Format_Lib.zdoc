@@ -1,0 +1,203 @@
+v	__>	|_||_|-
+v	___	|_||_||_|
+v	-->	[tb]
+v	<--	[nl]
+
+H	M.I.F.F.: Mixed Information File Format
+
+	|b ||. |Author:            | .|| b| Robbert de Groot
+	|b ||. |Date:              | .|| b| 2019-05-15
+	|b ||. |Copyright:         | .|| b| 2019, Robbert de Groot
+	|b ||. |License (Library): | .|| b| MIT License.
+	|b ||. |License (Document):| .|| b| Creative Commons Attribution-NoDerivs.|link |https://creativecommons.org/licenses/by-nd:4.0| link |(CC BY-ND)| link|
+
+HH	Table Of Contents:
+
+toc
+
+
+h	|chapter| - M.I.F.F.
+
+
+hh	|chapter| - Discussion
+
+	What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.  
+
+
+hh	|chapter| - Goals
+
+:[
+-	|b |Simple| b|    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
+-	|b |Brief| b|     The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+-	|b |Flexible| b|  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
+-	|b |Accurate| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
+]
+
+
+hh	|chapter| - Design Decisions:
+
+	|b |Why not XML or JSON?| b|
+	I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.
+	|b |Why big endian for multibyte data types?| b|
+	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was big endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another, accurately.
+
+
+hh	|chapter| - Disclosure
+
+	I, Robbert de Groot, have been a professional Software Developer since 1995.
+	This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing or developing options which I find lacking or distasteful in some fashion.
+	I can be reached at the following email address.
+	zekaric@gmail.com
+
+
+h	|chapter| - Format
+
+	A MIFF File is a UTF8 text file where items inside are tab delimited and each record is a single line terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.  
+	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a transfer file format to move data from one program to another.
+	Any data that is encode or stored as a binary byte sequence will be in big endian order.  
+
+
+hh	|chapter| - File Header
+
+	There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
+
+.[
+MIFF|<--|
+1|<--|
+[Sub-Format Name string]|<--|
+[Sub-Format Version string]|<--|
+]
+
+	|<--| means a new line character.
+
+:[
+-	|b |Line 1| b| - Format of the file.  MIFF.
+-	|b |Line 2| b| - Version of the file.  Version 1.
+-	|b |Line 4| b| - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.
+-	|b |Line 5| b| - Sub-Format version identifier.
+]
+
+	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain |-->|s or |<--|s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
+
+
+hh	|chapter| - Content
+
+	Each line is split into 3 sections.  The header for the line, the key for the line, and the value section.
+	Each section is separated by a |-->| character.  The entire line ends in a |<--| character.
+
+.[
+[header]|-->|[key]|-->|[value]|<--|
+]
+
+hhh	|chapter| - Header Section
+
+	The header for the line is one of the following.
+
+t[
+thx	Code
+th*	Description
+
+t-
+tcx	-
+tc	Comment line.  This has no meaning whatsoever in the file.  It should never contain any data or meta-data.  These lines will be ignored completely when reading the file.
+
+t-
+tcx	{
+tc	Open new scope.  This is so you can group data into sections or objects.
+
+t-
+tcx	}
+tc	Close scope.  Denotes the end of a scope.  
+
+t-
+tcx	[count]
+tc	This will be a number 0 or larger to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of objects, use a count key value and a scope for each individual object in the array instead.  
+
+t-
+tcx	*
+tc	This will be to indicate an array of unknown size.  In generaly I would advise trying to avoid this as muck as possible.  It is better to know beforehand howmuch space data should take up.  However sometimes this is unavoidable.
+
+]
+
+	The header can have leading spaces or |-->| characters to make it more obvious which scope it belongs to.  However these spaces and |-->| characters are not needed unless you want to make it more readable.  They are stripped when reading the file.
+
+hhh	|chapter| - Key Section
+
+	Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, some characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes the key is valid.  The key can have spaces or any special characters you like except |-->| and |<--| characters.  This does mean leading, trailing, and internal spaces in the key are significant.
+
+hhh	|chapter| - Value Section
+
+	The sub-format of the file should be dictating what values follow the key.  This should be defined somewhere in the documentation of the sub-format.  
+	There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a |-->| character.
+	If there is a count in the line header other than 1 then there should be multiple copies of whatever type that is associated with the key.
+	Values have a simple format.
+
+.[
+[header][valueData]
+]
+
+	The header is a single character.  
+	The valueData will depend on the header.
+
+t[
+thx	Header
+th*	Description
+
+t-
+tcx	~
+tc	The value data is unset/null.  Nothing else follows the header.
+
+t-
+tcx	T, F
+tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.  Often, when dealing with just a single boolean value, the existance of a key is enough to indicate T and ommision would indicate F.  
+
+t-
+tcx	x, b
+tc	A natural number (0 or larger integer values).  |b |x| b| for hexadecimal (0123456789abcdef) values and |b |b| b|for binary (01) values.  If you want to store an interger or real here then use unions Miff4 and Miff8 to get the natural number representing the bit pattern for the integer and real values.  Leading zeros will be trimmed from the number.  Values are store in Big Endian.  These are here because sometimes it makes sense to show values in hex or binary.  Leading 0's are stripped.  0 value will be just a singular 0.
+
+t-
+tcx	c, i, n, r
+tc	The value data will be a |b |c| b| complex number, an |b |i| b| integer number, a |b |n| b| natural number, or a |b |r| b| real number in human readable form.  If the value is a real number, it should be written using North American number format (E.G. 3.14159, 1.0e10.  Decimal/"." instead of comma/"," for the separation of the integer part and the fractional part.)  If the value is a complex number the is it written real number "+" imaginary number.  If the imaginary number is negative then it will include the "-" sign.  It will not change the "+" between the two numbers.
+
+t-
+tcx	C, I, N, R
+tc	The value data will be a 4 or 8 byte |b |C| b| complex number, |b |I| b| integer number, |b |N| b| natural number, or |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact int ASCII form depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.  Complex numbers encode the two reals as one buffer for the Base64 conversion.  Values are stored in Big Endian.
+
+t-
+tcx	"
+tc	The value data will be a string.  There is no closing |b |"| b|.  It will be in two parts separated by a space.  First part immediately follows the " and it denotes the size of the string in bytes.  After the space to the next |-->| or |<--| which ever is next, is the string.  The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  
+
+t-
+tcx	*
+tc	The value data is a binary buffer.  It will be two parts separated by a space.  First part immediately follows the * and it denotes the size of the binary buffer in bytes.  After the space will be the binary buffer in Base64 encoding.
+
+t-
+tcx	[Any other letter]
+tc	The value data is define by the subformat and decoded by an external to the library function.
+
+]
+
+hh	Examples
+
+.[
+- A null value.
+1|-->|Null|-->|~|<--|
+-
+- A boolean true without explicit setting.  If this was missing then isVisible is false.
+0|-->|isVisible|<--|
+-
+- A true and false array.
+2|-->|True And False|-->|T|-->|F|<--|
+-
+- Some integers, reals, and complex numbers.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
+7|-->|Numbers|-->|i0|-->|i1|-->|i-1|-->|r0|-->|r3.14159|-->|r-3.14159|-->|r1e-10|-->|c1|-->|c0+1|-->|c-1+-1|-->|RQEkP2w|-->|RQAkh+1RELRg|<--|
+-
+- Some natural numbers in different encoding.  Trim leading 0's.
+3|-->|Encoded Numbers|-->|xfeedface|-->|o12345670|-->|b111100110101|<--|
+-
+- Some strings.
+3|-->|Strings|-->|"The quick brown fox\njumped over the lazy dog.|-->|"Salut, c'est été.|-->|"你好马|<--|
+-
+- Some binary data.
+1|-->|binary buffer|-->|*32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg|<--|
+]

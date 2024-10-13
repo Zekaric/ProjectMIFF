@@ -16,6 +16,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mifflibTest", "mifflibTest\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jsonlib", "jsonlib\jsonlib.vcxproj", "{0A4139FB-7F79-439F-9C46-26B095C0B3AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7C6AEA1F-5596-4FE4-8AFD-E538AE723EED} = {7C6AEA1F-5596-4FE4-8AFD-E538AE723EED}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "b64lib", "b64lib\b64lib.vcxproj", "{7C6AEA1F-5596-4FE4-8AFD-E538AE723EED}"
 EndProject

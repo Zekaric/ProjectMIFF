@@ -43,6 +43,7 @@ include:
 #include <stdlib.h>
 #include <locale.h>
 
+#include "b64lib.h"
 #include "jsonlib.h"
 
 /******************************************************************************

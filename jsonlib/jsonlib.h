@@ -126,8 +126,12 @@ typedef char                              JsonStr;
 #define JsonN_MAX                         UINT64_MAX
 #define JsonN4_MAX                        UINT32_MAX
 #define JsonI_MAX                         INT64_MAX
-#define jsonI_MIN                         INT64_MIN
+#define JsonI_MIN                         INT64_MIN
 #define JsonI4_MAX                        INT32_MAX
+#define JsonR_EPSILON                     DBL_EPSILON
+#define JsonR_MAX                         DBL_MAX
+#define JsonR4_EPSILON                    FLT_EPSILON
+#define JsonR4_MAX                        FLT_MAX
 
 typedef void *(*JsonMemCreate)(        JsonN4 const memByteCount);
 typedef void  (*JsonMemDestroy)(       void * const mem);
@@ -164,6 +168,7 @@ typedef struct
    // Read value
    JsonValue                   value;
    JsonStr                     hex[4];
+   BsfData                     bsfData;
 } Json;
 
 /******************************************************************************
@@ -185,8 +190,11 @@ JsonType        jsonGetTypeElem(          Json       * const json);
 JsonType        jsonGetTypeFile(          Json       * const json);
 JsonType        jsonGetTypeObj(           Json       * const json);
 
-JsonB           jsonGetKey(               Json       * const json, JsonStr ** const key);
+JsonB           jsonGetBinByte(           Json       * const json, JsonN1 * const value);
+JsonB           jsonGetBinStart(          Json       * const json);
+JsonB           jsonGetBinStop(           Json       * const json);
 JsonB           jsonGetI(                 Json       * const json, JsonI *  const value);
+JsonB           jsonGetKey(               Json       * const json, JsonStr ** const key);
 JsonB           jsonGetN(                 Json       * const json, JsonN *  const value);
 JsonB           jsonGetR(                 Json       * const json, JsonR *  const value);
 JsonB           jsonGetR4(                Json       * const json, JsonR4 *  const value);
@@ -200,6 +208,7 @@ JsonB           jsonSetKey(               Json       * const json, JsonStr const
 JsonB           jsonSetObjectStart(       Json       * const json);
 JsonB           jsonSetObjectStop(        Json       * const json);
 JsonB           jsonSetSeparator(         Json       * const json);
+JsonB           jsonSetValueBin(          Json       * const json, JsonN const count, JsonN1 const * const value);
 JsonB           jsonSetValueBool(         Json       * const json, JsonB           const value);
 JsonB           jsonSetValueI(            Json       * const json, JsonI           const value);
 JsonB           jsonSetValueN(            Json       * const json, JsonN           const value);
@@ -207,8 +216,11 @@ JsonB           jsonSetValueNull(         Json       * const json);
 JsonB           jsonSetValueR(            Json       * const json, JsonR           const value);
 JsonB           jsonSetValueR4(           Json       * const json, JsonR4          const value);
 JsonB           jsonSetValueStr(          Json       * const json, JsonStr const * const value);
-JsonB           jsonSetValueStrStart(     Json       * const json);
+JsonB           jsonSetValueStrBinByte(   Json       * const json, JsonN1 const value);
+JsonB           jsonSetValueStrBinStart(  Json       * const json);
+JsonB           jsonSetValueStrBinStop(   Json       * const json);
 JsonB           jsonSetValueStrLetter(    Json       * const json, JsonStr         const value);
+JsonB           jsonSetValueStrStart(     Json       * const json);
 JsonB           jsonSetValueStrStop(      Json       * const json);
 JsonB           jsonStart(                JsonMemCreate const memCreate, JsonMemDestroy const memDestroy);
 void            jsonStop(                 void);

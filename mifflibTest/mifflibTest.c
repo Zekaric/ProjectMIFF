@@ -893,6 +893,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 100)                                     break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg = "I Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -911,6 +912,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 256)                                     break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg = "N Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -930,6 +932,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 256)                                     break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg = "R Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -937,8 +940,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       for (index = 0; index < 300; index++)
       {
          type = jsonGetTypeElem(json);
-         if (type != jsonTypeNUMBER_REAL || 
-             !jsonGetR(json, &rtemp)     || 
+         if (!(type == jsonTypeNUMBER_REAL    || 
+               type == jsonTypeNUMBER_INTEGER || 
+               type == jsonTypeNUMBER_NATURAL)  ||
+             !jsonGetR(json, &rtemp)            || 
              _reals8[index] != rtemp)
             break;
          
@@ -948,6 +953,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 300)                                     break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg = "R4 Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -955,8 +961,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       for (index = 0; index < 300; index++)
       {
          type = jsonGetTypeElem(json);
-         if (type != jsonTypeNUMBER_REAL ||
-             !jsonGetR4(json, &r4temp)   ||
+         if (!(type == jsonTypeNUMBER_REAL    ||
+               type == jsonTypeNUMBER_INTEGER ||
+               type == jsonTypeNUMBER_NATURAL)  ||
+             !jsonGetR4(json, &r4temp)          ||
              _reals4[index] != r4temp)
             break;
          
@@ -966,6 +974,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 300)                                     break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg = "String Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -984,7 +993,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             break;
       }
       if (index != 10)                                      break;
-
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
       msg    = "NO";
       result = jsonTRUE;
@@ -1020,7 +1029,7 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
       }
 
       // Create a json file.
-      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonFALSE);
+      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonTRUE);
       if (!json)
       {
          break;

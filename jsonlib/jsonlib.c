@@ -464,14 +464,14 @@ JsonB jsonGetBinByte(Json * const json, JsonN1 * const value)
 
    returnFalseIf(json->lastByte == '\"');
 
-   count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) &value);
+   count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) value);
    if (count == 0)
    {
       returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
 
       returnFalseIf(json->lastByte == '\"');
 
-      count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) &value);
+      count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) value);
 
       returnFalseIf(count == 0);
    }
@@ -508,6 +508,8 @@ JsonB jsonGetBinStop(Json * const json)
          breakIf(json->lastByte == '\"');
       }
    }
+
+   json->lastByte = 0;
 
    returnTrue;
 }

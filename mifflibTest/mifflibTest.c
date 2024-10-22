@@ -627,7 +627,7 @@ static JsonB JSON_TEST_KEY(Json * const JSON, char const * const KEY)
    JsonStr key[32];
 
    if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return jsonFALSE;
-   if (!(jsonGetStr(  JSON, 32, key) && memcmp(key, KEY, strlen(KEY)) == 0))  return jsonFALSE;
+   if (!(jsonGetStr(  JSON, 32, key) && strcmp(key, KEY) == 0))               return jsonFALSE;
    if (jsonGetTypeObj(JSON) != jsonTypeKEY_VALUE_SEPARATOR)                   return jsonFALSE;
    return jsonTRUE;
 }
@@ -696,7 +696,7 @@ static JsonB JSON_TEST_STR(Json * const JSON, char const * const VALUE)
    if (jletter == jsonStrLetterERROR)                                         return jsonFALSE;
 
    stemp[sindex] = 0;
-   if (memcmp(stemp, VALUE, sindex) != 0)                                     return jsonFALSE;
+   if (strcmp(stemp, VALUE) != 0)                                             return jsonFALSE;
    return jsonTRUE;
 }
 
@@ -872,10 +872,12 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       if (!JSON_TEST_STR(  json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./")) break;
       if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
 
+#if defined(INCLUDE_BIN)
       msg = "Binary";
       if (!JSON_TEST_KEY(  json, msg))                      break;
       if (!JSON_TEST_BIN(  json, 3 * 256, _binary))         break;
       if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+#endif
 
       msg = "Bool Array";
       if (!JSON_TEST_KEY(  json, msg))                      break;
@@ -982,9 +984,9 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       for (index = 0; index < 10; index++)
       {
          type = jsonGetTypeElem(json);
-         if (type != jsonTypeSTRING_START ||
-             jsonGetStr(json, 256, stemp) ||
-             memcmp(stemp, _strings[index], 256) != 0)
+         if (type != jsonTypeSTRING_START  ||
+             !jsonGetStr(json, 256, stemp) ||
+             strcmp(stemp, _strings[index]) != 0)
             break;
          
          type = jsonGetTypeElem(json);
@@ -994,6 +996,481 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       }
       if (index != 10)                                      break;
       if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+#if defined(INCLUDE_BIN)
+      msg = "Binary Array";
+      if (!JSON_TEST_KEY(  json, msg))                      break;
+      if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+      for (index = 0; index < 3; index++)
+      {
+         if (!JSON_TEST_BIN(json, 3 * 256, _binary))        break;
+
+         type = jsonGetTypeElem(json);
+         if ((index <  2 && type != jsonTypeSEPARATOR) ||
+             (index == 2 && type != jsonTypeARRAY_STOP))
+            break;
+      }
+      if (index != 3)                                       break;
+      if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+#endif
+
+      msg = "User Type IntStrReal";
+      if (!JSON_TEST_KEY(  json, msg))                      break;
+      if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+      {
+         if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+         if (!jsonGetI(json, &itemp))                       break;
+         if (itemp != 42)                                   break;
+
+         if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+         if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+         if (!jsonGetStr(json, 256, stemp))                 break;
+         if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+         if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+         if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+         if (!jsonGetR(json, &rtemp))                       break;
+         if (rtemp != 3.1415926535897932)                   break;
+
+         if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+      }
+      if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)        break;
+
+      msg = "User Type IntStrReal Array";
+      if (!JSON_TEST_KEY(  json, msg))                      break;
+      if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+      {
+         if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+         {
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+            if (!jsonGetI(json, &itemp))                       break;
+            if (itemp != 42)                                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+            if (!jsonGetStr(json, 256, stemp))                 break;
+            if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+            if (!jsonGetR(json, &rtemp))                       break;
+            if (rtemp != 3.1415926535897932)                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+         }
+         if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+         if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+         {
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+            if (!jsonGetI(json, &itemp))                       break;
+            if (itemp != 42)                                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+            if (!jsonGetStr(json, 256, stemp))                 break;
+            if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+            if (!jsonGetR(json, &rtemp))                       break;
+            if (rtemp != 3.1415926535897932)                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+         }
+         if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+         if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+         {
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+            if (!jsonGetI(json, &itemp))                       break;
+            if (itemp != 42)                                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+            if (!jsonGetStr(json, 256, stemp))                 break;
+            if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+            if (!jsonGetR(json, &rtemp))                       break;
+            if (rtemp != 3.1415926535897932)                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+         }
+         if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+      }
+      if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)        break;
+
+      msg = "Block";
+      if (!JSON_TEST_KEY(  json, msg))                      break;
+      if (jsonGetTypeObj(json) != jsonTypeOBJECT_START)     break;
+      {
+         msg = "Null";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeCONSTANT_NULL)  break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "True";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeCONSTANT_TRUE)  break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "False";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeCONSTANT_FALSE) break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I 0";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_INT(  json, 0))                        break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I 1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_INT(  json, 1))                        break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I -1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_INT(  json, -1))                       break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I MAX";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_INT(  json, JsonI_MAX))                break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I MIN";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_INT(  json, JsonI_MIN))                break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "N 0";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_NAT(  json, 0))                        break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "N 1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_NAT(  json, 1))                        break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "N MAX";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_NAT(  json, JsonN_MAX))                break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R 0";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, 0.0))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R 1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, 1.0))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+      
+         msg = "R -1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, -1.0))                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R PI";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, 3.1415926535897932))       break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R EPS";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, JsonR_EPSILON))            break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R MAX";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL( json, JsonR_MAX))                break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 0";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, 0.0f))                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, 1.0f))                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 -1";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, -1.0f))                    break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 PI";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, 3.1415926535897932f))      break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 EPS";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, JsonR4_EPSILON))           break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 MAX";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_REAL4(json, JsonR4_MAX))               break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "String";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_STR(  json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./")) break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+   #if defined(INCLUDE_BIN)
+         msg = "Binary";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (!JSON_TEST_BIN(  json, 3 * 256, _binary))         break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+   #endif
+
+         msg = "Bool Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 100; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (!((type == jsonTypeCONSTANT_TRUE  && _bools[index] == 1) ||
+                  (type == jsonTypeCONSTANT_FALSE && _bools[index] == 0)))
+               break;
+
+            type = jsonGetTypeElem(json);
+            if ((index <  99 && type != jsonTypeSEPARATOR) ||
+                (index == 99 && type != jsonTypeARRAY_STOP))   
+               break;
+         }
+         if (index != 100)                                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "I Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 256; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (type != jsonTypeNUMBER_INTEGER ||
+                !jsonGetI(json, &itemp)        || 
+                (JsonI) _narray[index] != itemp)
+               break;
+         
+            type = jsonGetTypeElem(json);
+            if ((index <  255 && type != jsonTypeSEPARATOR) ||
+                (index == 255 && type != jsonTypeARRAY_STOP))     
+               break;
+         }
+         if (index != 256)                                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "N Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 256; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (!(type == jsonTypeNUMBER_NATURAL ||
+                  type == jsonTypeNUMBER_INTEGER)  || 
+                !jsonGetN(json, &ntemp)            || 
+                _narray[index] != ntemp)
+               break;
+         
+            type = jsonGetTypeElem(json);
+            if ((index <  255 && type != jsonTypeSEPARATOR) ||
+                (index == 255 && type != jsonTypeARRAY_STOP))     
+               break;
+         }
+         if (index != 256)                                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 300; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (!(type == jsonTypeNUMBER_REAL    || 
+                  type == jsonTypeNUMBER_INTEGER || 
+                  type == jsonTypeNUMBER_NATURAL)  ||
+                !jsonGetR(json, &rtemp)            || 
+                _reals8[index] != rtemp)
+               break;
+         
+            type = jsonGetTypeElem(json);
+            if ((index <  299 && type != jsonTypeSEPARATOR) ||
+                (index == 299 && type != jsonTypeARRAY_STOP))     
+               break;
+         }
+         if (index != 300)                                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "R4 Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 300; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (!(type == jsonTypeNUMBER_REAL    ||
+                  type == jsonTypeNUMBER_INTEGER ||
+                  type == jsonTypeNUMBER_NATURAL)  ||
+                !jsonGetR4(json, &r4temp)          ||
+                _reals4[index] != r4temp)
+               break;
+         
+            type = jsonGetTypeElem(json);
+            if ((index <  299 && type != jsonTypeSEPARATOR) ||
+                (index == 299 && type != jsonTypeARRAY_STOP))     
+               break;
+         }
+         if (index != 300)                                     break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+         msg = "String Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 10; index++)
+         {
+            type = jsonGetTypeElem(json);
+            if (type != jsonTypeSTRING_START  ||
+                !jsonGetStr(json, 256, stemp) ||
+                strcmp(stemp, _strings[index]) != 0)
+               break;
+         
+            type = jsonGetTypeElem(json);
+            if ((index <  9 && type != jsonTypeSEPARATOR) ||
+                (index == 9 && type != jsonTypeARRAY_STOP))
+               break;
+         }
+         if (index != 10)                                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+
+   #if defined(INCLUDE_BIN)
+         msg = "Binary Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         for (index = 0; index < 3; index++)
+         {
+            if (!JSON_TEST_BIN(json, 3 * 256, _binary))        break;
+
+            type = jsonGetTypeElem(json);
+            if ((index <  2 && type != jsonTypeSEPARATOR) ||
+                (index == 2 && type != jsonTypeARRAY_STOP))
+               break;
+         }
+         if (index != 3)                                       break;
+         if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)      break;
+   #endif
+
+         msg = "User Type IntStrReal";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         {
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+            if (!jsonGetI(json, &itemp))                       break;
+            if (itemp != 42)                                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+            if (!jsonGetStr(json, 256, stemp))                 break;
+            if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+            if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+            if (!jsonGetR(json, &rtemp))                       break;
+            if (rtemp != 3.1415926535897932)                   break;
+
+            if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+         }
+         if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)        break;
+
+         msg = "User Type IntStrReal Array";
+         if (!JSON_TEST_KEY(  json, msg))                      break;
+         if (jsonGetTypeObj(  json) != jsonTypeARRAY_START)    break;
+         {
+            if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+            {
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+               if (!jsonGetI(json, &itemp))                       break;
+               if (itemp != 42)                                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+               if (!jsonGetStr(json, 256, stemp))                 break;
+               if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+               if (!jsonGetR(json, &rtemp))                       break;
+               if (rtemp != 3.1415926535897932)                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+            }
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+            if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+            {
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+               if (!jsonGetI(json, &itemp))                       break;
+               if (itemp != 42)                                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+               if (!jsonGetStr(json, 256, stemp))                 break;
+               if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+               if (!jsonGetR(json, &rtemp))                       break;
+               if (rtemp != 3.1415926535897932)                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+            }
+            if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+            if (jsonGetTypeObj(json) != jsonTypeARRAY_START)   break;
+            {
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_INTEGER) break;
+               if (!jsonGetI(json, &itemp))                       break;
+               if (itemp != 42)                                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSTRING_START) break;
+               if (!jsonGetStr(json, 256, stemp))                 break;
+               if (strcmp(stemp, "Yes, but what is the question?"))  break;
+
+               if (jsonGetTypeElem(json) != jsonTypeSEPARATOR)    break;
+
+               if (jsonGetTypeElem(json) != jsonTypeNUMBER_REAL)  break;
+               if (!jsonGetR(json, &rtemp))                       break;
+               if (rtemp != 3.1415926535897932)                   break;
+
+               if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+            }
+            if (jsonGetTypeElem(json) != jsonTypeARRAY_STOP)   break;
+         }
+
+         if (jsonGetTypeObj(json) != jsonTypeOBJECT_STOP)       break;
+      }
+
+      if (jsonGetTypeObj(json) != jsonTypeOBJECT_STOP)          break;
 
       msg    = "NO";
       result = jsonTRUE;
@@ -1381,7 +1858,7 @@ static MiffB MIFF_TEST_B_VALUE(Miff *miff, MiffB testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeB || 
+   if (miffValueGetType(value) != miffValueTypeNUMBER || 
        miffValueGetB(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1391,7 +1868,7 @@ static MiffB MIFF_TEST_I_VALUE(Miff *miff, MiffI testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeI || 
+   if (miffValueGetType(value) != miffValueTypeNUMBER || 
        miffValueGetI(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1401,7 +1878,7 @@ static MiffB MIFF_TEST_N_VALUE(Miff *miff, MiffN testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeN || 
+   if (miffValueGetType(value) != miffValueTypeNUMBER || 
        miffValueGetN(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1411,7 +1888,7 @@ static MiffB MIFF_TEST_R_VALUE(Miff *miff, MiffR testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeR || 
+   if (miffValueGetType(value) != miffValueTypeNUMBER || 
        miffValueIs4(    value)                   ||
        miffValueGetR(   value) != testValue)                return miffFALSE;
    return miffTRUE;
@@ -1422,7 +1899,7 @@ static MiffB MIFF_TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeR ||  
+   if (miffValueGetType(value) != miffValueTypeNUMBER ||  
        !miffValueIs4(   value)                   || 
        miffValueGetR4(  value) != testValue)                return miffFALSE;
    return miffTRUE;
@@ -1453,7 +1930,7 @@ static MiffB MIFF_TEST_STR_VALUE(Miff *miff, MiffStr *testValue)
    if (miffValueGetType(value) != miffValueTypeSTR &&
        testValueLen            != miffValueGetStrCount(value))        return miffFALSE;
    if (!miffGetValueStr(miff, miffValueGetStrCount(value), svalue))   return miffFALSE;
-   if (memcmp(testValue, svalue, testValueLen) != 0)        return miffFALSE;
+   if (strcmp(testValue, svalue) != 0)                      return miffFALSE;
    return miffTRUE;
 }
 

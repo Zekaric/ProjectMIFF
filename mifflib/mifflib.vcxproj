@@ -171,10 +171,8 @@
     <ClCompile Include="miff_byteSwap.c" />
     <ClCompile Include="miff_mem.c" />
     <ClCompile Include="mifflib.c" />
-    <ClCompile Include="miff_part.c" />
-    <ClCompile Include="miff_read.c" />
-    <ClCompile Include="miff_util.c" />
-    <ClCompile Include="miff_write.c" />
+    <ClCompile Include="miff_get.c" />
+    <ClCompile Include="miff_set.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="miff_local.h" />

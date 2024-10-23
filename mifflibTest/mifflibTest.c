@@ -1858,7 +1858,7 @@ static MiffB MIFF_TEST_B_VALUE(Miff *miff, MiffB testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeNUMBER || 
+   if (miffValueGetType(value) != miffValueTypeNUM_INT || 
        miffValueGetB(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1868,7 +1868,7 @@ static MiffB MIFF_TEST_I_VALUE(Miff *miff, MiffI testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeNUMBER || 
+   if (miffValueGetType(value) != miffValueTypeNUM_INT || 
        miffValueGetI(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1878,7 +1878,7 @@ static MiffB MIFF_TEST_N_VALUE(Miff *miff, MiffN testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeNUMBER || 
+   if (miffValueGetType(value) != miffValueTypeNUM_INT || 
        miffValueGetN(   value) != testValue)                return miffFALSE;
    return miffTRUE;
 }
@@ -1888,7 +1888,7 @@ static MiffB MIFF_TEST_R_VALUE(Miff *miff, MiffR testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeNUMBER || 
+   if (miffValueGetType(value) != miffValueTypeNUM_REAL || 
        miffValueIs4(    value)                   ||
        miffValueGetR(   value) != testValue)                return miffFALSE;
    return miffTRUE;
@@ -1899,7 +1899,7 @@ static MiffB MIFF_TEST_R4_VALUE(Miff *miff, MiffR4 testValue)
    MiffValue value;
 
    value = miffGetValue(miff);
-   if (miffValueGetType(value) != miffValueTypeNUMBER ||  
+   if (miffValueGetType(value) != miffValueTypeNUM_REAL ||  
        !miffValueIs4(   value)                   || 
        miffValueGetR4(  value) != testValue)                return miffFALSE;
    return miffTRUE;
@@ -1952,7 +1952,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
    Miff           *miff;
    MiffB           result;
    MiffStr         subFormatName[miffKeySIZE];
-   MiffN           subFormatVersion;
+   MiffStr         subFormatVersion[miffKeySIZE];
    MiffRecType     recType;
    MiffN           arrayCount;
    MiffN           index;
@@ -1973,7 +1973,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
          miffTRUE,
          _MiffGetBuffer,
          subFormatName,
-         &subFormatVersion,
+         subFormatVersion,
          (void *) file);
       if (!miff) break;
 
@@ -2504,7 +2504,7 @@ static MiffB _MiffTestWrite(MiffStr const * const fileName)
       }
 
       // Create a miff file.
-      miff = miffCreateWriter(miffTRUE, _MiffSetBuffer, "MiffTestFile", 1, (void *) file);
+      miff = miffCreateWriter(miffTRUE, _MiffSetBuffer, "MiffTestFile", "1", (void *) file);
       if (!miff)
       {
          break;

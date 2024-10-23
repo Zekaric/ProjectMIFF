@@ -18,22 +18,16 @@
     <ClCompile Include="mifflib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_write.c">
+    <ClCompile Include="miff_set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="miff_byteSwap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="miff_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_read.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="miff_part.c">
+    <ClCompile Include="miff_get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

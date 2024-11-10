@@ -59,6 +59,8 @@ constant:
 #define continueIf(EXP)                            if (EXP) { continue; }
 #define gotoIf(    EXP, LABEL)                     if (EXP) { goto LABEL; }
 
+#define strIsEqual(COUNT, A, B)                    (strncmp((char *) A, (char *) B, COUNT) == 0)
+
 #if defined(min)
 #undef min
 #undef max
@@ -149,8 +151,6 @@ void              *_MiffMemCreate(           MiffN const memByteCount);
 void               _MiffMemDestroy(          void * const mem);
 void               _MiffMemStart(            MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
 void               _MiffMemStop(             void);
-
-void               _MiffPushBack(            Miff       * const miff, MiffN1 const byte);
 
 #define            _MiffMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
 #define            _MiffMemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))

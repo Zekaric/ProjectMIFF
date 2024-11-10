@@ -79,7 +79,7 @@ Json *jsonCreateReader(JsonGetBuffer getBufferFunc, void * const dataRepo)
 /******************************************************************************
 func: jsonCreateReaderContent
 ******************************************************************************/
-JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc, 
+JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
    void * const dataRepo)
 {
    returnFalseIf(
@@ -122,7 +122,7 @@ Json *jsonCreateWriter(JsonSetBuffer setBufferFunc, void * const dataRepo, JsonB
 /******************************************************************************
 func: jsonCreateWriterContent
 ******************************************************************************/
-JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc, 
+JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
    void * const dataRepo, JsonB const isFormatted)
 {
    returnFalseIf(
@@ -192,6 +192,7 @@ JsonType jsonGetTypeElem(Json * const json)
    {
    case jsonARRAY_STOP_CHAR:
       json->scope--;
+      json->method   =  json->scopeType[json->scope].method;
       json->lastByte = 0;
       return jsonTypeARRAY_STOP;
 
@@ -200,12 +201,13 @@ JsonType jsonGetTypeElem(Json * const json)
       return jsonTypeSEPARATOR;
 
    case jsonOBJECT_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->scopeType[json->scope++].type = jsonScopeTypeOBJECT;
       json->lastByte = 0;
       return jsonTypeOBJECT_START;
 
    case jsonARRAY_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->scopeType[json->scope++].type = jsonScopeTypeARRAY;
+      json->method   = jsonMethodWRITING_COMPACT;
       json->lastByte = 0;
       return jsonTypeARRAY_START;
 
@@ -262,12 +264,12 @@ JsonType jsonGetTypeFile(Json * const json)
    switch (json->lastByte)
    {
    case jsonOBJECT_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->scopeType[json->scope++].type = jsonScopeTypeOBJECT;
       json->lastByte = 0;
       return jsonTypeOBJECT_START;
 
    case jsonARRAY_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->scopeType[json->scope++].type = jsonScopeTypeARRAY;
       json->lastByte = 0;
       return jsonTypeARRAY_START;
 
@@ -322,6 +324,7 @@ JsonType jsonGetTypeObj(Json * const json)
    {
    case jsonOBJECT_STOP_CHAR:
       json->scope--;
+      json->method   =  json->scopeType[json->scope].method;
       json->lastByte = 0;
       return jsonTypeOBJECT_STOP;
 
@@ -334,12 +337,12 @@ JsonType jsonGetTypeObj(Json * const json)
       return jsonTypeSEPARATOR;
 
    case jsonOBJECT_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeOBJECT;
+      json->scopeType[json->scope++].type = jsonScopeTypeOBJECT;
       json->lastByte = 0;
       return jsonTypeOBJECT_START;
 
    case jsonARRAY_START_CHAR:
-      json->scopeType[json->scope++] = jsonScopeARRAY;
+      json->scopeType[json->scope++].type = jsonScopeTypeARRAY;
       json->lastByte = 0;
       return jsonTypeARRAY_START;
 
@@ -452,69 +455,6 @@ JsonB jsonGetR4(Json * const json, JsonR4 *  const value)
 }
 
 /******************************************************************************
-func: jsonGetBinByte
-******************************************************************************/
-JsonB jsonGetBinByte(Json * const json, JsonN1 * const value)
-{
-   int count;
-
-   returnFalseIf(!json);
-
-   returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
-
-   returnFalseIf(json->lastByte == '\"');
-
-   count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) value);
-   if (count == 0)
-   {
-      returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
-
-      returnFalseIf(json->lastByte == '\"');
-
-      count = bsfToByte(&json->bsfData, (BsfN1) json->lastByte, (BsfN1 *) value);
-
-      returnFalseIf(count == 0);
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonGetBinStart
-******************************************************************************/
-JsonB jsonGetBinStart(Json * const json)
-{
-   returnFalseIf(!json);
-
-   returnFalseIf(!bsfPrep(&json->bsfData));
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonGetBinStop
-******************************************************************************/
-JsonB jsonGetBinStop(Json * const json)
-{
-   returnFalseIf(!json);
-
-   // Read in the next character(s) until "
-   if (json->lastByte != '\"')
-   {
-      loop
-      {
-         returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
-
-         breakIf(json->lastByte == '\"');
-      }
-   }
-
-   json->lastByte = 0;
-
-   returnTrue;
-}
-
-/******************************************************************************
 func: jsonGetStr
 ******************************************************************************/
 JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
@@ -543,6 +483,96 @@ JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
    }
 
    returnTrue;
+}
+
+/******************************************************************************
+func: jsonGetStrBinByte
+******************************************************************************/
+JsonStrLetter jsonGetStrBinByte(Json * const json, JsonN1 * const value)
+{
+   JsonN1 vtemp;
+
+   returnIf(!json, jsonStrLetterERROR);
+
+   returnIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte), jsonStrLetterERROR);
+
+   returnIf(json->lastByte == '\"', jsonStrLetterDONE);
+
+   switch (json->lastByte)
+   {
+   case '0':
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+      vtemp = (json->lastByte - '0') << 4;
+      break;
+
+   case 'A':
+   case 'B':
+   case 'C':
+   case 'D':
+   case 'E':
+   case 'F':
+      vtemp = (json->lastByte - 'A' + 0xA) << 4;
+      break;
+
+   case 'a':
+   case 'b':
+   case 'c':
+   case 'd':
+   case 'e':
+   case 'f':
+      vtemp = (json->lastByte - 'a' + 0xA) << 4;
+      break;
+   }
+
+   returnIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte), jsonStrLetterERROR);
+
+   returnIf(json->lastByte == '\"', jsonStrLetterERROR);
+
+   switch (json->lastByte)
+   {
+   case '0':
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+      vtemp |= json->lastByte - '0';
+      break;
+
+   case 'A':
+   case 'B':
+   case 'C':
+   case 'D':
+   case 'E':
+   case 'F':
+      vtemp |= json->lastByte - 'A' + 0xA;
+      break;
+
+   case 'a':
+   case 'b':
+   case 'c':
+   case 'd':
+   case 'e':
+   case 'f':
+      vtemp |= json->lastByte - 'a' + 0xA;
+      break;
+   }
+
+   *value = vtemp;
+
+   return jsonStrLetterNORMAL;
 }
 
 /******************************************************************************
@@ -606,10 +636,10 @@ JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
 
          returnFalseIf(!_JsonGetChar(json));
          json->hex[1] = _JsonStrToHex(json->lastByte);
-         
+
          returnFalseIf(!_JsonGetChar(json));
          json->hex[1] = _JsonStrToHex(json->lastByte);
-         
+
          returnFalseIf(!_JsonGetChar(json));
          json->hex[1] = _JsonStrToHex(json->lastByte);
          return jsonStrLetterHEX;
@@ -664,16 +694,18 @@ JsonB jsonSetArrayStart(Json * const json)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
 
    returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonARRAY_START_STR));
 
-   json->scopeType[json->scope] = jsonScopeARRAY;
+   json->scopeType[json->scope].type   = jsonScopeTypeARRAY;
+   json->scopeType[json->scope].method = json->method;
+   json->method                        = jsonMethodWRITING_COMPACT;
    json->scope++;
-   json->isFirstItem            = jsonTRUE;
+   json->isFirstItem                   = jsonTRUE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
@@ -692,12 +724,15 @@ JsonB jsonSetArrayStop(Json * const json)
       json->scope == 0);
 
    json->scope--;
-   json->scopeType[json->scope] = jsonScopeNONE;
-   json->isFirstItem            = jsonFALSE;
+   json->scopeType[json->scope].type = jsonScopeTypeNONE;
+   json->isFirstItem                 = jsonFALSE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonARRAY_STOP_STR));
+
+   json->method = json->scopeType[json->scope].method;
+
    returnTrue;
 }
 
@@ -714,7 +749,7 @@ JsonB jsonSetKey(Json * const json, JsonStr const * const key)
       !key);
 
    returnFalseIf(!jsonSetSeparator(json));
-   
+
    json->isFirstItem = jsonFALSE;
 
    returnFalseIf(!jsonSetValueStrStart(json));
@@ -739,14 +774,15 @@ JsonB jsonSetObjectStart(Json * const json)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
 
    returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonOBJECT_START_STR));
 
-   json->scopeType[json->scope] = jsonScopeOBJECT;
+   json->scopeType[json->scope].type   = jsonScopeTypeOBJECT;
+   json->scopeType[json->scope].method = json->method;
    json->scope++;
    json->isFirstItem            = jsonTRUE;
 
@@ -767,8 +803,9 @@ JsonB jsonSetObjectStop(Json * const json)
       json->scope == 0);
 
    json->scope--;
-   json->scopeType[json->scope] = jsonScopeNONE;
-   json->isFirstItem            = jsonFALSE;
+   json->scopeType[json->scope].type = jsonScopeTypeNONE;
+   json->method                      = json->scopeType[json->scope].method;
+   json->isFirstItem                 = jsonFALSE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
@@ -808,12 +845,10 @@ JsonB jsonSetValueBin(Json * const json, JsonN const count, JsonN1 const * const
       !value);
 
    returnFalseIf(!jsonSetValueStrStart(json));
-   returnFalseIf(!jsonSetValueStrBinStart(json));
    for (index = 0; index < count; index++)
    {
       returnFalseIf(!jsonSetValueStrBinByte(json, value[index]));
    }
-   returnFalseIf(!jsonSetValueStrBinStop(json));
    returnFalseIf(!jsonSetValueStrStop(json));
 
    returnTrue;
@@ -828,12 +863,12 @@ JsonB jsonSetValueBool(Json * const json, JsonB const value)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    if (value == jsonTRUE)
    {
       return _JsonSetBuffer(json, 4, (JsonN1 *) "true");
@@ -851,12 +886,12 @@ JsonB jsonSetValueI(Json * const json, JsonI const value)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    return _JsonSetI(json, value);
 }
 
@@ -869,12 +904,12 @@ JsonB jsonSetValueN(Json * const json, JsonN const value)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    return _JsonSetN(json, value);
 }
 
@@ -901,12 +936,12 @@ JsonB jsonSetValueR(Json * const json, JsonR const value)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    return _JsonSetR(json, value);
 }
 
@@ -919,12 +954,12 @@ JsonB jsonSetValueR4(Json * const json, JsonR4 const value)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    return _JsonSetR4(json, value);
 }
 
@@ -957,52 +992,15 @@ func: jsonSetValueStrBinByte
 ******************************************************************************/
 JsonB jsonSetValueStrBinByte(Json * const json, JsonN1 const value)
 {
-   BsfN1 letter[2];
+   JsonStr letters[] = "0123456789ABCDEF";
+   JsonN1  output[2];
 
    returnFalseIf(!json);
 
-   switch (bsfToBsf(&json->bsfData, (BsfN1) value, &letter[0], &letter[1]))
-   {
-   case 0:
-      returnFalse;
+   output[0] = letters[value >> 4];
+   output[1] = letters[value & 0x0F];
 
-   case 1:
-      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) letter));
-      break;
-
-   case 2:
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) letter));
-      break;
-   }
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonSetValueStrBinStart
-******************************************************************************/
-JsonB jsonSetValueStrBinStart(Json * const json)
-{
-   returnFalseIf(!json);
-
-   returnFalseIf(!bsfPrep(&json->bsfData));
-
-   returnTrue;
-}
-
-/******************************************************************************
-func: jsonSetValueStrBinStop
-******************************************************************************/
-JsonB jsonSetValueStrBinStop(Json * const json)
-{
-   BsfN1 letter;
-
-   returnFalseIf(!json);
-
-   if (bsfToBsfEnd(&json->bsfData, &letter) == 1)
-   {
-      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) &letter));
-   }
+   returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) output));
 
    returnTrue;
 }
@@ -1021,7 +1019,7 @@ JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
    case jsonSTRING_QUOTE_CHAR:
       returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_QUOTE_STR));
       break;
-      
+
    case jsonBACK_SLASH_CHAR:
       returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACK_SLASH_STR));
       break;
@@ -1066,12 +1064,12 @@ JsonB jsonSetValueStrStart(Json * const json)
       !_isStarted ||
       !json);
 
-   if (json->scopeType[json->scope - 1] == jsonScopeARRAY)
+   if (json->scopeType[json->scope - 1].type == jsonScopeTypeARRAY)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
    json->isFirstItem = jsonFALSE;
-   
+
    return _JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR);
 }
 

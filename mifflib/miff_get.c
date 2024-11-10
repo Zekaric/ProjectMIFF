@@ -44,7 +44,6 @@ static void   _GetNumInt(        Miff * const miff, MiffValue * const value, Mif
 static MiffB  _GetNumIntNegative(Miff * const miff, MiffValue * const value, MiffN4 const count, MiffN1 const * const buffer);
 
 static MiffN1 _ValueFromHexInt(  MiffN1 const value);
-static MiffN1 _ValueFromHexReal( MiffN1 const value);
 
 /******************************************************************************
 global:
@@ -122,6 +121,69 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    MiffN value;
    MiffN letterValue;
 
+   // Constants
+   if      (buffer[0] == 'Z')
+   {
+      if      (strIsEqual(5, buffer, "Z MAX"))
+      {
+         miff->value.inr.r = MiffR_MAX;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "Z-MAX"))
+      {
+         miff->value.inr.r = -MiffR_MAX;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "Z INF"))
+      {
+         miff->value.inr.r = HUGE_VAL;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "Z-INF"))
+      {
+         miff->value.inr.r = -HUGE_VAL;
+         returnTrue;
+      }
+      else if (strIsEqual(2, buffer, "Z?"))
+      {
+         miff->value.inr.r = NAN;
+         returnTrue;
+      }
+      // unknown Z value.
+      returnFalse;
+   }
+   else if (buffer[0] == 'z')
+   {
+      miff->value.isR4 = miffTRUE;
+      if      (strIsEqual(5, buffer, "z MAX"))
+      {
+         miff->value.inr4.r = MiffR4_MAX;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "z-MAX"))
+      {
+         miff->value.inr4.r = -MiffR4_MAX;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "z INF"))
+      {
+         miff->value.inr4.r = HUGE_VALF;
+         returnTrue;
+      }
+      else if (strIsEqual(5, buffer, "z-INF"))
+      {
+         miff->value.inr4.r = -HUGE_VALF;
+         returnTrue;
+      }
+      else if (strIsEqual(2, buffer, "z?"))
+      {
+         miff->value.inr4.r = NAN;
+         returnTrue;
+      }
+      // unknown z value
+      returnFalse;
+   }
+
    value = 0;
    forCount(index, count)
    {
@@ -175,24 +237,17 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
       value = (value << 4) + letterValue;
    }
 
-   _MiffMemClearType(MiffValue, &miff->value);
-
-   if      (count == 1 && (buffer[0] == 'G' || buffer[0] == 'g'))
-   {
-      miff->value.inr.r  = 0;
-      miff->value.inr4.r = 0;
-   }
-   // double values always start with G
-   else if (count == 16 || (buffer[0] == 'G' || buffer[0] == 'g'))
+   // double values always user upper case letters.
+   if ('G' <= buffer[0] && buffer[0] <= 'V')
    {
       miff->value.inr.n = value;
       _MiffByteSwap8(miff, &miff->value.inr);
    }
-   // float
+   // float values always use lower case letters.
    else
    {
-      miff->value.inr4.n = (MiffN4) value;
       miff->value.isR4   = miffTRUE;
+      miff->value.inr4.n = (MiffN4) value;
       _MiffByteSwap4(miff, &miff->value.inr4);
    }
 
@@ -346,7 +401,7 @@ func: _MiffGetStrLetter
 ******************************************************************************/
 MiffData _MiffGetStrLetter(Miff * const miff, MiffStr * const letter)
 {
-   returnIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) letter), miffDataERROR); 
+   returnIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) letter), miffDataERROR);
 
    // Escape single character slash, tab, and newline characters.
    switch (*letter)
@@ -433,13 +488,13 @@ static MiffB _GetNumIntNegative(Miff * const miff, MiffValue * const value, Miff
 {
    _GetNumInt(miff, value, count, buffer);
 
-   // Out of range.  
+   // Out of range.
    // If positive, nTemp can't be larger than UINT64_MAX.
    // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
    returnFalseIf(value->inr.n > ((MiffN) MiffI_MAX) + 1);
-   
+
    value->inr.i = -((MiffI) value->inr.n - 1) - 1;
-   
+
    returnTrue;
 }
 
@@ -483,7 +538,7 @@ static void _GetNumInt(Miff * const miff, MiffValue * const value, MiffN4 const 
          break;
 
       // Here just in case.  Should never be using lower case letters.
-      case 'a': 
+      case 'a':
       case 'b':
       case 'c':
       case 'd':
@@ -537,53 +592,6 @@ static MiffN1 _ValueFromHexInt(MiffN1 const value)
    case 'e':
    case 'f':
       return value - 'a' + 0xA;
-   }
-
-   return 0;
-}
-
-/******************************************************************************
-func: _ValueFromHexReal
-******************************************************************************/
-static MiffN1 _ValueFromHexReal(MiffN1 const value)
-{
-   switch (value)
-   {
-   case 'G':
-   case 'H':
-   case 'I':
-   case 'J':
-   case 'K':
-   case 'L':
-   case 'M':
-   case 'N':
-   case 'O':
-   case 'P':
-   case 'Q':
-   case 'R':
-   case 'S':
-   case 'T':
-   case 'U':
-   case 'V':
-      return value - 'G';
-
-   case 'g':
-   case 'h':
-   case 'i':
-   case 'j':
-   case 'k':
-   case 'l':
-   case 'm':
-   case 'n':
-   case 'o':
-   case 'p':
-   case 'q':
-   case 'r':
-   case 's':
-   case 't':
-   case 'u':
-   case 'v':
-      return value - 'g';
    }
 
    return 0;

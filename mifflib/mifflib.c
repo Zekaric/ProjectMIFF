@@ -104,13 +104,13 @@ MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
    // Read the header.
    miff->isRecordDone = miffFALSE;
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
-   returnFalseIf(strncmp((char *) miff->readData, MIFF_HEADER_FILETYPE_STR, miff->readCount) != 0);
+   returnFalseIf(!strIsEqual(miff->readCount, (char *) miff->readData, MIFF_HEADER_FILETYPE_STR));
 
    miff->isRecordDone = miffFALSE;
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    returnFalseIf(!_MiffGetNumInt(miff, miff->readCount, miff->readData));
    miff->version = miff->value.inr.n;
-   returnFalseIf(strncmp((char *) miff->readData, MIFF_HEADER_VERSION_STR, miff->readCount) != 0);
+   returnFalseIf(!strIsEqual(miff->readCount, (char *) miff->readData, MIFF_HEADER_VERSION_STR));
 
    miff->isRecordDone = miffFALSE;
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
@@ -164,7 +164,7 @@ Miff *miffCreateWriter(MiffB const isByteSwaping, MiffSetBuffer setBufferFunc,
 func: miffCreateWriterContent
 ******************************************************************************/
 MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
-   MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName, 
+   MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName,
    MiffStr const * const subFormatVersion, void * const dataRepo)
 {
    MiffN4 count;
@@ -271,7 +271,7 @@ MiffB miffGetRecordStart(Miff * const miff, MiffRecType * const type, MiffN * co
    default:
       *type                   = miffRecTypeVALUE;
       returnFalseIf(!_MiffGetNumInt(miff, miff->readCount, miff->readData));
-      miff->currentArrayCount = 
+      miff->currentArrayCount =
          *count               = miff->value.inr.n;
       break;
    }
@@ -330,6 +330,8 @@ MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1 * const bi
    {
       returnFalseIf(!miffGetValueBinData(miff, &binBuffer[index]));
    }
+
+   returnFalseIf(!_MiffGetPartEnd(miff));
 
    returnTrue;
 }
@@ -431,6 +433,24 @@ MiffValue miffGetValue(Miff * const miff)
    case 'T': // D
    case 'U': // E
    case 'V': // F
+   case 'Z': // constant
+   case 'g': // 0
+   case 'h': // 1
+   case 'i': // 2
+   case 'j': // 3
+   case 'k': // 4
+   case 'l': // 5
+   case 'm': // 6
+   case 'n': // 7
+   case 'o': // 8
+   case 'p': // 9
+   case 'q': // A
+   case 'r': // B
+   case 's': // C
+   case 't': // D
+   case 'u': // E
+   case 'v': // F
+   case 'z': // constant
       miff->value.type        = miffValueTypeNUM_REAL;
       _MiffGetPartRest(miff, header);
       _MiffGetNumReal( miff, miff->readCount, miff->readData);
@@ -442,15 +462,15 @@ MiffValue miffGetValue(Miff * const miff)
       // Reading the buffer is done with miffValueBinGet();
       break;
    }
-   
+
    return miff->value;
 }
 
 /******************************************************************************
 func: miffGetValueStr
 
-Convenience function for getting a whole string if memory requirements are 
-not that large.  Str should be large enough for the string being read in 
+Convenience function for getting a whole string if memory requirements are
+not that large.  Str should be large enough for the string being read in
 including null terminator.
 ******************************************************************************/
 MiffB miffGetValueStr(Miff * const miff, MiffN const strCount, MiffStr * const str)
@@ -514,7 +534,7 @@ MiffData miffGetValueStrData(Miff * const miff, MiffStr * const strLetter)
 /******************************************************************************
 func: miffSetRecordStart
 ******************************************************************************/
-MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const count, 
+MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const count,
    MiffStr const * const key)
 {
    MiffN index;
@@ -579,7 +599,7 @@ MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const 
 
    returnFalseIf(!miffSetSeparator(miff));
    returnFalseIf(!_MiffSetBuffer(miff, miff->currentNameCount, (MiffN1 *) miff->currentName));
-   
+
    // We are starting a new key value block.
    if (type == miffRecTypeBLOCK_START)
    {
@@ -646,7 +666,7 @@ MiffB miffSetValue(Miff * const miff, MiffValue const value)
 
    // Write out the value.
    returnFalseIf(!_MiffSetValueData(miff, value));
-   
+
    // Write whatever is left to writ out and final check.
    return miffSetValueStop(miff);
 }
@@ -698,7 +718,7 @@ MiffB miffSetValueStrData(Miff * const miff, MiffStr const strLetter)
    returnFalseIf(
       miff->value.type != miffValueTypeSTR ||
       miff->valueIndex >= miff->value.bufferCount);
-   
+
    return _MiffSetStr(miff, 1, &strLetter);
 }
 
@@ -756,7 +776,7 @@ void miffStop(void)
 }
 
 /******************************************************************************
-miffValue 
+miffValue
 function:
 ******************************************************************************/
 /******************************************************************************
@@ -765,7 +785,7 @@ func: miffValueGetB
 MiffB miffValueGetB(MiffValue const value)
 {
    returnFalseIf(value.type != miffValueTypeNUM_INT);
-   
+
    returnTrueIf(value.inr.n > 0);
 
    returnFalse;
@@ -787,7 +807,7 @@ func: miffValueGetI
 MiffI miffValueGetI(MiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_INT);
-   
+
    return value.inr.i;
 }
 
@@ -797,7 +817,7 @@ func: miffValueGetN
 MiffN miffValueGetN(MiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_INT);
-   
+
    return value.inr.n;
 }
 
@@ -827,7 +847,7 @@ MiffR4 miffValueGetR4(MiffValue const value)
    {
       return value.inr4.r;
    }
- 
+
    return (MiffR4) value.inr.r;
 }
 
@@ -857,7 +877,7 @@ True if MiffR4
 ******************************************************************************/
 MiffB miffValueIs4(MiffValue const value)
 {
-   return0If(value.type != miffValueTypeNUM_REAL);
+   returnFalseIf(value.type != miffValueTypeNUM_REAL);
 
    return value.isR4;
 }

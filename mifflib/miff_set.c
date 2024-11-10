@@ -112,7 +112,7 @@ MiffB _MiffSetStr(Miff * const miff, MiffN const strLen, MiffStr const * const s
             bufferData[bufferIndex++] = '\\';
             break;
 
-         case '\t': 
+         case '\t':
             // Tabs become two character "\t"
             bufferData[bufferIndex++] = 't';
             break;
@@ -219,11 +219,11 @@ function:
 /******************************************************************************
 func: _SetBinBuffer
 ******************************************************************************/
-static MiffB _SetBinBuffer(Miff * const miff, MiffN const bufferCount, 
+static MiffB _SetBinBuffer(Miff * const miff, MiffN const bufferCount,
    MiffN1 const * const bufferData)
 {
    MiffN        index;
-   
+
    // Testing the user way.
    forCount(index, bufferCount)
    {
@@ -327,15 +327,65 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
              ntemp;
    MiffN     mask;
    MiffStr   string[16];
-   MiffStr   letters[] = "GHIJKLMNOPQRSTUV";
+   MiffStr   letters[]  = "GHIJKLMNOPQRSTUV";
+   MiffStr   letters4[] = "ghijklmnopqrstuv";
    MiffValue value;
 
    value = valueInput;
 
-   if (( value.isR4 && value.inr4.r == 0.0f) ||
-       (!value.isR4 && value.inr.r  == 0.0))
+   if (value.isR4)
    {
-      return _MiffSetBuffer(miff, 1, (MiffN1 *) "G");
+      if      (value.inr4.r == 0)
+      {
+         _MiffSetBuffer(miff, 1, (MiffN1 *) letters4);
+      }
+      else if (value.inr4.r == MiffR4_MAX)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z MAX");
+      }
+      else if (value.inr4.r == -MiffR4_MAX)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z-MAX");
+      }
+      else if (value.inr4.r == HUGE_VALF)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z INF");
+      }
+      else if (value.inr4.r == -HUGE_VALF)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z-INF");
+      }
+      else if (isnan(value.inr4.r))
+      {
+         return _MiffSetBuffer(miff, 2, (MiffN1 *) "z?");
+      }
+   }
+   else
+   {
+      if      (value.inr.r == 0)
+      {
+         _MiffSetBuffer(miff, 1, (MiffN1 *) letters);
+      }
+      else if (value.inr.r == MiffR_MAX)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z MAX");
+      }
+      else if (value.inr.r == -MiffR_MAX)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z-MAX");
+      }
+      else if (value.inr.r == HUGE_VALF)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z INF");
+      }
+      else if (value.inr.r == -HUGE_VALF)
+      {
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z-INF");
+      }
+      else if (isnan(value.inr.r))
+      {
+         return _MiffSetBuffer(miff, 2, (MiffN1 *) "Z?");
+      }
    }
 
    // Write out the number.  Real numbers are being written out as hex.
@@ -364,7 +414,7 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       for (         ; index < count; index++)
       {
          ntemp                 = (int) ((value.inr4.n & mask) >> shift);
-         string[stringIndex++] = letters[ntemp];
+         string[stringIndex++] = letters4[ntemp];
 
          mask   = mask >> 4;
          shift -= 4;
@@ -386,12 +436,6 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
 
          mask   = mask >> 4;
          shift -= 4;
-      }
-
-      // doubles start with a G
-      if (index)
-      { 
-         string[stringIndex++] = 'G';
       }
 
       // Fill in the buffer.

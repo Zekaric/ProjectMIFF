@@ -38,8 +38,8 @@ SOFTWARE.
 include:
 ******************************************************************************/
 #include <stdint.h>
-
-#include "b64lib.h"
+#include <float.h>
+#include <math.h>
 
 /******************************************************************************
 local:
@@ -113,6 +113,7 @@ typedef char                           MiffStr;
 
 #define MiffR_MAX                      DBL_MAX
 #define MiffR_EPSILON                  DBL_EPSILON
+#define MiffR_NAN                      NAN
 #define MiffR4_MAX                     FLT_MAX
 #define MiffR4_EPSILON                 FLT_EPSILON
 #define MiffN_MAX                      UINT64_MAX

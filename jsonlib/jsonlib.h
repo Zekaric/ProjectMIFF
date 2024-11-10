@@ -41,6 +41,8 @@ include:
 ******************************************************************************/
 #include <stdint.h>
 
+#include "b64lib.h"
+
 /******************************************************************************
 local:
 constant:
@@ -70,19 +72,19 @@ typedef enum
 
 typedef enum
 {
-   jsonScopeNONE,
+   jsonScopeTypeNONE,
 
-   jsonScopeOBJECT,
-   jsonScopeARRAY,
+   jsonScopeTypeOBJECT,
+   jsonScopeTypeARRAY,
 
-   jsonScopeCOUNT
-} JsonScope;
+   jsonScopeTypeCOUNT
+} JsonScopeType;
 
 typedef enum
 {
    jsonTypeNONE,
 
-   // Reading the first json file value 
+   // Reading the first json file value
    jsonTypeOBJECT_START,
    jsonTypeARRAY_START,
    jsonTypeSTRING_START,
@@ -151,6 +153,12 @@ typedef struct
 
 typedef struct
 {
+   JsonScopeType               type;
+   JsonMethod                  method;
+} JsonScope;
+
+typedef struct
+{
    // JSON file information and configuration.
    JsonN                       version;
    JsonMethod                  method;
@@ -168,7 +176,6 @@ typedef struct
    // Read value
    JsonValue                   value;
    JsonStr                     hex[4];
-   BsfData                     bsfData;
 } Json;
 
 /******************************************************************************
@@ -190,15 +197,13 @@ JsonType        jsonGetTypeElem(          Json       * const json);
 JsonType        jsonGetTypeFile(          Json       * const json);
 JsonType        jsonGetTypeObj(           Json       * const json);
 
-JsonB           jsonGetBinByte(           Json       * const json, JsonN1 * const value);
-JsonB           jsonGetBinStart(          Json       * const json);
-JsonB           jsonGetBinStop(           Json       * const json);
 JsonB           jsonGetI(                 Json       * const json, JsonI *  const value);
 JsonB           jsonGetKey(               Json       * const json, JsonStr ** const key);
 JsonB           jsonGetN(                 Json       * const json, JsonN *  const value);
 JsonB           jsonGetR(                 Json       * const json, JsonR *  const value);
 JsonB           jsonGetR4(                Json       * const json, JsonR4 *  const value);
 JsonB           jsonGetStr(               Json       * const json, JsonI4 const maxCount, JsonStr *value);
+JsonStrLetter   jsonGetStrBinByte(        Json       * const json, JsonN1 * const value);
 JsonStrLetter   jsonGetStrLetter(         Json       * const json, JsonStr * const value);
 JsonB           jsonGetStrHex(            Json       * const json, JsonStr * const h1, JsonStr * const h2, JsonStr * const h3, JsonStr * const h4);
 
@@ -217,8 +222,6 @@ JsonB           jsonSetValueR(            Json       * const json, JsonR        
 JsonB           jsonSetValueR4(           Json       * const json, JsonR4          const value);
 JsonB           jsonSetValueStr(          Json       * const json, JsonStr const * const value);
 JsonB           jsonSetValueStrBinByte(   Json       * const json, JsonN1 const value);
-JsonB           jsonSetValueStrBinStart(  Json       * const json);
-JsonB           jsonSetValueStrBinStop(   Json       * const json);
 JsonB           jsonSetValueStrLetter(    Json       * const json, JsonStr         const value);
 JsonB           jsonSetValueStrStart(     Json       * const json);
 JsonB           jsonSetValueStrStop(      Json       * const json);

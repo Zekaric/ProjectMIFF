@@ -35,6 +35,7 @@ SOFTWARE.
 include:
 ******************************************************************************/
 #include <stdio.h>
+#include <math.h>
 
 #include "json_local.h"
 
@@ -140,6 +141,19 @@ JsonB _JsonSetR(Json * const json, JsonR const value)
 {
    JsonStr ctemp[80];
 
+   if      (value == HUGE_VAL)
+   {
+      return _JsonSetBuffer(json, 10, (JsonN1 *) "\"Infinity\"");
+   }
+   else if (value == -HUGE_VAL)
+   {
+      return _JsonSetBuffer(json, 11, (JsonN1 *) "\"-Infinity\"");
+   }
+   else if (isnan(value))
+   {
+      return _JsonSetBuffer(json, 5, (JsonN1 *) "\"NaN\"");
+   }
+
    _sprintf_s_l((char *) ctemp, 80, "%.17g", _JsonLocaleGet(), value);
 
    return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
@@ -152,8 +166,21 @@ JsonB _JsonSetR4(Json * const json, JsonR4 const value)
 {
    JsonStr ctemp[80];
 
+   if      (value == HUGE_VALF)
+   {
+      return _JsonSetBuffer(json, 10, (JsonN1 *) "\"Infinity\"");
+   }
+   else if (value == -HUGE_VALF)
+   {
+      return _JsonSetBuffer(json, 11, (JsonN1 *) "\"-Infinity\"");
+   }
+   else if (isnan(value))
+   {
+      return _JsonSetBuffer(json, 5, (JsonN1 *) "\"NaN\"");
+   }
+
    _sprintf_s_l((char *) ctemp, 80, "%.8g", _JsonLocaleGet(), value);
-   
+
    return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
 }
 
@@ -164,11 +191,11 @@ JsonB _JsonSetStr(Json * const json, JsonN const strLen, JsonStr const * const s
 {
    JsonN    index;
    JsonN1   letter[2];
-   
+
    letter[1] = 0;
 
    returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR));
-   
+
    forCount(index, strLen)
    {
       if      (str[index] == '\"')

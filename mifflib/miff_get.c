@@ -124,7 +124,7 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    // Constants
    if      (buffer[0] == 'Z')
    {
-      if      (strIsEqual(5, buffer, "Z MAX"))
+      if      (strIsEqual(5, buffer, "Z+MAX"))
       {
          miff->value.inr.r = MiffR_MAX;
          returnTrue;
@@ -134,7 +134,7 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
          miff->value.inr.r = -MiffR_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "Z INF"))
+      else if (strIsEqual(5, buffer, "Z+INF"))
       {
          miff->value.inr.r = HUGE_VAL;
          returnTrue;
@@ -155,7 +155,7 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    else if (buffer[0] == 'z')
    {
       miff->value.isR4 = miffTRUE;
-      if      (strIsEqual(5, buffer, "z MAX"))
+      if      (strIsEqual(5, buffer, "z+MAX"))
       {
          miff->value.inr4.r = MiffR4_MAX;
          returnTrue;
@@ -165,7 +165,7 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
          miff->value.inr4.r = -MiffR4_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "z INF"))
+      else if (strIsEqual(5, buffer, "z+INF"))
       {
          miff->value.inr4.r = HUGE_VALF;
          returnTrue;

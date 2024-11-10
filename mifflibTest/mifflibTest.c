@@ -1602,7 +1602,7 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
       }
 
       // Create a json file.
-      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonTRUE);
+      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonFALSE);
       if (!json)
       {
          break;

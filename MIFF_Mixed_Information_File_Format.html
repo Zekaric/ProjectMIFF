@@ -31,6 +31,11 @@
 <p class="zword_toc3"><a href="#2.2.2">2.2.2 - Key Section</a></p>
 <p class="zword_toc3"><a href="#2.2.3">2.2.3 - Value Section</a></p>
 <p class="zword_toc2"><a href="#2.3">Examples</a></p>
+<p class="zword_toc1"><a href="#3">Notes</a></p>
+<p class="zword_toc2"><a href="#3.1">Comparing with JSON.</a></p>
+<p class="zword_toc3"><a href="#3.1.1">File Size</a></p>
+<p class="zword_toc3"><a href="#3.1.2">Comments</a></p>
+<p class="zword_toc2"><a href="#3.2">Comments on MIFF</a></p>
 
 
 <h1 class="zword"><a name="1">1 - M.I.F.F.</a></h1>
@@ -48,7 +53,9 @@
 
 <h2 class="zword"><a name="1.3">1.3 - Design Decisions:</a></h2>
 <p class="zword"><strong>Why not XML or JSON?</strong></p>
-<p class="zword">I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.</p>
+<p class="zword">I find XML is too verbose.</p>
+<p class="zword">JSON is much better than XML and is a reasonable alternative to XML.  I do have a few issues that I found out with JSON.  JSON format doesn't specify any limits on numbers.  Which is great.  However implementations can do what they like when it comes to numbers they can't handle.  I.E. Javascript change handle 64 bit integers and unsigned integers.  So it tends to write those values out as strings.  The JSON format has no problems but Javascript does.  JSON format doesn't have NAN, Infinity defined for any of the numbers.  So those too are written out as strings and more worryingly, there is no standard on how to write that information out.</p>
+<p class="zword">Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.</p>
 <p class="zword"><strong>Why big endian for multibyte data types?</strong></p>
 <p class="zword">In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was big endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another, accurately.</p>
 
@@ -60,8 +67,9 @@
 
 
 <h1 class="zword"><a name="2">2 - Format</a></h1>
-<p class="zword">A MIFF File is a UTF8 text file where items inside are tab delimited and each record is a single line terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.</p>
-<p class="zword">The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a transfer file format to move data from one program to another.</p>
+<p class="zword">A MIFF File is a UTF8 text file.</p>
+<p class="zword">Each line in the text file is a 'record' or piece of data.  A record is delimited by [tb], '\t', tab characters and is terminated by a UNIX [nl], '\n', new line character.  The contents of the file is a collection of key value pairs.</p>
+<p class="zword">The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a data transfer file format between softwared packages or a general format to store data.  It could be used as a native format if desired, just like where JSON is used.</p>
 <p class="zword">Any data that is encode or stored as a binary byte sequence will be in big endian order.</p>
 
 <h2 class="zword"><a name="2.1">2.1 - File Header</a></h2>
@@ -78,11 +86,11 @@
 <li class="zword"><strong>Line 4</strong> - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.</li>
 <li class="zword"><strong>Line 5</strong> - Sub-Format version identifier.</li>
 </ul>
-<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.</p>
+<p class="zword">If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8, one UNICODE character or codepoint can span multiple bytes.  So this name can not exceed this byte count.</p>
 
 <h2 class="zword"><a name="2.2">2.2 - Content</a></h2>
 <p class="zword">Each line is split into 3 sections.  The header for the line, the key for the line, and the value section.</p>
-<p class="zword">Each section is separated by a [tb] character.  The entire line ends in a [nl] character.</p>
+<p class="zword">Each section is separated by a [tb].  The entire line ends in a [nl].</p>
 <p class="zwordPre">[header][tb][key][tb][value][nl]
 </p>
 
@@ -107,22 +115,22 @@
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>[count]</td>
-<td class="zword">This will be a number larger than 0 to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of complex objects, use scoped above and a separate count.</td>
+<td class="zword">This will be a hexidecimal number 0 or larger to indicate an array count for the value.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of objects, use a separate count key-value and a scope for each individual object in the array instead.</td>
 </tr>
 <tr class="zword">
 <td class="zword"><nobr>*</td>
-<td class="zword">This will be to indicate an array of unknown size.  In generaly I would advise trying to avoid this as muck as possible.  It is better to know beforehand howmuch space data should take up.  However sometimes this is unavoidable.</td>
+<td class="zword">This indicates an array of unknown size.  In generaly I would advise trying to avoid this as much as possible.  It is better to know beforehand how many bytes or how many items are needed.  However sometimes this is unavoidable, but in my opinion, avoid as much as you can.</td>
 </tr>
 </tbody></table>
-<p class="zword">The header can have leading spaces or [tb] characters to make it more obvious which scope it belongs to.  However these spaces and [tb] characters are not needed unless you want to make it more readable.  They are stripped when reading the file.</p>
+<p class="zword">The header can have leading spaces or [tb]s to make it more obvious which scope it belongs to.  However these spaces and [tb]s are not needed unless you want to make it more readable.  They are ignored when reading the header.</p>
 
 <h3 class="zword"><a name="2.2.2">2.2.2 - Key Section</a></h3>
-<p class="zword">Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, some characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes the key is valid.  The key can have spaces or any special characters you like except [tb] and [nl] characters.  This does mean leading, trailing, and internal spaces in the key are significant.</p>
+<p class="zword">Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, UNICODE characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes, the key is valid.  The key can have spaces or any special characters you like except [tb]s and [nl]s.  This does mean leading, trailing, and internal spaces in the key are significant.</p>
 
 <h3 class="zword"><a name="2.2.3">2.2.3 - Value Section</a></h3>
 <p class="zword">The sub-format of the file should be dictating what values follow the key.  This should be defined somewhere in the documentation of the sub-format.</p>
-<p class="zword">There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a [tb] character.</p>
-<p class="zword">If there is a count in the line header other than 1 then there should be multiple copies of whatever type that is associated with the key.</p>
+<p class="zword">There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a [tb].</p>
+<p class="zword">If there is a count in the line header other than 1, then there should be multiple copies of whatever type that is associated with the key.</p>
 <p class="zword">Values have a simple format.</p>
 <p class="zwordPre">[header][valueData]
 </p>
@@ -138,63 +146,167 @@
 <td class="zword">The value data is unset/null.  Nothing else follows the header.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>T, F</td>
-<td class="zword">The value data is a boolean and the header is already the value data.  Nothing else follows the header.  <strong>T</strong> for true, <strong>F</strong> for false.</td>
+<td class="zword"><nobr>0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, -</td>
+<td class="zword">A hexidecimal number.  If a boolean value this will be 0 (false) or 1 (true).  If an integer or natural then it will be that number in hexidecimal form.  Leading 0's will be trimmed off.  If a real value then it will be the byte value of the real (8 characters for a float, 16 characters for a double).  For integers we can have a negative hexidecimal.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>+, -, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9</td>
-<td class="zword">The value data will be a number of some sort.  An integer, real, or complex number, in human readable form.  The header is part of the number.</td>
+<td class="zword"><nobr>G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, Z+MAX, Z-MAX, Z+INF, Z-INF, Z?</td>
+<td class="zword">A hexidecimal representation of a double precision real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for maximum positive value, maximum negative value, positive infinity, negative infinity, not a number.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>x, o, b</td>
-<td class="zword">The value data will be a number of some sort.  But encoded in <strong>x</strong> hexidecimal (0123456789abcdef), <strong>o</strong> octal (01234567), <strong>b</strong> binary (01) digits.</td>
+<td class="zword"><nobr>g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, z+MAX, z-MAX, z+INF, z-INF, z?</td>
+<td class="zword">A hexidecimal representation of a single precision real value (float).  Same as the double case.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>I, R</td>
-<td class="zword">The value data will be an <strong>I</strong> integer or a <strong>R</strong> real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.</td>
+<td class="zword"><nobr>"[count]</td>
+<td class="zword">The value data will be a string.  There is no closing <strong>"</strong>.  [count] denotes the size of the string in bytes represented in hexidecimal form.  A single space follows the [count] value and the string immediately follows up to the next [tb] or [nl] which ever is next.  All [tb], [nl], and '\' characters inside the string are escaped.  Meaning a [tb] inside the string will be '\t', a [nl] inside teh string will be a '\n', and a '\' inside the string will be a '\\'.  Nothing else is escaped and should be written as is in the file.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>n, N</td>
-<td class="zword">The value data will be a big integer or big real number.  <strong>n</strong> will be in human readable format.  <strong>N</strong> will be in Base64 encoding.</td>
+<td class="zword"><nobr>*[count]</td>
+<td class="zword">The value data is a binary buffer.  [count] denotes the size of the binary buffer in bytes represented in hexidecimal form.  A single space follows the [count] value and the binary buffer in hexidecimal encoding immediately follows.</td>
 </tr>
 <tr class="zword">
-<td class="zword"><nobr>"</td>
-<td class="zword">The value data will be a string.  There is no closing <strong>"</strong>.  Whatever follows the header <strong>"</strong> to the next [tb] or [nl] which ever is next, is the string.  The string is preprocessed before storing.  All [tb], [nl], and \ characters are escaped with a \.</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>*</td>
-<td class="zword">The value data is a binary chunk.  It will be two parts separated by a space.  First part immediately follows the * an it denotes the size of the binary chunk.  After the space will be the binary chunk in Base64 encoding.</td>
+<td class="zword"><nobr>[Any other letter]</td>
+<td class="zword">The value data is define by the subformat and decoded by an external to the library function.</td>
 </tr>
 </tbody></table>
+<p class="zword">a, b, c, d, e, f are not accepted for hex values.  The G-V and the g-v were used to</p>
 
 <h2 class="zword"><a name="2.3">Examples</a></h2>
 <p class="zwordPre">- A null value.
 1[tb]Null[tb]~[nl]
+-
+- A boolean true without explicit setting.  If this was missing then isVisible is false.
+0[tb]isVisible[nl]
+-
+- Or explicitly setting the value.
+1[tb]isVisible[tb]1[nl]
+1[tb]isOpen[tb]0[nl]
+-
 - A true and false array.
-2[tb]True And False[tb]T[tb]F[nl]
-- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
-7[tb]Numbers[tb]0[tb]1[tb]-1[tb]3.14159[tb]-3.14159[tb]RQEkP2w[tb]RQAkh+1RELRg[nl]
-- Some integers in different encoding..
-3[tb]Encoded Numbers[tb]xfeedface[tb]o12345670[tb]b0000111100110101[nl]
+2[tb]True And False[tb]1[tb]0[nl]
+-
+- Some integers, reals, and complex numbers.  A single 'G' is (double) 0, 'g' is (float) 0.  HOI... is (double) PI, trg... is (float) PI.
+7[tb]Numbers[tb]0[tb]1[tb]-1[tb]G[tb]HOITKKLKVRIHGPKG[tb]Z+MAX[tb]Z?[tb]trgvkpkg[tb]z+MAX[nl]
+-
 - Some strings.
-3[tb]Strings[tb]"The quick brown fox\njumped over the lazy dog.[tb]"Salut, c'est été.[tb]"你好马[nl]
+3[tb]Strings[tb]"2D The quick brown fox\njumped over the lazy dog.[tb]"11 Salut, c'est été.[tb]"* 你好马[nl]
+-
 - Some binary data.
-1[tb]binary buffer[tb]*32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg[nl]
+1[tb]binary buffer[tb]*20 FEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEF[nl]
 </p>
-<p class="zword">Same with removing the tabs and newlines to give you a better idea what you might see in an actual file.</p>
-<p class="zwordPre">- A null value.
-1        Null             ~
-- A true and false array.
-2        True And False   T        F
-- Some integers and reals.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
-7        Numbers          0        1        -1        3.14159        -3.14159        RQEkP2w        RQAkh+1RELRg
-- Some integers in different encoding..
-3        Encoded Numbers  xfeedface        o12345670        b0000111100110101
-- Some strings.
-3        Strings          "The quick brown fox\njumped over the lazy dog.        "Salut, c'est été.        "你好马
-- Some binary data.
-1        binary buffer    *32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg
-</p>
+
+
+<h1 class="zword"><a name="3">Notes</a></h1>
+
+<h2 class="zword"><a name="3.1">Comparing with JSON.</a></h2>
+
+<h3 class="zword"><a name="3.1.1">File Size</a></h3>
+<p class="zword">File size from the test program which dumps out every data type MIFF can support and also dumps out the exact same data to a similar JSON file.</p>
+<table class="zword"><tbody class="zword">
+<tr class="zword">
+<th class="zword"><nobr>File</th>
+<th class="zword"><nobr>Size In Bytes Text</th>
+<th class="zword"><nobr>Size In Bytes Zipped</th>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>JSON compressed to one line</td>
+<td class="zword"><nobr>32,335</td>
+<td class="zword"><nobr>2,178</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>JSON Miff style formatted</td>
+<td class="zword"><nobr>32,550</td>
+<td class="zword"><nobr>2,316</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>MIFF</td>
+<td class="zword"><nobr>26,136</td>
+<td class="zword"><nobr>2,161</td>
+</tr>
+</tbody></table>
+<p class="zword">JSON compressed to one line removed quite a bit of formatting bytes.  But is it still quite shy of MIFF's raw size.  When compressed this difference becomes almost negligable.</p>
+
+<h3 class="zword"><a name="3.1.2">Comments</a></h3>
+<p class="zword">Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge numbers.</p>
+<p class="zword">Where MIFF saves some space.</p>
+<table class="zword"><tbody class="zword">
+<tr class="zword">
+<th class="zword"><nobr>Part</th>
+<th class="zword_fill">Comments</th>
+<th class="zword"><nobr>Size</th>
+<th class="zword"><nobr>Readable</th>
+<th class="zword"><nobr>Speed</th>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Keys</td>
+<td class="zword_fill">MIFF does not need keys to be enclosed in quotes.<br />JSON encloses keys within quotes.</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>-</td>
+<td class="zword"><nobr>-</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Array Count</td>
+<td class="zword_fill">MIFF uses a line header that includes an array count.<br />JSON does not have such concept.</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>+ MIFF (Memory resizing not needed)</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Record Ender</td>
+<td class="zword_fill">MIFF needs just a single [nl].<br />JSON will depend on formatting.</td>
+<td class="zword"><nobr>- (+ MIFF if JSON has formatting)</td>
+<td class="zword"><nobr>-</td>
+<td class="zword"><nobr>-</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Header</td>
+<td class="zword_fill">MIFF has a header with versions<br />JSON does not have a header.</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>-</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Numbers (integer, natural)</td>
+<td class="zword_fill">MIFF writes all integral values in HEX format.<br />JSON writes numbers in human readable format.</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>+ MIFF</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Numbers (real)</td>
+<td class="zword_fill">MIFF writes all real values in a binary dump hex format.<br />JSON writes numbers in human readable format.</td>
+<td class="zword"><nobr>- (depends)</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>+ MIFF (+ accuracy)</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Numbers (real, special values)</td>
+<td class="zword_fill">Infinity, -Infinity, Not a Number, double/float Maximums.<br />MIFF has constants for these values.<br />JSON has no standard for these values.  Implementations vary.</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>+ MIFF</td>
+<td class="zword"><nobr>+ MIFF</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>Array of objects</td>
+<td class="zword_fill">MIFF will require you to just make duplicate key blocks<br />JSON has object definition built in.</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>+ JSON</td>
+<td class="zword"><nobr>-</td>
+</tr>
+</tbody></table>
+<p class="zword"><strong>Is MIFF better?</strong></p>
+<p class="zword">No.  It will depend on how much value you place on readability and editability of the format.</p>
+<p class="zword">I suspect MIFF will have a slight advantage over reading and writing speed over JSON because there is less processing of numbers from the text format to binary in memory representation.</p>
+<p class="zword">The question is, how important is it to read the file and edit it manually?  Maybe for testing and debugging but in general, common everyday users are never going to.  So for the most part, whoever is actually reading the file will be a developer or similar.  Granted the real numbers will be a pain in the ass even for developers.</p>
+
+<h2 class="zword"><a name="3.2">Comments on MIFF</a></h2>
+<p class="zword"><strong>Are there parts of the format that I dislike?</strong></p>
+<p class="zword">Currently the real number handling I am a bit on the fence on.  I use different characters for the numbers just so that I can differentiate them from integer and natural numbers.  Since they are essentially a binary dump, I needed a way to differentiate the 4 byte reals with the 8 byte reals.  This already is problematic because there can be 2 byte reals used in graphics programming and and 10 byte reals (long double in C) which older floating point processors/CPUs used to use.  I think most have really decided to drop it looking at the graphics cards, and extended assembly functions of modern CPUs.  But this is not to say there will not be a future double double that is 16 bytes possibly and that will make MIFF format useless.  I may revert back to a previous style of dumping the bytes and not try to trim zeros.  Which will mean doubles will always take 16 bytes in MIFF and floats will take 8.  So 2 byte floats will take up 4.</p>
+<p class="zword">I am still mulling this over.</p>
+<p class="zword"><strong>Why not use Base64 for binary data?</strong></p>
+<p class="zword">I started with base 64.  The problem is that base64 encoding adds complication.  And in the end, zipping up a similar wild with base64 encoded binary data (even for double and floats) results in a larger zip file.  Or at least with my basic test with the test program.  It seems Hex dumping of binary data results in better data compression.  I suspect it is because half byte hex dumping matches the raw byte data more closely and results in a lot more pattern matching; whereas the base64 encoding, which shifts bits around and causes, what appears to be, a little more 'randomness', give compression algorithms a harder time.  Compression algorithms do not like randomness.  Base64 saves in text file size but negatively affects compressed file sizes.</p>
+<p class="zword">So I figured, why bother with the added complexity of base64.  If you want to save space, compress the file.  Text files are inefficient to begin with.</p>
  </body>
 
 </html>

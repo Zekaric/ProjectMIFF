@@ -341,7 +341,7 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       }
       else if (value.inr4.r == MiffR4_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z MAX");
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z+MAX");
       }
       else if (value.inr4.r == -MiffR4_MAX)
       {
@@ -349,7 +349,7 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       }
       else if (value.inr4.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z INF");
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z+INF");
       }
       else if (value.inr4.r == -HUGE_VALF)
       {
@@ -368,7 +368,7 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       }
       else if (value.inr.r == MiffR_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z MAX");
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z+MAX");
       }
       else if (value.inr.r == -MiffR_MAX)
       {
@@ -376,7 +376,7 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       }
       else if (value.inr.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z INF");
+         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z+INF");
       }
       else if (value.inr.r == -HUGE_VALF)
       {

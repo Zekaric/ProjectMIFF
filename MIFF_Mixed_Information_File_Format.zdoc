@@ -28,8 +28,11 @@ hh	|chapter| - Goals
 
 :[
 -	|b |Simple| b|    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
+
 -	|b |Brief| b|     The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
+
 -	|b |Flexible| b|  The format needs to be able to accomodate change or specific data.  As years go by, software will also change and requirements will change.  The format needs to try its best to keep up without importers and exporters to be completely remade.
+
 -	|b |Accurate| b|  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 ]
 
@@ -37,23 +40,37 @@ hh	|chapter| - Goals
 hh	|chapter| - Design Decisions:
 
 	|b |Why not XML or JSON?| b|
-	I find XML is too verbose.  JSON is much better than XML and is a reasonable alternative to XML.  Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.
+
+	I find XML is too verbose.  
+
+	JSON is much better than XML and is a reasonable alternative to XML.  I do have a few issues that I found out with JSON.  JSON format doesn't specify any limits on numbers.  Which is great.  However implementations can do what they like when it comes to numbers they can't handle.  I.E. Javascript change handle 64 bit integers and unsigned integers.  So it tends to write those values out as strings.  The JSON format has no problems but Javascript does.  JSON format doesn't have NAN, Infinity defined for any of the numbers.  So those too are written out as strings and more worryingly, there is no standard on how to write that information out.
+
+	Both are very flexible but that can be a double edged sword.  I feel there should be something better.  I do not claim MIFF is better, it is just different.
+
 	|b |Why big endian for multibyte data types?| b|
+
 	In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was big endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another, accurately.
 
 
 hh	|chapter| - Disclosure
 
 	I, Robbert de Groot, have been a professional Software Developer since 1995.
+
 	This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing or developing options which I find lacking or distasteful in some fashion.
+
 	I can be reached at the following email address.
+
 	zekaric@gmail.com
 
 
 h	|chapter| - Format
 
-	A MIFF File is a UTF8 text file where items inside are tab delimited and each record is a single line terminated by a UNIX \n new line.  The contents of the file a collection of key value pairs.  
-	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a transfer file format to move data from one program to another.
+	A MIFF File is a UTF8 text file.
+
+	Each line in the text file is a 'record' or piece of data.  A record is delimited by |-->|, '\t', tab characters and is terminated by a UNIX |<--|, '\n', new line character.  The contents of the file is a collection of key value pairs.  
+
+	The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a data transfer file format between softwared packages or a general format to store data.  It could be used as a native format if desired, just like where JSON is used.
+
 	Any data that is encode or stored as a binary byte sequence will be in big endian order.  
 
 
@@ -72,18 +89,22 @@ MIFF|<--|
 
 :[
 -	|b |Line 1| b| - Format of the file.  MIFF.
+
 -	|b |Line 2| b| - Version of the file.  Version 1.
+
 -	|b |Line 4| b| - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.
+
 -	|b |Line 5| b| - Sub-Format version identifier.
 ]
 
-	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain |-->|s or |<--|s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8 one character/codepoint can span multiple bytes.  So this name can not exceed this byte count.
+	If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain |-->|s or |<--|s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8, one UNICODE character or codepoint can span multiple bytes.  So this name can not exceed this byte count.
 
 
 hh	|chapter| - Content
 
 	Each line is split into 3 sections.  The header for the line, the key for the line, and the value section.
-	Each section is separated by a |-->| character.  The entire line ends in a |<--| character.
+
+	Each section is separated by a |-->|.  The entire line ends in a |<--|.
 
 .[
 [header]|-->|[key]|-->|[value]|<--|
@@ -111,25 +132,28 @@ tc	Close scope.  Denotes the end of a scope.
 
 t-
 tcx	[count]
-tc	This will be a number 0 or larger to indicate an array count for the key.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of objects, use a count key value and a scope for each individual object in the array instead.  
+tc	This will be a hexidecimal number 0 or larger to indicate an array count for the value.  Whatever data the key is suppose to hold, there should be that many of them.  If you have an array of objects, use a separate count key-value and a scope for each individual object in the array instead.  
 
 t-
 tcx	*
-tc	This will be to indicate an array of unknown size.  In generaly I would advise trying to avoid this as muck as possible.  It is better to know beforehand howmuch space data should take up.  However sometimes this is unavoidable.
+tc	This indicates an array of unknown size.  In generaly I would advise trying to avoid this as much as possible.  It is better to know beforehand how many bytes or how many items are needed.  However sometimes this is unavoidable, but in my opinion, avoid as much as you can.
 
 ]
 
-	The header can have leading spaces or |-->| characters to make it more obvious which scope it belongs to.  However these spaces and |-->| characters are not needed unless you want to make it more readable.  They are stripped when reading the file.
+	The header can have leading spaces or |-->|s to make it more obvious which scope it belongs to.  However these spaces and |-->|s are not needed unless you want to make it more readable.  They are ignored when reading the header.
 
 hhh	|chapter| - Key Section
 
-	Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, some characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes the key is valid.  The key can have spaces or any special characters you like except |-->| and |<--| characters.  This does mean leading, trailing, and internal spaces in the key are significant.
+	Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, UNICODE characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes, the key is valid.  The key can have spaces or any special characters you like except |-->|s and |<--|s.  This does mean leading, trailing, and internal spaces in the key are significant.
 
 hhh	|chapter| - Value Section
 
 	The sub-format of the file should be dictating what values follow the key.  This should be defined somewhere in the documentation of the sub-format.  
-	There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a |-->| character.
-	If there is a count in the line header other than 1 then there should be multiple copies of whatever type that is associated with the key.
+
+	There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a |-->|.
+
+	If there is a count in the line header other than 1, then there should be multiple copies of whatever type that is associated with the key.
+
 	Values have a simple format.
 
 .[
@@ -148,34 +172,32 @@ tcx	~
 tc	The value data is unset/null.  Nothing else follows the header.
 
 t-
-tcx	T, F
-tc	The value data is a boolean and the header is already the value data.  Nothing else follows the header.  |b |T| b| for true, |b |F| b| for false.  Often, when dealing with just a single boolean value, the existance of a key is enough to indicate T and ommision would indicate F.  
+tcx	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, -
+tc	A hexidecimal number.  If a boolean value this will be 0 (false) or 1 (true).  If an integer or natural then it will be that number in hexidecimal form.  Leading 0's will be trimmed off.  If a real value then it will be the byte value of the real (8 characters for a float, 16 characters for a double).  For integers we can have a negative hexidecimal.
 
 t-
-tcx	x, b
-tc	A natural number (0 or larger integer values).  |b |x| b| for hexadecimal (0123456789abcdef) values and |b |b| b|for binary (01) values.  If you want to store an interger or real here then use unions Miff4 and Miff8 to get the natural number representing the bit pattern for the integer and real values.  Leading zeros will be trimmed from the number.  Values are store in Big Endian.  These are here because sometimes it makes sense to show values in hex or binary.  Leading 0's are stripped.  0 value will be just a singular 0.
+tcx	G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, Z+MAX, Z-MAX, Z+INF, Z-INF, Z?
+tc	A hexidecimal representation of a double precision real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for maximum positive value, maximum negative value, positive infinity, negative infinity, not a number.
 
 t-
-tcx	c, i, n, r
-tc	The value data will be a |b |c| b| complex number, an |b |i| b| integer number, a |b |n| b| natural number, or a |b |r| b| real number in human readable form.  If the value is a real number, it should be written using North American number format (E.G. 3.14159, 1.0e10.  Decimal/"." instead of comma/"," for the separation of the integer part and the fractional part.)  If the value is a complex number the is it written real number "+" imaginary number.  If the imaginary number is negative then it will include the "-" sign.  It will not change the "+" between the two numbers.
+tcx	g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, z+MAX, z-MAX, z+INF, z-INF, z?
+tc	A hexidecimal representation of a single precision real value (float).  Same as the double case.
 
 t-
-tcx	C, I, N, R
-tc	The value data will be a 4 or 8 byte |b |C| b| complex number, |b |I| b| integer number, |b |N| b| natural number, or |b |R| b| real number encoded in Base64.  Why have this instead of just output the number in human readable form.  I believe when dealing with reals that there is a loss of precision possible when writing them out in human readable form.  Writing out reals this way will ensure the bits are exactly the same as they were when you were storing the values.  Integers are on average unnecessary to write this way as they are exactly the same in human readable form.  The human readable form may also be more compact int ASCII form depending on what sort of values you end up writing out.  However this option may be faster to convert to and from text if that is a concern.  Complex numbers encode the two reals as one buffer for the Base64 conversion.  Values are stored in Big Endian.
+tcx	"[count] 
+tc	The value data will be a string.  There is no closing |b |"| b|.  [count] denotes the size of the string in bytes represented in hexidecimal form.  A single space follows the [count] value and the string immediately follows up to the next |-->| or |<--| which ever is next.  All |-->|, |<--|, and '\' characters inside the string are escaped.  Meaning a |-->| inside the string will be '\t', a |<--| inside teh string will be a '\n', and a '\' inside the string will be a '\\'.  Nothing else is escaped and should be written as is in the file.
 
 t-
-tcx	"
-tc	The value data will be a string.  There is no closing |b |"| b|.  It will be in two parts separated by a space.  First part immediately follows the " and it denotes the size of the string in bytes.  After the space to the next |-->| or |<--| which ever is next, is the string.  The string is preprocessed before storing.  All |-->|, |<--|, and \ characters are escaped with a \.  
-
-t-
-tcx	*
-tc	The value data is a binary buffer.  It will be two parts separated by a space.  First part immediately follows the * and it denotes the size of the binary buffer in bytes.  After the space will be the binary buffer in Base64 encoding.
+tcx	*[count]
+tc	The value data is a binary buffer.  [count] denotes the size of the binary buffer in bytes represented in hexidecimal form.  A single space follows the [count] value and the binary buffer in hexidecimal encoding immediately follows.
 
 t-
 tcx	[Any other letter]
 tc	The value data is define by the subformat and decoded by an external to the library function.
 
 ]
+
+	a, b, c, d, e, f are not accepted for hex values.  The G-V and the g-v were used to 
 
 hh	Examples
 
@@ -186,18 +208,146 @@ hh	Examples
 - A boolean true without explicit setting.  If this was missing then isVisible is false.
 0|-->|isVisible|<--|
 -
+- Or explicitly setting the value.
+1|-->|isVisible|-->|1|<--|
+1|-->|isOpen|-->|0|<--|
+-
 - A true and false array.
-2|-->|True And False|-->|T|-->|F|<--|
+2|-->|True And False|-->|1|-->|0|<--|
 -
-- Some integers, reals, and complex numbers.  Last two are 4 Byte 3.1415926535897932f, and 8 Byte 3.1415926535897932.
-7|-->|Numbers|-->|i0|-->|i1|-->|i-1|-->|r0|-->|r3.14159|-->|r-3.14159|-->|r1e-10|-->|c1|-->|c0+1|-->|c-1+-1|-->|RQEkP2w|-->|RQAkh+1RELRg|<--|
--
-- Some natural numbers in different encoding.  Trim leading 0's.
-3|-->|Encoded Numbers|-->|xfeedface|-->|o12345670|-->|b111100110101|<--|
+- Some integers, reals, and complex numbers.  A single 'G' is (double) 0, 'g' is (float) 0.  HOI... is (double) PI, trg... is (float) PI.
+7|-->|Numbers|-->|0|-->|1|-->|-1|-->|G|-->|HOITKKLKVRIHGPKG|-->|Z+MAX|-->|Z?|-->|trgvkpkg|-->|z+MAX|<--|
 -
 - Some strings.
-3|-->|Strings|-->|"The quick brown fox\njumped over the lazy dog.|-->|"Salut, c'est été.|-->|"你好马|<--|
+3|-->|Strings|-->|"2D The quick brown fox\njumped over the lazy dog.|-->|"11 Salut, c'est été.|-->|"* 你好马|<--|
 -
 - Some binary data.
-1|-->|binary buffer|-->|*32 QAkh+1RELRgQAkh+1RELRgQAkh+1RELRgQAkh+1RELRg|<--|
+1|-->|binary buffer|-->|*20 FEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEF|<--|
 ]
+
+h	Notes
+
+hh	Comparing with JSON.
+
+hhh	File Size
+
+	File size from the test program which dumps out every data type MIFF can support and also dumps out the exact same data to a similar JSON file.
+
+t[
+
+thx	File
+thx	Size In Bytes Text
+thx	Size In Bytes Zipped
+
+t-
+tcx	JSON compressed to one line
+tcx	32,335
+tcx	2,178
+
+t-
+tcx	JSON Miff style formatted
+tcx	32,550
+tcx	2,316
+
+t-
+tcx	MIFF
+tcx	26,136
+tcx	2,161
+
+]
+
+	JSON compressed to one line removed quite a bit of formatting bytes.  But is it still quite shy of MIFF's raw size.  When compressed this difference becomes almost negligable.  
+
+hhh	Comments
+
+	Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge numbers.
+
+	Where MIFF saves some space.
+
+t[
+
+thx	Part
+th*	Comments
+thx	Size
+thx	Readable
+thx	Speed
+
+t-
+tcx	Keys
+tc*	MIFF does not need keys to be enclosed in quotes.|line|JSON encloses keys within quotes.
+tcx	+ MIFF
+tcx	-
+tcx	-
+
+t-
+tcx	Array Count
+tc*	MIFF uses a line header that includes an array count.|line|JSON does not have such concept.
+tcx	+ JSON
+tcx	+ MIFF
+tcx	+ MIFF (Memory resizing not needed)
+
+t-
+tcx	Record Ender
+tc*	MIFF needs just a single |<--|.|line|JSON will depend on formatting.
+tcx	- (+ MIFF if JSON has formatting)
+tcx	-
+tcx	-
+
+t-
+tcx	Header
+tc*	MIFF has a header with versions|line|JSON does not have a header.
+tcx	+ JSON
+tcx	+ MIFF
+tcx	-
+
+t-
+tcx	Numbers (integer, natural)
+tc*	MIFF writes all integral values in HEX format.|line|JSON writes numbers in human readable format.
+tcx	+ MIFF
+tcx	+ JSON
+tcx	+ MIFF
+
+t-
+tcx	Numbers (real)
+tc*	MIFF writes all real values in a binary dump hex format.|line|JSON writes numbers in human readable format.
+tcx	- (depends)
+tcx	+ JSON
+tcx	+ MIFF (+ accuracy)
+
+t-
+tcx	Numbers (real, special values)
+tc*	Infinity, -Infinity, Not a Number, double/float Maximums.|line|MIFF has constants for these values.|line|JSON has no standard for these values.  Implementations vary.
+tcx	+ MIFF
+tcx	+ MIFF
+tcx	+ MIFF
+
+t-
+tcx	Array of objects
+tc*	MIFF will require you to just make duplicate key blocks|line|JSON has object definition built in.
+tcx	+ JSON
+tcx	+ JSON
+tcx	-
+
+]
+
+	|b |Is MIFF better?| b|
+
+	No.  It will depend on how much value you place on readability and editability of the format.  
+
+	I suspect MIFF will have a slight advantage over reading and writing speed over JSON because there is less processing of numbers from the text format to binary in memory representation.
+
+	The question is, how important is it to read the file and edit it manually?  Maybe for testing and debugging but in general, common everyday users are never going to.  So for the most part, whoever is actually reading the file will be a developer or similar.  Granted the real numbers will be a pain in the ass even for developers.
+
+hh	Comments on MIFF
+
+	|b |Are there parts of the format that I dislike?| b|
+
+	Currently the real number handling I am a bit on the fence on.  I use different characters for the numbers just so that I can differentiate them from integer and natural numbers.  Since they are essentially a binary dump, I needed a way to differentiate the 4 byte reals with the 8 byte reals.  This already is problematic because there can be 2 byte reals used in graphics programming and and 10 byte reals (long double in C) which older floating point processors/CPUs used to use.  I think most have really decided to drop it looking at the graphics cards, and extended assembly functions of modern CPUs.  But this is not to say there will not be a future double double that is 16 bytes possibly and that will make MIFF format useless.  I may revert back to a previous style of dumping the bytes and not try to trim zeros.  Which will mean doubles will always take 16 bytes in MIFF and floats will take 8.  So 2 byte floats will take up 4.  
+
+	I am still mulling this over.
+
+	|b |Why not use Base64 for binary data?| b|
+
+	I started with base 64.  The problem is that base64 encoding adds complication.  And in the end, zipping up a similar wild with base64 encoded binary data (even for double and floats) results in a larger zip file.  Or at least with my basic test with the test program.  It seems Hex dumping of binary data results in better data compression.  I suspect it is because half byte hex dumping matches the raw byte data more closely and results in a lot more pattern matching; whereas the base64 encoding, which shifts bits around and causes, what appears to be, a little more 'randomness', give compression algorithms a harder time.  Compression algorithms do not like randomness.  Base64 saves in text file size but negatively affects compressed file sizes. 
+
+	So I figured, why bother with the added complexity of base64.  If you want to save space, compress the file.  Text files are inefficient to begin with.

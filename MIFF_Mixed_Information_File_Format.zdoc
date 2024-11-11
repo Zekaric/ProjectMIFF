@@ -176,12 +176,8 @@ tcx	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, -
 tc	A hexidecimal number.  If a boolean value this will be 0 (false) or 1 (true).  If an integer or natural then it will be that number in hexidecimal form.  Leading 0's will be trimmed off.  If a real value then it will be the byte value of the real (8 characters for a float, 16 characters for a double).  For integers we can have a negative hexidecimal.
 
 t-
-tcx	G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, Z+MAX, Z-MAX, Z+INF, Z-INF, Z?
-tc	A hexidecimal representation of a double precision real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for maximum positive value, maximum negative value, positive infinity, negative infinity, not a number.
-
-t-
-tcx	g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, z+MAX, z-MAX, z+INF, z-INF, z?
-tc	A hexidecimal representation of a single precision real value (float).  Same as the double case.
+tcx	G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V,|line|Z80, Z8+M, Z8-M, Z8+I, Z8-I, Z8?,|line|Z40, Z4+M, Z4-M, Z4+I, Z4-I, Z4?
+tc	A hexidecimal representation of a real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for 0, maximum positive value, maximum negative value, positive infinity, negative infinity, and not a number for doubles (8) and floats (4).  They are to save a little bit of space when written out.  All real values follow IEEE 754 formats.
 
 t-
 tcx	"[count] 
@@ -197,7 +193,7 @@ tc	The value data is define by the subformat and decoded by an external to the l
 
 ]
 
-	a, b, c, d, e, f are not accepted for hex values.  The G-V and the g-v were used to 
+	a, b, c, d, e, f are not accepted for hex values.  The G-V are used for real value storage and basically map to the hex numbers 0-9,A-F.  It is so a real value can be differenciated from an integer or natural value.  Lower case g-v are not accepted for real hex values.
 
 hh	Examples
 
@@ -208,15 +204,15 @@ hh	Examples
 - A boolean true without explicit setting.  If this was missing then isVisible is false.
 0|-->|isVisible|<--|
 -
-- Or explicitly setting the value.
+- Or explicitly setting the value.  True is 1, False is 0.
 1|-->|isVisible|-->|1|<--|
 1|-->|isOpen|-->|0|<--|
 -
 - A true and false array.
 2|-->|True And False|-->|1|-->|0|<--|
 -
-- Some integers, reals, and complex numbers.  A single 'G' is (double) 0, 'g' is (float) 0.  HOI... is (double) PI, trg... is (float) PI.
-7|-->|Numbers|-->|0|-->|1|-->|-1|-->|G|-->|HOITKKLKVRIHGPKG|-->|Z+MAX|-->|Z?|-->|trgvkpkg|-->|z+MAX|<--|
+- Some integers, reals, and complex numbers.  "Z80" is (double) 0, "Z40" is (float) 0.  HOI... is (double) PI, TRG... is (float) PI.
+7|-->|Numbers|-->|0|-->|1|-->|-1|-->|Z80|-->|HOITKKLKVRIHGPKG|-->|Z8+M|-->|Z8?|-->|TRGVKPKG|-->|Z4+M|<--|
 -
 - Some strings.
 3|-->|Strings|-->|"2D The quick brown fox\njumped over the lazy dog.|-->|"11 Salut, c'est été.|-->|"* 你好马|<--|
@@ -251,16 +247,16 @@ tcx	2,316
 
 t-
 tcx	MIFF
-tcx	26,136
-tcx	2,161
+tcx	29,432
+tcx	2,191
 
 ]
 
-	JSON compressed to one line removed quite a bit of formatting bytes.  But is it still quite shy of MIFF's raw size.  When compressed this difference becomes almost negligable.  
+	JSON compressed to one line removed quite a bit of formatting bytes.  When compressed this difference becomes almost negligable.
 
 hhh	Comments
 
-	Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge numbers.
+	Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge differences.
 
 	Where MIFF saves some space.
 
@@ -299,6 +295,13 @@ tc*	MIFF has a header with versions|line|JSON does not have a header.
 tcx	+ JSON
 tcx	+ MIFF
 tcx	-
+
+t-
+tcx	True, False, Null
+tc*	MIFF uses "1", "0", "~".|line|JSON uses "true", "false", "null"
+tcx	+ MIFF
+tcx	-
+tcx	+ MIFF
 
 t-
 tcx	Numbers (integer, natural)
@@ -342,9 +345,11 @@ hh	Comments on MIFF
 
 	|b |Are there parts of the format that I dislike?| b|
 
-	Currently the real number handling I am a bit on the fence on.  I use different characters for the numbers just so that I can differentiate them from integer and natural numbers.  Since they are essentially a binary dump, I needed a way to differentiate the 4 byte reals with the 8 byte reals.  This already is problematic because there can be 2 byte reals used in graphics programming and and 10 byte reals (long double in C) which older floating point processors/CPUs used to use.  I think most have really decided to drop it looking at the graphics cards, and extended assembly functions of modern CPUs.  But this is not to say there will not be a future double double that is 16 bytes possibly and that will make MIFF format useless.  I may revert back to a previous style of dumping the bytes and not try to trim zeros.  Which will mean doubles will always take 16 bytes in MIFF and floats will take 8.  So 2 byte floats will take up 4.  
+	Currently the real number handling I am a bit on the fence on.  I use different characters for the hex numbers just so that I can differentiate them from integer and natural numbers.  And to figure out if they are representing a double (8 bytes) or a float (4 bytes) I have to write all the bytes out.  Which will mean 16 bytes for a double and 8 bytes for a float.  However this allows me to potentially support short floats (2 bytes) and long doubles (10 bytes), or larger if need be.
 
-	I am still mulling this over.
+	Why write real values out this way?  I want quick and accurate store and load of real values.  Writing them out in human readable form is nice and all but there is a conversion cost and when dealing with large numbers, they will take up a lot more space.  Meaning, a non-rational real number as a double will mean 15 decimals of precision plus the decimal point and sign possibly with an exponent portion.  You are looking at 21 bytes potentially instead of 16.  I could encode in base64 for a more compact text representation but I will talk about that further down.
+
+	I do like human readable numbers but I find that there is a risk of losing accuracy with that over using a binary dump of the number.  And doing a conversion from human readable numbers to binary numbers is not cheap when you have to convert a huge amount of them.
 
 	|b |Why not use Base64 for binary data?| b|
 

@@ -328,7 +328,6 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
    MiffN     mask;
    MiffStr   string[16];
    MiffStr   letters[]  = "GHIJKLMNOPQRSTUV";
-   MiffStr   letters4[] = "ghijklmnopqrstuv";
    MiffValue value;
 
    value = valueInput;
@@ -337,54 +336,54 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
    {
       if      (value.inr4.r == 0)
       {
-         _MiffSetBuffer(miff, 1, (MiffN1 *) letters4);
+         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z40");
       }
       else if (value.inr4.r == MiffR4_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z+MAX");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4+M");
       }
       else if (value.inr4.r == -MiffR4_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z-MAX");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4-M");
       }
       else if (value.inr4.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z+INF");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4+I");
       }
       else if (value.inr4.r == -HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "z-INF");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4-I");
       }
       else if (isnan(value.inr4.r))
       {
-         return _MiffSetBuffer(miff, 2, (MiffN1 *) "z?");
+         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z4?");
       }
    }
    else
    {
       if      (value.inr.r == 0)
       {
-         _MiffSetBuffer(miff, 1, (MiffN1 *) letters);
+         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z80");
       }
       else if (value.inr.r == MiffR_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z+MAX");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8+M");
       }
       else if (value.inr.r == -MiffR_MAX)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z-MAX");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8-M");
       }
       else if (value.inr.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z+INF");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8+I");
       }
       else if (value.inr.r == -HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 5, (MiffN1 *) "Z-INF");
+         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8-I");
       }
       else if (isnan(value.inr.r))
       {
-         return _MiffSetBuffer(miff, 2, (MiffN1 *) "Z?");
+         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z8?");
       }
    }
 
@@ -400,21 +399,11 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
 
       _MiffByteSwap4(miff, &value.inr4);
 
-      // Skip leading 0s
+      // Fill in the buffer.
       for (index = 0; index < count; index++)
       {
-         ntemp = (int) ((value.inr4.n & mask) >> shift);
-         breakIf(ntemp);
-
-         mask   = mask >> 4;
-         shift -= 4;
-      }
-
-      // Fill in the buffer.
-      for (         ; index < count; index++)
-      {
-         ntemp                 = (int) ((value.inr4.n & mask) >> shift);
-         string[stringIndex++] = letters4[ntemp];
+         ntemp         = (int) ((value.inr4.n & mask) >> shift);
+         string[index] = letters[ntemp];
 
          mask   = mask >> 4;
          shift -= 4;
@@ -428,26 +417,16 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
 
       _MiffByteSwap8(miff, &value.inr);
 
-      // Skip leading 0s
+      // Fill in the buffer.
       for (index = 0; index < count; index++)
       {
-         ntemp = (int) ((value.inr.n & mask) >> shift);
-         breakIf(ntemp);
-
-         mask   = mask >> 4;
-         shift -= 4;
-      }
-
-      // Fill in the buffer.
-      for (         ; index < count; index++)
-      {
-         ntemp                 = (int) ((value.inr.n & mask) >> shift);
-         string[stringIndex++] = letters[ntemp];
+         ntemp         = (int) ((value.inr.n & mask) >> shift);
+         string[index] = letters[ntemp];
 
          mask   = mask >> 4;
          shift -= 4;
       }
    }
 
-   return _MiffSetBuffer(miff, stringIndex, (MiffN1 *) string);
+   return _MiffSetBuffer(miff, count, (MiffN1 *) string);
 }

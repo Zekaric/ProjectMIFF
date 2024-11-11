@@ -124,63 +124,71 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    // Constants
    if      (buffer[0] == 'Z')
    {
-      if      (strIsEqual(5, buffer, "Z+MAX"))
+      if      (strIsEqual(3, buffer, "Z80"))
+      {
+         miff->value.inr.r = 0;
+      }
+      if      (strIsEqual(4, buffer, "Z8+M"))
       {
          miff->value.inr.r = MiffR_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "Z-MAX"))
+      else if (strIsEqual(4, buffer, "Z8-M"))
       {
          miff->value.inr.r = -MiffR_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "Z+INF"))
+      else if (strIsEqual(4, buffer, "Z8+I"))
       {
          miff->value.inr.r = HUGE_VAL;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "Z-INF"))
+      else if (strIsEqual(4, buffer, "Z8-I"))
       {
          miff->value.inr.r = -HUGE_VAL;
          returnTrue;
       }
-      else if (strIsEqual(2, buffer, "Z?"))
+      else if (strIsEqual(3, buffer, "Z8?"))
       {
          miff->value.inr.r = NAN;
          returnTrue;
       }
-      // unknown Z value.
-      returnFalse;
-   }
-   else if (buffer[0] == 'z')
-   {
-      miff->value.isR4 = miffTRUE;
-      if      (strIsEqual(5, buffer, "z+MAX"))
+      else if (strIsEqual(3, buffer, "Z40"))
       {
+         miff->value.isR4 = miffTRUE;
+         miff->value.inr4.r = 0;
+      }
+      else if (strIsEqual(4, buffer, "Z4+M"))
+      {
+         miff->value.isR4 = miffTRUE;
          miff->value.inr4.r = MiffR4_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "z-MAX"))
+      else if (strIsEqual(4, buffer, "Z4-M"))
       {
+         miff->value.isR4 = miffTRUE;
          miff->value.inr4.r = -MiffR4_MAX;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "z+INF"))
+      else if (strIsEqual(4, buffer, "Z4+I"))
       {
+         miff->value.isR4 = miffTRUE;
          miff->value.inr4.r = HUGE_VALF;
          returnTrue;
       }
-      else if (strIsEqual(5, buffer, "z-INF"))
+      else if (strIsEqual(4, buffer, "Z4-I"))
       {
+         miff->value.isR4 = miffTRUE;
          miff->value.inr4.r = -HUGE_VALF;
          returnTrue;
       }
-      else if (strIsEqual(2, buffer, "z?"))
+      else if (strIsEqual(3, buffer, "Z4?"))
       {
+         miff->value.isR4 = miffTRUE;
          miff->value.inr4.r = NAN;
          returnTrue;
       }
-      // unknown z value
+      // unknown Z value
       returnFalse;
    }
 
@@ -209,26 +217,6 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
          letterValue = letterValue - 'G';
          break;
 
-      // Here just in case.  Should never be using lower case letters.
-      case 'g':
-      case 'h':
-      case 'i':
-      case 'j':
-      case 'k':
-      case 'l':
-      case 'm':
-      case 'n':
-      case 'o':
-      case 'p':
-      case 'q':
-      case 'r':
-      case 's':
-      case 't':
-      case 'u':
-      case 'v':
-         letterValue = letterValue - 'g';
-         break;
-
       default:
          letterValue = 0;
          break;
@@ -238,13 +226,13 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    }
 
    // double values always user upper case letters.
-   if ('G' <= buffer[0] && buffer[0] <= 'V')
+   if      (count == 16)
    {
       miff->value.inr.n = value;
       _MiffByteSwap8(miff, &miff->value.inr);
    }
    // float values always use lower case letters.
-   else
+   else if (count == 8)
    {
       miff->value.isR4   = miffTRUE;
       miff->value.inr4.n = (MiffN4) value;

@@ -243,7 +243,7 @@ MiffB           miffStart(                         MiffMemCreate const memCreate
 void            miffStop(                          void);
 
 /******************************************************************************
-miffValue 
+miffValue
 prototype:
 ******************************************************************************/
 MiffB           miffValueGetB(                     MiffValue const value);

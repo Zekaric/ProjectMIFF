@@ -131,14 +131,12 @@ JsonType  _JsonGetNull(                   Json       * const json);
 JsonType  _JsonGetNumber(                 Json       * const json);
 JsonType  _JsonGetNumberInteger(          Json       * const json, JsonStr * const str);
 JsonType  _JsonGetNumberReal(             Json       * const json, JsonStr * const str);
-JsonType  _JsonGetNumberRealWithExponent( Json       * const json, JsonStr * const str);
 JsonType  _JsonGetTrue(                   Json       * const json);
 
 JsonB     _JsonIsSpace(                   Json       * const json);
 
 void     *_JsonMemCreate(                 JsonN const memByteCount);
 void      _JsonMemDestroy(                void * const mem);
-JsonB     _JsonMemIsEqual(                JsonN const countA, JsonN1 const * const memA, JsonN const countB, JsonN1 const * const memB);
 void      _JsonMemStart(                  JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc);
 void      _JsonMemStop(                   void);
 
@@ -155,29 +153,8 @@ JsonN     _JsonStrToN(                    JsonStr const * const str);
 
 #define   _JsonStrGetCount(STR)   ((JsonN4) strlen((char const *)    STR))
 
-void      _JsonUtilStart(        void);
-void      _JsonUtilStop(         void);
-
-
-
-
 _locale_t _JsonLocaleGet(        void);
 
-JsonB     _JsonStrEncodedToStr(  JsonN4  * const strLen, JsonStr       * const str);
-JsonB     _JsonStrToStrEncoded(  JsonN4    const strLen, JsonStr const * const str, JsonN4 * const strEncodedLen, JsonStr ** const strEncoded);
-JsonI     _JsonStrToI(           JsonN4    const strLen, JsonStr const * const str);
-//JsonStr   *_JsonC2Append(          JsonStr const * const a, JsonStr const * const b, JsonStr const * const c);
-//JsonStr   *_JsonC2Clone(           JsonN4    const c2Count, JsonStr const * const c2);
-
-
-JsonB     _JsonGetLine(          Json       * const json);
-JsonB     _JsonGetLineSkip(      Json       * const json);
-JsonB     _JsonGetPart(          Json       * const json);
-JsonB     _JsonGetR(             Json       * const json, JsonR   * const value);
-JsonB     _JsonGetRS(            Json       * const json, JsonR   * const value);
-JsonB     _JsonGetR4(            Json       * const json, JsonR4  * const value);
-JsonB     _JsonGetR4S(           Json       * const json, JsonR4  * const value);
-JsonB     _JsonGetStr(           Json       * const json, JsonStr ** const string);
 JsonB     _JsonSetBuffer(        Json const * const json, JsonN const bufCount, JsonN1 const * const buf);
 JsonB     _JsonSetI(             Json       * const json, JsonI const value);
 JsonB     _JsonSetIndent(        Json       * const json);
@@ -185,6 +162,5 @@ JsonB     _JsonSetN(             Json       * const json, JsonN const value);
 JsonB     _JsonSetNewLine(       Json       * const json);
 JsonB     _JsonSetR(             Json       * const json, JsonR const value);
 JsonB     _JsonSetR4(            Json       * const json, JsonR4 const value);
-JsonB     _JsonSetStr(           Json       * const json, JsonN const strLen, JsonStr const * const value);
 
 #endif

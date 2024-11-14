@@ -42,7 +42,8 @@ include:
 local:
 variable:
 ******************************************************************************/
-static MiffB   _isStarted = miffFALSE;
+static MiffB       _isStarted = miffFALSE;
+static _locale_t   _locale;
 
 /******************************************************************************
 prototype:
@@ -757,6 +758,8 @@ MiffB miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestr
       !memDestroyFunc)
 
    _MiffMemStart(memCreateFunc, memDestroyFunc);
+
+   _locale = _create_locale(LC_ALL, "C");
 
    _isStarted = miffTRUE;
 

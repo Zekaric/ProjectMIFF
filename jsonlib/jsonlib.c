@@ -46,7 +46,8 @@ macro:
 /******************************************************************************
 variable:
 ******************************************************************************/
-static JsonB _isStarted = jsonFALSE;
+static JsonB       _isStarted = jsonFALSE;
+static _locale_t   _locale;
 
 /******************************************************************************
 global:
@@ -1100,7 +1101,8 @@ JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestr
 
    _JsonMemStart(memCreateFunc, memDestroyFunc);
    _JsonStrStart();
-   _JsonUtilStart();
+
+   _locale = _create_locale(LC_ALL, "C");
 
    _isStarted = jsonTRUE;
 
@@ -1114,9 +1116,20 @@ void jsonStop(void)
 {
    returnVoidIf(!_isStarted);
 
-   _JsonUtilStop();
    _JsonStrStop();
    _JsonMemStop();
 
    _isStarted = jsonFALSE;
+}
+
+/******************************************************************************
+library local:
+function:
+******************************************************************************/
+/******************************************************************************
+func: _JsonLocaleGet
+******************************************************************************/
+_locale_t _JsonLocaleGet(void)
+{
+   return _locale;
 }

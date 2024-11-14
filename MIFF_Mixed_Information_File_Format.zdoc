@@ -1,5 +1,3 @@
-v	__>	|_||_|-
-v	___	|_||_||_|
 v	-->	[tb]
 v	<--	[nl]
 
@@ -21,7 +19,9 @@ h	|chapter| - M.I.F.F.
 
 hh	|chapter| - Discussion
 
-	What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.  
+	|b |What is the purpose of M.I.F.F. (MIFF)?| b|
+
+	MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.  
 
 
 hh	|chapter| - Goals

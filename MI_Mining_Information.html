@@ -5,13 +5,13 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" type="text/css" href="style_reset.css">
   <link rel="stylesheet" type="text/css" href="style_zword.css">
-  <title>M.I. M.I.F.F.: Mine Information MIFF</title>
+  <title>M.I. File: Mine Information File</title>
  </head>
 
  <body class="zword">
 
 
-<h1 class="zword">M.I. M.I.F.F.: Mine Information MIFF</h1>
+<h1 class="zword">M.I. File: Mine Information File</h1>
 <p class="zword"><strong><code>Author:            </code></strong> Robbert de Groot</p>
 <p class="zword"><strong><code>Date:              </code></strong> 2019-05-15</p>
 <p class="zword"><strong><code>Copyright:         </code></strong> 2019, Robbert de Groot</p>
@@ -19,33 +19,33 @@
 <p class="zword"><strong><code>License (Document):</code></strong> Creative Commons Attribution-NoDerivs.<a href="https://creativecommons.org/licenses/by-nd:4.0">(CC BY-ND)</a></p>
 
 <h2 class="zword">Table Of Contents:</h2>
-<p class="zword_toc1"><a href="#1">1 - M.I. M.I.F.F.</a></p>
+<p class="zword_toc1"><a href="#1">1 - M.I.</a></p>
 <p class="zword_toc2"><a href="#1.1">1.1 - Discussion</a></p>
 <p class="zword_toc2"><a href="#1.2">1.2 - Goals</a></p>
 <p class="zword_toc2"><a href="#1.3">1.3 - Disclosure</a></p>
-<p class="zword_toc1"><a href="#2">2 - MI-MIFF Format</a></p>
+<p class="zword_toc1"><a href="#2">2 - MI Format</a></p>
 <p class="zword_toc2"><a href="#2.1">2.1 - Header</a></p>
 <p class="zword_toc1"><a href="#3">3 - Mine Information Block (MIB)</a></p>
 <p class="zword_toc2"><a href="#3.1">3.1 - Information Block</a></p>
-<p class="zword_toc2"><a href="#3.2">3.2 - Type Block</a></p>
-<p class="zword_toc2"><a href="#3.3">3.3 - Item Block</a></p>
-<p class="zword_toc2"><a href="#3.4">3.4 - Image Block</a></p>
-<p class="zword_toc2"><a href="#3.5">3.5 - Drillhole Block</a></p>
-<p class="zword_toc2"><a href="#3.6">3.6 - Geometry Block</a></p>
-<p class="zword_toc2"><a href="#3.7">3.7 - Model Data</a></p>
-<p class="zword_toc3"><a href="#3.7.1">3.7.1 - Model Block</a></p>
-<p class="zword_toc2"><a href="#3.8">3.8 - Model Block:</a></p>
-<p class="zword_toc3"><a href="#3.8.1">3.8.1 - SubBlock: Fixed</a></p>
-<p class="zword_toc3"><a href="#3.8.2">3.8.2 - SubBlock: Semi</a></p>
-<p class="zword_toc3"><a href="#3.8.3">3.8.3 - SubBlock: Octree</a></p>
-<p class="zword_toc3"><a href="#3.8.4">3.8.4 - SubBlock: Free</a></p>
+<p class="zword_toc2"><a href="#3.2">3.2 - Item Block</a></p>
+<p class="zword_toc2"><a href="#3.3">3.3 - Image Block</a></p>
+<p class="zword_toc2"><a href="#3.4">3.4 - Drillhole Block</a></p>
+<p class="zword_toc2"><a href="#3.5">3.5 - Geometry Block</a></p>
+<p class="zword_toc2"><a href="#3.6">3.6 - Model Data</a></p>
+<p class="zword_toc3"><a href="#3.6.1">3.6.1 - Model Block</a></p>
+<p class="zword_toc2"><a href="#3.7">3.7 - Model Block:</a></p>
+<p class="zword_toc3"><a href="#3.7.1">3.7.1 - SubBlock: Fixed</a></p>
+<p class="zword_toc3"><a href="#3.7.2">3.7.2 - SubBlock: Semi</a></p>
+<p class="zword_toc3"><a href="#3.7.3">3.7.3 - SubBlock: Octree</a></p>
+<p class="zword_toc3"><a href="#3.7.4">3.7.4 - SubBlock: Free</a></p>
 
 
-<h1 class="zword"><a name="1">1 - M.I. M.I.F.F.</a></h1>
+<h1 class="zword"><a name="1">1 - M.I.</a></h1>
 
 <h2 class="zword"><a name="1.1">1.1 - Discussion</a></h2>
-<p class="zword">What is the purpose of M.I. M.I.F.F. (MI-MIFF)?  MI-MIFF is intended to be a file format for exporting and importing data from one mining software package to another software package.</p>
-<p class="zword">I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently some software packages attempt to do their best at supporting competitor file formats (reading only) but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, like DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.</p>
+<p class="zword"><strong>What is the purpose of M.I. (MI)?</strong></p>
+<p class="zword">MI is intended to be a file format for exporting and importing data from one mining software package to another software package.</p>
+<p class="zword">I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently some software packages attempt to do their best at supporting competitor file formats (read only) but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, like DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.</p>
 <p class="zword">A lot of the client's time is lost with all this work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with an information format is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard part of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.</p>
 
 <h2 class="zword"><a name="1.2">1.2 - Goals</a></h2>
@@ -61,13 +61,14 @@
 <h2 class="zword"><a name="1.3">1.3 - Disclosure</a></h2>
 <p class="zword">As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of survey equipment and related material; as well as other mine related hardware and software products.</p>
 <p class="zword">This format is currently not sanctioned by any software vendor, including Hexagon.  This was something I am doing as an experiment to satisfy my curiosity.  It was brought about by recent efforts being made by Global Mining Guidelines (GMG), with their Open Mining Format (OMF), which seems to have the backing of some big players in the industry.  My issue with OMF, for now, is that they only have a Python library that implements the format available publically.  The format is strictly binary, which is not entirely a bad idea considering the data that needs to be passed around, but binary formats can be very fussy.  The format is also based on a ZIP archive.  The good thing about ZIP is that it will have excellent compression.  The bad thing is that ZIP archives are, in my opinion, not a great file format.</p>
-<p class="zword">So, I thought I would try my hand at defining a format what I think would be good as an information format.  I am trying to write MI-MIFF independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.</p>
+<p class="zword">So, I thought I would try my hand at defining a format that I think would be good as an information format.  I am trying to write MI independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.</p>
 <p class="zword">If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at the following email address.</p>
 <p class="zword">zekaric@gmail.com</p>
 
 
-<h1 class="zword"><a name="2">2 - MI-MIFF Format</a></h1>
-<p class="zword">See the MIFF_Mixed_Information_File_Format.html file for the discussion of the base file format which is being used for the information file format.  This document will cover specifics related to using MIFF for mining as an information file format to move data.</p>
+<h1 class="zword"><a name="2">2 - MI Format</a></h1>
+<p class="zword">MI is not restricted to any particular format.  Here I will specify two, MIFF and JSON.  See the MIFF_Mixed_Information_File_Format document for the discussion of the MIFF file format.  Refer to JSON.org for information about JSON.  This document will cover specifics related to using MI but it will not be restricted to any particular underlying format.</p>
+<p class="zword">The library connect to this document will read and write to either MIFF or JSON.  XML could be an option but I would not suggest it.</p>
 <p class="zword">The data mining companies need to keep track of and transfer around.</p>
 <p class="zwordPre">- General information
   - Project limits
@@ -91,55 +92,62 @@
     - Polylines (open and closed)
     - Text
     - Symbol
+  - Survey
+    - Points, Polylines but using angles instead of coordinates.
 - Drillhole
   - Drillhole survery information.
   - Drillhole assay information.
   - Drillhole composite information.
   - Blast hole shot information.
   - Chip assay information.
-  - Design vs surveyed information.
+  - Design vs Actual information.
 - Model
   - Block model information.
-    - Regular
-    - Sub-blocked
+    - Block
+      - Regular (all blocks the same)
+      - Plan Regular, Variable Bench (all blocks same i and j dimensions but k (bench) can vary.)
+      - Octree
+      - Regular sub-blocked (all sub-blocks are the same)
+      - Multi-level sub-blocked
     - Seam
+    - Surface
   - Seam model information.
     - Regular
     - Sub-blocked
   - Surface model information.
     - Sub-blocked
 </p>
-<p class="zword">File naming can help in MIFF file importing.  It is suggested to use the following file extensions...</p>
+<p class="zword">File naming can help in file importing.  It is suggested to use the following file extensions...</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Extension</th>
 <th class="zword_fill">File Contents</th>
 </tr>
 <tr class="zword">
-<td class="zword">*.miff</td>
+<td class="zword">*.miff, *.json</td>
 <td class="zword">Still valid but can be anything.  What is it?</td>
 </tr>
 <tr class="zword">
-<td class="zword">*.miffMI</td>
+<td class="zword">*.miffMI, *.jsonMI</td>
 <td class="zword">for a very general Mine Information of anything mine related.</td>
 </tr>
 <tr class="zword">
-<td class="zword">*.miffMIDrill</td>
+<td class="zword">*.miffMIDrill, *.jsonMIDrill</td>
 <td class="zword">for only Drillhole related data.</td>
 </tr>
 <tr class="zword">
-<td class="zword">*.miffMIGeom</td>
+<td class="zword">*.miffMIGeom, *.jsonMIGeom</td>
 <td class="zword">for only Geometry related data.</td>
 </tr>
 <tr class="zword">
-<td class="zword">*.miffMIModel</td>
+<td class="zword">*.miffMIModel, *.jsonMIModel</td>
 <td class="zword">for only Model related data.</td>
 </tr>
 </tbody></table>
-<p class="zword">This information is duplicated inside the file so reading in the file will confirm with the extension but it will help the user if the extension is properly set and will make it easier on the software on how to read in the file if these are properly set.</p>
+<p class="zword">This information is duplicated inside the file so reading in the file should match the extension but it will help the user if the extension is properly set and will make it easier on the software on how to read in the file if these are properly set.</p>
 
 <h2 class="zword"><a name="2.1">2.1 - Header</a></h2>
-<p class="zword">MIFF has fields for a Sub-Format Name and Version.  For an MI-MIFF file this will be set to...</p>
+<p class="zword">MIFF has fields for a Sub-Format Name and Version.  For an MI file this will be set to...</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Field</th>
@@ -154,45 +162,92 @@
 <td class="zword">1</td>
 </tr>
 </tbody></table>
+<p class="zword">For a JSON file, since it doesn't have a header, create base object for all the blocks in the file.  First block should be the "format" block.</p>
+<p class="zwordPre">{
+   "format":{
+      "name":   "Mining Information",
+      "version":1,
+   },
+   ...
+}
+</p>
 
 
 <h1 class="zword"><a name="3">3 - Mine Information Block (MIB)</a></h1>
-<p class="zword">An MI-MIFF file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.</p>
-<p class="zwordPre">{	mine
-...
-}
-</p>
+<p class="zword"><strong>Block Name</strong>: mine</p>
+<p class="zword">An MI file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.</p>
+<p class="zword">Each mine block in a file separates information related to one specific mine.  Meaning, you could have more than one mine in a MI file.  One mine could be a gold mine in Australia while another could be a bitumen mine in Africa.  This will probably not happen often because the file size just for one mine could be very large so adding more than one mine would probably not be a good idea, but it is doable.</p>
 <p class="zword">Inside a MIB you will have the following blocks.</p>
 <ul class="zword">
 <li class="zword"><strong>Information block</strong> to hold general information about the project.  This must be the first block.</li>
-<li class="zword"><strong>Type List block</strong> to hold the user types that are used in the format.</li>
-<li class="zword"><strong>Item List block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
-<li class="zword"><strong>Image List block</strong> to hold the images.  Images can be used for texturing, symbols, etc.</li>
-<li class="zword"><strong>Geometry Block</strong> to hold geometry information.  There can be more than one Geoemtry block.</li>
+<li class="zword"><strong>Item list block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
+<li class="zword"><strong>Image list block</strong> to hold the images.  Images can be used for texturing, symbols, etc.</li>
+<li class="zword"><strong>Geometry block</strong> to hold geometry information.  There can be more than one Geoemtry block.</li>
 <li class="zword"><strong>Drillhole block</strong> to hold drillhole information.  Item List block must already be defined or else you are not providing assay or survey values with your drillhole data.  There can be more than one Drillhole block.</li>
-<li class="zword"><strong>Model Block</strong> to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.</li>
+<li class="zword"><strong>Model block</strong> to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.</li>
 </ul>
 
 <h2 class="zword"><a name="3.1">3.1 - Information Block</a></h2>
-<p class="zword">Common to all MI-MIFF files for any of the types above, there will be an information block providing general, project wide information.</p>
-<p class="zword">This information block will be the very first key value in the file right after the MIFF header.</p>
+<p class="zword"><strong>Block Name</strong>: info</p>
+<p class="zword">Common to all MI files for any of the types above, there will be an information block providing general, project wide information.</p>
+<p class="zword">This information block should be before other blocks.</p>
 <p class="zword">Inside the information block we have the following possible key values.  Not all are required.</p>
-<p class="zwordPre">{	info
-"	type	1	[file type]
-"	company	1	[company name]
-"	copyright	1	[copyright if any]
-"	author	1	[client employee name]
-"	software	1	[software preparing this file]
-"	softwareVersion	1	[software version]
-"	comment	1	[comments]
-"	projectSystem	1	[coordinate system the project is in]
-"	projectName	1	[name of project area]
-abcr8	projectMin	1	[minimum project area point]
-abcr8	projectMax	1	[maximum project area point]
-}
-</p>
+<table class="zword"><tbody class="zword">
+<tr class="zword">
+<th class="zword"><nobr>Name</th>
+<th class="zword_fill">Description</th>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>type</td>
+<td class="zword_fill">The type of the MI file.  See further down.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>company</td>
+<td class="zword_fill">The name of the company related to the mine.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>copyright</td>
+<td class="zword_fill">Copyright information</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>author</td>
+<td class="zword_fill">Author or person who prepared this data.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>software</td>
+<td class="zword_fill">The software that was used to prepare this data.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>softwareVersion</td>
+<td class="zword_fill">The version of the above software.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>comment</td>
+<td class="zword_fill">Any comments provided by the author or software about the data.  This comment should hold no information that needs to be parsed by an importer of the data.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>projectSystem</td>
+<td class="zword_fill">Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like "WGS84" or "NAD27".  Even the [projectMin] and [projectMax] will be in this system.  Use "local" to indicate that the project coordinates are in a local flat earth space.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>projectName</td>
+<td class="zword_fill">The name of the project.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>projectMin</td>
+<td class="zword_fill">Array of 3 real values in the given project system.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>projectMax</td>
+<td class="zword_fill">Array of 3 real values in the given project system.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>other</td>
+<td class="zword">A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values.</td>
+</tr>
+</tbody></table>
 <p class="zword">Most keys are self explanatory.</p>
-<p class="zword"><strong>[file type]</strong> is one of...</p>
+<p class="zword"><strong>[Type]</strong> is one of...</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">
 <th class="zword"><nobr>Value</th>
@@ -215,252 +270,67 @@ abcr8	projectMax	1	[maximum project area point]
 <td class="zword">Only holds model data.</td>
 </tr>
 </tbody></table>
-<p class="zword"><strong>[projectSystem]</strong> will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Specifying the system here will mean all coordinate values will be in that system.  Like "WGS84" or "NAD27".  Even the [projectMin] and [projectMax] will be in this system.  Use "local" to indicate that the project coordinates are in a local flat earth space.</p>
-<p class="zword"><strong>[projectMin]</strong> and <strong>[projectMax]</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or around.</p>
+<p class="zword"><strong>projectMin</strong> and <strong>projectMax</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.</p>
 
-<h2 class="zword"><a name="3.2">3.2 - Type Block</a></h2>
-<p class="zwordPre">{	type
-"	name	1	[name of type]
-v	[name of variable]	[array count of variable]	[type of variable]
-v	[name of enumeration variable]	[array count of variable]	[type of variable]	([int code of enum]	[string value of enum])*
-}
-</p>
-<p class="zword"><strong>name</strong> appears first in the block.  It will be the name of the type.</p>
-<p class="zword">There will be 1 or more of the following two lines.  Each line indicates a member of the type.  The second line indicates an enumeration where after the [type of variable] will be a series of code and string pairs.</p>
-<p class="zword">When data is provided for the type, the order of the members will be the order of the values.</p>
-<p class="zwordPre">{	type
-" 	name 	1	id
-v	value	1	n4
-}
-{	type
-"	name	1	date
-v	year	1	i4
-v	month	1	n1
-v	day	1	n1
-}
-{	type
-"	name	1	time
-v	hour	1	n1
-v	minute	1	n1
-v	second	1	n1
-}
-{	type
-"	name	1	dateTime
-v	year	1	i4
-v	month	1	n1
-v	day	1	n1
-v	hour	1	n1
-v	minute	1	n1
-v	second	1	n1
-}
-{	type
-"	name	1	imageId
-v	value	1	n4
-}
-{	type
-"	name	1	enumCode
-v	value	1	n1	0	value1	1	value2	999	value3
-}
-{	type
-"	name	1	azimuth
-v	value	1	"
-}
-{	type
-"	name	1	degree
-v	value	1	r4
-}
-{	type
-"	name	1	dipDegree
-	1	value	r4
-}
-{	type
-"	name	1	dipRatio
-	1	value	r4
-}
-{	type
-"	name	1	matrix
-	1	value	matrix4x4r8
-}
-{	type
-"	name	1	color
-	1	value	abcn1
-}
-{	type
-"	name	1	colorA
-	1	value	abcdn1
-}
-{	type
-"	name	1	normal
-	1	value	abcr8
-}
-{	type
-"	name	1	point
-	1	value	abcr8
-}
-{	type
-"	name	1	textureUV
-	1	value	abr4
-}
-{	type
-"	name	1	planeOUR
-	1	origin	abcr8	up	abcr8	right	abcr8
-}
-{	type
-"	name	1	planeEquation
-	1	value	abcdr8
-}
-{	type
-"	name	1	enumPointOption
-	1	value	n1	0	no options	1	coloring
-}
-{	type
-"	name	1	pointGroup
-v	pointCount	1	n4
-v	pointList	*	abcr8
-v	pointOption	1	enumPointOption
-v	colorList	*	abcn1
-}
-{	type
-"	name	1	enumPolyOption
-v	value	1	n1	0	no options	1	node coloring	2	line coloring	10	texture coloring
-}
-{	type
-"	name	1	polyline
-v	pointCount	1	n4
-v	pointList	*	abcr8
-v	polyOption	1	enumPolyOption
-v	colorList	*	abcn1
-v	textureUV	*	abr4
-v	texture	1	imageId
-}
-{	type
-"	name	1	enumSurfaceOption
-v	value	1	n1	0	no options	1	node coloring	2	face coloring	10	normals	11	normals with node coloring	12	normals with face coloring	100	textured	110	textured with normals
-}
-{	type
-"	name	1	surface
-v	pointCount	1	n4
-v	pointList	*	abcr8
-v	faceCount	1	n4
-v	faceList	*	abcn4
-v	surfaceOption	1	enumSurfaceOption
-v	colorList	*	abcdn1
-v	uvList	*	abr4
-v	texture	1	imageId
-v	normalList	*	abcr4
-}
-{	type
-"	name	1	enumCodeMeshOption
-v	value	1	n1	0	no options	1	face vis	10	node coloring	11	node coloring and face vis	20	face coloring	21	face coloring and face vis	100	textured	101	textured and face vis	100	textured and normals	101	textured and normals and face vis
-}
-{	type
-"	name	1	mesh
-v	pointCountX	1	n4
-v	pointCountY	1	n4
-v	pointList	*	abcr4
-v	meshOption	1	enumMeshOption
-v	faceVisList	*	b
-v	colorList	*	abcdn1
-v	textureUVList	*	abr4
-v	textureId	1	imageId
-}
-{	type
-"	name	1	textGeneric
-v	location	1	planeOUR
-v	value	1	"
-}
-{	type
-"	name	1	formula
-v	text	1	"
-}
-</p>
-<p class="zword">All MI-MIFF files will have the above types defined as they are listed above.  These types ARE part of the MI-MIFF subformat.  However these types are only required to be present if they are used in the file.</p>
-<p class="zword">For polyline, surface, and mesh, if the options don't require the presence of a field then that field will be default.  Meaning, if it is an array, the array size is 0; if an id, the id is 0; etc.</p>
-
-<h2 class="zword"><a name="3.3">3.3 - Item Block</a></h2>
-<p class="zword">Item will describe the value that will be stored in the various places where the item is being tracked.</p>
-<p class="zwordPre">{	item
-"	name	1	[item name]
-type	type	1	[item type]
-[item type]	min	1	[item min value]
-[item type]	max	1	[item max value]
-[item type]	precision	1	[item precision]
-[item type]	default	1	[default value for this item, missing value otherwise.]
-"	calculation	1	[calculation field value]
-}
-</p>
-<p class="zword">Each item will have a unique <strong>id</strong>.  This id may or may not be provided by the software.  This id is used by the other places in this MI-MIFF where this item's values are stored.  It has to be unique compared to any other items in the item list.</p>
-<p class="zword"><strong>nameLong</strong> and <strong>nameShort</strong> are two names for this item.  These names may not be unique.  There can be multiple items with the same names but need to have different ids.</p>
-<p class="zword"><strong>type</strong> will define the value being stored for this item.  Type is one of "", r*, n*, i*, date, time, dateTime, enumCode, or formula (formula meaning the item's value is calculated.)</p>
-<p class="zword"><strong>min</strong>, <strong>max</strong> define the limits for an item.  Only applicable if item type is a r*, n*, or i*.  If these are missing then the range is the full range as defined by the type.</p>
-<p class="zword"><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a r*.</p>
-<p class="zword"><strong>default</strong> will define the default value for this item if block is skipped.  If this is missing then the default value is 'missing'.</p>
-<p class="zword"><strong>calculation</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item id]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.</p>
-<p class="zword">When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'missing value' as well.  If this is all the values that need to be recorded then we don't really need to use a full r4 or r8 to store it.  We will be storing instead an n* value such that the n value, multiplied by the precision and added to the min value will recover the r value which is being stored.  In this case, 102 values only requires an n1 to encode all the values in the range.</p>
-<p class="zword">If there is an enumeration item value then define the enumeration as a type in the type list and use that type for the item's type.</p>
+<h2 class="zword"><a name="3.2">3.2 - Item Block</a></h2>
+<p class="zword"><strong>Block Name</strong>: item</p>
+<p class="zword">Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drillhole assay value, a block model item value, a geometry element value, a geometry point value, etc.</p>
+<p class="zword">Items need to be defined before they are used elsewhere in the MI file.</p>
+<table class="zword"><tbody class="zword">
+<tr class="zword">
+<th class="zword"><nobr>Name</th>
+<th class="zword_fill">Description</th>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>key</td>
+<td class="zword">A unique key for the item.  This is stored as a string even if it is a number by the software that sets it.  This key needs to be unique so that no two items have the same key value.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>name</td>
+<td class="zword">The name of the item.  A UTF8 string limited to 255 bytes.  Not necessarily unique but generally, it would be a good idea.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>type</td>
+<td class="zword">The type of the item.  See lower down.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>range</td>
+<td class="zword">If a number type, the minimum and maximum value for the item.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>value</td>
+<td class="zword">If the item has limited number of values, list the array of values here.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>precision</td>
+<td class="zword">If a real type, how many decimal places is this values accurrate to.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>default</td>
+<td class="zword">The default value for something that did not have a value assigned.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>calculation</td>
+<td class="zword">The formula used to calculate the value of this item.  In other words, this item has not stored value.  The value will be calculated when needed.</td>
+</tr>
+<tr class="zword">
+<td class="zword"><nobr>other</td>
+<td class="zword">A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values.</td>
+</tr>
+</tbody></table>
+<p class="zword">Each item will be given an index value starting at 0 and incrementing with every new item added to the MI file.</p>
+<p class="zword"><strong>type</strong> will define the value being stored for this item.  Type is one of string, real, real4, natural, integer, date, time, dateTime, or formula (formula meaning the item's value is calculated.)</p>
+<p class="zword"><strong>range</strong> defines the limits for an item.  Only applicable if item type is a real, real4, natural, or integer.  If these are missing then the range is the full range as defined by the type.</p>
+<p class="zword"><strong>valueList</strong> defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.</p>
+<p class="zword"><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a real and real4.</p>
+<p class="zword"><strong>default</strong> will define the default value for this item if block is skipped.  If this value is not set then the default value is 'unset'.</p>
+<p class="zword"><strong>calculation</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item key]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.</p>
+<p class="zword">When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'unset value' as well.  If this is all the values that need to be recorded, then we do not really need to use a full real or real4 value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recover the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.</p>
 <p class="zwordPre">Calculation example:
 (@ore%@ * @cu@) - @i_am_making_something_up@
 </p>
-<p class="zword">Missing values for the various types</p>
-<table class="zword"><tbody class="zword">
-<tr class="zword">
-<th class="zword"><nobr>Type</th>
-<th class="zword">Missing Value Binary</th>
-<th class="zword">Missing Value Text</th>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>r4, r8</td>
-<td class="zword">FLT_MAX, DBL_MAX</td>
-<td class="zword">FLT_MAX, DBL_MAX</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>i*, n*</td>
-<td class="zword">MAX value for the size</td>
-<td class="zword">"-" without the quotes</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>date, dateTime</td>
-<td class="zword">year is MAX value for that field.</td>
-<td class="zword">"-" without the quotes</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>time</td>
-<td class="zword">hour is MAX value for that field.</td>
-<td class="zword">"-" without the quotes</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>enumCode</td>
-<td class="zword">MAX value for the code.</td>
-<td class="zword">"-" without the quotes</td>
-</tr>
-<tr class="zword">
-<td class="zword"><nobr>""</td>
-<td class="zword">0 string length.  An actual 0 string will have 1 character and that character will 0.</td>
-<td class="zword">0 string length.  An actual 0 string will have 1 character and that character will 0.</td>
-</tr>
-</tbody></table>
-<p class="zword">Examples:</p>
-<p class="zwordPre">{	type
-"	name	1	rock type
-v	value	1	n1	15	Granite	17	Sandstone	19	Shale
-}
-{	item
-"	name	1	Copper
-type	type	1	r4
-r4	min	1	[base64 0]
-r4	max	1	[base64 5]
-r4	precision	1	[base64 0.01]
-r4	default	1	[base64 missing value]
-}
-{	item
-"	name	1	Rock Type
-type	type	1	rock type
-rock type	default	1	0
-}
-</p>
-<p class="zword">An enumeration requires the types defined before the item is defined.  Place the enumeration in the type list.  Note, the enumeration has values 15-Granite, 17-Sandstone, and 19-Shale.  Yet the default for Rock Type item is 0.  This is because it is the index of the value and not the code value.  0 being Granite, 1 being Sandstone, and 2 being Shale in this case.</p>
 
-<h2 class="zword"><a name="3.4">3.4 - Image Block</a></h2>
+<h2 class="zword"><a name="3.3">3.3 - Image Block</a></h2>
 <p class="zword">Defining an image.</p>
 <p class="zwordPre">{	image
 "	name	1	[image name]
@@ -483,10 +353,10 @@ n1	data	[file byte count]	[file data]
 <p class="zword">The third image refers to an image file external to the MIFF file.</p>
 <p class="zword">The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.</p>
 
-<h2 class="zword"><a name="3.5">3.5 - Drillhole Block</a></h2>
+<h2 class="zword"><a name="3.4">3.4 - Drillhole Block</a></h2>
 <p class="zword">Drillhole data holds information about drillholes.</p>
 
-<h2 class="zword"><a name="3.6">3.6 - Geometry Block</a></h2>
+<h2 class="zword"><a name="3.5">3.5 - Geometry Block</a></h2>
 <p class="zword">Within the geometry list you will only find geometry blocks.</p>
 <p class="zwordPre">{	geom
 "	name	1	[geom name]
@@ -510,7 +380,7 @@ attr	line	[point count]	[line attr list]
 <p class="zword">Each geom may have an optional geomAttr key value block.</p>
 <p class="zword">If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.</p>
 
-<h2 class="zword"><a name="3.7">3.7 - Model Data</a></h2>
+<h2 class="zword"><a name="3.6">3.6 - Model Data</a></h2>
 <p class="zword">Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.</p>
 <p class="zword"><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">Block Model Knowledge For Mining Engineers - An Introduction</a></p>
 <p class="zword">There are 3 basic model formats that are in use as Hexagon.</p>
@@ -522,9 +392,9 @@ attr	line	[point count]	[line attr list]
 <p class="zword"><strong>Block Model</strong> is a regular collection of, usually, uniform blocks.  Each block will have values for items that are being tracked by the client.</p>
 <p class="zword"><strong>Seam Model</strong> is a bit fancier Block Model.  This model is subdivided uniformly in the row and column directions of the model but instead of levels, seams are described.  Each block in a seam will have an elevation top and bottom to indicate the seam's limits, as well as any other values that are found within that seam block just like a normal block model.</p>
 <p class="zword"><strong>Surface Model</strong> is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.</p>
-<p class="zword">Even though only Block Models are sub-blocked, MI-MIFF does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
+<p class="zword">Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
 
-<h3 class="zword"><a name="3.7.1">3.7.1 - Model Block</a></h3>
+<h3 class="zword"><a name="3.6.1">3.6.1 - Model Block</a></h3>
 <p class="zword">After the general information block the next block will be the Model Information block.</p>
 <p class="zwordPre">{	model
 "	type	1	[model type]
@@ -656,7 +526,7 @@ Uniform divisions in the row and column directions.
 <p class="zword"><strong>isLevVariable</strong> - Flag to indicate the level heights are not uniform.  This does not need to be present if the levels are a fixed height.</p>
 <p class="zword"><strong>levList</strong> - A list of level heights starting from first level.  Only required if isLevVariable is true.</p>
 
-<h2 class="zword"><a name="3.8">3.8 - Model Block:</a></h2>
+<h2 class="zword"><a name="3.7">3.7 - Model Block:</a></h2>
 <p class="zword">This is where the model data is placed.  The format is slightly different in that it is a key value list but without value headers and potentially optional values depending on the key.</p>
 <p class="zwordPre">{	model
 </p>
@@ -761,10 +631,10 @@ B2R2C2v1 2 3cc.\n
 </p>
 <p class="zword">Note, if you can removed a separator without losing then that should be done.</p>
 
-<h3 class="zword"><a name="3.8.1">3.8.1 - SubBlock: Fixed</a></h3>
+<h3 class="zword"><a name="3.7.1">3.7.1 - SubBlock: Fixed</a></h3>
 <p class="zword">In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.</p>
 
-<h3 class="zword"><a name="3.8.2">3.8.2 - SubBlock: Semi</a></h3>
+<h3 class="zword"><a name="3.7.2">3.7.2 - SubBlock: Semi</a></h3>
 <p class="zword">In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...</p>
 <p class="zword">In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level subblocks will depend on how many times H is used for the same column.</p>
 <table class="zword"><tbody class="zword">
@@ -784,11 +654,11 @@ B2R2C2v1 2 3cc.\n
 <p class="zword">If H or h follows an H or h then the previous block will be holding default values, and the current block will be incremented to the next subblock.  The following H or h will determin the height of the new current block.</p>
 <p class="zword">If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.</p>
 
-<h3 class="zword"><a name="3.8.3">3.8.3 - SubBlock: Octree</a></h3>
+<h3 class="zword"><a name="3.7.3">3.7.3 - SubBlock: Octree</a></h3>
 <p class="zword">In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.</p>
 <p class="zword">The 's' key need to preceed the v record.</p>
 
-<h3 class="zword"><a name="3.8.4">3.8.4 - SubBlock: Free</a></h3>
+<h3 class="zword"><a name="3.7.4">3.7.4 - SubBlock: Free</a></h3>
 <p class="zword">In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.</p>
 <table class="zword"><tbody class="zword">
 <tr class="zword">

@@ -32,13 +32,10 @@
     <ClCompile Include="json_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_write.c">
+    <ClCompile Include="json_set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_read.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="json_util.c">
+    <ClCompile Include="json_get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

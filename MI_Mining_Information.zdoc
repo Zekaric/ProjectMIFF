@@ -295,6 +295,46 @@ tc	Only holds model data.
 
 
 
+hh	|chapter| - Property Block
+
+	|b |Block Name| b|: prop
+
+	This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.
+
+t[
+
+thx	Name
+th*	Description
+
+t-
+tcx	key
+tc	A unique string key for the property.
+
+t-
+tcx	name
+tc	A nice name for the property.  Optional.
+
+t-
+tcx	value
+tc	If this property block is in an item block's prop list then a value will be present.  The value will match the value type of the item.  Depending on the type the value will be an exact match or, if it is a number value, it will be the minimum value that an attribute needs to be in order to use the properties.
+
+t-
+tcx	vis, point vis, line vis, face vis, drill vis, model vis
+tc	boolean values for a global visibility, point visibility, line visibility, face visibility, drillhole geometry vis, and model geometry vis to be used when rendering the geometry.  Global trumps the rest of the visibilities.  Default visibilities will be used if these are missing.
+
+t-
+tcx	color, point color, line color, face color, face style color, drill color, model color
+tc	An rgba value for a point color, line color, face color, drillhole color, and model color to be used when rendering the geometry.  Default color will be used if these are missing.
+
+t-
+tcx	point style, line style, face style
+tc	A string representing the point style (symbol), line style (pattern), and face style (pattern) to be used when rendering the geometry.  Default styles as dictated by the software reading the MI will be used if these are missing.
+
+t-
+tcx	other
+tc	A string key and value pair array of any information that the software feels necessary for the property.
+]
+
 hh	|chapter| - Item Block
 
 	|b |Block Name| b|: item
@@ -341,6 +381,10 @@ tcx	calculation
 tc	The formula used to calculate the value of this item.  In other words, this item has not stored value.  The value will be calculated when needed.
 
 t-
+tcx	prop list
+tc*	An array of properties for rendering purposes in a view.  See Display block for what this might mean.  First property in this array will define the properties for something that does not match any other prop block's values.  The prop blocks in this array should be in order of increasing value if the item type is a number value.
+
+t-
 tcx	other
 tc	A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values.
 ]
@@ -369,65 +413,131 @@ Calculation example:
 
 hh	|chapter| - Image Block
 
-	XXXXXXXXXXXXXXXXX
+	|b |Block Name| b|: image
 
-	Defining an image.
+	Defining an image.  Images are mainly used for texture mapping in geometry blocks.
 
-.[
-{	image
-"	name	1	[image name]
-n4	width	1	[width of image]
-n4	height	1	[height of image]
-[color|colorA]	pixels	[pixel count]
-}
-{	image
-"	name	1	[image name]
-"	file	1	[file name]
-n1	data	[file byte count]	[file data]
-}
-{	image
-"	name	1	[image name]
-"	path	1	[path to image file]
-}
+t[
+
+thx	Name
+th*	Description
+
+t-
+tc	key
+tc	Unique identifier for the image.
+
+t-
+tc	name
+tc	A nice name for the image.
+
+t-
+tc	rgb
+tc	The pixels as a raw image.|line|[width int]|-->|[height int]|-->|[hex dump of image pixels in 8 bit rgb values, no compression.] 
+
+t-
+tc	rgba
+tc	The pixels as a raw image.|line|[width int]|-->|[height int]|-->|[hex dump of image pixels in 8 bit rgba values, not compression.] 
+
+t-
+tc	file
+tc	A hex dump of the image file.  
+
+t-
+tc	filePath
+tc	A relative path to an image file.  The file should be relative to the MI file and should be in the same folder or in a sub folder of this folder.  The file should be an image file.  
 ]
 
-	The first image defines the image raw, inline.  
-	The second image defines the image embedded as a verbatum copy of the file contents.
-	The third image refers to an image file external to the MIFF file.
-	The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.
+	An image will only have one of the following 4 items (rgb, rgba, file, filePath) and never more than one.  
 
 
 hh	|chapter| - Drillhole Block
 
 	Drillhole data holds information about drillholes.
 
+
 hh	|chapter| - Geometry Block
 
-	Within the geometry list you will only find geometry blocks.
+	|b |Block Name| b|: geom
 
-.[
-{	geom
-"	name	1	[geom name]
-"	item list geom	[item Count]	[name of item]*
-"	item list point	[item count]	[name of item]*
-"	item list line	[item count]	[name of item]*
-type	type	1	[geom type]
-[geom type]	data	1	[data of geom type]
-attr	geom	1	[geom attr list]
-attr	point	[point count]	[point attr list]
-attr	line	[point count]	[line attr list]
-}
+	Defining a piece of geometry.  There can be multiple geometry blocks within an MI file.
+
+t[
+
+thx	Name
+th*	Description
+
+t-
+tc	key
+tc	A string that is a unique identifier for the geometry item.
+
+t-
+tc	name
+tc	A nice name for the geometry if any.
+
+t-
+tc	image
+tc	key to the image being used for texturing.
+
+t-
+tcx	prop
+tc	Key to the property block to use to render the geometry.
+
+t-
+tc	attr item list geom
+tc	An array of item keys that are defined for the geometry as a whole.
+
+t-
+tc	attr item list point
+tc	An array of item keys that are defined for the geometry points.  Only used for Polyline geometry and is optional.
+
+t-
+tc	attr item list line
+tc	An array of item keys that are defined for the geometry segments.  A segment is the connection between two points.  Only used for Polyline geometry and is optional.
+
+t-
+tc	type
+tc	The type of the geometry.  One of "label", "point", "polyline", "surface", "mesh", "grid"
+
+t-
+tc	point list
+tc	The point list for the geometry.  This will depend on the type above.
+
+t-
+tc	face list
+tc	If the type is a surface there will be a face connectivity list.  Each face will be a triangle and be composed of 3 indicies into the point list.
+
+t-
+tc	uv list
+tc	If the type is a surface or mesh, there could be a uv texture list.  One for every point in the point list.
+
+t-
+tc	color list point
+tc	If the type is polyline, surface, or mesh then the geometry could be colored at the point level.  The blending over the face or line segment will be smooth from one color to the next.
+
+t-
+tc	color list face
+tc	If the type is surface, or mesh then the geometry could be colored at the face level.  The face will be a solid color.
+
+t-
+tc	attr list geom
+tc	The geometry level attribute values.  One value per item in the attr item list geom.
+
+t-
+tc	attr list point
+tc	The point level attribute values.  One per point in the point list.  One value per item in the attr item list point.
+
+t-
+tc	attr list line
+tc	The line level attribute values.  One per line segment in the point list.  One value per item in the attr item list line.
 ]
 
 	Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.
+
 	Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.
+
 	attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.
+
 	In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.
-	Each geom has a unique id.
-	Each geom will have a type.  One of point, pointGroup, polyline, surface, mesh, grid, or text.
-	Each geom will have data of the given type.
-	Each geom may have an optional geomAttr key value block. 
-	If the geometry is a polyline, then there may be an optional pointAttr and lineAttr arrays.  1 set of attributes per point and line segment.
 
 hh	|chapter| - Model Data
 

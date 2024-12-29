@@ -331,27 +331,39 @@
 </p>
 
 <h2 class="zword"><a name="3.3">3.3 - Image Block</a></h2>
+<p class="zword"><strong>Block Name</strong>: image</p>
 <p class="zword">Defining an image.</p>
-<p class="zwordPre">{	image
-"	name	1	[image name]
-n4	width	1	[width of image]
-n4	height	1	[height of image]
-[color|colorA]	pixels	[pixel count]
-}
-{	image
-"	name	1	[image name]
-"	file	1	[file name]
-n1	data	[file byte count]	[file data]
-}
-{	image
-"	name	1	[image name]
-"	path	1	[path to image file]
-}
-</p>
-<p class="zword">The first image defines the image raw, inline.</p>
-<p class="zword">The second image defines the image embedded as a verbatum copy of the file contents.</p>
-<p class="zword">The third image refers to an image file external to the MIFF file.</p>
-<p class="zword">The first and second forms are the safest to transport images mainly because the third will mean you have to include another file with the MIFF file and that can be error prone for users as they can forget to include it.</p>
+<table class="zword"><tbody class="zword">
+<tr class="zword">
+<th class="zword"><nobr>Name</th>
+<th class="zword_fill">Description</th>
+</tr>
+<tr class="zword">
+<td class="zword">key</td>
+<td class="zword">Unique identifier for the image.</td>
+</tr>
+<tr class="zword">
+<td class="zword">name</td>
+<td class="zword">A nice name for the image.</td>
+</tr>
+<tr class="zword">
+<td class="zword">rgb</td>
+<td class="zword">The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgb values]</td>
+</tr>
+<tr class="zword">
+<td class="zword">rgba</td>
+<td class="zword">The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgba values]</td>
+</tr>
+<tr class="zword">
+<td class="zword">file</td>
+<td class="zword">A hex dump of the image file.</td>
+</tr>
+<tr class="zword">
+<td class="zword">filePath</td>
+<td class="zword">A relative path to an image file.  The file should be relative to the MI file and should be in the same folder or in a sub folder of this folder.  The file should be an image file.</td>
+</tr>
+</tbody></table>
+<p class="zword">An image will only have one of the following 4 items (rgb, rgba, file, filePath) and never more than one.</p>
 
 <h2 class="zword"><a name="3.4">3.4 - Drillhole Block</a></h2>
 <p class="zword">Drillhole data holds information about drillholes.</p>

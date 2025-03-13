@@ -43,7 +43,7 @@ function:
 /******************************************************************************
 func: _MiffByteSwap4
 ******************************************************************************/
-void _MiffByteSwap4(Miff const * const miff, Miff4 * const value)
+void _MiffByteSwap4(Gmiff const * const miff, Gmiff4 * const value)
 {
    if (miff->isByteSwapping)
    {
@@ -60,7 +60,7 @@ void _MiffByteSwap4(Miff const * const miff, Miff4 * const value)
 /******************************************************************************
 func: _MiffByteSwap8
 ******************************************************************************/
-void _MiffByteSwap8(Miff const * const miff, Miff8 * const value)
+void _MiffByteSwap8(Gmiff const * const miff, Gmiff8 * const value)
 {
    if (miff->isByteSwapping)
    {

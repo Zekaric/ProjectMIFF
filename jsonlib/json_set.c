@@ -46,23 +46,23 @@ function
 /******************************************************************************
 func: _JsonSetBuffer
 ******************************************************************************/
-JsonB _JsonSetBuffer(Json const * const json, JsonN const bufCount, JsonN1 const * const buf)
+Gb _JsonSetBuffer(Gjson const * const json, Gn8 const bufCount, Gn1 const * const buf)
 {
    assert(bufCount < JsonN4_MAX);
-   return json->setBuffer(json->dataRepo, (JsonN4) bufCount, buf);
+   return json->setBuffer(json->dataRepo, (Gn4) bufCount, buf);
 }
 
 /******************************************************************************
 func: _JsonSetI
 ******************************************************************************/
-JsonB _JsonSetI(Json * const json, JsonI const value)
+Gb _JsonSetI(Gjson * const json, Gi8 const value)
 {
-   JsonN ntemp;
+   Gn8 ntemp;
 
    ntemp = 0;
    if (value < 0)
    {
-      json->setBuffer(json->dataRepo, 1, (JsonN1 *) "-");
+      json->setBuffer(json->dataRepo, 1, (Gn1 *) "-");
       ntemp = -value;
    }
    else
@@ -76,16 +76,16 @@ JsonB _JsonSetI(Json * const json, JsonI const value)
 /******************************************************************************
 func: _JsonSetIndent
 ******************************************************************************/
-JsonB _JsonSetIndent(Json * const json)
+Gb _JsonSetIndent(Gjson * const json)
 {
-   JsonI4 index;
+   Gi4 index;
 
    // No writing indents when in compact mode.
-   returnTrueIf(json->method == jsonMethodWRITING_COMPACT);
+   returnTrueIf(json->method == gmethodWRITE);
 
    forCount (index, json->scope)
    {
-      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) "\t"));
+      returnFalseIf(!_JsonSetBuffer(json, 1, (Gn1 *) "\t"));
    }
    returnTrue;
 }
@@ -93,13 +93,13 @@ JsonB _JsonSetIndent(Json * const json)
 /******************************************************************************
 func: _JsonSetN
 ******************************************************************************/
-JsonB _JsonSetN(Json * const json, JsonN const value)
+Gb _JsonSetN(Gjson * const json, Gn8 const value)
 {
    int    index,
           count,
           digit;
-   JsonN  temp;
-   JsonN1 string[32];
+   Gn8  temp;
+   Gn1 string[32];
 
    temp = value;
    for (index = 0; ; index++)
@@ -107,7 +107,7 @@ JsonB _JsonSetN(Json * const json, JsonN const value)
       digit = temp % 10;
       temp  = temp / 10;
 
-      string[index] = (JsonN1) ('0' + digit);
+      string[index] = (Gn1) ('0' + digit);
 
       breakIf(temp == 0);
    }
@@ -115,7 +115,7 @@ JsonB _JsonSetN(Json * const json, JsonN const value)
    count = index + 1;
    forCountDown (index, count)
    {
-      returnFalseIf(!json->setBuffer(json->dataRepo, 1, (JsonN1 *) &string[index]));
+      returnFalseIf(!json->setBuffer(json->dataRepo, 1, (Gn1 *) &string[index]));
    }
 
    returnTrue;
@@ -124,12 +124,12 @@ JsonB _JsonSetN(Json * const json, JsonN const value)
 /******************************************************************************
 func: _JsonSetNewLine
 ******************************************************************************/
-JsonB _JsonSetNewLine(Json * const json)
+Gb _JsonSetNewLine(Gjson * const json)
 {
    // No writing new lines when in compact mode.
-   returnTrueIf(json->method == jsonMethodWRITING_COMPACT);
+   returnTrueIf(json->method == gmethodWRITE);
 
-   returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) "\n"));
+   returnFalseIf(!_JsonSetBuffer(json, 1, (Gn1 *) "\n"));
 
    returnTrue;
 }
@@ -137,49 +137,49 @@ JsonB _JsonSetNewLine(Json * const json)
 /******************************************************************************
 func: _JsonSetR
 ******************************************************************************/
-JsonB _JsonSetR(Json * const json, JsonR const value)
+Gb _JsonSetR(Gjson * const json, Gr8 const value)
 {
-   JsonStr ctemp[80];
+   Gstr ctemp[80];
 
    if      (value == HUGE_VAL)
    {
-      return _JsonSetBuffer(json, 10, (JsonN1 *) "\"Infinity\"");
+      return _JsonSetBuffer(json, 10, (Gn1 *) "\"Infinity\"");
    }
    else if (value == -HUGE_VAL)
    {
-      return _JsonSetBuffer(json, 11, (JsonN1 *) "\"-Infinity\"");
+      return _JsonSetBuffer(json, 11, (Gn1 *) "\"-Infinity\"");
    }
    else if (isnan(value))
    {
-      return _JsonSetBuffer(json, 5, (JsonN1 *) "\"NaN\"");
+      return _JsonSetBuffer(json, 5, (Gn1 *) "\"NaN\"");
    }
 
    _sprintf_s_l((char *) ctemp, 80, "%.17g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
+   return _JsonSetBuffer(json, strlen(ctemp), (Gn1 *) ctemp);
 }
 
 /******************************************************************************
 func: _JsonSetR4
 ******************************************************************************/
-JsonB _JsonSetR4(Json * const json, JsonR4 const value)
+Gb _JsonSetR4(Gjson * const json, Gr4 const value)
 {
-   JsonStr ctemp[80];
+   Gstr ctemp[80];
 
    if      (value == HUGE_VALF)
    {
-      return _JsonSetBuffer(json, 10, (JsonN1 *) "\"Infinity\"");
+      return _JsonSetBuffer(json, 10, (Gn1 *) "\"Infinity\"");
    }
    else if (value == -HUGE_VALF)
    {
-      return _JsonSetBuffer(json, 11, (JsonN1 *) "\"-Infinity\"");
+      return _JsonSetBuffer(json, 11, (Gn1 *) "\"-Infinity\"");
    }
    else if (isnan(value))
    {
-      return _JsonSetBuffer(json, 5, (JsonN1 *) "\"NaN\"");
+      return _JsonSetBuffer(json, 5, (Gn1 *) "\"NaN\"");
    }
 
    _sprintf_s_l((char *) ctemp, 80, "%.8g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, strlen(ctemp), (JsonN1 *) ctemp);
+   return _JsonSetBuffer(json, strlen(ctemp), (Gn1 *) ctemp);
 }

@@ -40,8 +40,8 @@ include:
 local:
 variable:
 ******************************************************************************/
-static JsonMemCreate    _memCreate  = NULL;
-static JsonMemDestroy   _memDestroy = NULL;
+static GmemCloc    _memCreate  = NULL;
+static GmemDloc   _memDestroy = NULL;
 
 /******************************************************************************
 global:
@@ -50,14 +50,14 @@ function:
 /******************************************************************************
 func: _JsonMemCreate
 ******************************************************************************/
-void *_JsonMemCreate(JsonN const memByteCount)
+void *_JsonMemCreate(Gn8 const memByteCount)
 {
    if (memByteCount > JsonN4_MAX)
    {
       return NULL;
    }
 
-   return _memCreate((JsonN4) memByteCount);
+   return _memCreate((Gn4) memByteCount);
 }
 
 /******************************************************************************
@@ -71,7 +71,7 @@ void _JsonMemDestroy(void * const mem)
 /******************************************************************************
 func: _JsonMemStart
 ******************************************************************************/
-void _JsonMemStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc)
+void _JsonMemStart(GmemCloc const memCreateFunc, GmemDloc const memDestroyFunc)
 {
    _memCreate        = memCreateFunc;
    _memDestroy       = memDestroyFunc;

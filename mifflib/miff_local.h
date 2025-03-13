@@ -50,33 +50,8 @@ include:
 local:
 constant:
 ******************************************************************************/
-#define loop                                       for (;;)
-#define forCount(    INDEX, COUNT)                 for ((INDEX) = 0;         (INDEX) < (COUNT); (INDEX)++)
-#define forCountDown(INDEX, COUNT)                 for ((INDEX) = COUNT - 1; (INDEX) >= 0;      (INDEX)--)
-#define once                                       for (int __count__ = 0; __count__ < 1; __count__++)
-
-#define breakIf(   EXP)                            if (EXP) { break;    }
-#define continueIf(EXP)                            if (EXP) { continue; }
-#define gotoIf(    EXP, LABEL)                     if (EXP) { goto LABEL; }
 
 #define strIsEqual(COUNT, A, B)                    (strncmp((char *) A, (char *) B, COUNT) == 0)
-
-#if defined(min)
-#undef min
-#undef max
-#endif
-#define min(A, B)                                  (((A) < (B)) ? (A) : (B))
-#define max(A, B)                                  (((A) < (B)) ? (B) : (A))
-
-#define returnFalse                                return miffFALSE
-#define returnNull                                 return NULL
-#define returnTrue                                 return miffTRUE
-#define returnIf(     EXP, VALUE)                  if (EXP) { return (VALUE); }
-#define return0If(    EXP)                         if (EXP) { return 0;       }
-#define returnFalseIf(EXP)                         if (EXP) { returnFalse;    }
-#define returnNullIf( EXP)                         if (EXP) { returnNull;     }
-#define returnTrueIf( EXP)                         if (EXP) { returnTrue;     }
-#define returnVoidIf( EXP)                         if (EXP) { return;         }
 
 #define MIFF_HEADER_FILETYPE_STR                   "MIFF"
 #define MIFF_HEADER_FILETYPE_SIZE                  4
@@ -132,22 +107,22 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-void               _MiffByteSwap4(           Miff const * const miff, Miff4 * const value);
-void               _MiffByteSwap8(           Miff const * const miff, Miff8 * const value);
+void               _MiffByteSwap4(           Gmiff const * const miff, Gmiff4 * const value);
+void               _MiffByteSwap8(           Gmiff const * const miff, Gmiff8 * const value);
 
-MiffB              _MiffGetBinByte(          Miff       * const miff, MiffN1 * const binByte);
-MiffB              _MiffGetKey(              Miff       * const miff);
-MiffB              _MiffGetLineSkip(         Miff       * const miff);
-MiffB              _MiffGetNumInt(           Miff       * const miff, MiffN4 const count, MiffN1 const * const buffer);
-MiffB              _MiffGetNumReal(          Miff       * const miff, MiffN4 const count, MiffN1 const * const buffer);
-MiffB              _MiffGetPartRest(         Miff       * const miff, MiffN1 const start);
-MiffB              _MiffGetPart(             Miff       * const miff, MiffB const trimLeadingTabs);
-MiffB              _MiffGetPartEnd(          Miff       * const miff);
-MiffData           _MiffGetStrLetter(        Miff       * const miff, MiffStr * const letter);
-MiffStr            _MiffGetValueHeader(      Miff       * const miff);
-MiffN              _MiffGetValueBufferCount( Miff       * const miff);
+Gb              _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
+Gb              _MiffGetKey(              Gmiff       * const miff);
+Gb              _MiffGetLineSkip(         Gmiff       * const miff);
+Gb              _MiffGetNumInt(           Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
+Gb              _MiffGetNumReal(          Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
+Gb              _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
+Gb              _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
+Gb              _MiffGetPartEnd(          Gmiff       * const miff);
+GmiffData           _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
+Gstr            _MiffGetValueHeader(      Gmiff       * const miff);
+Gn8              _MiffGetValueBufferCount( Gmiff       * const miff);
 
-void              *_MiffMemCreate(           MiffN const memByteCount);
+void              *_MiffMemCreate(           Gn8 const memByteCount);
 void               _MiffMemDestroy(          void * const mem);
 void               _MiffMemStart(            MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
 void               _MiffMemStop(             void);
@@ -158,13 +133,13 @@ void               _MiffMemStop(             void);
 #define            _MiffMemCreateType(            TYPE)           (TYPE *) _MiffMemCreate(                    sizeof(TYPE))
 #define            _MiffMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MiffMemCreate(          (COUNT) * sizeof(TYPE))
 
-MiffB              _MiffSetBinByte(          Miff       * const miff, MiffN1 const binByte);
-MiffB              _MiffSetBuffer(           Miff const * const miff, MiffN     const bufCount, MiffN1 const * const buf);
-MiffB              _MiffSetNumInt(           Miff       * const miff, MiffN     const value);
-MiffB              _MiffSetStr(              Miff       * const miff, MiffN     const strCount, MiffStr const * const strBuffer);
-MiffB              _MiffSetValueHeader(      Miff       * const miff, MiffValue const value);
-MiffB              _MiffSetValueData(        Miff       * const miff, MiffValue const value);
+Gb              _MiffSetBinByte(          Gmiff       * const miff, Gn1 const binByte);
+Gb              _MiffSetBuffer(           Gmiff const * const miff, Gn8     const bufCount, Gn1 const * const buf);
+Gb              _MiffSetNumInt(           Gmiff       * const miff, Gn8     const value);
+Gb              _MiffSetStr(              Gmiff       * const miff, Gn8     const strCount, Gstr const * const strBuffer);
+Gb              _MiffSetValueHeader(      Gmiff       * const miff, GmiffValue const value);
+Gb              _MiffSetValueData(        Gmiff       * const miff, GmiffValue const value);
 
-#define            _MiffStrGetCount(STR)                          ((MiffN4) strlen((char const *)    STR))
+#define            _MiffStrGetCount(STR)                          ((Gn4) strlen((char const *)    STR))
 
 #endif

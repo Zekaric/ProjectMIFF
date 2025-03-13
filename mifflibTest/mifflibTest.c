@@ -492,20 +492,20 @@ static int                  _bools[100] =
 /******************************************************************************
 prototype:
 ******************************************************************************/
-static MiffB    _JsonGetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1       * const byteData);
-static void    *_JsonMemCreate(     JsonN4 const memByteCount);
+static Gb    _JsonGetBuffer(     void * const dataRepo, Gn4 const byteCount, Gn1       * const byteData);
+static void    *_JsonMemCreate(     Gn4 const memByteCount);
 static void     _JsonMemDestroy(    void * const mem);
-static JsonB    _JsonTestRead(      JsonStr const * const fileName);
-static JsonB    _JsonTestReadObject(Json * const json);
-static JsonB    _JsonSetBuffer(     void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData);
-static JsonB    _JsonTestWrite(     JsonStr const * const fileName);
+static Gb    _JsonTestRead(      Gstr const * const fileName);
+static Gb    _JsonTestReadObject(Gjson * const json);
+static Gb    _JsonSetBuffer(     void * const dataRepo, Gn4 const byteCount, Gn1 const * const byteData);
+static Gb    _JsonTestWrite(     Gstr const * const fileName);
 
-static MiffB    _MiffGetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1       * const byteData);
-static void    *_MiffMemCreate(     MiffN4 const memByteCount);
+static Gb    _MiffGetBuffer(     void * const dataRepo, Gn4 const byteCount, Gn1       * const byteData);
+static void    *_MiffMemCreate(     Gn4 const memByteCount);
 static void     _MiffMemDestroy(    void * const mem);
-static MiffB    _MiffSetBuffer(     void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData);
-static MiffB    _MiffTestRead(      MiffStr const * const fileName);
-static MiffB    _MiffTestWrite(     MiffStr const * const fileName);
+static Gb    _MiffSetBuffer(     void * const dataRepo, Gn4 const byteCount, Gn1 const * const byteData);
+static Gb    _MiffTestRead(      Gstr const * const fileName);
+static Gb    _MiffTestWrite(     Gstr const * const fileName);
 
 /******************************************************************************
 global:
@@ -570,12 +570,12 @@ function:
 /******************************************************************************
 func: _GetBuffer
 ******************************************************************************/
-static JsonB _JsonGetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 * const byteData)
+static Gb _JsonGetBuffer(void * const dataRepo, Gn4 const byteCount, Gn1 * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffB _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 * const byteData)
+static Gb _MiffGetBuffer(void * const dataRepo, Gn4 const byteCount, Gn1 * const byteData)
 {
    return (_fread_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -583,12 +583,12 @@ static MiffB _MiffGetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN
 /******************************************************************************
 func: _MemCreate
 ******************************************************************************/
-void *_JsonMemCreate(JsonN4 const memByteCount)
+void *_JsonMemCreate(Gn4 const memByteCount)
 {
    return calloc(1, (size_t) memByteCount);
 }
 
-void *_MiffMemCreate(MiffN4 const memByteCount)
+void *_MiffMemCreate(Gn4 const memByteCount)
 {
    return calloc(1, (size_t) memByteCount);
 }
@@ -609,12 +609,12 @@ void _MiffMemDestroy(void * const mem)
 /******************************************************************************
 func: _SetBuffer
 ******************************************************************************/
-static JsonB _JsonSetBuffer(void * const dataRepo, JsonN4 const byteCount, JsonN1 const * const byteData)
+static Gb _JsonSetBuffer(void * const dataRepo, Gn4 const byteCount, Gn1 const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
 
-static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN1 const * const byteData)
+static Gb _MiffSetBuffer(void * const dataRepo, Gn4 const byteCount, Gn1 const * const byteData)
 {
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == byteCount);
 }
@@ -622,45 +622,45 @@ static MiffB _MiffSetBuffer(void * const dataRepo, MiffN4 const byteCount, MiffN
 /******************************************************************************
 func: _JsonTestRead
 ******************************************************************************/
-static JsonB _JsonTestKey(Json * const JSON, char const * const KEY)
+static Gb _JsonTestKey(Gjson * const JSON, char const * const KEY)
 {
-   JsonStr key[32];
+   Gstr key[32];
 
-   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return jsonFALSE;
-   if (!(jsonGetStr(  JSON, 32, key) && strcmp(key, KEY) == 0))               return jsonFALSE;
-   if (jsonGetTypeObj(JSON) != jsonTypeKEY_VALUE_SEPARATOR)                   return jsonFALSE;
-   return jsonTRUE;
+   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return gbFALSE;
+   if (!(jsonGetStr(  JSON, 32, key) && strcmp(key, KEY) == 0))               return gbFALSE;
+   if (jsonGetTypeObj(JSON) != jsonTypeKEY_VALUE_SEPARATOR)                   return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestInt(Json * const JSON, JsonI const VALUE)
+static Gb _JsonTestInt(Gjson * const JSON, Gi8 const VALUE)
 {
-   JsonI itemp;
+   Gi8 itemp;
 
-   if (jsonGetTypeObj(JSON) != jsonTypeNUMBER_INTEGER)                        return jsonFALSE;
-   if (!jsonGetI(     JSON, &itemp))                                          return jsonFALSE;
-   if (itemp != VALUE)                                                        return jsonFALSE;
-   return jsonTRUE;
+   if (jsonGetTypeObj(JSON) != jsonTypeNUMBER_INTEGER)                        return gbFALSE;
+   if (!jsonGetI(     JSON, &itemp))                                          return gbFALSE;
+   if (itemp != VALUE)                                                        return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestNat(Json * const JSON, JsonN const VALUE)
+static Gb _JsonTestNat(Gjson * const JSON, Gn8 const VALUE)
 {
-   JsonType type;
-   JsonN    ntemp;
+   GjsonType type;
+   Gn8    ntemp;
 
    type = jsonGetTypeObj(JSON);
-   if (!(type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL))   return jsonFALSE;
-   if (!jsonGetN(      JSON, &ntemp))                                         return jsonFALSE;
-   if (ntemp != VALUE)                                                        return jsonFALSE;
-   return jsonTRUE;
+   if (!(type == jsonTypeNUMBER_INTEGER || type == jsonTypeNUMBER_NATURAL))   return gbFALSE;
+   if (!jsonGetN(      JSON, &ntemp))                                         return gbFALSE;
+   if (ntemp != VALUE)                                                        return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestReal(Json * const JSON, JsonR VALUE)
+static Gb _JsonTestReal(Gjson * const JSON, Gr8 VALUE)
 {
-   JsonType        type;
-   JsonR           rtemp;
-   JsonStrLetter   jletter;
+   GjsonType        type;
+   Gr8           rtemp;
+   GjsonStrLetter   jletter;
    int             sindex;
-   JsonStr         sletter,
+   Gstr         sletter,
                    stemp[256];
 
    type = jsonGetTypeObj(JSON);
@@ -689,29 +689,29 @@ static JsonB _JsonTestReal(Json * const JSON, JsonR VALUE)
       {
          rtemp = NAN;
       }
-      else                                                                    return jsonFALSE;
+      else                                                                    return gbFALSE;
 
       goto CHECK_VAL;
    }
 
    if (!(type == jsonTypeNUMBER_REAL    ||
          type == jsonTypeNUMBER_INTEGER ||
-         type == jsonTypeNUMBER_NATURAL))                                     return jsonFALSE;
-   if (!jsonGetR(JSON, &rtemp))                                               return jsonFALSE;
+         type == jsonTypeNUMBER_NATURAL))                                     return gbFALSE;
+   if (!jsonGetR(JSON, &rtemp))                                               return gbFALSE;
 
 CHECK_VAL:
-   if ( isnan(VALUE) && !isnan(rtemp))                                        return jsonFALSE;
-   if (!isnan(VALUE) && rtemp != VALUE)                                       return jsonFALSE;
-   return jsonTRUE;
+   if ( isnan(VALUE) && !isnan(rtemp))                                        return gbFALSE;
+   if (!isnan(VALUE) && rtemp != VALUE)                                       return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestReal4(Json * const JSON, JsonR4 VALUE)
+static Gb _JsonTestReal4(Gjson * const JSON, Gr4 VALUE)
 {
-   JsonType        type;
-   JsonR4          r4temp;
-   JsonStrLetter   jletter;
+   GjsonType        type;
+   Gr4          r4temp;
+   GjsonStrLetter   jletter;
    int             sindex;
-   JsonStr         sletter,
+   Gstr         sletter,
                    stemp[256];
 
    type = jsonGetTypeObj(JSON);
@@ -740,30 +740,30 @@ static JsonB _JsonTestReal4(Json * const JSON, JsonR4 VALUE)
       {
          r4temp = NAN;
       }
-      else                                                                    return jsonFALSE;
+      else                                                                    return gbFALSE;
 
       goto CHECK_VAL;
    }
 
    if (!(type == jsonTypeNUMBER_REAL    ||
          type == jsonTypeNUMBER_INTEGER ||
-         type == jsonTypeNUMBER_NATURAL))                                     return jsonFALSE;
-   if (!jsonGetR4(     JSON, &r4temp))                                        return jsonFALSE;
+         type == jsonTypeNUMBER_NATURAL))                                     return gbFALSE;
+   if (!jsonGetR4(     JSON, &r4temp))                                        return gbFALSE;
 
 CHECK_VAL:
-   if ( isnan(VALUE) && !isnan(r4temp))                                       return jsonFALSE;
-   if (!isnan(VALUE) && r4temp != VALUE)                                      return jsonFALSE;
-   return jsonTRUE;
+   if ( isnan(VALUE) && !isnan(r4temp))                                       return gbFALSE;
+   if (!isnan(VALUE) && r4temp != VALUE)                                      return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestStr(Json * const JSON, char const * const VALUE)
+static Gb _JsonTestStr(Gjson * const JSON, char const * const VALUE)
 {
    int            sindex;
-   JsonStrLetter  jletter;
-   JsonStr        sletter,
+   GjsonStrLetter  jletter;
+   Gstr        sletter,
                   stemp[256];
 
-   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return jsonFALSE;
+   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return gbFALSE;
    for (sindex = 0; ; sindex++)
    {
       jletter = jsonGetStrLetter(JSON, &sletter);
@@ -771,123 +771,123 @@ static JsonB _JsonTestStr(Json * const JSON, char const * const VALUE)
       if (jletter == jsonStrLetterERROR) break;
       stemp[sindex] = sletter;
    }
-   if (jletter == jsonStrLetterERROR)                                         return jsonFALSE;
+   if (jletter == jsonStrLetterERROR)                                         return gbFALSE;
 
    stemp[sindex] = 0;
-   if (strcmp(stemp, VALUE) != 0)                                             return jsonFALSE;
-   return jsonTRUE;
+   if (strcmp(stemp, VALUE) != 0)                                             return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestBin(Json * const JSON, int binCount, JsonN1 const * const binData)
+static Gb _JsonTestBin(Gjson * const JSON, int binCount, Gn1 const * const binData)
 {
    int    bindex;
-   JsonN1 byte;
-   JsonN1 binBuffer[3*256];
+   Gn1 byte;
+   Gn1 binBuffer[3*256];
 
 
-   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return jsonFALSE;
+   if (jsonGetTypeObj(JSON) != jsonTypeSTRING_START)                          return gbFALSE;
    for (bindex = 0; bindex < binCount; bindex++)
    {
-      if (jsonGetStrBinByte(JSON, &byte) != jsonStrLetterNORMAL)              return jsonFALSE;
+      if (jsonGetStrBinByte(JSON, &byte) != jsonStrLetterNORMAL)              return gbFALSE;
       binBuffer[bindex] = byte;
    }
-   if (jsonGetStrLetter(JSON, (JsonStr *) &byte) != jsonStrLetterDONE)        return jsonFALSE;
+   if (jsonGetStrLetter(JSON, (Gstr *) &byte) != jsonStrLetterDONE)        return gbFALSE;
 
-   if (memcmp(binBuffer, binData, binCount) != 0)                             return jsonFALSE;
-   return jsonTRUE;
+   if (memcmp(binBuffer, binData, binCount) != 0)                             return gbFALSE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetNull(Json * const json, char const * const key)
+static Gb _JsonTestGetNull(Gjson * const json, char const * const key)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeCONSTANT_NULL)                         return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeCONSTANT_NULL)                         return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetBool(Json * const json, char const * const key, JsonB const value)
+static Gb _JsonTestGetBool(Gjson * const json, char const * const key, Gb const value)
 {
-   JsonType type;
+   GjsonType type;
 
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
    type = jsonGetTypeObj(json);
-   if (value == jsonTRUE  && type != jsonTypeCONSTANT_TRUE)                   return jsonFALSE;
-   if (value == jsonFALSE && type != jsonTypeCONSTANT_FALSE)                  return jsonFALSE;
-   if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)                           return jsonFALSE;
+   if (value == gbTRUE  && type != jsonTypeCONSTANT_TRUE)                   return gbFALSE;
+   if (value == gbFALSE && type != jsonTypeCONSTANT_FALSE)                  return gbFALSE;
+   if (jsonGetTypeObj(  json) != jsonTypeSEPARATOR)                           return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetInt(Json * const json, char const * const key, JsonI const value)
+static Gb _JsonTestGetInt(Gjson * const json, char const * const key, Gi8 const value)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (!_JsonTestInt(json, value))                                            return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (!_JsonTestInt(json, value))                                            return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetNat(Json * const json, char const * const key, JsonN const value)
+static Gb _JsonTestGetNat(Gjson * const json, char const * const key, Gn8 const value)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (!_JsonTestNat(json, value))                                            return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (!_JsonTestNat(json, value))                                            return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetReal(Json * const json, char const * const key, JsonR const value)
+static Gb _JsonTestGetReal(Gjson * const json, char const * const key, Gr8 const value)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (!_JsonTestReal(json, value))                                           return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (!_JsonTestReal(json, value))                                           return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetReal4(Json * const json, char const * const key, JsonR4 const value)
+static Gb _JsonTestGetReal4(Gjson * const json, char const * const key, Gr4 const value)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (!_JsonTestReal4(json, value))                                          return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (!_JsonTestReal4(json, value))                                          return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestGetStr(Json * const json, char const * const key, JsonStr const * const value)
+static Gb _JsonTestGetStr(Gjson * const json, char const * const key, Gstr const * const value)
 {
-   if (!_JsonTestKey(json, key))                                              return jsonFALSE;
-   if (!_JsonTestStr(json, value))                                            return jsonFALSE;
-   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return jsonFALSE;
+   if (!_JsonTestKey(json, key))                                              return gbFALSE;
+   if (!_JsonTestStr(json, value))                                            return gbFALSE;
+   if (jsonGetTypeObj(json) != jsonTypeSEPARATOR)                             return gbFALSE;
 
-   return jsonTRUE;
+   return gbTRUE;
 }
 
-static JsonB _JsonTestRead(JsonStr const * const fileName)
+static Gb _JsonTestRead(Gstr const * const fileName)
 {
    int           index;
    FILE         *file;
-   Json         *json;
-   JsonB         result;
-   JsonType      type;
+   Gjson         *json;
+   Gb         result;
+   GjsonType      type;
    char const   *msg;
-   JsonI         itemp;
-   JsonN         ntemp;
-   JsonR         rtemp;
-   JsonR4        r4temp;
-   JsonStr       stemp[256];
+   Gi8         itemp;
+   Gn8         ntemp;
+   Gr8         rtemp;
+   Gr4        r4temp;
+   Gstr       stemp[256];
 
    file   = NULL;
    json   = NULL;
-   result = jsonFALSE;
+   result = gbFALSE;
 
    for (;;)
    {
       msg = "Open file";
       if (fopen_s(&file, fileName, "rb") != 0) break;
 
-      // Set Json up for reading.
+      // Set Gjson up for reading.
       msg = "Create reader";
       json = jsonCreateReader(_JsonGetBuffer, (void *) file);
       if (!json) break;
@@ -900,10 +900,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       if (!_JsonTestGetNull(json, msg))                        break;
 
       msg = "True";
-      if (!_JsonTestGetBool(json, msg, jsonTRUE))              break;
+      if (!_JsonTestGetBool(json, msg, gbTRUE))              break;
 
       msg = "False";
-      if (!_JsonTestGetBool(json, msg, jsonFALSE))             break;
+      if (!_JsonTestGetBool(json, msg, gbFALSE))             break;
 
       msg = "I 0";
       if (!_JsonTestGetInt(json, msg, 0))                      break;
@@ -1025,7 +1025,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
          type = jsonGetTypeElem(json);
          if (type != jsonTypeNUMBER_INTEGER ||
              !jsonGetI(json, &itemp)        ||
-             (JsonI) _narray[index] != itemp)
+             (Gi8) _narray[index] != itemp)
             break;
 
          type = jsonGetTypeElem(json);
@@ -1236,10 +1236,10 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
          if (!_JsonTestGetNull(json, msg))                        break;
 
          msg = "True";
-         if (!_JsonTestGetBool(json, msg, jsonTRUE))              break;
+         if (!_JsonTestGetBool(json, msg, gbTRUE))              break;
 
          msg = "False";
-         if (!_JsonTestGetBool(json, msg, jsonFALSE))             break;
+         if (!_JsonTestGetBool(json, msg, gbFALSE))             break;
 
          msg = "I 0";
          if (!_JsonTestGetInt(json, msg, 0))                      break;
@@ -1361,7 +1361,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
             type = jsonGetTypeElem(json);
             if (type != jsonTypeNUMBER_INTEGER ||
                 !jsonGetI(json, &itemp)        ||
-                (JsonI) _narray[index] != itemp)
+                (Gi8) _narray[index] != itemp)
                break;
 
             type = jsonGetTypeElem(json);
@@ -1569,7 +1569,7 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
       if (jsonGetTypeObj(json) != jsonTypeOBJECT_STOP)          break;
 
       msg    = "NO";
-      result = jsonTRUE;
+      result = gbTRUE;
       break;
    }
    printf("JSON Read: %s ERROR\n", msg);
@@ -1583,16 +1583,16 @@ static JsonB _JsonTestRead(JsonStr const * const fileName)
 /******************************************************************************
 func: _JsonTestWrite
 ******************************************************************************/
-static JsonB _JsonTestWrite(JsonStr const * const fileName)
+static Gb _JsonTestWrite(Gstr const * const fileName)
 {
    FILE     *file;
-   Json     *json;
-   JsonB     result;
-   JsonI4    index;
+   Gjson     *json;
+   Gb     result;
+   Gi4    index;
 
    file   = NULL;
    json   = NULL;
-   result = jsonFALSE;
+   result = gbFALSE;
 
    for (;;)
    {
@@ -1602,7 +1602,7 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
       }
 
       // Create a json file.
-      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, jsonFALSE);
+      json = jsonCreateWriter(_JsonSetBuffer, (void *) file, gbFALSE);
       if (!json)
       {
          break;
@@ -1614,9 +1614,9 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
       jsonSetValueNull(        json);
 
       jsonSetKey(              json, "True");
-      jsonSetValueBool(        json, jsonTRUE);
+      jsonSetValueBool(        json, gbTRUE);
       jsonSetKey(              json, "False");
-      jsonSetValueBool(        json, jsonFALSE);
+      jsonSetValueBool(        json, gbFALSE);
 
       jsonSetKey(              json, "I 0");
       jsonSetValueI(           json, 0);
@@ -1783,9 +1783,9 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
          jsonSetValueNull(        json);
 
          jsonSetKey(              json, "True");
-         jsonSetValueBool(        json, jsonTRUE);
+         jsonSetValueBool(        json, gbTRUE);
          jsonSetKey(              json, "False");
-         jsonSetValueBool(        json, jsonFALSE);
+         jsonSetValueBool(        json, gbFALSE);
 
          jsonSetKey(              json, "I 0");
          jsonSetValueI(           json, 0);
@@ -1948,7 +1948,7 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
 
       jsonSetObjectStop(json);
 
-      result = jsonTRUE;
+      result = gbTRUE;
       break;
    }
 
@@ -1961,29 +1961,29 @@ static JsonB _JsonTestWrite(JsonStr const * const fileName)
 /******************************************************************************
 func: _MiffTestRead
 ******************************************************************************/
-static MiffB _MiffTestKey(Miff *miff, char const * const KEY, MiffRecType *recType, MiffN *arrayCount)
+static Gb _MiffTestKey(Gmiff *miff, char const * const KEY, GmiffRecType *recType, Gn8 *arrayCount)
 {
-   MiffStr key[miffKeySIZE];
+   Gstr key[GkeySIZE];
 
-   memset(key, 0, miffKeySIZE);
+   memset(key, 0, GkeySIZE);
 
    if (!miffGetRecordStart(miff, recType, arrayCount, key)) return miffFALSE;
    if (!streq(key, KEY))                                    return miffFALSE;
    return miffTRUE;
 }
 
-static MiffB _MiffTestNullValue(Miff *miff)
+static Gb _MiffTestNullValue(Gmiff *miff)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNULL)        return miffFALSE;
    return miffTRUE;
 }
 
-static MiffB _MiffTestBValue(Miff *miff, MiffB testValue)
+static Gb _MiffTestBValue(Gmiff *miff, Gb testValue)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNUM_INT ||
@@ -1991,9 +1991,9 @@ static MiffB _MiffTestBValue(Miff *miff, MiffB testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestIValue(Miff *miff, MiffI testValue)
+static Gb _MiffTestIValue(Gmiff *miff, Gi8 testValue)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNUM_INT ||
@@ -2001,9 +2001,9 @@ static MiffB _MiffTestIValue(Miff *miff, MiffI testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestNValue(Miff *miff, MiffN testValue)
+static Gb _MiffTestNValue(Gmiff *miff, Gn8 testValue)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNUM_INT ||
@@ -2011,9 +2011,9 @@ static MiffB _MiffTestNValue(Miff *miff, MiffN testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestRValue(Miff *miff, MiffR testValue)
+static Gb _MiffTestRValue(Gmiff *miff, Gr8 testValue)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNUM_REAL ||
@@ -2023,9 +2023,9 @@ static MiffB _MiffTestRValue(Miff *miff, MiffR testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestR4Value(Miff *miff, MiffR4 testValue)
+static Gb _MiffTestR4Value(Gmiff *miff, Gr4 testValue)
 {
-   MiffValue value;
+   GmiffValue value;
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeNUM_REAL ||
@@ -2035,10 +2035,10 @@ static MiffB _MiffTestR4Value(Miff *miff, MiffR4 testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestBinValue(Miff *miff, MiffN testCount, MiffN1 *testValue)
+static Gb _MiffTestBinValue(Gmiff *miff, Gn8 testCount, Gn1 *testValue)
 {
-   MiffValue value;
-   MiffN1    svalue[256 * 3];
+   GmiffValue value;
+   Gn1    svalue[256 * 3];
 
    value = miffGetValue(miff);
    if (miffValueGetType(value) != miffValueTypeBIN &&
@@ -2048,11 +2048,11 @@ static MiffB _MiffTestBinValue(Miff *miff, MiffN testCount, MiffN1 *testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestStrValue(Miff *miff, MiffStr const *testValue)
+static Gb _MiffTestStrValue(Gmiff *miff, Gstr const *testValue)
 {
-   MiffValue value;
-   MiffN     testValueLen;
-   MiffStr   svalue[256];
+   GmiffValue value;
+   Gn8     testValueLen;
+   Gstr   svalue[256];
 
    testValueLen = strlen(testValue);
 
@@ -2064,22 +2064,22 @@ static MiffB _MiffTestStrValue(Miff *miff, MiffStr const *testValue)
    return miffTRUE;
 }
 
-static MiffB _MiffTestCount(MiffN COUNT, MiffN arrayCount)
+static Gb _MiffTestCount(Gn8 COUNT, Gn8 arrayCount)
 {
    if (COUNT != arrayCount) return miffFALSE;
    return miffTRUE;
 }
 
-static MiffB _MiffTestNext(Miff *miff)
+static Gb _MiffTestNext(Gmiff *miff)
 {
    if (!miffGetRecordEnd(miff)) return miffFALSE;
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetNull(Miff *miff, char const *key)
+static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2089,10 +2089,10 @@ static MiffB _MiffTestGetNull(Miff *miff, char const *key)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetBool(Miff *miff, char const *key, MiffB const value)
+static Gb _MiffTestGetBool(Gmiff *miff, char const *key, Gb const value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2102,10 +2102,10 @@ static MiffB _MiffTestGetBool(Miff *miff, char const *key, MiffB const value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetI(Miff *miff, char const *key, MiffI const value)
+static Gb _MiffTestGetI(Gmiff *miff, char const *key, Gi8 const value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2115,10 +2115,10 @@ static MiffB _MiffTestGetI(Miff *miff, char const *key, MiffI const value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetN(Miff *miff, char const *key, MiffN const value)
+static Gb _MiffTestGetN(Gmiff *miff, char const *key, Gn8 const value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2128,10 +2128,10 @@ static MiffB _MiffTestGetN(Miff *miff, char const *key, MiffN const value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetR(Miff *miff, char const *key, MiffR const value)
+static Gb _MiffTestGetR(Gmiff *miff, char const *key, Gr8 const value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2141,10 +2141,10 @@ static MiffB _MiffTestGetR(Miff *miff, char const *key, MiffR const value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetR4(Miff *miff, char const *key, MiffR4 const value)
+static Gb _MiffTestGetR4(Gmiff *miff, char const *key, Gr4 const value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2154,10 +2154,10 @@ static MiffB _MiffTestGetR4(Miff *miff, char const *key, MiffR4 const value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestGetStr(Miff *miff, char const *key, MiffStr const *value)
+static Gb _MiffTestGetStr(Gmiff *miff, char const *key, Gstr const *value)
 {
-   MiffRecType     recType;
-   MiffN           arrayCount;
+   GmiffRecType     recType;
+   Gn8           arrayCount;
 
    if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return miffFALSE;
    if (!_MiffTestCount(1, arrayCount))                   return miffFALSE;
@@ -2167,16 +2167,16 @@ static MiffB _MiffTestGetStr(Miff *miff, char const *key, MiffStr const *value)
    return miffTRUE;
 }
 
-static MiffB _MiffTestRead(MiffStr const * const fileName)
+static Gb _MiffTestRead(Gstr const * const fileName)
 {
    FILE           *file;
-   Miff           *miff;
-   MiffB           result;
-   MiffStr         subFormatName[miffKeySIZE];
-   MiffStr         subFormatVersion[miffKeySIZE];
-   MiffRecType     recType;
-   MiffN           arrayCount;
-   MiffN           index;
+   Gmiff           *miff;
+   Gb           result;
+   Gstr         subFormatName[GkeySIZE];
+   Gstr         subFormatVersion[GkeySIZE];
+   GmiffRecType     recType;
+   Gn8           arrayCount;
+   Gn8           index;
    char const     *msg;
 
    file   = NULL;
@@ -2188,7 +2188,7 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
       msg = "Open file";
       if (fopen_s(&file, fileName, "rb") != 0) break;
 
-      // Set Miff up for reading.
+      // Set Gmiff up for reading.
       msg = "Create reader";
       miff = miffCreateReader(
          miffTRUE,
@@ -2611,11 +2611,11 @@ static MiffB _MiffTestRead(MiffStr const * const fileName)
 /******************************************************************************
 func: _MiffTestWrite
 ******************************************************************************/
-static MiffB _MiffTestWrite(MiffStr const * const fileName)
+static Gb _MiffTestWrite(Gstr const * const fileName)
 {
    FILE     *file;
-   Miff     *miff;
-   MiffB  result;
+   Gmiff     *miff;
+   Gb  result;
 
    file   = NULL;
    miff   = NULL;

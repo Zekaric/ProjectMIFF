@@ -48,7 +48,7 @@ function:
 /******************************************************************************
 func: _JsonEatSpace
 ******************************************************************************/
-JsonB _JsonEatSpace(Json * const json)
+Gb _JsonEatSpace(Gjson * const json)
 {
    returnTrueIf(!_JsonIsSpace(json))
 
@@ -63,16 +63,16 @@ JsonB _JsonEatSpace(Json * const json)
 /******************************************************************************
 func: _JsonGetChar
 ******************************************************************************/
-JsonB _JsonGetChar(Json * const json)
+Gb _JsonGetChar(Gjson * const json)
 {
    returnFalseIf(!json->getBuffer(json->dataRepo, 1, &json->lastByte));
-   return jsonTRUE;
+   return gbTRUE;
 }
 
 /******************************************************************************
 func: _JsonGetFalse
 ******************************************************************************/
-JsonType _JsonGetFalse(Json * const json)
+GjsonType _JsonGetFalse(Gjson * const json)
 {
    loop
    {
@@ -99,7 +99,7 @@ JsonType _JsonGetFalse(Json * const json)
 /******************************************************************************
 func: _JsonGetNull
 ******************************************************************************/
-JsonType _JsonGetNull(Json * const json)
+GjsonType _JsonGetNull(Gjson * const json)
 {
    loop
    {
@@ -123,13 +123,13 @@ JsonType _JsonGetNull(Json * const json)
 /******************************************************************************
 func: _JsonGetNumber
 ******************************************************************************/
-JsonType _JsonGetNumber(Json * const json)
+GjsonType _JsonGetNumber(Gjson * const json)
 {
-   JsonB   isIntegerNumberFound,
+   Gb   isIntegerNumberFound,
            isFractionalNumberFound,
            isExponentNumberFound;
    // Current doulbe maxes out a 10^+/-308, 400 characters is large enough.
-   JsonStr numberStr[400];
+   Gstr numberStr[400];
    int     index;
 
    // Reset the number string.
@@ -139,11 +139,11 @@ JsonType _JsonGetNumber(Json * const json)
    }
 
    // Read in the integer part.
-   isIntegerNumberFound = jsonFALSE;
+   isIntegerNumberFound = gbFALSE;
    numberStr[0]        = json->lastByte;
    if ('0' <= json->lastByte && json->lastByte <= '9')
    {
-      isIntegerNumberFound = jsonTRUE;
+      isIntegerNumberFound = gbTRUE;
    }
 
    for (index = 1; ; index++)
@@ -172,8 +172,8 @@ JsonType _JsonGetNumber(Json * const json)
       // Add to the integer portion.
       if ('0' <= json->lastByte && json->lastByte <= '9')
       {
-         numberStr[index]     = (JsonStr) json->lastByte;
-         isIntegerNumberFound = jsonTRUE;
+         numberStr[index]     = (Gstr) json->lastByte;
+         isIntegerNumberFound = gbTRUE;
       }
       // Assuming this is the end of the number.
       else
@@ -185,7 +185,7 @@ JsonType _JsonGetNumber(Json * const json)
 
 GET_FRACTION:
    // Decimal was found.
-   isFractionalNumberFound = jsonFALSE;
+   isFractionalNumberFound = gbFALSE;
    numberStr[index++]      = '.';
    for (;; index++)
    {
@@ -207,8 +207,8 @@ GET_FRACTION:
       // Add to the fractional portion.
       if ('0' <= json->lastByte && json->lastByte <= '9')
       {
-         numberStr[index]        = (JsonStr) json->lastByte;
-         isFractionalNumberFound = jsonTRUE;
+         numberStr[index]        = (Gstr) json->lastByte;
+         isFractionalNumberFound = gbTRUE;
       }
       // Assuming this is the end of the number.
       else
@@ -220,7 +220,7 @@ GET_FRACTION:
 
 GET_EXPONENT:
    // Exponent was found
-   isExponentNumberFound = jsonFALSE;
+   isExponentNumberFound = gbFALSE;
    numberStr[index++]    = 'e';
 
    // End of file in the middle of a number!
@@ -229,13 +229,13 @@ GET_EXPONENT:
    // Get the sign.
    if      ('0' <= json->lastByte && json->lastByte <= '9')
    {
-      numberStr[index++]    = (JsonStr) json->lastByte;
-      isExponentNumberFound = jsonTRUE;
+      numberStr[index++]    = (Gstr) json->lastByte;
+      isExponentNumberFound = gbTRUE;
    }
    // Negative exponent.
    else if (json->lastByte == '-')
    {
-      numberStr[index++] = (JsonStr) json->lastByte;
+      numberStr[index++] = (Gstr) json->lastByte;
    }
    // Wasn't a sign or a digit after the 'e'.
    else if (json->lastByte != '+')
@@ -255,8 +255,8 @@ GET_EXPONENT:
 
       if ('0' <= json->lastByte && json->lastByte <= '9')
       {
-         numberStr[index]      = (JsonStr) json->lastByte;
-         isExponentNumberFound = jsonTRUE;
+         numberStr[index]      = (Gstr) json->lastByte;
+         isExponentNumberFound = gbTRUE;
       }
       else
       {
@@ -271,9 +271,9 @@ GET_EXPONENT:
 /******************************************************************************
 func: _JsonGetNumberInteger
 ******************************************************************************/
-JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
+GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
 {
-   JsonType type;
+   GjsonType type;
 
    // Default number type.
    type = jsonTypeNUMBER_INTEGER;
@@ -282,18 +282,18 @@ JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
    if (numberStr[0] == '-')
    {
       json->value.n = _JsonStrToN(&numberStr[1]);
-      if      (json->value.n == ((JsonN) JsonI_MAX) + 1)
+      if      (json->value.n == ((Gn8) JsonI_MAX) + 1)
       {
          json->value.i = JsonI_MIN;
       }
       else if (json->value.n <= JsonI_MAX)
       {
-         json->value.i = - (JsonI) json->value.n;
+         json->value.i = - (Gi8) json->value.n;
       }
 
       json->value.n  = 0;
-      json->value.r  = (JsonR)  json->value.i;
-      json->value.r4 = (JsonR4) json->value.i;
+      json->value.r  = (Gr8)  json->value.i;
+      json->value.r4 = (Gr4) json->value.i;
 
       json->value.type = type;
       return type;
@@ -312,8 +312,8 @@ JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
       type          = jsonTypeNUMBER_NATURAL;
    }
 
-   json->value.r  = (JsonR)  json->value.n;
-   json->value.r4 = (JsonR4) json->value.n;
+   json->value.r  = (Gr8)  json->value.n;
+   json->value.r4 = (Gr4) json->value.n;
 
    // Set the type of the value.
    json->value.type = type;
@@ -323,7 +323,7 @@ JsonType _JsonGetNumberInteger(Json * const json, JsonStr * const numberStr)
 /******************************************************************************
 func: _JsonGetNumberReal
 ******************************************************************************/
-JsonType _JsonGetNumberReal(Json * const json, JsonStr * const str)
+GjsonType _JsonGetNumberReal(Gjson * const json, Gstr * const str)
 {
    json->value.i    = 0;
    json->value.n    = 0;
@@ -337,7 +337,7 @@ JsonType _JsonGetNumberReal(Json * const json, JsonStr * const str)
 /******************************************************************************
 func: _JsonGetTrue
 ******************************************************************************/
-JsonType _JsonGetTrue(Json * const json)
+GjsonType _JsonGetTrue(Gjson * const json)
 {
    loop
    {
@@ -361,7 +361,7 @@ JsonType _JsonGetTrue(Json * const json)
 /******************************************************************************
 func: _JsonIsSpace
 ******************************************************************************/
-JsonB _JsonIsSpace(Json * const json)
+Gb _JsonIsSpace(Gjson * const json)
 {
    returnTrueIf(
       json->lastByte == 0    ||
@@ -370,5 +370,5 @@ JsonB _JsonIsSpace(Json * const json)
       json->lastByte == 0x0D ||
       json->lastByte == 0x20);
 
-   return jsonFALSE;
+   return gbFALSE;
 }

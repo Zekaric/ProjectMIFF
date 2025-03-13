@@ -41,7 +41,7 @@ include:
 local:
 variable:
 ******************************************************************************/
-static JsonN1 _hex[128];
+static Gn1 _hex[128];
 
 /******************************************************************************
 global:
@@ -50,7 +50,7 @@ function:
 /******************************************************************************
 func: _JsonStrStart
 ******************************************************************************/
-JsonB _JsonStrStart(void)
+Gb _JsonStrStart(void)
 {
    _hex['0']    = 0x0;
    _hex['1']    = 0x1;
@@ -89,7 +89,7 @@ void _JsonStrStop(void)
 /******************************************************************************
 func: _JsonStrToHex
 ******************************************************************************/
-JsonN1 _JsonStrToHex(JsonN1 const value)
+Gn1 _JsonStrToHex(Gn1 const value)
 {
    return _hex[value];
 }
@@ -97,10 +97,10 @@ JsonN1 _JsonStrToHex(JsonN1 const value)
 /******************************************************************************
 func: _JsonStrToN
 ******************************************************************************/
-JsonN _JsonStrToN(JsonStr const * const str)
+Gn8 _JsonStrToN(Gstr const * const str)
 {
-   JsonI4  index;
-   JsonN   value;
+   Gi4  index;
+   Gn8   value;
 
    value = 0;
    for (index = 0;; index++)

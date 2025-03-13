@@ -42,7 +42,7 @@ include:
 local:
 variable:
 ******************************************************************************/
-static MiffB       _isStarted = miffFALSE;
+static Gb       _isStarted = miffFALSE;
 static _locale_t   _locale;
 
 /******************************************************************************
@@ -56,15 +56,15 @@ function:
 /******************************************************************************
 func: miffCreateReader
 ******************************************************************************/
-Miff *miffCreateReader(MiffB const isByteSwaping, MiffGetBuffer getBufferFunc,
-   MiffStr * const subFormatName, MiffStr * const subFormatVersion, void * const dataRepo)
+Gmiff *miffCreateReader(Gb const isByteSwaping, GgetBuffer getBufferFunc,
+   Gstr * const subFormatName, Gstr * const subFormatVersion, void * const dataRepo)
 {
-   Miff *miff;
+   Gmiff *miff;
 
    returnNullIf(!_isStarted);
 
    // Create the miff structure.
-   miff = _MiffMemCreateType(Miff);
+   miff = _MiffMemCreateType(Gmiff);
    returnNullIf(!miff);
 
    // Initialize the miff structure.
@@ -87,8 +87,8 @@ Miff *miffCreateReader(MiffB const isByteSwaping, MiffGetBuffer getBufferFunc,
 /******************************************************************************
 func: miffCreateReaderContent
 ******************************************************************************/
-MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
-   MiffGetBuffer getBufferFunc, MiffStr * const subFormatName, MiffStr * const subFormatVersion,
+Gb miffCreateReaderContent(Gmiff * const miff, Gb const isByteSwaping,
+   GgetBuffer getBufferFunc, Gstr * const subFormatName, Gstr * const subFormatVersion,
    void * const dataRepo)
 {
    returnFalseIf(
@@ -96,7 +96,7 @@ MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
       !miff       ||
       !getBufferFunc);
 
-   _MiffMemClearType(Miff, miff);
+   _MiffMemClearType(Gmiff, miff);
    miff->method               = miffMethodREADING;
    miff->dataRepo             = dataRepo;
    miff->isByteSwapping       = isByteSwaping;
@@ -116,14 +116,14 @@ MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
    miff->isRecordDone = miffFALSE;
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    _MiffGetKey(miff);
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, subFormatName,       miff->currentName);
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, miff->subFormatName, miff->currentName);
+   _MiffMemCopyTypeArray(GkeyBYTE_COUNT, Gstr, subFormatName,       miff->currentName);
+   _MiffMemCopyTypeArray(GkeyBYTE_COUNT, Gstr, miff->subFormatName, miff->currentName);
 
    miff->isRecordDone = miffFALSE;
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    _MiffGetKey(miff);
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, subFormatVersion,       miff->currentName);
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffStr, miff->subFormatVersion, miff->currentName);
+   _MiffMemCopyTypeArray(GkeyBYTE_COUNT, Gstr, subFormatVersion,       miff->currentName);
+   _MiffMemCopyTypeArray(GkeyBYTE_COUNT, Gstr, miff->subFormatVersion, miff->currentName);
 
    returnFalseIf(!miff->isRecordDone);
 
@@ -133,15 +133,15 @@ MiffB miffCreateReaderContent(Miff * const miff, MiffB const isByteSwaping,
 /******************************************************************************
 func: miffCreateWriter
 ******************************************************************************/
-Miff *miffCreateWriter(MiffB const isByteSwaping, MiffSetBuffer setBufferFunc,
-   MiffStr const * const subFormatName, MiffStr const * const subFormatVersion, void * const dataRepo)
+Gmiff *miffCreateWriter(Gb const isByteSwaping, GsetBuffer setBufferFunc,
+   Gstr const * const subFormatName, Gstr const * const subFormatVersion, void * const dataRepo)
 {
-   Miff *miff;
+   Gmiff *miff;
 
    returnNullIf(!_isStarted);
 
    // Create the miff structure
-   miff = _MiffMemCreateType(Miff);
+   miff = _MiffMemCreateType(Gmiff);
    returnNullIf(!miff);
 
    // Initialize the structure
@@ -164,11 +164,11 @@ Miff *miffCreateWriter(MiffB const isByteSwaping, MiffSetBuffer setBufferFunc,
 /******************************************************************************
 func: miffCreateWriterContent
 ******************************************************************************/
-MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
-   MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName,
-   MiffStr const * const subFormatVersion, void * const dataRepo)
+Gb miffCreateWriterContent(Gmiff * const miff, Gb const isByteSwaping,
+   GsetBuffer setBufferFunc, Gstr const * const subFormatName,
+   Gstr const * const subFormatVersion, void * const dataRepo)
 {
-   MiffN4 count;
+   Gn4 count;
 
    returnFalseIf(
       !_isStarted     ||
@@ -177,7 +177,7 @@ MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
       !subFormatName  ||
       !subFormatVersion);
 
-   _MiffMemClearType(Miff, miff);
+   _MiffMemClearType(Gmiff, miff);
    miff->version              = 1;
    miff->method               = miffMethodWRITING;
    miff->dataRepo             = dataRepo;
@@ -185,19 +185,19 @@ MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
    miff->setBuffer            = setBufferFunc;
 
    count = min(255, _MiffStrGetCount(subFormatName));
-   _MiffMemCopyTypeArray(count, MiffStr, miff->subFormatName,    subFormatName);
+   _MiffMemCopyTypeArray(count, Gstr, miff->subFormatName,    subFormatName);
    count = min(255, _MiffStrGetCount(subFormatVersion));
-   _MiffMemCopyTypeArray(count, MiffStr, miff->subFormatVersion, subFormatVersion);
+   _MiffMemCopyTypeArray(count, Gstr, miff->subFormatVersion, subFormatVersion);
 
    // Write the miff header.
-   _MiffSetBuffer(   miff, MIFF_HEADER_FILETYPE_SIZE, (MiffN1 *) MIFF_HEADER_FILETYPE_STR);
+   _MiffSetBuffer(   miff, MIFF_HEADER_FILETYPE_SIZE, (Gn1 *) MIFF_HEADER_FILETYPE_STR);
    miffSetRecordStop(miff);
-   _MiffSetBuffer(   miff, MIFF_HEADER_VERSION_SIZE,  (MiffN1 *) MIFF_HEADER_VERSION_STR);
+   _MiffSetBuffer(   miff, MIFF_HEADER_VERSION_SIZE,  (Gn1 *) MIFF_HEADER_VERSION_STR);
    miffSetRecordStop(miff);
 
-   _MiffSetBuffer(   miff, _MiffStrGetCount(miff->subFormatName),    (MiffN1 *) miff->subFormatName);
+   _MiffSetBuffer(   miff, _MiffStrGetCount(miff->subFormatName),    (Gn1 *) miff->subFormatName);
    miffSetRecordStop(miff);
-   _MiffSetBuffer(   miff, _MiffStrGetCount(miff->subFormatVersion), (MiffN1 *) miff->subFormatVersion);
+   _MiffSetBuffer(   miff, _MiffStrGetCount(miff->subFormatVersion), (Gn1 *) miff->subFormatVersion);
    miffSetRecordStop(miff);
 
    returnTrue;
@@ -206,7 +206,7 @@ MiffB miffCreateWriterContent(Miff * const miff, MiffB const isByteSwaping,
 /******************************************************************************
 func: miffDestroy
 ******************************************************************************/
-void miffDestroy(Miff * const miff)
+void miffDestroy(Gmiff * const miff)
 {
    returnVoidIf(
       !_isStarted ||
@@ -218,7 +218,7 @@ void miffDestroy(Miff * const miff)
 /******************************************************************************
 func: miffDestroyContent
 ******************************************************************************/
-void miffDestroyContent(Miff * const miff)
+void miffDestroyContent(Gmiff * const miff)
 {
    returnVoidIf(
       !_isStarted ||
@@ -230,10 +230,10 @@ void miffDestroyContent(Miff * const miff)
 /******************************************************************************
 func: miffGetRecordStart
 
-key needs to be a buffer of size miffKeySIZE.
+key needs to be a buffer of size GkeySIZE.
 ******************************************************************************/
-MiffB miffGetRecordStart(Miff * const miff, MiffRecType * const type, MiffN * const count,
-   MiffStr * const key)
+Gb miffGetRecordStart(Gmiff * const miff, GmiffRecType * const type, Gn8 * const count,
+   Gstr * const key)
 {
    returnFalseIf(
       !_isStarted ||
@@ -246,7 +246,7 @@ MiffB miffGetRecordStart(Miff * const miff, MiffRecType * const type, MiffN * co
    *count             = 0;
 
    // Clear the key.
-   _MiffMemClearTypeArray(miffKeySIZE, MiffStr, key);
+   _MiffMemClearTypeArray(GkeySIZE, Gstr, key);
 
    // Read in the type.
    returnFalseIf(!_MiffGetPart(miff, miffTRUE));
@@ -283,7 +283,7 @@ MiffB miffGetRecordStart(Miff * const miff, MiffRecType * const type, MiffN * co
    returnFalseIf(!_MiffGetPart(miff, miffFALSE));
    returnFalseIf(!_MiffGetKey( miff));
 
-   _MiffMemCopyTypeArray(miff->currentNameCount, MiffStr, key, miff->currentName);
+   _MiffMemCopyTypeArray(miff->currentNameCount, Gstr, key, miff->currentName);
 
    returnTrueIf(miff->currentArrayCount == miffArrayCountBLOCK_START);
 
@@ -295,7 +295,7 @@ func: miffGetRecordEnd
 
 Skip to the end of the record if not at the end already.
 ******************************************************************************/
-MiffB miffGetRecordEnd(Miff * const miff)
+Gb miffGetRecordEnd(Gmiff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -316,9 +316,9 @@ func: miffGetValueBin
 bin should be large enough for the bin data.  I.E. it should be of size from
 miffGetValue() value.bufferCount
 ******************************************************************************/
-MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1 * const binBuffer)
+Gb miffGetValueBin(Gmiff * const miff, Gn8 const binCount, Gn1 * const binBuffer)
 {
-   MiffN index;
+   Gn8 index;
 
    returnFalseIf(
       !_isStarted                          ||
@@ -340,7 +340,7 @@ MiffB miffGetValueBin(Miff * const miff, MiffN const binCount, MiffN1 * const bi
 /******************************************************************************
 func: miffValueBinGetData
 ******************************************************************************/
-MiffB miffGetValueBinData(Miff * const miff, MiffN1 * const binByte)
+Gb miffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
 {
    returnFalseIf(
       !_isStarted                          ||
@@ -355,12 +355,12 @@ MiffB miffGetValueBinData(Miff * const miff, MiffN1 * const binByte)
 /******************************************************************************
 func: miffGetValue
 ******************************************************************************/
-MiffValue miffGetValue(Miff * const miff)
+GmiffValue miffGetValue(Gmiff * const miff)
 {
-   MiffStr   header;
-   MiffValue vtemp;
+   Gstr   header;
+   GmiffValue vtemp;
 
-   _MiffMemClearType(MiffValue, &vtemp);
+   _MiffMemClearType(GmiffValue, &vtemp);
 
    returnIf(
          !_isStarted ||
@@ -368,7 +368,7 @@ MiffValue miffGetValue(Miff * const miff)
       vtemp);
 
    miff->isPartDone = miffFALSE;
-   _MiffMemClearType(MiffValue, &miff->value);
+   _MiffMemClearType(GmiffValue, &miff->value);
 
    miff->value.type = miffValueTypeNONE;
    miff->valueIndex = 0;
@@ -474,12 +474,12 @@ Convenience function for getting a whole string if memory requirements are
 not that large.  Str should be large enough for the string being read in
 including null terminator.
 ******************************************************************************/
-MiffB miffGetValueStr(Miff * const miff, MiffN const strCount, MiffStr * const str)
+Gb miffGetValueStr(Gmiff * const miff, Gn8 const strCount, Gstr * const str)
 {
-   MiffN      index;
-   MiffN      strIndex;
-   MiffStr    letter;
-   MiffData   dataResult;
+   Gn8      index;
+   Gn8      strIndex;
+   Gstr    letter;
+   GmiffData   dataResult;
 
    returnFalseIf(
       !_isStarted                         ||
@@ -515,9 +515,9 @@ MiffB miffGetValueStr(Miff * const miff, MiffN const strCount, MiffStr * const s
 /******************************************************************************
 func: miffGetValueStrData
 ******************************************************************************/
-MiffData miffGetValueStrData(Miff * const miff, MiffStr * const strLetter)
+GmiffData miffGetValueStrData(Gmiff * const miff, Gstr * const strLetter)
 {
-   MiffData miffData;
+   GmiffData miffData;
 
    returnIf(
          !_isStarted ||
@@ -535,10 +535,10 @@ MiffData miffGetValueStrData(Miff * const miff, MiffStr * const strLetter)
 /******************************************************************************
 func: miffSetRecordStart
 ******************************************************************************/
-MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const count,
-   MiffStr const * const key)
+Gb miffSetRecordStart(Gmiff * const miff, GmiffRecType const type, Gn8 const count,
+   Gstr const * const key)
 {
-   MiffN index;
+   Gn8 index;
 
    returnFalseIf(
       !_isStarted ||
@@ -558,7 +558,7 @@ MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const 
    // Add indents to the current scope level.
    forCount(index, miff->currentScopeLevel)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) " "));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) " "));
    }
 
    // Write the type for the record.  Common for all cases.
@@ -567,17 +567,17 @@ MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const 
 
    if      (type == miffRecTypeBLOCK_START)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "{"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "{"));
       miff->isRecordDone = miffTRUE;
    }
    else if (type == miffRecTypeBLOCK_STOP)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "}"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "}"));
       miff->isRecordDone = miffTRUE;
    }
    else if (count == miffArrayCountUNKNOWN)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "*"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
    }
    else
    {
@@ -595,11 +595,11 @@ MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const 
 
    // Copy the key.
    miff->currentNameCount = min(256, _MiffStrGetCount(key));
-   _MiffMemClearTypeArray(miffKeySIZE,            MiffStr, miff->currentName);
-   _MiffMemCopyTypeArray( miff->currentNameCount, MiffStr, miff->currentName, key);
+   _MiffMemClearTypeArray(GkeySIZE,            Gstr, miff->currentName);
+   _MiffMemCopyTypeArray( miff->currentNameCount, Gstr, miff->currentName, key);
 
    returnFalseIf(!miffSetSeparator(miff));
-   returnFalseIf(!_MiffSetBuffer(miff, miff->currentNameCount, (MiffN1 *) miff->currentName));
+   returnFalseIf(!_MiffSetBuffer(miff, miff->currentNameCount, (Gn1 *) miff->currentName));
 
    // We are starting a new key value block.
    if (type == miffRecTypeBLOCK_START)
@@ -616,7 +616,7 @@ MiffB miffSetRecordStart(Miff * const miff, MiffRecType const type, MiffN const 
 /******************************************************************************
 func: miffSetRecordStop
 ******************************************************************************/
-MiffB miffSetRecordStop(Miff * const miff)
+Gb miffSetRecordStop(Gmiff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -626,19 +626,19 @@ MiffB miffSetRecordStop(Miff * const miff)
    // fullfill the record requirements.
    miff->isRecordDone = miffTRUE;
 
-   return _MiffSetBuffer(miff, 1, (MiffN1 *) "\n");
+   return _MiffSetBuffer(miff, 1, (Gn1 *) "\n");
 }
 
 /******************************************************************************
 func: miffSetSeparator
 ******************************************************************************/
-MiffB miffSetSeparator(Miff * const miff)
+Gb miffSetSeparator(Gmiff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
       !miff);
 
-   return _MiffSetBuffer(miff, 1, (MiffN1 *) "\t");
+   return _MiffSetBuffer(miff, 1, (Gn1 *) "\t");
 }
 
 /******************************************************************************
@@ -652,7 +652,7 @@ miffSetValueStart()
 miffsetValueBinData() or miffSetValueStrData() called multiple times.
 miffSetValueStop()
 ******************************************************************************/
-MiffB miffSetValue(Miff * const miff, MiffValue const value)
+Gb miffSetValue(Gmiff * const miff, GmiffValue const value)
 {
    // If the buffer data isn't provided with these types then we cannot used
    // this function to export them.
@@ -675,7 +675,7 @@ MiffB miffSetValue(Miff * const miff, MiffValue const value)
 /******************************************************************************
 func: miffSetValueStart
 ******************************************************************************/
-MiffB miffSetValueStart(Miff * const miff, MiffValue const value)
+Gb miffSetValueStart(Gmiff * const miff, GmiffValue const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -691,7 +691,7 @@ MiffB miffSetValueStart(Miff * const miff, MiffValue const value)
 /******************************************************************************
 func: miffSetValueBinData
 ******************************************************************************/
-MiffB miffSetValueBinData(Miff * const miff, MiffN1 const binByte)
+Gb miffSetValueBinData(Gmiff * const miff, Gn1 const binByte)
 {
    returnFalseIf(
       !_isStarted ||
@@ -707,7 +707,7 @@ MiffB miffSetValueBinData(Miff * const miff, MiffN1 const binByte)
 /******************************************************************************
 func: miffSetValueStrData
 ******************************************************************************/
-MiffB miffSetValueStrData(Miff * const miff, MiffStr const strLetter)
+Gb miffSetValueStrData(Gmiff * const miff, Gstr const strLetter)
 {
    returnFalseIf(
       !_isStarted ||
@@ -726,7 +726,7 @@ MiffB miffSetValueStrData(Miff * const miff, MiffStr const strLetter)
 /******************************************************************************
 func: miffSetValueStop
 ******************************************************************************/
-MiffB miffSetValueStop(Miff * const miff)
+Gb miffSetValueStop(Gmiff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -747,7 +747,7 @@ MiffB miffSetValueStop(Miff * const miff)
 /******************************************************************************
 func: miffStart
 ******************************************************************************/
-MiffB miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
+Gb miffStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
 {
    returnTrueIf(_isStarted);
 
@@ -785,7 +785,7 @@ function:
 /******************************************************************************
 func: miffValueGetB
 ******************************************************************************/
-MiffB miffValueGetB(MiffValue const value)
+Gb miffValueGetB(GmiffValue const value)
 {
    returnFalseIf(value.type != miffValueTypeNUM_INT);
 
@@ -797,7 +797,7 @@ MiffB miffValueGetB(MiffValue const value)
 /******************************************************************************
 func: miffValueGetBinCount
 ******************************************************************************/
-MiffN miffValueGetBinCount(MiffValue const value)
+Gn8 miffValueGetBinCount(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeBIN);
 
@@ -807,7 +807,7 @@ MiffN miffValueGetBinCount(MiffValue const value)
 /******************************************************************************
 func: miffValueGetI
 ******************************************************************************/
-MiffI miffValueGetI(MiffValue const value)
+Gi8 miffValueGetI(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_INT);
 
@@ -817,7 +817,7 @@ MiffI miffValueGetI(MiffValue const value)
 /******************************************************************************
 func: miffValueGetN
 ******************************************************************************/
-MiffN miffValueGetN(MiffValue const value)
+Gn8 miffValueGetN(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_INT);
 
@@ -827,13 +827,13 @@ MiffN miffValueGetN(MiffValue const value)
 /******************************************************************************
 func: miffValueGetR
 ******************************************************************************/
-MiffR miffValueGetR(MiffValue const value)
+Gr8 miffValueGetR(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_REAL);
 
    if (value.isR4)
    {
-      return (MiffR) value.inr4.r;
+      return (Gr8) value.inr4.r;
    }
 
    return value.inr.r;
@@ -842,7 +842,7 @@ MiffR miffValueGetR(MiffValue const value)
 /******************************************************************************
 func: miffValueGetR4
 ******************************************************************************/
-MiffR4 miffValueGetR4(MiffValue const value)
+Gr4 miffValueGetR4(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeNUM_REAL);
 
@@ -851,13 +851,13 @@ MiffR4 miffValueGetR4(MiffValue const value)
       return value.inr4.r;
    }
 
-   return (MiffR4) value.inr.r;
+   return (Gr4) value.inr.r;
 }
 
 /******************************************************************************
 func: miffValueGetStrLen
 ******************************************************************************/
-MiffN miffValueGetStrCount(MiffValue const value)
+Gn8 miffValueGetStrCount(GmiffValue const value)
 {
    return0If(value.type != miffValueTypeSTR);
 
@@ -867,7 +867,7 @@ MiffN miffValueGetStrCount(MiffValue const value)
 /******************************************************************************
 func: miffValueGetType
 ******************************************************************************/
-MiffValueType miffValueGetType(MiffValue const value)
+GmiffValueType miffValueGetType(GmiffValue const value)
 {
    return value.type;
 }
@@ -876,9 +876,9 @@ MiffValueType miffValueGetType(MiffValue const value)
 func: miffValueIs4
 
 Return the Real value byte count.
-True if MiffR4
+True if Gr4
 ******************************************************************************/
-MiffB miffValueIs4(MiffValue const value)
+Gb miffValueIs4(GmiffValue const value)
 {
    returnFalseIf(value.type != miffValueTypeNUM_REAL);
 
@@ -888,11 +888,11 @@ MiffB miffValueIs4(MiffValue const value)
 /******************************************************************************
 func: miffValueSetB
 ******************************************************************************/
-MiffValue miffValueSetB(MiffB const ivalue)
+GmiffValue miffValueSetB(Gb const ivalue)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type  = miffValueTypeNUM_INT;
    value.inr.n = ivalue;
@@ -903,11 +903,11 @@ MiffValue miffValueSetB(MiffB const ivalue)
 /******************************************************************************
 func: miffValueSetBinBuffer
 ******************************************************************************/
-MiffValue miffValueSetBinBuffer(MiffN  const binCount, MiffN1  * const binBuffer)
+GmiffValue miffValueSetBinBuffer(Gn8  const binCount, Gn1  * const binBuffer)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type           = miffValueTypeBIN;
    value.bufferCount    = binCount;
@@ -919,11 +919,11 @@ MiffValue miffValueSetBinBuffer(MiffN  const binCount, MiffN1  * const binBuffer
 /******************************************************************************
 func: miffValueSetBinCount
 ******************************************************************************/
-MiffValue miffValueSetBinCount(MiffN  const binCount)
+GmiffValue miffValueSetBinCount(Gn8  const binCount)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type        = miffValueTypeBIN;
    value.bufferCount = binCount;
@@ -934,11 +934,11 @@ MiffValue miffValueSetBinCount(MiffN  const binCount)
 /******************************************************************************
 func: miffValueSetI
 ******************************************************************************/
-MiffValue miffValueSetI(MiffI const ivalue)
+GmiffValue miffValueSetI(Gi8 const ivalue)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type  = miffValueTypeNUM_INT;
    value.isI   = miffTRUE;
@@ -950,11 +950,11 @@ MiffValue miffValueSetI(MiffI const ivalue)
 /******************************************************************************
 func: miffValueSetN
 ******************************************************************************/
-MiffValue miffValueSetN(MiffN const ivalue)
+GmiffValue miffValueSetN(Gn8 const ivalue)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type  = miffValueTypeNUM_INT;
    value.inr.n = ivalue;
@@ -965,11 +965,11 @@ MiffValue miffValueSetN(MiffN const ivalue)
 /******************************************************************************
 func: miffValueSetNull
 ******************************************************************************/
-MiffValue miffValueSetNull(void)
+GmiffValue miffValueSetNull(void)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type = miffValueTypeNULL;
 
@@ -979,11 +979,11 @@ MiffValue miffValueSetNull(void)
 /******************************************************************************
 func: miffValueSetR
 ******************************************************************************/
-MiffValue miffValueSetR(MiffR const ivalue)
+GmiffValue miffValueSetR(Gr8 const ivalue)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type  = miffValueTypeNUM_REAL;
    value.inr.r = ivalue;
@@ -994,11 +994,11 @@ MiffValue miffValueSetR(MiffR const ivalue)
 /******************************************************************************
 func: miffValueSetR4
 ******************************************************************************/
-MiffValue miffValueSetR4(MiffR4 const ivalue)
+GmiffValue miffValueSetR4(Gr4 const ivalue)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type   = miffValueTypeNUM_REAL;
    value.isR4   = miffTRUE;
@@ -1010,11 +1010,11 @@ MiffValue miffValueSetR4(MiffR4 const ivalue)
 /******************************************************************************
 func: miffValueSetStrBuffer
 ******************************************************************************/
-MiffValue miffValueSetStrBuffer(MiffN const strCount, MiffStr * const strBuffer)
+GmiffValue miffValueSetStrBuffer(Gn8 const strCount, Gstr * const strBuffer)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type           = miffValueTypeSTR;
    value.bufferCount    = strCount;
@@ -1026,11 +1026,11 @@ MiffValue miffValueSetStrBuffer(MiffN const strCount, MiffStr * const strBuffer)
 /******************************************************************************
 func: miffValueSetStrCount
 ******************************************************************************/
-MiffValue miffValueSetStrCount(MiffN const strCount)
+GmiffValue miffValueSetStrCount(Gn8 const strCount)
 {
-   MiffValue value;
+   GmiffValue value;
 
-   _MiffMemClearType(MiffValue, &value);
+   _MiffMemClearType(GmiffValue, &value);
 
    value.type        = miffValueTypeSTR;
    value.bufferCount = strCount;

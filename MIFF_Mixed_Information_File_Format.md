@@ -1,48 +1,45 @@
-
 # M.I.F.F.: Mixed Information File Format
 
-
-**`Author:            `** Robbert de Groot
-
-**`Date:              `** 2019-05-15
-
-**`Copyright:         `** 2019, Robbert de Groot
-
-**`License (Library): `** MIT License.
-
-**`License (Document):`** Creative Commons Attribution-NoDerivs.[LINK](https://creativecommons.org/licenses/by-nd:4.0) (CC BY-ND)
+```
+Author:             Robbert de Groot
+Date:               2019-05-15
+Copyright:          2019, Robbert de Groot
+License (Library):  MIT License.
+License (Document): Creative Commons Attribution-NoDerivs.[LINK](https://creativecommons.org/licenses/by-nd:4.0) (CC BY-ND)
+```
 
 ## Table Of Contents:
 
-**1 - M.I.F.F.**<br />
-    1.1 - Discussion<br />
-    1.2 - Goals<br />
-    1.3 - Design Decisions:<br />
-    1.4 - Disclosure<br />
-**2 - Format**<br />
-    2.1 - File Header<br />
-    2.2 - Content<br />
-        2.2.1 - Header Section<br />
-        2.2.2 - Key Section<br />
-        2.2.3 - Value Section<br />
-    Examples<br />
-**Notes**<br />
-    Comparing with JSON.<br />
-        File Size<br />
-        Comments<br />
-    Comments on MIFF<br />
+- [M.I.F.F.: Mixed Information File Format](#miff-mixed-information-file-format)
+  - [Table Of Contents:](#table-of-contents)
+- [1 - M.I.F.F.](#1---miff)
+  - [1.1 - Discussion](#11---discussion)
+  - [1.2 - Goals](#12---goals)
+  - [1.3 - Design Decisions:](#13---design-decisions)
+  - [1.4 - Disclosure](#14---disclosure)
+- [2 - Format](#2---format)
+  - [2.1 - File Header](#21---file-header)
+  - [2.2 - Content](#22---content)
+    - [2.2.1 - Header Section](#221---header-section)
+    - [2.2.2 - Key Section](#222---key-section)
+    - [2.2.3 - Value Section](#223---value-section)
+  - [Examples](#examples)
+- [Notes](#notes)
+  - [Comparing with JSON.](#comparing-with-json)
+    - [File Size](#file-size)
+    - [Comments](#comments)
+  - [Comments on MIFF](#comments-on-miff)
+
 
 # 1 - M.I.F.F.
 
-
 ## 1.1 - Discussion
 
+**What is the purpose of M.I.F.F. (MIFF)?**
 
-What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.
+MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.
 
 ## 1.2 - Goals
-
-
 
 * **Simple**    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
 
@@ -53,7 +50,6 @@ What is the purpose of M.I.F.F. (MIFF)?  MIFF is intended to be a simple file fo
 * **Accurate**  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 
 ## 1.3 - Design Decisions:
-
 
 **Why not XML or JSON?**
 
@@ -69,7 +65,6 @@ In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Win
 
 ## 1.4 - Disclosure
 
-
 I, Robbert de Groot, have been a professional Software Developer since 1995.
 
 This format is currently not sanctioned by any software vendor.  This was an attempt on developing something in place of existing or developing options which I find lacking or distasteful in some fashion.
@@ -80,7 +75,6 @@ zekaric@gmail.com
 
 # 2 - Format
 
-
 A MIFF File is a UTF8 text file.
 
 Each line in the text file is a 'record' or piece of data.  A record is delimited by [tb], '\t', tab characters and is terminated by a UNIX [nl], '\n', new line character.  The contents of the file is a collection of key value pairs.
@@ -90,7 +84,6 @@ The intent with this format is to make only one read pass over the file.  There 
 Any data that is encode or stored as a binary byte sequence will be in big endian order.
 
 ## 2.1 - File Header
-
 
 There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
 
@@ -103,19 +96,14 @@ MIFF[nl]
 
 [nl] means a new line character.
 
-
 * **Line 1** - Format of the file.  MIFF.
-
 * **Line 2** - Version of the file.  Version 1.
-
 * **Line 4** - Sub-Format name.  A MIFF file is potentially a container for an sub format of the file.
-
 * **Line 5** - Sub-Format version identifier.
 
 If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  If there are leading and trailing spaces, then that is part of the format name as silly as that may sound.  Spaces internal to the format name are also allowed and are significant.  I say 255 bytes instead of characters because in UTF8, one UNICODE character or codepoint can span multiple bytes.  So this name can not exceed this byte count.
 
 ## 2.2 - Content
-
 
 Each line is split into 3 sections.  The header for the line, the key for the line, and the value section.
 
@@ -126,7 +114,6 @@ Each section is separated by a [tb].  The entire line ends in a [nl].
 ```
 
 ### 2.2.1 - Header Section
-
 
 The header for the line is one of the following.
 
@@ -143,11 +130,9 @@ The header can have leading spaces or [tb]s to make it more obvious which scope 
 
 ### 2.2.2 - Key Section
 
-
 Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, UNICODE characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes, the key is valid.  The key can have spaces or any special characters you like except [tb]s and [nl]s.  This does mean leading, trailing, and internal spaces in the key are significant.
 
 ### 2.2.3 - Value Section
-
 
 The sub-format of the file should be dictating what values follow the key.  This should be defined somewhere in the documentation of the sub-format.
 
@@ -174,11 +159,9 @@ The valueData will depend on the header.
 | &#42;[count] | The value data is a binary buffer.  [count] denotes the size of the binary buffer in bytes represented in hexidecimal form.  A single space follows the [count] value and the binary buffer in hexidecimal encoding immediately follows. |
 | [Any other letter] | The value data is define by the subformat and decoded by an external to the library function. |
 
-
 a, b, c, d, e, f are not accepted for hex values.  The G-V are used for real value storage and basically map to the hex numbers 0-9,A-F.  It is so a real value can be differenciated from an integer or natural value.  Lower case g-v are not accepted for real hex values.
 
 ## Examples
-
 
 ```
 - A null value.
@@ -206,12 +189,9 @@ a, b, c, d, e, f are not accepted for hex values.  The G-V are used for real val
 
 # Notes
 
-
 ## Comparing with JSON.
 
-
 ### File Size
-
 
 File size from the test program which dumps out every data type MIFF can support and also dumps out the exact same data to a similar JSON file.
 
@@ -225,7 +205,6 @@ File size from the test program which dumps out every data type MIFF can support
 JSON compressed to one line removed quite a bit of formatting bytes.  When compressed this difference becomes almost negligable.
 
 ### Comments
-
 
 Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge differences.
 
@@ -243,17 +222,15 @@ Where MIFF saves some space.
 | Numbers (real, special values) | Infinity, -Infinity, Not a Number, double/float Maximums.<br />MIFF has constants for these values.<br />JSON has no standard for these values.  Implementations vary. | + MIFF | + MIFF | + MIFF |
 | Array of objects | MIFF will require you to just make duplicate key blocks<br />JSON has object definition built in. | + JSON | + JSON | - |
 
-
 **Is MIFF better?**
 
 No.  It will depend on how much value you place on readability and editability of the format.
 
-I suspect MIFF will have a slight advantage over reading and writing speed over JSON because there is less processing of numbers from the text format to binary in memory representation.
+I suspect MIFF will have a slight advantage over reading and writing speed over JSON because there is less processing of numbers from the text format to binary in memory representation since the text format of the number is basically binary.
 
 The question is, how important is it to read the file and edit it manually?  Maybe for testing and debugging but in general, common everyday users are never going to.  So for the most part, whoever is actually reading the file will be a developer or similar.  Granted the real numbers will be a pain in the ass even for developers.
 
 ## Comments on MIFF
-
 
 **Are there parts of the format that I dislike?**
 

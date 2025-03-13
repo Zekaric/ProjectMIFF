@@ -50,14 +50,14 @@ function:
 /******************************************************************************
 func: _MiffMemCreate
 ******************************************************************************/
-void *_MiffMemCreate(MiffN const memByteCount)
+void *_MiffMemCreate(Gn8 const memByteCount)
 {
    if (memByteCount > MiffN4_MAX)
    {
       return NULL;
    }
 
-   return _memCreate((MiffN4) memByteCount);
+   return _memCreate((Gn4) memByteCount);
 }
 
 /******************************************************************************

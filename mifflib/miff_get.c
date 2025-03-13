@@ -40,10 +40,10 @@ include:
 local:
 prototype:
 ******************************************************************************/
-static void   _GetNumInt(        Miff * const miff, MiffValue * const value, MiffN4 const count, MiffN1 const * const buffer);
-static MiffB  _GetNumIntNegative(Miff * const miff, MiffValue * const value, MiffN4 const count, MiffN1 const * const buffer);
+static void   _GetNumInt(        Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer);
+static Gb  _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer);
 
-static MiffN1 _ValueFromHexInt(  MiffN1 const value);
+static Gn1 _ValueFromHexInt(  Gn1 const value);
 
 /******************************************************************************
 global:
@@ -52,9 +52,9 @@ function:
 /******************************************************************************
 func: _MiffGetBinByte
 ******************************************************************************/
-MiffB _MiffGetBinByte(Miff * const miff, MiffN1 * const binByte)
+Gb _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
 {
-   MiffN1 byte[2];
+   Gn1 byte[2];
 
    returnFalseIf(!miff->getBuffer(miff->dataRepo, 2, byte));
 
@@ -68,9 +68,9 @@ MiffB _MiffGetBinByte(Miff * const miff, MiffN1 * const binByte)
 /******************************************************************************
 func: _MiffGetKey
 ******************************************************************************/
-MiffB _MiffGetKey(Miff * const miff)
+Gb _MiffGetKey(Gmiff * const miff)
 {
-   _MiffMemCopyTypeArray(miffKeyBYTE_COUNT, MiffN1, miff->currentName, miff->readData);
+   _MiffMemCopyTypeArray(GkeyBYTE_COUNT, Gn1, miff->currentName, miff->readData);
 
    miff->currentNameCount = miff->readCount;
 
@@ -80,16 +80,16 @@ MiffB _MiffGetKey(Miff * const miff)
 /******************************************************************************
 func: _MiffGetLineSkip
 ******************************************************************************/
-MiffB _MiffGetLineSkip(Miff * const miff)
+Gb _MiffGetLineSkip(Gmiff * const miff)
 {
-   MiffN1 byte;
+   Gn1 byte;
 
    returnFalseIf(!miff);
 
    // Ignoring everything till the next record or eof.
    loop
    {
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
       breakIf(byte == '\n');
    }
 
@@ -99,7 +99,7 @@ MiffB _MiffGetLineSkip(Miff * const miff)
 /******************************************************************************
 func: _MiffGetNumInt
 ******************************************************************************/
-MiffB _MiffGetNumInt(Miff * const miff, MiffN4 const count, MiffN1 const * const buffer)
+Gb _MiffGetNumInt(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer)
 {
    // Negative number.
    if (buffer[0] == '-')
@@ -115,11 +115,11 @@ MiffB _MiffGetNumInt(Miff * const miff, MiffN4 const count, MiffN1 const * const
 /******************************************************************************
 func: _MiffGetNumReal
 ******************************************************************************/
-MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * const buffer)
+Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer)
 {
-   MiffN index;
-   MiffN value;
-   MiffN letterValue;
+   Gn8 index;
+   Gn8 value;
+   Gn8 letterValue;
 
    // Constants
    if      (buffer[0] == 'Z')
@@ -235,7 +235,7 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
    else if (count == 8)
    {
       miff->value.isR4   = miffTRUE;
-      miff->value.inr4.n = (MiffN4) value;
+      miff->value.inr4.n = (Gn4) value;
       _MiffByteSwap4(miff, &miff->value.inr4);
    }
 
@@ -245,11 +245,11 @@ MiffB _MiffGetNumReal(Miff * const miff, MiffN4 const count, MiffN1 const * cons
 /******************************************************************************
 func: _MiffGetPart
 ******************************************************************************/
-MiffB _MiffGetPart(Miff * const miff, MiffB const trimLeadingTabs)
+Gb _MiffGetPart(Gmiff * const miff, Gb const trimLeadingTabs)
 {
-   MiffN4   index;
-   MiffN1   byte;
-   MiffB    trimTabs;
+   Gn4   index;
+   Gn1   byte;
+   Gb    trimTabs;
 
    // Nothing left to read for this record.
    returnFalseIf(
@@ -261,7 +261,7 @@ MiffB _MiffGetPart(Miff * const miff, MiffB const trimLeadingTabs)
    loop
    {
       // End of file?
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
 
       // Eating tabs at the start of the line.
       if (trimTabs && byte == '\t')
@@ -279,7 +279,7 @@ MiffB _MiffGetPart(Miff * const miff, MiffB const trimLeadingTabs)
 
       // Add the letter to the byte array.
       // Only read up to a key size.  Ignore everything else.
-      if (index < miffKeyBYTE_COUNT)
+      if (index < GkeyBYTE_COUNT)
       {
          miff->readData[index++] = byte;
       }
@@ -301,10 +301,10 @@ MiffB _MiffGetPart(Miff * const miff, MiffB const trimLeadingTabs)
 /******************************************************************************
 func: _MiffGetPartRest
 ******************************************************************************/
-MiffB _MiffGetPartRest(Miff * const miff, MiffN1 const start)
+Gb _MiffGetPartRest(Gmiff * const miff, Gn1 const start)
 {
-   MiffN4   index;
-   MiffN1   byte;
+   Gn4   index;
+   Gn1   byte;
 
    // Nothing left to read for this record.
    returnFalseIf(
@@ -319,7 +319,7 @@ MiffB _MiffGetPartRest(Miff * const miff, MiffN1 const start)
    loop
    {
       // End of file?
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
 
       // End of line or part, we are done reading.
       breakIf(byte == '\n' ||
@@ -327,7 +327,7 @@ MiffB _MiffGetPartRest(Miff * const miff, MiffN1 const start)
 
       // Add the letter to the byte array.
       // Only read up to a key size.  Ignore everything else.
-      if (index < miffKeyBYTE_COUNT)
+      if (index < GkeyBYTE_COUNT)
       {
          miff->readData[index++] = byte;
       }
@@ -351,10 +351,10 @@ func: _MiffGetPartEnd
 
 Skip to the next tab or newline.
 ******************************************************************************/
-MiffB _MiffGetPartEnd(Miff * const miff)
+Gb _MiffGetPartEnd(Gmiff * const miff)
 {
-   MiffN4   index;
-   MiffN1   byte;
+   Gn4   index;
+   Gn1   byte;
 
    // Nothing left to read for this record.
    returnFalseIf(!miff);
@@ -368,7 +368,7 @@ MiffB _MiffGetPartEnd(Miff * const miff)
    loop
    {
       // End of file?
-      breakIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+      breakIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
 
       // End of line or part, we are done reading.
       breakIf(byte == '\n' ||
@@ -387,9 +387,9 @@ MiffB _MiffGetPartEnd(Miff * const miff)
 /******************************************************************************
 func: _MiffGetStrLetter
 ******************************************************************************/
-MiffData _MiffGetStrLetter(Miff * const miff, MiffStr * const letter)
+GmiffData _MiffGetStrLetter(Gmiff * const miff, Gstr * const letter)
 {
-   returnIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) letter), miffDataERROR);
+   returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), miffDataERROR);
 
    // Escape single character slash, tab, and newline characters.
    switch (*letter)
@@ -404,7 +404,7 @@ MiffData _MiffGetStrLetter(Miff * const miff, MiffStr * const letter)
       return miffDataIS_RECORD_DONE;
 
    case '\\':
-      returnIf(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) letter), miffDataERROR);
+      returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), miffDataERROR);
       switch (*letter)
       {
       case '\\':
@@ -431,27 +431,27 @@ MiffData _MiffGetStrLetter(Miff * const miff, MiffStr * const letter)
 /******************************************************************************
 func: _MiffGetValueHeader
 ******************************************************************************/
-MiffStr _MiffGetValueHeader(Miff * const miff)
+Gstr _MiffGetValueHeader(Gmiff * const miff)
 {
-   MiffN1 byte;
+   Gn1 byte;
 
-   return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &byte));
+   return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
 
-   return (MiffStr) byte;
+   return (Gstr) byte;
 }
 
 /******************************************************************************
 func: _MiffGetValueBufferCount
 ******************************************************************************/
-MiffN _MiffGetValueBufferCount(Miff * const miff)
+Gn8 _MiffGetValueBufferCount(Gmiff * const miff)
 {
-   MiffN     index;
-   MiffStr   buffer[32];
-   MiffValue value;
+   Gn8     index;
+   Gstr   buffer[32];
+   GmiffValue value;
 
    forCount(index, 32)
    {
-      return0If(!miff->getBuffer(miff->dataRepo, 1, (MiffN1 *) &buffer[index]));
+      return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &buffer[index]));
       if (buffer[index] == ' ')
       {
          buffer[index] = 0;
@@ -459,7 +459,7 @@ MiffN _MiffGetValueBufferCount(Miff * const miff)
       }
    }
 
-   _GetNumInt(miff, &value, (MiffN4) index, (MiffN1 *) buffer);
+   _GetNumInt(miff, &value, (Gn4) index, (Gn1 *) buffer);
 
    return value.inr.n;
 }
@@ -471,17 +471,17 @@ function:
 /******************************************************************************
 func: _GetNumIntNegative
 ******************************************************************************/
-static MiffB _GetNumIntNegative(Miff * const miff, MiffValue * const value, MiffN4 const count,
-   MiffN1 const * const buffer)
+static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 const count,
+   Gn1 const * const buffer)
 {
    _GetNumInt(miff, value, count, buffer);
 
    // Out of range.
    // If positive, nTemp can't be larger than UINT64_MAX.
    // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
-   returnFalseIf(value->inr.n > ((MiffN) MiffI_MAX) + 1);
+   returnFalseIf(value->inr.n > ((Gn8) MiffI_MAX) + 1);
 
-   value->inr.i = -((MiffI) value->inr.n - 1) - 1;
+   value->inr.i = -((Gi8) value->inr.n - 1) - 1;
 
    returnTrue;
 }
@@ -489,11 +489,11 @@ static MiffB _GetNumIntNegative(Miff * const miff, MiffValue * const value, Miff
 /******************************************************************************
 func: _GetNumInt
 ******************************************************************************/
-static void _GetNumInt(Miff * const miff, MiffValue * const value, MiffN4 const count, MiffN1 const * const buffer)
+static void _GetNumInt(Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer)
 {
-   MiffN index;
-   MiffN ntemp;
-   MiffN letterValue;
+   Gn8 index;
+   Gn8 ntemp;
+   Gn8 letterValue;
 
    miff;
 
@@ -549,7 +549,7 @@ static void _GetNumInt(Miff * const miff, MiffValue * const value, MiffN4 const 
 /******************************************************************************
 func: _ValueFromHexInt
 ******************************************************************************/
-static MiffN1 _ValueFromHexInt(MiffN1 const value)
+static Gn1 _ValueFromHexInt(Gn1 const value)
 {
    switch (value)
    {

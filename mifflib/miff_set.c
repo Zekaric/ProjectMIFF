@@ -42,10 +42,10 @@ include:
 local:
 prototype:
 ******************************************************************************/
-static MiffB _SetBinBuffer(Miff       * const miff, MiffN const bufferCount, MiffN1 const * const bufferData);
-static MiffB _SetBinByte(  Miff       * const miff, MiffN1    const value);
-static MiffB _SetNumInt(   Miff       * const miff, MiffValue const value);
-static MiffB _SetNumReal(  Miff       * const miff, MiffValue const valueInput);
+static Gb _SetBinBuffer(Gmiff       * const miff, Gn8 const bufferCount, Gn1 const * const bufferData);
+static Gb _SetBinByte(  Gmiff       * const miff, Gn1    const value);
+static Gb _SetNumInt(   Gmiff       * const miff, GmiffValue const value);
+static Gb _SetNumReal(  Gmiff       * const miff, GmiffValue const valueInput);
 
 /******************************************************************************
 global:
@@ -54,7 +54,7 @@ function
 /******************************************************************************
 func: _MiffSetBinByte
 ******************************************************************************/
-MiffB _MiffSetBinByte(Miff * const miff, MiffN1 const binByte)
+Gb _MiffSetBinByte(Gmiff * const miff, Gn1 const binByte)
 {
    returnFalseIf(!_SetBinByte(miff, binByte));
 
@@ -66,20 +66,20 @@ MiffB _MiffSetBinByte(Miff * const miff, MiffN1 const binByte)
 /******************************************************************************
 func: _MiffSetBuffer
 ******************************************************************************/
-MiffB _MiffSetBuffer(Miff const * const miff, MiffN const bufCount, MiffN1 const * const buf)
+Gb _MiffSetBuffer(Gmiff const * const miff, Gn8 const bufCount, Gn1 const * const buf)
 {
    assert(bufCount < MiffN4_MAX);
-   return miff->setBuffer(miff->dataRepo, (MiffN4) bufCount, buf);
+   return miff->setBuffer(miff->dataRepo, (Gn4) bufCount, buf);
 }
 
 /******************************************************************************
 func: _MiffSetNumInt
 ******************************************************************************/
-MiffB _MiffSetNumInt(Miff * const miff, MiffN const value)
+Gb _MiffSetNumInt(Gmiff * const miff, Gn8 const value)
 {
-   MiffValue vtemp;
+   GmiffValue vtemp;
 
-   _MiffMemClearType(MiffValue, &vtemp);
+   _MiffMemClearType(GmiffValue, &vtemp);
 
    vtemp.inr.n = value;
    return _SetNumInt(miff, vtemp);
@@ -88,14 +88,14 @@ MiffB _MiffSetNumInt(Miff * const miff, MiffN const value)
 /******************************************************************************
 func: _MiffSetStr
 ******************************************************************************/
-MiffB _MiffSetStr(Miff * const miff, MiffN const strLen, MiffStr const * const str)
+Gb _MiffSetStr(Gmiff * const miff, Gn8 const strLen, Gstr const * const str)
 {
-   MiffN   index;
-   MiffN   bufferIndex;
-   MiffStr bufferData[66];
+   Gn8   index;
+   Gn8   bufferIndex;
+   Gstr bufferData[66];
 
    bufferIndex = 0;
-   _MiffMemClearTypeArray(66, MiffN1, bufferData);
+   _MiffMemClearTypeArray(66, Gn1, bufferData);
    forCount(index, strLen)
    {
       // Escape single character slash, tab, and newline characters.
@@ -132,17 +132,17 @@ MiffB _MiffSetStr(Miff * const miff, MiffN const strLen, MiffStr const * const s
       // Filled the buffer, write out and restart.
       if (bufferIndex >= 64)
       {
-         returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (MiffN1 *) bufferData));
+         returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) bufferData));
 
          bufferIndex = 0;
-         _MiffMemClearTypeArray(66, MiffN1, bufferData);
+         _MiffMemClearTypeArray(66, Gn1, bufferData);
       }
    }
 
    // Write out the remainder.
    if (bufferIndex)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (MiffN1 *) bufferData));
+      returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) bufferData));
    }
 
    miff->valueIndex += strLen;
@@ -153,31 +153,31 @@ MiffB _MiffSetStr(Miff * const miff, MiffN const strLen, MiffStr const * const s
 /******************************************************************************
 func: _MiffSetValueHeader
 ******************************************************************************/
-MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const value)
+Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 {
-   MiffValue vtemp;
+   GmiffValue vtemp;
 
-   _MiffMemClearType(MiffValue, &vtemp);
+   _MiffMemClearType(GmiffValue, &vtemp);
    miff->valueIndex = 0;
 
    switch (value.type)
    {
    case miffValueTypeNULL:
-      return         _MiffSetBuffer(miff, 1, (MiffN1 *) "~");
+      return         _MiffSetBuffer(miff, 1, (Gn1 *) "~");
 
    case miffValueTypeBIN:
       vtemp.inr.n = value.bufferCount;
 
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "*"));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
       returnFalseIf(!_SetNumInt( miff, vtemp));
-      return         _MiffSetBuffer(miff, 1, (MiffN1 *) " ");
+      return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
 
    case miffValueTypeSTR:
       vtemp.inr.n = value.bufferCount;
 
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (MiffN1 *) "\""));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
       returnFalseIf(!_SetNumInt( miff, vtemp));
-      return         _MiffSetBuffer(miff, 1, (MiffN1 *) " ");
+      return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
    }
 
    returnTrue;
@@ -186,7 +186,7 @@ MiffB _MiffSetValueHeader(Miff * const miff, MiffValue const value)
 /******************************************************************************
 func: _MiffSetValueData
 ******************************************************************************/
-MiffB _MiffSetValueData(Miff * const miff, MiffValue const value)
+Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
 {
    switch (value.type)
    {
@@ -219,10 +219,10 @@ function:
 /******************************************************************************
 func: _SetBinBuffer
 ******************************************************************************/
-static MiffB _SetBinBuffer(Miff * const miff, MiffN const bufferCount,
-   MiffN1 const * const bufferData)
+static Gb _SetBinBuffer(Gmiff * const miff, Gn8 const bufferCount,
+   Gn1 const * const bufferData)
 {
-   MiffN        index;
+   Gn8        index;
 
    // Testing the user way.
    forCount(index, bufferCount)
@@ -239,38 +239,38 @@ func: _SetBinByte
 The different between this and _SetNumInt is that this will not trim leading
 0s and works only on Bytes.
 ******************************************************************************/
-static MiffB _SetBinByte(Miff * const miff, MiffN1 const value)
+static Gb _SetBinByte(Gmiff * const miff, Gn1 const value)
 {
-   MiffStr  string[2];
-   MiffStr  letters[] = "0123456789ABCDEF";
+   Gstr  string[2];
+   Gstr  letters[] = "0123456789ABCDEF";
 
    string[0] = letters[(int) (value >> 4)];
    string[1] = letters[(int) (value & 0x0F)];
 
-   return _MiffSetBuffer(miff, 2, (MiffN1 *) string);
+   return _MiffSetBuffer(miff, 2, (Gn1 *) string);
 }
 
 /****************************************************************************
 func: _SetNumInt
 ******************************************************************************/
-static MiffB _SetNumInt(Miff * const miff, MiffValue const valueInput)
+static Gb _SetNumInt(Gmiff * const miff, GmiffValue const valueInput)
 {
    int       index,
              count,
              shift,
              stringIndex,
              ntemp;
-   MiffN     mask;
-   MiffStr   string[16];
-   MiffStr   letters[] = "0123456789ABCDEF";
-   MiffValue value;
+   Gn8     mask;
+   Gstr   string[16];
+   Gstr   letters[] = "0123456789ABCDEF";
+   GmiffValue value;
 
    value = valueInput;
 
    // If the number is 0, it's 0.
    if (value.inr.n == 0)
    {
-      return _MiffSetBuffer(miff, 1, (MiffN1 *) "0");
+      return _MiffSetBuffer(miff, 1, (Gn1 *) "0");
    }
 
    // Toss in the negative if the number is a negative integer.
@@ -278,10 +278,10 @@ static MiffB _SetNumInt(Miff * const miff, MiffValue const valueInput)
    {
       if (value.inr.i < 0)
       {
-         _MiffSetBuffer(miff, 1, (MiffN1 *) "-");
+         _MiffSetBuffer(miff, 1, (Gn1 *) "-");
 
          // Make the number positive.
-         value.inr.n = ((MiffN) -(value.inr.i + 1)) + 1;
+         value.inr.n = ((Gn8) -(value.inr.i + 1)) + 1;
       }
    }
 
@@ -312,23 +312,23 @@ static MiffB _SetNumInt(Miff * const miff, MiffValue const valueInput)
       shift -= 4;
    }
 
-   return _MiffSetBuffer(miff, stringIndex, (MiffN1 *) string);
+   return _MiffSetBuffer(miff, stringIndex, (Gn1 *) string);
 }
 
 /****************************************************************************
 func: _SetNumReal
 ******************************************************************************/
-static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
+static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
 {
    int       index,
              count,
              shift,
              stringIndex,
              ntemp;
-   MiffN     mask;
-   MiffStr   string[16];
-   MiffStr   letters[]  = "GHIJKLMNOPQRSTUV";
-   MiffValue value;
+   Gn8     mask;
+   Gstr   string[16];
+   Gstr   letters[]  = "GHIJKLMNOPQRSTUV";
+   GmiffValue value;
 
    value = valueInput;
 
@@ -336,54 +336,54 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
    {
       if      (value.inr4.r == 0)
       {
-         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z40");
+         return _MiffSetBuffer(miff, 3, (Gn1 *) "Z40");
       }
       else if (value.inr4.r == MiffR4_MAX)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4+M");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4+M");
       }
       else if (value.inr4.r == -MiffR4_MAX)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4-M");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4-M");
       }
       else if (value.inr4.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4+I");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4+I");
       }
       else if (value.inr4.r == -HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z4-I");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4-I");
       }
       else if (isnan(value.inr4.r))
       {
-         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z4?");
+         return _MiffSetBuffer(miff, 3, (Gn1 *) "Z4?");
       }
    }
    else
    {
       if      (value.inr.r == 0)
       {
-         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z80");
+         return _MiffSetBuffer(miff, 3, (Gn1 *) "Z80");
       }
       else if (value.inr.r == MiffR_MAX)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8+M");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8+M");
       }
       else if (value.inr.r == -MiffR_MAX)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8-M");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8-M");
       }
       else if (value.inr.r == HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8+I");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8+I");
       }
       else if (value.inr.r == -HUGE_VALF)
       {
-         return _MiffSetBuffer(miff, 4, (MiffN1 *) "Z8-I");
+         return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8-I");
       }
       else if (isnan(value.inr.r))
       {
-         return _MiffSetBuffer(miff, 3, (MiffN1 *) "Z8?");
+         return _MiffSetBuffer(miff, 3, (Gn1 *) "Z8?");
       }
    }
 
@@ -428,5 +428,5 @@ static MiffB _SetNumReal(Miff * const miff, MiffValue const valueInput)
       }
    }
 
-   return _MiffSetBuffer(miff, count, (MiffN1 *) string);
+   return _MiffSetBuffer(miff, count, (Gn1 *) string);
 }

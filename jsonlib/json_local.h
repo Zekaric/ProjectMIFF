@@ -50,32 +50,6 @@ include:
 local:
 constant:
 ******************************************************************************/
-#define loop                                       for (;;)
-#define forCount(    INDEX, COUNT)                 for ((INDEX) = 0;         (INDEX) < (COUNT); (INDEX)++)
-#define forCountDown(INDEX, COUNT)                 for ((INDEX) = COUNT - 1; (INDEX) >= 0;      (INDEX)--)
-#define once                                       for (int __count__ = 0; __count__ < 1; __count__++)
-
-#define breakIf(   EXP)                            if (EXP) { break;    }
-#define continueIf(EXP)                            if (EXP) { continue; }
-#define gotoIf(    EXP, LABEL)                     if (EXP) { goto LABEL; }
-
-#if defined(min)
-#undef min
-#undef max
-#endif
-#define min(A, B)                                  (((A) < (B)) ? (A) : (B))
-#define max(A, B)                                  (((A) < (B)) ? (B) : (A))
-
-#define returnFalse                                return jsonFALSE
-#define returnNull                                 return NULL
-#define returnTrue                                 return jsonTRUE
-#define returnIf(     EXP, VALUE)                  if (EXP) { return (VALUE); }
-#define return0If(    EXP)                         if (EXP) { return 0;       }
-#define returnFalseIf(EXP)                         if (EXP) { returnFalse;    }
-#define returnNullIf( EXP)                         if (EXP) { returnNull;     }
-#define returnTrueIf( EXP)                         if (EXP) { returnTrue;     }
-#define returnVoidIf( EXP)                         if (EXP) { return;         }
-
 #define jsonARRAY_START_STR                        "["
 #define jsonARRAY_STOP_STR                         "]"
 #define jsonOBJECT_START_STR                       "{"
@@ -123,21 +97,21 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-JsonB     _JsonEatSpace(                  Json       * const json);
+Gb     _JsonEatSpace(                  Gjson       * const json);
 
-JsonB     _JsonGetChar(                   Json       * const json);
-JsonType  _JsonGetFalse(                  Json       * const json);
-JsonType  _JsonGetNull(                   Json       * const json);
-JsonType  _JsonGetNumber(                 Json       * const json);
-JsonType  _JsonGetNumberInteger(          Json       * const json, JsonStr * const str);
-JsonType  _JsonGetNumberReal(             Json       * const json, JsonStr * const str);
-JsonType  _JsonGetTrue(                   Json       * const json);
+Gb     _JsonGetChar(                   Gjson       * const json);
+GjsonType  _JsonGetFalse(                  Gjson       * const json);
+GjsonType  _JsonGetNull(                   Gjson       * const json);
+GjsonType  _JsonGetNumber(                 Gjson       * const json);
+GjsonType  _JsonGetNumberInteger(          Gjson       * const json, Gstr * const str);
+GjsonType  _JsonGetNumberReal(             Gjson       * const json, Gstr * const str);
+GjsonType  _JsonGetTrue(                   Gjson       * const json);
 
-JsonB     _JsonIsSpace(                   Json       * const json);
+Gb     _JsonIsSpace(                   Gjson       * const json);
 
-void     *_JsonMemCreate(                 JsonN const memByteCount);
+void     *_JsonMemCreate(                 Gn8 const memByteCount);
 void      _JsonMemDestroy(                void * const mem);
-void      _JsonMemStart(                  JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc);
+void      _JsonMemStart(                  GmemCloc const memCreateFunc, GmemDloc const memDestroyFunc);
 void      _JsonMemStop(                   void);
 
 #define   _JsonMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
@@ -146,21 +120,21 @@ void      _JsonMemStop(                   void);
 #define   _JsonMemCreateType(            TYPE)           (TYPE *) _JsonMemCreate(                    sizeof(TYPE))
 #define   _JsonMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _JsonMemCreate(          (COUNT) * sizeof(TYPE))
 
-JsonB     _JsonStrStart(                  void);
+Gb     _JsonStrStart(                  void);
 void      _JsonStrStop(                   void);
-JsonN1    _JsonStrToHex(                  JsonN1 const value);
-JsonN     _JsonStrToN(                    JsonStr const * const str);
+Gn1    _JsonStrToHex(                  Gn1 const value);
+Gn8     _JsonStrToN(                    Gstr const * const str);
 
-#define   _JsonStrGetCount(STR)   ((JsonN4) strlen((char const *)    STR))
+#define   _JsonStrGetCount(STR)   ((Gn4) strlen((char const *)    STR))
 
 _locale_t _JsonLocaleGet(        void);
 
-JsonB     _JsonSetBuffer(        Json const * const json, JsonN const bufCount, JsonN1 const * const buf);
-JsonB     _JsonSetI(             Json       * const json, JsonI const value);
-JsonB     _JsonSetIndent(        Json       * const json);
-JsonB     _JsonSetN(             Json       * const json, JsonN const value);
-JsonB     _JsonSetNewLine(       Json       * const json);
-JsonB     _JsonSetR(             Json       * const json, JsonR const value);
-JsonB     _JsonSetR4(            Json       * const json, JsonR4 const value);
+Gb     _JsonSetBuffer(        Gjson const * const json, Gn8 const bufCount, Gn1 const * const buf);
+Gb     _JsonSetI(             Gjson       * const json, Gi8 const value);
+Gb     _JsonSetIndent(        Gjson       * const json);
+Gb     _JsonSetN(             Gjson       * const json, Gn8 const value);
+Gb     _JsonSetNewLine(       Gjson       * const json);
+Gb     _JsonSetR(             Gjson       * const json, Gr8 const value);
+Gb     _JsonSetR4(            Gjson       * const json, Gr4 const value);
 
 #endif

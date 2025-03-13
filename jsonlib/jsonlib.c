@@ -46,7 +46,7 @@ macro:
 /******************************************************************************
 variable:
 ******************************************************************************/
-static JsonB       _isStarted = jsonFALSE;
+static Gb       _isStarted = gbFALSE;
 static _locale_t   _locale;
 
 /******************************************************************************
@@ -56,14 +56,14 @@ function:
 /******************************************************************************
 func: jsonCreateReader
 ******************************************************************************/
-Json *jsonCreateReader(JsonGetBuffer getBufferFunc, void * const dataRepo)
+Gjson *jsonCreateReader(GgetBuffer getBufferFunc, void * const dataRepo)
 {
-   Json *json;
+   Gjson *json;
 
    returnNullIf(!_isStarted);
 
    // Create the json structure.
-   json = _JsonMemCreateType(Json);
+   json = _JsonMemCreateType(Gjson);
    returnNullIf(!json);
 
    // Initialize the json structure.
@@ -80,7 +80,7 @@ Json *jsonCreateReader(JsonGetBuffer getBufferFunc, void * const dataRepo)
 /******************************************************************************
 func: jsonCreateReaderContent
 ******************************************************************************/
-JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
+Gb jsonCreateReaderContent(Gjson * const json, GgetBuffer getBufferFunc,
    void * const dataRepo)
 {
    returnFalseIf(
@@ -88,8 +88,8 @@ JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
       !json       ||
       !getBufferFunc);
 
-   _JsonMemClearType(Json, json);
-   json->method               = jsonMethodREADING;
+   _JsonMemClearType(Gjson, json);
+   json->method               = gmethodREAD;
    json->dataRepo             = dataRepo;
    json->getBuffer            = getBufferFunc;
 
@@ -99,14 +99,14 @@ JsonB jsonCreateReaderContent(Json * const json, JsonGetBuffer getBufferFunc,
 /******************************************************************************
 func: jsonCreateWriter
 ******************************************************************************/
-Json *jsonCreateWriter(JsonSetBuffer setBufferFunc, void * const dataRepo, JsonB const isFormatted)
+Gjson *jsonCreateWriter(GsetBuffer setBufferFunc, void * const dataRepo, Gb const isFormatted)
 {
-   Json *json;
+   Gjson *json;
 
    returnNullIf(!_isStarted);
 
    // Create the json structure
-   json = _JsonMemCreateType(Json);
+   json = _JsonMemCreateType(Gjson);
    returnNullIf(!json);
 
    // Initialize the structure
@@ -123,27 +123,27 @@ Json *jsonCreateWriter(JsonSetBuffer setBufferFunc, void * const dataRepo, JsonB
 /******************************************************************************
 func: jsonCreateWriterContent
 ******************************************************************************/
-JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
-   void * const dataRepo, JsonB const isFormatted)
+Gb jsonCreateWriterContent(Gjson * const json, GsetBuffer setBufferFunc,
+   void * const dataRepo, Gb const isFormatted)
 {
    returnFalseIf(
       !_isStarted ||
       !json       ||
       !setBufferFunc);
 
-   _JsonMemClearType(Json, json);
+   _JsonMemClearType(Gjson, json);
    if (isFormatted)
    {
-      json->method   = jsonMethodWRITING_INDENTED;
+      json->method   = gmethodWRITE_MINIMIZED;
    }
    else
    {
-      json->method   = jsonMethodWRITING_COMPACT;
+      json->method   = gmethodWRITE;
    }
 
    json->dataRepo    = dataRepo;
    json->setBuffer   = setBufferFunc;
-   json->isFirstItem = jsonTRUE;
+   json->isFirstItem = gbTRUE;
 
    returnTrue;
 }
@@ -151,7 +151,7 @@ JsonB jsonCreateWriterContent(Json * const json, JsonSetBuffer setBufferFunc,
 /******************************************************************************
 func: jsonDestroy
 ******************************************************************************/
-void jsonDestroy(Json * const json)
+void jsonDestroy(Gjson * const json)
 {
    returnVoidIf(
       !_isStarted ||
@@ -163,7 +163,7 @@ void jsonDestroy(Json * const json)
 /******************************************************************************
 func: jsonDestroyContent
 ******************************************************************************/
-void jsonDestroyContent(Json * const json)
+void jsonDestroyContent(Gjson * const json)
 {
    returnVoidIf(
       !_isStarted ||
@@ -175,7 +175,7 @@ void jsonDestroyContent(Json * const json)
 /******************************************************************************
 func: jsonGetTypeElem
 ******************************************************************************/
-JsonType jsonGetTypeElem(Json * const json)
+GjsonType jsonGetTypeElem(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -208,7 +208,7 @@ JsonType jsonGetTypeElem(Json * const json)
 
    case jsonARRAY_START_CHAR:
       json->scopeType[json->scope++].type = jsonScopeTypeARRAY;
-      json->method   = jsonMethodWRITING_COMPACT;
+      json->method   = gmethodWRITE;
       json->lastByte = 0;
       return jsonTypeARRAY_START;
 
@@ -248,7 +248,7 @@ func: jsonGetTypeFile
 The first function you should be calling to obtain the value initial start of
 the JSON file.
 ******************************************************************************/
-JsonType jsonGetTypeFile(Json * const json)
+GjsonType jsonGetTypeFile(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -307,7 +307,7 @@ JsonType jsonGetTypeFile(Json * const json)
 /******************************************************************************
 func: jsonGetTypeObj
 ******************************************************************************/
-JsonType jsonGetTypeObj(Json * const json)
+GjsonType jsonGetTypeObj(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -380,7 +380,7 @@ JsonType jsonGetTypeObj(Json * const json)
 /******************************************************************************
 func: jsonGetKey
 ******************************************************************************/
-JsonB jsonGetKey(Json * const json, JsonStr ** const key)
+Gb jsonGetKey(Gjson * const json, Gstr ** const key)
 {
    returnFalseIf(
       !_isStarted ||
@@ -395,7 +395,7 @@ JsonB jsonGetKey(Json * const json, JsonStr ** const key)
 /******************************************************************************
 func: jsonGetI
 ******************************************************************************/
-JsonB jsonGetI(Json * const json, JsonI * const value)
+Gb jsonGetI(Gjson * const json, Gi8 * const value)
 {
    *value = 0;
 
@@ -412,7 +412,7 @@ JsonB jsonGetI(Json * const json, JsonI * const value)
 /******************************************************************************
 func: jsonGetN
 ******************************************************************************/
-JsonB jsonGetN(Json * const json, JsonN *  const value)
+Gb jsonGetN(Gjson * const json, Gn8 *  const value)
 {
    *value = 0;
 
@@ -426,7 +426,7 @@ JsonB jsonGetN(Json * const json, JsonN *  const value)
    returnFalseIf(
       !(json->value.type == jsonTypeNUMBER_NATURAL    ||
         (json->value.type == jsonTypeNUMBER_INTEGER &&
-         json->value.i    == (JsonI) json->value.n)));
+         json->value.i    == (Gi8) json->value.n)));
 
    returnTrue;
 }
@@ -438,7 +438,7 @@ All numbers can be real.  However not all integers or naturals can be propely
 or accurately be represented in real.  Up to the caller to determine if they
 are doing something right in that situation.
 ******************************************************************************/
-JsonB jsonGetR(Json * const json, JsonR *  const value)
+Gb jsonGetR(Gjson * const json, Gr8 *  const value)
 {
    *value = json->value.r;
 
@@ -448,7 +448,7 @@ JsonB jsonGetR(Json * const json, JsonR *  const value)
 /******************************************************************************
 func: jsonGetR4
 ******************************************************************************/
-JsonB jsonGetR4(Json * const json, JsonR4 *  const value)
+Gb jsonGetR4(Gjson * const json, Gr4 *  const value)
 {
    *value = json->value.r4;
 
@@ -458,10 +458,10 @@ JsonB jsonGetR4(Json * const json, JsonR4 *  const value)
 /******************************************************************************
 func: jsonGetStr
 ******************************************************************************/
-JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
+Gb jsonGetStr(Gjson * const json, Gi4 const maxCount, Gstr *value)
 {
-   JsonI4        index;
-   JsonStrLetter letterType;
+   Gi4        index;
+   GjsonStrLetter letterType;
 
    // Get the letters.
    for (index = 0; index < maxCount; index++)
@@ -489,9 +489,9 @@ JsonB jsonGetStr(Json * const json, JsonI4 const maxCount, JsonStr *value)
 /******************************************************************************
 func: jsonGetStrBinByte
 ******************************************************************************/
-JsonStrLetter jsonGetStrBinByte(Json * const json, JsonN1 * const value)
+GjsonStrLetter jsonGetStrBinByte(Gjson * const json, Gn1 * const value)
 {
-   JsonN1 vtemp;
+   Gn1 vtemp;
 
    returnIf(!json, jsonStrLetterERROR);
 
@@ -585,7 +585,7 @@ jsonStrLetterHEX    when it is a \u[hex][hex][hex][hex] esscaped sequence.
 jsonStrLetterDONE   when the string was fully read.
 jsonStrLetterERROR  when there was a problem reading the string.
 ******************************************************************************/
-JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
+GjsonStrLetter jsonGetStrLetter(Gjson * const json, Gstr * const value)
 {
    *value = 0;
 
@@ -659,7 +659,7 @@ JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
          return jsonStrLetterDONE;
       }
 
-      *value = (JsonStr) json->lastByte;
+      *value = (Gstr) json->lastByte;
    }
 
    return jsonStrLetterNORMAL;
@@ -668,7 +668,7 @@ JsonStrLetter jsonGetStrLetter(Json * const json, JsonStr * const value)
 /******************************************************************************
 func: jsonGetStrHex
 ******************************************************************************/
-JsonB jsonGetStrHex(Json * const json, JsonStr * const h1, JsonStr * const h2, JsonStr * const h3, JsonStr * const h4)
+Gb jsonGetStrHex(Gjson * const json, Gstr * const h1, Gstr * const h2, Gstr * const h3, Gstr * const h4)
 {
    returnFalseIf(
       !_isStarted ||
@@ -689,7 +689,7 @@ JsonB jsonGetStrHex(Json * const json, JsonStr * const h1, JsonStr * const h2, J
 /******************************************************************************
 func: jsonSetArrayStart
 ******************************************************************************/
-JsonB jsonSetArrayStart(Json * const json)
+Gb jsonSetArrayStart(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -700,13 +700,13 @@ JsonB jsonSetArrayStart(Json * const json)
       returnFalseIf(!jsonSetSeparator(json));
    }
 
-   returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonARRAY_START_STR));
+   returnFalseIf(!_JsonSetBuffer(json, 1, (Gn1 *) jsonARRAY_START_STR));
 
    json->scopeType[json->scope].type   = jsonScopeTypeARRAY;
    json->scopeType[json->scope].method = json->method;
-   json->method                        = jsonMethodWRITING_COMPACT;
+   json->method                        = gmethodWRITE;
    json->scope++;
-   json->isFirstItem                   = jsonTRUE;
+   json->isFirstItem                   = gbTRUE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
@@ -717,7 +717,7 @@ JsonB jsonSetArrayStart(Json * const json)
 /******************************************************************************
 func: jsonSetArrayStop
 ******************************************************************************/
-JsonB jsonSetArrayStop(Json * const json)
+Gb jsonSetArrayStop(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -726,11 +726,11 @@ JsonB jsonSetArrayStop(Json * const json)
 
    json->scope--;
    json->scopeType[json->scope].type = jsonScopeTypeNONE;
-   json->isFirstItem                 = jsonFALSE;
+   json->isFirstItem                 = gbFALSE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
-   returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonARRAY_STOP_STR));
+   returnFalseIf(!_JsonSetBuffer( json, 1, (Gn1 *) jsonARRAY_STOP_STR));
 
    json->method = json->scopeType[json->scope].method;
 
@@ -740,9 +740,9 @@ JsonB jsonSetArrayStop(Json * const json)
 /******************************************************************************
 func: jsonSetKey
 ******************************************************************************/
-JsonB jsonSetKey(Json * const json, JsonStr const * const key)
+Gb jsonSetKey(Gjson * const json, Gstr const * const key)
 {
-   JsonI4 index;
+   Gi4 index;
 
    returnFalseIf(
       !_isStarted ||
@@ -751,7 +751,7 @@ JsonB jsonSetKey(Json * const json, JsonStr const * const key)
 
    returnFalseIf(!jsonSetSeparator(json));
 
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
    returnFalseIf(!jsonSetValueStrStart(json));
    for (index = 0; ; index++)
@@ -762,14 +762,14 @@ JsonB jsonSetKey(Json * const json, JsonStr const * const key)
    }
    returnFalseIf(!jsonSetValueStrStop(json));
 
-   returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonKEY_VALUE_SEPARATOR_STR));
+   returnFalseIf(!_JsonSetBuffer( json, 1, (Gn1 *) jsonKEY_VALUE_SEPARATOR_STR));
    returnTrue;
 }
 
 /******************************************************************************
 func: jsonSetObjectStart
 ******************************************************************************/
-JsonB jsonSetObjectStart(Json * const json)
+Gb jsonSetObjectStart(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -780,12 +780,12 @@ JsonB jsonSetObjectStart(Json * const json)
       returnFalseIf(!jsonSetSeparator(json));
    }
 
-   returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonOBJECT_START_STR));
+   returnFalseIf(!_JsonSetBuffer( json, 1, (Gn1 *) jsonOBJECT_START_STR));
 
    json->scopeType[json->scope].type   = jsonScopeTypeOBJECT;
    json->scopeType[json->scope].method = json->method;
    json->scope++;
-   json->isFirstItem            = jsonTRUE;
+   json->isFirstItem            = gbTRUE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
@@ -796,7 +796,7 @@ JsonB jsonSetObjectStart(Json * const json)
 /******************************************************************************
 func: jsonSetObjectStop
 ******************************************************************************/
-JsonB jsonSetObjectStop(Json * const json)
+Gb jsonSetObjectStop(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -806,18 +806,18 @@ JsonB jsonSetObjectStop(Json * const json)
    json->scope--;
    json->scopeType[json->scope].type = jsonScopeTypeNONE;
    json->method                      = json->scopeType[json->scope].method;
-   json->isFirstItem                 = jsonFALSE;
+   json->isFirstItem                 = gbFALSE;
 
    returnFalseIf(!_JsonSetNewLine(json));
    returnFalseIf(!_JsonSetIndent( json));
-   returnFalseIf(!_JsonSetBuffer( json, 1, (JsonN1 *) jsonOBJECT_STOP_STR));
+   returnFalseIf(!_JsonSetBuffer( json, 1, (Gn1 *) jsonOBJECT_STOP_STR));
    returnTrue;
 }
 
 /******************************************************************************
 func: jsonSetSeparator
 ******************************************************************************/
-JsonB jsonSetSeparator(Json * const json)
+Gb jsonSetSeparator(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -825,20 +825,20 @@ JsonB jsonSetSeparator(Json * const json)
 
    if (!json->isFirstItem)
    {
-      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) jsonSEPARATOR_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 1, (Gn1 *) jsonSEPARATOR_STR));
       returnFalseIf(!_JsonSetNewLine( json));
       returnFalseIf(!_JsonSetIndent(  json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
    returnTrue;
 }
 
 /******************************************************************************
 func: jsonSetValueBin
 ******************************************************************************/
-JsonB jsonSetValueBin(Json * const json, JsonN const count, JsonN1 const * const value)
+Gb jsonSetValueBin(Gjson * const json, Gn8 const count, Gn1 const * const value)
 {
-   JsonI4 index;
+   Gi4 index;
 
    returnFalseIf(
       !_isStarted ||
@@ -858,7 +858,7 @@ JsonB jsonSetValueBin(Json * const json, JsonN const count, JsonN1 const * const
 /******************************************************************************
 func: jsonSetValueBool
 ******************************************************************************/
-JsonB jsonSetValueBool(Json * const json, JsonB const value)
+Gb jsonSetValueBool(Gjson * const json, Gb const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -868,20 +868,20 @@ JsonB jsonSetValueBool(Json * const json, JsonB const value)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
-   if (value == jsonTRUE)
+   if (value == gbTRUE)
    {
-      return _JsonSetBuffer(json, 4, (JsonN1 *) "true");
+      return _JsonSetBuffer(json, 4, (Gn1 *) "true");
    }
 
-   return _JsonSetBuffer(json, 5, (JsonN1 *) "false");
+   return _JsonSetBuffer(json, 5, (Gn1 *) "false");
 }
 
 /******************************************************************************
 func: jsonSetValueI
 ******************************************************************************/
-JsonB jsonSetValueI(Json * const json, JsonI const value)
+Gb jsonSetValueI(Gjson * const json, Gi8 const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -891,7 +891,7 @@ JsonB jsonSetValueI(Json * const json, JsonI const value)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
    return _JsonSetI(json, value);
 }
@@ -899,7 +899,7 @@ JsonB jsonSetValueI(Json * const json, JsonI const value)
 /******************************************************************************
 func: jsonSetValueN
 ******************************************************************************/
-JsonB jsonSetValueN(Json * const json, JsonN const value)
+Gb jsonSetValueN(Gjson * const json, Gn8 const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -909,7 +909,7 @@ JsonB jsonSetValueN(Json * const json, JsonN const value)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
    return _JsonSetN(json, value);
 }
@@ -917,21 +917,21 @@ JsonB jsonSetValueN(Json * const json, JsonN const value)
 /******************************************************************************
 func: jsonSetValueNull
 ******************************************************************************/
-JsonB jsonSetValueNull(Json * const json)
+Gb jsonSetValueNull(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
       !json);
 
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
-   return _JsonSetBuffer(json, 4, (JsonN1 *) "null");
+   return _JsonSetBuffer(json, 4, (Gn1 *) "null");
 }
 
 /******************************************************************************
 func: jsonSetValueR
 ******************************************************************************/
-JsonB jsonSetValueR(Json * const json, JsonR const value)
+Gb jsonSetValueR(Gjson * const json, Gr8 const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -941,7 +941,7 @@ JsonB jsonSetValueR(Json * const json, JsonR const value)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
    return _JsonSetR(json, value);
 }
@@ -949,7 +949,7 @@ JsonB jsonSetValueR(Json * const json, JsonR const value)
 /******************************************************************************
 func: jsonSetValueR4
 ******************************************************************************/
-JsonB jsonSetValueR4(Json * const json, JsonR4 const value)
+Gb jsonSetValueR4(Gjson * const json, Gr4 const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -959,7 +959,7 @@ JsonB jsonSetValueR4(Json * const json, JsonR4 const value)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
    return _JsonSetR4(json, value);
 }
@@ -967,9 +967,9 @@ JsonB jsonSetValueR4(Json * const json, JsonR4 const value)
 /******************************************************************************
 func: jsonSetValueStr
 ******************************************************************************/
-JsonB jsonSetValueStr(Json * const json, JsonStr const * const str)
+Gb jsonSetValueStr(Gjson * const json, Gstr const * const str)
 {
-   JsonI4 index;
+   Gi4 index;
 
    returnFalseIf(
       !_isStarted ||
@@ -991,17 +991,17 @@ JsonB jsonSetValueStr(Json * const json, JsonStr const * const str)
 /******************************************************************************
 func: jsonSetValueStrBinByte
 ******************************************************************************/
-JsonB jsonSetValueStrBinByte(Json * const json, JsonN1 const value)
+Gb jsonSetValueStrBinByte(Gjson * const json, Gn1 const value)
 {
-   JsonStr letters[] = "0123456789ABCDEF";
-   JsonN1  output[2];
+   Gstr letters[] = "0123456789ABCDEF";
+   Gn1  output[2];
 
    returnFalseIf(!json);
 
    output[0] = letters[value >> 4];
    output[1] = letters[value & 0x0F];
 
-   returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) output));
+   returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) output));
 
    returnTrue;
 }
@@ -1009,7 +1009,7 @@ JsonB jsonSetValueStrBinByte(Json * const json, JsonN1 const value)
 /******************************************************************************
 func: jsonSetValueStrLetter
 ******************************************************************************/
-JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
+Gb jsonSetValueStrLetter(Gjson * const json, Gstr const value)
 {
    returnFalseIf(
       !_isStarted ||
@@ -1018,39 +1018,39 @@ JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
    switch (value)
    {
    case jsonSTRING_QUOTE_CHAR:
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_QUOTE_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_QUOTE_STR));
       break;
 
    case jsonBACK_SLASH_CHAR:
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACK_SLASH_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_BACK_SLASH_STR));
       break;
 
    case jsonFOREWARD_SLASH_CHAR:
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORWARD_SLASH_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_FORWARD_SLASH_STR));
       break;
 
    case '\b':
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_BACKSPACE_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_BACKSPACE_STR));
       break;
 
    case '\f':
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_FORMFEED_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_FORMFEED_STR));
       break;
 
    case '\n':
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_LINEFEED_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_LINEFEED_STR));
       break;
 
    case '\r':
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_CARRIAGE_RETURN_STR));
       break;
 
    case '\t':
-      returnFalseIf(!_JsonSetBuffer(json, 2, (JsonN1 *) jsonSTRING_ESCAPE_TAB_STR));
+      returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) jsonSTRING_ESCAPE_TAB_STR));
       break;
 
    default:
-      returnFalseIf(!_JsonSetBuffer(json, 1, (JsonN1 *) &value));
+      returnFalseIf(!_JsonSetBuffer(json, 1, (Gn1 *) &value));
    }
 
    returnTrue;
@@ -1059,7 +1059,7 @@ JsonB jsonSetValueStrLetter(Json * const json, JsonStr const value)
 /******************************************************************************
 func: jsonSetValueStrStart
 ******************************************************************************/
-JsonB jsonSetValueStrStart(Json * const json)
+Gb jsonSetValueStrStart(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
@@ -1069,27 +1069,27 @@ JsonB jsonSetValueStrStart(Json * const json)
    {
       returnFalseIf(!jsonSetSeparator(json));
    }
-   json->isFirstItem = jsonFALSE;
+   json->isFirstItem = gbFALSE;
 
-   return _JsonSetBuffer(json, 1, (JsonN1 *) jsonSTRING_QUOTE_STR);
+   return _JsonSetBuffer(json, 1, (Gn1 *) jsonSTRING_QUOTE_STR);
 }
 
 /******************************************************************************
 func: jsonSetValueStrStop
 ******************************************************************************/
-JsonB jsonSetValueStrStop(Json * const json)
+Gb jsonSetValueStrStop(Gjson * const json)
 {
    returnFalseIf(
       !_isStarted ||
       !json);
 
-   return _JsonSetBuffer(json, 1, (JsonN1 *) "\"");
+   return _JsonSetBuffer(json, 1, (Gn1 *) "\"");
 }
 
 /******************************************************************************
 func: jsonStart
 ******************************************************************************/
-JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestroyFunc)
+Gb jsonStart(GmemCloc const memCreateFunc, GmemDloc const memDestroyFunc)
 {
    returnTrueIf(_isStarted);
 
@@ -1104,7 +1104,7 @@ JsonB jsonStart(JsonMemCreate const memCreateFunc, JsonMemDestroy const memDestr
 
    _locale = _create_locale(LC_ALL, "C");
 
-   _isStarted = jsonTRUE;
+   _isStarted = gbTRUE;
 
    returnTrue;
 }
@@ -1119,7 +1119,7 @@ void jsonStop(void)
    _JsonStrStop();
    _JsonMemStop();
 
-   _isStarted = jsonFALSE;
+   _isStarted = gbFALSE;
 }
 
 /******************************************************************************

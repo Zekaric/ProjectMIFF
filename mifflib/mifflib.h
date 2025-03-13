@@ -37,23 +37,11 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include <stdint.h>
-#include <float.h>
-#include <math.h>
 
 /******************************************************************************
 local:
 constant:
 ******************************************************************************/
-#define miffKeyBYTE_COUNT                 256
-#define miffKeySIZE                       257
-
-typedef enum
-{
-   miffFALSE,
-   miffTRUE
-} MiffB;
-
 typedef enum
 {
    miffDataIS_DATA,
@@ -61,13 +49,7 @@ typedef enum
    miffDataIS_RECORD_DONE,
 
    miffDataERROR
-} MiffData;
-
-typedef enum
-{
-   miffMethodREADING,
-   miffMethodWRITING,
-} MiffMethod;
+} GmiffData;
 
 typedef enum
 {
@@ -76,7 +58,7 @@ typedef enum
    miffRecTypeBLOCK_START,
    miffRecTypeBLOCK_STOP,
    miffRecTypeVALUE
-} MiffRecType;
+} GmiffRecType;
 
 typedef enum
 {
@@ -88,7 +70,7 @@ typedef enum
    miffValueTypeNUM_REAL, //   G H I J K L M N O P Q R S T U V
    miffValueTypeBIN,      // *
    miffValueTypeOTHER     // Any other character.
-} MiffValueType;
+} GmiffValueType;
 
 #define miffArrayCountBLOCK_START      (UINT64_MAX - 2)
 #define miffArrayCountBLOCK_STOP       (UINT64_MAX - 1)
@@ -98,114 +80,71 @@ typedef enum
 /******************************************************************************
 type:
 ******************************************************************************/
-// Integer type -X to X
-typedef int64_t                        MiffI;
-typedef int32_t                        MiffI4;
-// Natural type 0 to X
-typedef uint64_t                       MiffN;
-typedef uint32_t                       MiffN4;
-typedef uint8_t                        MiffN1;
-// Real types X.XXX
-typedef double                         MiffR;
-typedef float                          MiffR4;
-// String (UTF8) type
-typedef char                           MiffStr;
-
-#define MiffR_MAX                      DBL_MAX
-#define MiffR_EPSILON                  DBL_EPSILON
-#define MiffR_NAN                      NAN
-#define MiffR4_MAX                     FLT_MAX
-#define MiffR4_EPSILON                 FLT_EPSILON
-#define MiffN_MAX                      UINT64_MAX
-#define MiffN4_MAX                     UINT32_MAX
-#define MiffI_MAX                      INT64_MAX
-#define MiffI_MIN                      INT64_MIN
-#define MiffI4_MAX                     INT32_MAX
-
-typedef struct
+typedef union
 {
-   MiffR4             real;
-   MiffR4             imaginary;
-} MiffComplex4;
-
-typedef struct
-{
-   MiffR              real;
-   MiffR              imaginary;
-} MiffComplex;
+   Gstr            *str;
+   Gn1             *bin;
+} GmiffP;
 
 typedef union
 {
-   MiffStr           *str;
-   MiffN1            *bin;
-} MiffP;
+   Gi4              i;
+   Gn4              n;
+   Gr4              r;
+   Gn1              byte[4];
+} Gmiff4;
 
 typedef union
 {
-   MiffI4             i;
-   MiffN4             n;
-   MiffR4             r;
-   MiffN1             byte[4];
-} Miff4;
-
-typedef union
-{
-   MiffI              i;
-   MiffN              n;
-   MiffR              r;
-   MiffN1             byte[8];
-} Miff8;
+   Gi8               i;
+   Gn8               n;
+   Gr8               r;
+   Gn1              byte[8];
+} Gmiff8;
 
 typedef struct
 {
-   MiffValueType      type;
-   MiffStr            header;
-   MiffB              isI;
-   MiffB              isR4;
-   Miff4              inr4;
-   Miff8              inr;
-   MiffN              bufferCount;
-   MiffP              bufferData;
-} MiffValue;
-
-typedef void *(*MiffMemCreate)(  MiffN4 const memByteCount);
-typedef void  (*MiffMemDestroy)( void * const mem);
-
-typedef MiffB (*MiffGetBuffer)(  void * const dataSource,      MiffN4 const byteCount, MiffN1       * const data);
-
-typedef MiffB (*MiffSetBuffer)(  void * const dataDestination, MiffN4 const byteCount, MiffN1 const * const data);
+   GmiffValueType      type;
+   Gstr             header;
+   Gb               isI;
+   Gb               isR4;
+   Gmiff4              inr4;
+   Gmiff8              inr;
+   Gn8               bufferCount;
+   GmiffP              bufferData;
+} GmiffValue;
 
 typedef struct
 {
    // MIFF file information and configuration.
-   MiffN                       version;
-   MiffMethod                  method;
-   MiffB                       isByteSwapping;
-   MiffB                       isPartDone;
-   MiffB                       isRecordDone;
+   Gn8                        version;
+   Gmethod                  method;
+   Gb                        isByteSwapping;
+   Gb                        isPartDone;
+   Gb                        isRecordDone;
 
-   MiffStr                     subFormatName[   miffKeySIZE];
-   MiffStr                     subFormatVersion[miffKeySIZE];
+   Gstr                      subFormatName[   GkeySIZE];
+   Gstr                      subFormatVersion[GkeySIZE];
 
    // The current value information.
-   MiffN                       currentScopeLevel;
-   MiffStr                     currentName[miffKeySIZE];
-   MiffN                       currentNameCount;
-   MiffN                       currentArrayCount;
-   MiffN                       currentArrayIndex;
+   Gn8                        currentScopeLevel;
+   Gstr                      currentName[GkeySIZE];
+   Gn8                        currentNameCount;
+   Gn8                        currentArrayCount;
+   Gn8                        currentArrayIndex;
 
    // Data repo getters and setters.
    void                       *dataRepo;
-   MiffGetBuffer               getBuffer;
-   MiffSetBuffer               setBuffer;
+   GgetBuffer                getBuffer;
+   GsetBuffer                setBuffer;
 
    // Temporary storage for uncompressed memory.
-   MiffValue                   value;
-   MiffN                       valueIndex;
+   GmiffValue                   value;
+   Gn8                       valueIndex;
 
-   MiffN4                      readCount;
-   MiffN1                      readData[miffKeySIZE];
-} Miff;
+   Gn4                      readCount;
+   Gn1                      readData[GkeySIZE];
+} Gmiff;
 
 /******************************************************************************
 variable:
@@ -214,59 +153,59 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-Miff           *miffCreateReader(                                           MiffB const isByteSwaping, MiffGetBuffer getBufferFunc, MiffStr       * const subFormatName, MiffStr       * const subFormatVersion, void * const dataRepo);
-MiffB           miffCreateReaderContent(           Miff       * const miff, MiffB const isByteSwaping, MiffGetBuffer getBufferFunc, MiffStr       * const subFormatName, MiffStr       * const subFormatVersion, void * const dataRepo);
-Miff           *miffCreateWriter(                                           MiffB const isByteSwaping, MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName, MiffStr const * const subFormatVersion, void * const dataRepo);
-MiffB           miffCreateWriterContent(           Miff       * const miff, MiffB const isByteSwaping, MiffSetBuffer setBufferFunc, MiffStr const * const subFormatName, MiffStr const * const subFormatVersion, void * const dataRepo);
+Gmiff           *miffCreateReader(                                           Gb const isByteSwaping, GgetBuffer getBufferFunc, Gstr       * const subFormatName, Gstr       * const subFormatVersion, void * const dataRepo);
+Gb            miffCreateReaderContent(           Gmiff       * const miff, Gb const isByteSwaping, GgetBuffer getBufferFunc, Gstr       * const subFormatName, Gstr       * const subFormatVersion, void * const dataRepo);
+Gmiff           *miffCreateWriter(                                           Gb const isByteSwaping, GsetBuffer setBufferFunc, Gstr const * const subFormatName, Gstr const * const subFormatVersion, void * const dataRepo);
+Gb            miffCreateWriterContent(           Gmiff       * const miff, Gb const isByteSwaping, GsetBuffer setBufferFunc, Gstr const * const subFormatName, Gstr const * const subFormatVersion, void * const dataRepo);
 
-void            miffDestroy(                       Miff       * const miff);
-void            miffDestroyContent(                Miff       * const miff);
+void            miffDestroy(                       Gmiff       * const miff);
+void            miffDestroyContent(                Gmiff       * const miff);
 
-MiffB           miffGetRecordStart(                Miff       * const miff, MiffRecType * const type, MiffN * const count, MiffStr       * const key);
-MiffB           miffGetRecordEnd(                  Miff       * const miff);
-MiffValue       miffGetValue(                      Miff       * const miff);
-MiffB           miffGetValueBin(                   Miff       * const miff, MiffN const binCount, MiffN1  * const binBuffer);
-MiffData        miffGetValueBinData(               Miff       * const miff, MiffN1 * const binByte);
-MiffB           miffGetValueStr(                   Miff       * const miff, MiffN const strCount, MiffStr * const str);
-MiffData        miffGetValueStrData(               Miff       * const miff, MiffStr * const strLetter);
+Gb            miffGetRecordStart(                Gmiff       * const miff, GmiffRecType * const type, Gn8 * const count, Gstr       * const key);
+Gb            miffGetRecordEnd(                  Gmiff       * const miff);
+GmiffValue       miffGetValue(                      Gmiff       * const miff);
+Gb            miffGetValueBin(                   Gmiff       * const miff, Gn8 const binCount, Gn1  * const binBuffer);
+GmiffData        miffGetValueBinData(               Gmiff       * const miff, Gn1 * const binByte);
+Gb            miffGetValueStr(                   Gmiff       * const miff, Gn8 const strCount, Gstr * const str);
+GmiffData        miffGetValueStrData(               Gmiff       * const miff, Gstr * const strLetter);
 
-MiffB           miffSetRecordStart(                Miff       * const miff, MiffRecType   const type, MiffN   const count, MiffStr const * const key);
-MiffB           miffSetRecordStop(                 Miff       * const miff);
-MiffB           miffSetSeparator(                  Miff       * const miff);
-MiffB           miffSetValue(                      Miff       * const miff, MiffValue const value);
-MiffB           miffSetValueBinData(               Miff       * const miff, MiffN1 const binByte);
-MiffB           miffSetValueStart(                 Miff       * const miff, MiffValue const value);
-MiffB           miffSetValueStop(                  Miff       * const miff);
-MiffB           miffSetValueStrData(               Miff       * const miff, MiffStr const strLetter);
+Gb            miffSetRecordStart(                Gmiff       * const miff, GmiffRecType   const type, Gn8   const count, Gstr const * const key);
+Gb            miffSetRecordStop(                 Gmiff       * const miff);
+Gb            miffSetSeparator(                  Gmiff       * const miff);
+Gb            miffSetValue(                      Gmiff       * const miff, GmiffValue const value);
+Gb            miffSetValueBinData(               Gmiff       * const miff, Gn1 const binByte);
+Gb            miffSetValueStart(                 Gmiff       * const miff, GmiffValue const value);
+Gb            miffSetValueStop(                  Gmiff       * const miff);
+Gb            miffSetValueStrData(               Gmiff       * const miff, Gstr const strLetter);
 
-MiffB           miffStart(                         MiffMemCreate const memCreate, MiffMemDestroy const memDestroy);
+Gb            miffStart(                         MiffMemCreate const memCreate, MiffMemDestroy const memDestroy);
 void            miffStop(                          void);
 
 /******************************************************************************
 miffValue
 prototype:
 ******************************************************************************/
-MiffB           miffValueGetB(                     MiffValue const value);
-MiffN           miffValueGetBinCount(              MiffValue const value);
-MiffI           miffValueGetI(                     MiffValue const value);
-MiffN           miffValueGetN(                     MiffValue const value);
-MiffR           miffValueGetR(                     MiffValue const value);
-MiffR4          miffValueGetR4(                    MiffValue const value);
-MiffN           miffValueGetStrCount(              MiffValue const value);
-MiffValueType   miffValueGetType(                  MiffValue const value);
+Gb            miffValueGetB(                     GmiffValue const value);
+Gn8            miffValueGetBinCount(              GmiffValue const value);
+Gi8            miffValueGetI(                     GmiffValue const value);
+Gn8            miffValueGetN(                     GmiffValue const value);
+Gr8            miffValueGetR(                     GmiffValue const value);
+Gr4           miffValueGetR4(                    GmiffValue const value);
+Gn8            miffValueGetStrCount(              GmiffValue const value);
+GmiffValueType   miffValueGetType(                  GmiffValue const value);
 
-MiffB           miffValueIs4(                      MiffValue const value);
+Gb            miffValueIs4(                      GmiffValue const value);
 
-MiffValue       miffValueSetB(                     MiffB  const bvalue);
-MiffValue       miffValueSetBinBuffer(             MiffN  const binCount, MiffN1  * const binBuffer);
-MiffValue       miffValueSetBinCount(              MiffN  const binCount);
-MiffValue       miffValueSetI(                     MiffI  const ivalue);
-MiffValue       miffValueSetN(                     MiffN  const nvalue);
-MiffValue       miffValueSetNull(                  void);
-MiffValue       miffValueSetR(                     MiffR  const rvalue);
-MiffValue       miffValueSetR4(                    MiffR4 const rvalue);
-MiffValue       miffValueSetStrBuffer(             MiffN  const strCount, MiffStr * const strBuffer);
-MiffValue       miffValueSetStrCount(              MiffN  const strCount);
+GmiffValue       miffValueSetB(                     Gb  const bvalue);
+GmiffValue       miffValueSetBinBuffer(             Gn8  const binCount, Gn1  * const binBuffer);
+GmiffValue       miffValueSetBinCount(              Gn8  const binCount);
+GmiffValue       miffValueSetI(                     Gi8  const ivalue);
+GmiffValue       miffValueSetN(                     Gn8  const nvalue);
+GmiffValue       miffValueSetNull(                  void);
+GmiffValue       miffValueSetR(                     Gr8  const rvalue);
+GmiffValue       miffValueSetR4(                    Gr4 const rvalue);
+GmiffValue       miffValueSetStrBuffer(             Gn8  const strCount, Gstr * const strBuffer);
+GmiffValue       miffValueSetStrCount(              Gn8  const strCount);
 
 // Convenience macroes
 #define miffValueSetStr(                  VALUE)                              miffValueSetStrBuffer(strlen(VALUE), VALUE)
@@ -274,14 +213,14 @@ MiffValue       miffValueSetStrCount(              MiffN  const strCount);
 #define miffSetRecordBlockStart(          MIFF, NAME)                       { miffSetRecordStart(MIFF, miffRecTypeBLOCK_START, 0, NAME); miffSetRecordStop(MIFF); }
 #define miffSetRecordBlockStop(           MIFF)                             { miffSetRecordStart(MIFF, miffRecTypeBLOCK_STOP,  0, NULL); miffSetRecordStop(MIFF); }
 
-#define miffSetRecordValueNull(           MIFF)                             { MiffValue __value__; __value__ = miffValueSetNull(                     ); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueB(              MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetB(                 (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueI(              MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetI(                 (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueN(              MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetN(                 (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueR(              MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetR(                 (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueR4(             MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetR4(                (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueStr(            MIFF,        VALUE)               { MiffValue __value__; __value__ = miffValueSetStr(               (VALUE)); miffSetValue(MIFF, __value__); }
-#define miffSetRecordValueBinBuffer(      MIFF, COUNT, VALUE)               { MiffValue __value__; __value__ = miffValueSetBinBuffer((COUNT), (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueNull(           MIFF)                             { GmiffValue __value__; __value__ = miffValueSetNull(                     ); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueB(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetB(                 (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueI(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetI(                 (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueN(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetN(                 (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueR(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetR(                 (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueR4(             MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetR4(                (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueStr(            MIFF,        VALUE)               { GmiffValue __value__; __value__ = miffValueSetStr(               (VALUE)); miffSetValue(MIFF, __value__); }
+#define miffSetRecordValueBinBuffer(      MIFF, COUNT, VALUE)               { GmiffValue __value__; __value__ = miffValueSetBinBuffer((COUNT), (VALUE)); miffSetValue(MIFF, __value__); }
 
 #define miffSetRecordNull(                MIFF,       NAME)                 { miffSetRecordStart(MIFF, miffRecTypeVALUE, 1,     NAME); { miffSetRecordValueNull(     MIFF                  ); } miffSetRecordStop(MIFF); }
 #define miffSetRecordBool(                MIFF,       NAME,        VALUE)   { miffSetRecordStart(MIFF, miffRecTypeVALUE, 1,     NAME); { miffSetRecordValueB(        MIFF,          (VALUE)); } miffSetRecordStop(MIFF); }

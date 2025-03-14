@@ -43,8 +43,7 @@ include:
 #include <stdlib.h>
 #include <locale.h>
 
-#include "b64lib.h"
-#include "jsonlib.h"
+#include "gjsonlib.h"
 
 /******************************************************************************
 local:
@@ -97,44 +96,44 @@ variable:
 /******************************************************************************
 prototype:
 ******************************************************************************/
-Gb     _JsonEatSpace(                  Gjson       * const json);
+Gb         _JsonEatSpace(         Gjson       * const json);
 
-Gb     _JsonGetChar(                   Gjson       * const json);
-GjsonType  _JsonGetFalse(                  Gjson       * const json);
-GjsonType  _JsonGetNull(                   Gjson       * const json);
-GjsonType  _JsonGetNumber(                 Gjson       * const json);
-GjsonType  _JsonGetNumberInteger(          Gjson       * const json, Gstr * const str);
-GjsonType  _JsonGetNumberReal(             Gjson       * const json, Gstr * const str);
-GjsonType  _JsonGetTrue(                   Gjson       * const json);
+Gb         _JsonGetChar(          Gjson       * const json);
+GjsonType  _JsonGetFalse(         Gjson       * const json);
+GjsonType  _JsonGetNull(          Gjson       * const json);
+GjsonType  _JsonGetNumber(        Gjson       * const json);
+GjsonType  _JsonGetNumberInteger( Gjson       * const json, Gstr * const str);
+GjsonType  _JsonGetNumberReal(    Gjson       * const json, Gstr * const str);
+GjsonType  _JsonGetTrue(          Gjson       * const json);
 
-Gb     _JsonIsSpace(                   Gjson       * const json);
+Gb         _JsonIsSpace(          Gjson       * const json);
 
-void     *_JsonMemCreate(                 Gn8 const memByteCount);
-void      _JsonMemDestroy(                void * const mem);
-void      _JsonMemStart(                  GmemCloc const memCreateFunc, GmemDloc const memDestroyFunc);
-void      _JsonMemStop(                   void);
+void      *_JsonMemCloc(          Gcount const memByteCount);
+void       _JsonMemDloc(          void * const mem);
+void       _JsonMemStart(         GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
+void       _JsonMemStop(          void);
 
-#define   _JsonMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
-#define   _JsonMemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
-#define   _JsonMemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
-#define   _JsonMemCreateType(            TYPE)           (TYPE *) _JsonMemCreate(                    sizeof(TYPE))
-#define   _JsonMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _JsonMemCreate(          (COUNT) * sizeof(TYPE))
+#define    _JsonMemClearType(            TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
+#define    _JsonMemClearTypeArray(COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
+#define    _JsonMemCopyTypeArray( COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
+#define    _JsonMemClocType(             TYPE)           (TYPE *) _JsonMemCloc(                  sizeof(TYPE))
+#define    _JsonMemClocTypeArray( COUNT, TYPE)           (TYPE *) _JsonMemCloc(        (COUNT) * sizeof(TYPE))
 
-Gb     _JsonStrStart(                  void);
-void      _JsonStrStop(                   void);
-Gn1    _JsonStrToHex(                  Gn1 const value);
-Gn8     _JsonStrToN(                    Gstr const * const str);
+Gb         _JsonStrStart(         void);
+void       _JsonStrStop(          void);
+Gn1        _JsonStrToHex(         Gn1 const value);
+Gn8        _JsonStrToN(           Gstr const * const str);
 
-#define   _JsonStrGetCount(STR)   ((Gn4) strlen((char const *)    STR))
+#define    _JsonStrGetCount(STR)  ((Gn4) strlen((char const *) STR))
 
-_locale_t _JsonLocaleGet(        void);
+_locale_t  _JsonLocaleGet(        void);
 
-Gb     _JsonSetBuffer(        Gjson const * const json, Gn8 const bufCount, Gn1 const * const buf);
-Gb     _JsonSetI(             Gjson       * const json, Gi8 const value);
-Gb     _JsonSetIndent(        Gjson       * const json);
-Gb     _JsonSetN(             Gjson       * const json, Gn8 const value);
-Gb     _JsonSetNewLine(       Gjson       * const json);
-Gb     _JsonSetR(             Gjson       * const json, Gr8 const value);
-Gb     _JsonSetR4(            Gjson       * const json, Gr4 const value);
+Gb         _JsonSetBuffer(        Gjson const * const json, Gcount const bufCount, Gn1 const * const buf);
+Gb         _JsonSetI(             Gjson       * const json, Gi8 const value);
+Gb         _JsonSetIndent(        Gjson       * const json);
+Gb         _JsonSetN(             Gjson       * const json, Gn8 const value);
+Gb         _JsonSetNewLine(       Gjson       * const json);
+Gb         _JsonSetR(             Gjson       * const json, Gr8 const value);
+Gb         _JsonSetR4(            Gjson       * const json, Gr4 const value);
 
 #endif

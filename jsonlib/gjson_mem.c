@@ -1,10 +1,10 @@
 /******************************************************************************
-file:       byteSwap
+file:       mem
 author:     Robbert de Groot
-copyright:  2021,
+copyright:  2021, Robbert de Groot
 
 description:
-Functions to swap bytes from little endian to big endian and vice versa.
+memory functions
 ******************************************************************************/
 
 /******************************************************************************
@@ -34,50 +34,51 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "miff_local.h"
+#include "gjson_local.h"
+
+/******************************************************************************
+local:
+variable:
+******************************************************************************/
+static GmemCloc _memCloc = NULL;
+static GmemDloc _memDloc = NULL;
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffByteSwap4
+func: _JsonMemCloc
 ******************************************************************************/
-void _MiffByteSwap4(Gmiff const * const miff, Gmiff4 * const value)
+void *_JsonMemCloc(Gcount const memByteCount)
 {
-   if (miff->isByteSwapping)
-   {
-      value->byte[0] ^= value->byte[3];
-      value->byte[3] ^= value->byte[0];
-      value->byte[0] ^= value->byte[3];
+   returnNullIf(memByteCount < 0);
 
-      value->byte[1] ^= value->byte[2];
-      value->byte[2] ^= value->byte[1];
-      value->byte[1] ^= value->byte[2];
-   }
+   return _memCloc((Gn4) memByteCount);
 }
 
 /******************************************************************************
-func: _MiffByteSwap8
+func: _JsonMemDloc
 ******************************************************************************/
-void _MiffByteSwap8(Gmiff const * const miff, Gmiff8 * const value)
+void _JsonMemDloc(void * const mem)
 {
-   if (miff->isByteSwapping)
-   {
-      value->byte[0] ^= value->byte[7];
-      value->byte[7] ^= value->byte[0];
-      value->byte[0] ^= value->byte[7];
+   _memDloc(mem);
+}
 
-      value->byte[1] ^= value->byte[6];
-      value->byte[6] ^= value->byte[1];
-      value->byte[1] ^= value->byte[6];
+/******************************************************************************
+func: _JsonMemStart
+******************************************************************************/
+void _JsonMemStart(GmemCloc const memClocFunc, GmemDloc const memDlocFunc)
+{
+   _memCloc = memClocFunc;
+   _memDloc = memDlocFunc;
+}
 
-      value->byte[2] ^= value->byte[5];
-      value->byte[5] ^= value->byte[2];
-      value->byte[2] ^= value->byte[5];
-
-      value->byte[3] ^= value->byte[4];
-      value->byte[4] ^= value->byte[3];
-      value->byte[3] ^= value->byte[4];
-   }
+/******************************************************************************
+func: _JsonMemStop
+******************************************************************************/
+void _JsonMemStop(void)
+{
+   _memCloc = NULL;
+   _memDloc = NULL;
 }

@@ -43,8 +43,7 @@ include:
 #include <stdlib.h>
 #include <locale.h>
 
-#include "b64lib.h"
-#include "mifflib.h"
+#include "gmifflib.h"
 
 /******************************************************************************
 local:
@@ -110,35 +109,35 @@ prototype:
 void               _MiffByteSwap4(           Gmiff const * const miff, Gmiff4 * const value);
 void               _MiffByteSwap8(           Gmiff const * const miff, Gmiff8 * const value);
 
-Gb              _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
-Gb              _MiffGetKey(              Gmiff       * const miff);
-Gb              _MiffGetLineSkip(         Gmiff       * const miff);
-Gb              _MiffGetNumInt(           Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
-Gb              _MiffGetNumReal(          Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
-Gb              _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
-Gb              _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
-Gb              _MiffGetPartEnd(          Gmiff       * const miff);
-GmiffData           _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
-Gstr            _MiffGetValueHeader(      Gmiff       * const miff);
-Gn8              _MiffGetValueBufferCount( Gmiff       * const miff);
+Gb                 _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
+Gb                 _MiffGetKey(              Gmiff       * const miff);
+Gb                 _MiffGetLineSkip(         Gmiff       * const miff);
+Gb                 _MiffGetNumInt(           Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
+Gb                 _MiffGetNumReal(          Gmiff       * const miff, Gn4 const count, Gn1 const * const buffer);
+Gb                 _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
+Gb                 _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
+Gb                 _MiffGetPartEnd(          Gmiff       * const miff);
+GmiffData          _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
+Gstr               _MiffGetValueHeader(      Gmiff       * const miff);
+Gcount             _MiffGetValueBufferCount( Gmiff       * const miff);
 
-void              *_MiffMemCreate(           Gn8 const memByteCount);
-void               _MiffMemDestroy(          void * const mem);
-void               _MiffMemStart(            MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc);
+void              *_MiffMemCloc(             Gcount const memByteCount);
+void               _MiffMemDloc(             void * const mem);
+void               _MiffMemStart(            GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
 void               _MiffMemStop(             void);
 
-#define            _MiffMemClearType(             TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
-#define            _MiffMemClearTypeArray( COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
-#define            _MiffMemCopyTypeArray(  COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
-#define            _MiffMemCreateType(            TYPE)           (TYPE *) _MiffMemCreate(                    sizeof(TYPE))
-#define            _MiffMemCreateTypeArray(COUNT, TYPE)           (TYPE *) _MiffMemCreate(          (COUNT) * sizeof(TYPE))
+#define            _MiffMemClearType(               TYPE, MEM)               memset((MEM), 0,               sizeof(TYPE))
+#define            _MiffMemClearTypeArray(   COUNT, TYPE, MEM)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
+#define            _MiffMemCopyTypeArray(    COUNT, TYPE, DST, SRC)          memcpy((DST), (SRC), (COUNT) * sizeof(TYPE))
+#define            _MiffMemClocType(                TYPE)           (TYPE *) _MiffMemCloc(                    sizeof(TYPE))
+#define            _MiffMemClocTypeArray(    COUNT, TYPE)           (TYPE *) _MiffMemCloc(          (COUNT) * sizeof(TYPE))
 
-Gb              _MiffSetBinByte(          Gmiff       * const miff, Gn1 const binByte);
-Gb              _MiffSetBuffer(           Gmiff const * const miff, Gn8     const bufCount, Gn1 const * const buf);
-Gb              _MiffSetNumInt(           Gmiff       * const miff, Gn8     const value);
-Gb              _MiffSetStr(              Gmiff       * const miff, Gn8     const strCount, Gstr const * const strBuffer);
-Gb              _MiffSetValueHeader(      Gmiff       * const miff, GmiffValue const value);
-Gb              _MiffSetValueData(        Gmiff       * const miff, GmiffValue const value);
+Gb                 _MiffSetBinByte(          Gmiff       * const miff, Gn1 const binByte);
+Gb                 _MiffSetBuffer(           Gmiff const * const miff, Gcount const bufCount, Gn1 const * const buf);
+Gb                 _MiffSetNumInt(           Gmiff       * const miff, Gn8    const value);
+Gb                 _MiffSetStr(              Gmiff       * const miff, Gcount const strCount, Gstr const * const strBuffer);
+Gb                 _MiffSetValueHeader(      Gmiff       * const miff, GmiffValue const value);
+Gb                 _MiffSetValueData(        Gmiff       * const miff, GmiffValue const value);
 
 #define            _MiffStrGetCount(STR)                          ((Gn4) strlen((char const *)    STR))
 

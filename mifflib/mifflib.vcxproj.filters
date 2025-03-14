@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mifflib.c">
+    <ClCompile Include="gmifflib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_set.c">
+    <ClCompile Include="gmiff_set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_byteSwap.c">
+    <ClCompile Include="gmiff_byteSwap.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_mem.c">
+    <ClCompile Include="gmiff_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="miff_get.c">
+    <ClCompile Include="gmiff_get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="mifflib.h">
+    <ClInclude Include="gmifflib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="miff_local.h">
+    <ClInclude Include="gmiff_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

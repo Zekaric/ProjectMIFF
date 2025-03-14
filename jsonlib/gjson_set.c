@@ -37,7 +37,7 @@ include:
 #include <stdio.h>
 #include <math.h>
 
-#include "json_local.h"
+#include "gjson_local.h"
 
 /******************************************************************************
 global:
@@ -46,9 +46,9 @@ function
 /******************************************************************************
 func: _JsonSetBuffer
 ******************************************************************************/
-Gb _JsonSetBuffer(Gjson const * const json, Gn8 const bufCount, Gn1 const * const buf)
+Gb _JsonSetBuffer(Gjson const * const json, Gcount const bufCount, Gn1 const * const buf)
 {
-   assert(bufCount < JsonN4_MAX);
+   assert(bufCount < GcountMAX);
    return json->setBuffer(json->dataRepo, (Gn4) bufCount, buf);
 }
 
@@ -156,7 +156,7 @@ Gb _JsonSetR(Gjson * const json, Gr8 const value)
 
    _sprintf_s_l((char *) ctemp, 80, "%.17g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, strlen(ctemp), (Gn1 *) ctemp);
+   return _JsonSetBuffer(json, (Gcount) strlen(ctemp), (Gn1 *) ctemp);
 }
 
 /******************************************************************************
@@ -181,5 +181,5 @@ Gb _JsonSetR4(Gjson * const json, Gr4 const value)
 
    _sprintf_s_l((char *) ctemp, 80, "%.8g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, strlen(ctemp), (Gn1 *) ctemp);
+   return _JsonSetBuffer(json, (Gcount) strlen(ctemp), (Gn1 *) ctemp);
 }

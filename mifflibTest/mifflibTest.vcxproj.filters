@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mifflibTest.c">
+    <ClCompile Include="gmifflibTest.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -36,7 +36,7 @@ include:
 ******************************************************************************/
 #include <stdio.h>
 
-#include "miff_local.h"
+#include "gmiff_local.h"
 
 /******************************************************************************
 local:
@@ -66,9 +66,9 @@ Gb _MiffSetBinByte(Gmiff * const miff, Gn1 const binByte)
 /******************************************************************************
 func: _MiffSetBuffer
 ******************************************************************************/
-Gb _MiffSetBuffer(Gmiff const * const miff, Gn8 const bufCount, Gn1 const * const buf)
+Gb _MiffSetBuffer(Gmiff const * const miff, Gcount const bufCount, Gn1 const * const buf)
 {
-   assert(bufCount < MiffN4_MAX);
+   assert(bufCount < GcountMAX);
    return miff->setBuffer(miff->dataRepo, (Gn4) bufCount, buf);
 }
 
@@ -88,11 +88,11 @@ Gb _MiffSetNumInt(Gmiff * const miff, Gn8 const value)
 /******************************************************************************
 func: _MiffSetStr
 ******************************************************************************/
-Gb _MiffSetStr(Gmiff * const miff, Gn8 const strLen, Gstr const * const str)
+Gb _MiffSetStr(Gmiff * const miff, Gcount const strLen, Gstr const * const str)
 {
-   Gn8   index;
-   Gn8   bufferIndex;
-   Gstr bufferData[66];
+   Gindex index;
+   Gindex bufferIndex;
+   Gstr   bufferData[66];
 
    bufferIndex = 0;
    _MiffMemClearTypeArray(66, Gn1, bufferData);
@@ -162,17 +162,17 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
    switch (value.type)
    {
-   case miffValueTypeNULL:
+   case gmiffValueTypeNULL:
       return         _MiffSetBuffer(miff, 1, (Gn1 *) "~");
 
-   case miffValueTypeBIN:
+   case gmiffValueTypeBIN:
       vtemp.inr.n = value.bufferCount;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
       returnFalseIf(!_SetNumInt( miff, vtemp));
       return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
 
-   case miffValueTypeSTR:
+   case gmiffValueTypeSTR:
       vtemp.inr.n = value.bufferCount;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
@@ -190,19 +190,19 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
 {
    switch (value.type)
    {
-   case miffValueTypeBIN:
+   case gmiffValueTypeBIN:
       returnFalseIf(
          value.bufferCount == miffBufferCountUNKNOWN ||
          !value.bufferData.bin);
       return _SetBinBuffer(miff, value.bufferCount, value.bufferData.bin);
 
-   case miffValueTypeNUM_INT:
+   case gmiffValueTypeNUM_INT:
       return _SetNumInt(miff, value);
 
-   case miffValueTypeNUM_REAL:
+   case gmiffValueTypeNUM_REAL:
       return _SetNumReal(miff, value);
 
-   case miffValueTypeSTR:
+   case gmiffValueTypeSTR:
       returnFalseIf(
          value.bufferCount == miffBufferCountUNKNOWN ||
          !value.bufferData.str);
@@ -338,11 +338,11 @@ static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
       {
          return _MiffSetBuffer(miff, 3, (Gn1 *) "Z40");
       }
-      else if (value.inr4.r == MiffR4_MAX)
+      else if (value.inr4.r == Gr4MAX)
       {
          return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4+M");
       }
-      else if (value.inr4.r == -MiffR4_MAX)
+      else if (value.inr4.r == -Gr4MAX)
       {
          return _MiffSetBuffer(miff, 4, (Gn1 *) "Z4-M");
       }
@@ -365,11 +365,11 @@ static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
       {
          return _MiffSetBuffer(miff, 3, (Gn1 *) "Z80");
       }
-      else if (value.inr.r == MiffR_MAX)
+      else if (value.inr.r == Gr8MAX)
       {
          return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8+M");
       }
-      else if (value.inr.r == -MiffR_MAX)
+      else if (value.inr.r == -Gr8MAX)
       {
          return _MiffSetBuffer(miff, 4, (Gn1 *) "Z8-M");
       }

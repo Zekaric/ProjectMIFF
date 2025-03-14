@@ -1,5 +1,5 @@
 /**************************************************************************************************
-file:       CommonLib
+file:       GrlMiffLib
 author:     Robbert de Groot
 copyright:  2025, Robbert de Groot
 
@@ -7,8 +7,8 @@ description:
 Header only file common to all projects.
 **************************************************************************************************/
 
-#if !defined (ROBBERT_DE_GROOT_COMMON_LIB_MIFF)
-#define       ROBBERT_DE_GROOT_COMMON_LIB_MIFF
+#if !defined (GRL_MIFF_LIB)
+#define       GRL_MIFF_LIB
 
 /**************************************************************************************************
 include:
@@ -16,6 +16,8 @@ include:
 #include <stdint.h>
 #include <float.h>
 #include <math.h>
+
+#include "GrlMiffLib.h"
 
 /**************************************************************************************************
 constant:
@@ -41,9 +43,19 @@ constant:
 #define Gr8MAX                DBL_MAX
 #define Gr8MIN                DBL_MIN
 
-#define GrR_NAN               NAN
-#define GrR4_EPSILON          FLT_EPSILON
-#define Gr8R_EPSILON          DBL_EPSILON
+#define GrNAN                 NAN
+#define Gr4EPSILON            FLT_EPSILON
+#define Gr8EPSILON            DBL_EPSILON
+
+#define GcountMAX             Gi4MAX
+
+#define GindexERROR           Gi4MIN
+#define GindexMAX             Gi4MAX
+
+#define GoffsetMAX            Gi4MAX
+#define GoffsetMIN            Gi4MIN
+
+#define GsizeMAX              Gi4MAX
 
 #endif
 
@@ -99,17 +111,17 @@ typedef enum
 
 typedef enum
 {
-   gmethodREADING,
-   gmethodWRITING,
-   gmethodWRITING_MINIMIZED
+   gmethodREAD,
+   gmethodWRITE,
+   gmethodWRITE_MINIMIZED
 } Gmethod;
 
 typedef void *(*GmemCloc)(    Gcount const memByteCount);
 typedef void  (*GmemDloc)(    void * const mem);
 
-typedef Gb  (*GgetBuffer)(  void * const dataSource,      Gcount const byteCount, Gn1       * const data);
+typedef Gb    (*GgetBuffer)(  void * const dataSource,      Gcount const byteCount, Gn1       * const data);
 
-typedef Gb  (*GsetBuffer)(  void * const dataDestination, Gcount const byteCount, Gn1 const * const data);
+typedef Gb    (*GsetBuffer)(  void * const dataDestination, Gcount const byteCount, Gn1 const * const data);
 
 /**************************************************************************************************
 macro:
@@ -143,6 +155,9 @@ macro:
 #define returnNullIf(C)    if ((C)) { return NULL; }
 #define returnTrueIf(C)    if ((C)) { return gbTRUE; }
 #define returnFalseIf(C)   if ((C)) { return gbFALSE; }
+#define returnFalse        return gbFALSE
+#define returnNull         return NULL
+#define returnTrue         return gbTRUE
 #define continueIf(C)      if ((C)) { continue; }
 #define breakIf(C)         if ((C)) { break; }
 

@@ -1,10 +1,10 @@
 /******************************************************************************
-file:       mem
+file:       byteSwap
 author:     Robbert de Groot
-copyright:  2021, Robbert de Groot
+copyright:  2021,
 
 description:
-memory functions
+Functions to swap bytes from little endian to big endian and vice versa.
 ******************************************************************************/
 
 /******************************************************************************
@@ -34,54 +34,50 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "miff_local.h"
-
-/******************************************************************************
-local:
-variable:
-******************************************************************************/
-static MiffMemCreate    _memCreate  = NULL;
-static MiffMemDestroy   _memDestroy = NULL;
+#include "gmiff_local.h"
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _MiffMemCreate
+func: _MiffByteSwap4
 ******************************************************************************/
-void *_MiffMemCreate(Gn8 const memByteCount)
+void _MiffByteSwap4(Gmiff const * const miff, Gmiff4 * const value)
 {
-   if (memByteCount > MiffN4_MAX)
+   if (miff->isByteSwapping)
    {
-      return NULL;
+      value->byte[0] ^= value->byte[3];
+      value->byte[3] ^= value->byte[0];
+      value->byte[0] ^= value->byte[3];
+
+      value->byte[1] ^= value->byte[2];
+      value->byte[2] ^= value->byte[1];
+      value->byte[1] ^= value->byte[2];
    }
-
-   return _memCreate((Gn4) memByteCount);
 }
 
 /******************************************************************************
-func: _MiffMemDestroy
+func: _MiffByteSwap8
 ******************************************************************************/
-void _MiffMemDestroy(void * const mem)
+void _MiffByteSwap8(Gmiff const * const miff, Gmiff8 * const value)
 {
-   _memDestroy(mem);
-}
+   if (miff->isByteSwapping)
+   {
+      value->byte[0] ^= value->byte[7];
+      value->byte[7] ^= value->byte[0];
+      value->byte[0] ^= value->byte[7];
 
-/******************************************************************************
-func: _MiffMemStart
-******************************************************************************/
-void _MiffMemStart(MiffMemCreate const memCreateFunc, MiffMemDestroy const memDestroyFunc)
-{
-   _memCreate        = memCreateFunc;
-   _memDestroy       = memDestroyFunc;
-}
+      value->byte[1] ^= value->byte[6];
+      value->byte[6] ^= value->byte[1];
+      value->byte[1] ^= value->byte[6];
 
-/******************************************************************************
-func: _MiffMemStop
-******************************************************************************/
-void _MiffMemStop(void)
-{
-   _memCreate        = NULL;
-   _memDestroy       = NULL;
+      value->byte[2] ^= value->byte[5];
+      value->byte[5] ^= value->byte[2];
+      value->byte[2] ^= value->byte[5];
+
+      value->byte[3] ^= value->byte[4];
+      value->byte[4] ^= value->byte[3];
+      value->byte[3] ^= value->byte[4];
+   }
 }

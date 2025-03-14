@@ -15,27 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="jsonlib.h">
+    <ClInclude Include="gjsonlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="json_local.h">
+    <ClInclude Include="gjson_local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="jsonlib.c">
+    <ClCompile Include="gjsonlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_mem.c">
+    <ClCompile Include="gjson_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_string.c">
+    <ClCompile Include="gjson_string.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_set.c">
+    <ClCompile Include="gjson_set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="json_get.c">
+    <ClCompile Include="gjson_get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

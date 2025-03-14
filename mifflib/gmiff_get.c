@@ -34,7 +34,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "miff_local.h"
+#include "gmiff_local.h"
 
 /******************************************************************************
 local:
@@ -130,12 +130,12 @@ Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer
       }
       if      (strIsEqual(4, buffer, "Z8+M"))
       {
-         miff->value.inr.r = MiffR_MAX;
+         miff->value.inr.r = Gr8MAX;
          returnTrue;
       }
       else if (strIsEqual(4, buffer, "Z8-M"))
       {
-         miff->value.inr.r = -MiffR_MAX;
+         miff->value.inr.r = -Gr8MAX;
          returnTrue;
       }
       else if (strIsEqual(4, buffer, "Z8+I"))
@@ -150,42 +150,42 @@ Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer
       }
       else if (strIsEqual(3, buffer, "Z8?"))
       {
-         miff->value.inr.r = NAN;
+         miff->value.inr.r = GrNAN;
          returnTrue;
       }
       else if (strIsEqual(3, buffer, "Z40"))
       {
-         miff->value.isR4 = miffTRUE;
+         miff->value.isR4 = gbTRUE;
          miff->value.inr4.r = 0;
       }
       else if (strIsEqual(4, buffer, "Z4+M"))
       {
-         miff->value.isR4 = miffTRUE;
-         miff->value.inr4.r = MiffR4_MAX;
+         miff->value.isR4 = gbTRUE;
+         miff->value.inr4.r = Gr4MAX;
          returnTrue;
       }
       else if (strIsEqual(4, buffer, "Z4-M"))
       {
-         miff->value.isR4 = miffTRUE;
-         miff->value.inr4.r = -MiffR4_MAX;
+         miff->value.isR4 = gbTRUE;
+         miff->value.inr4.r = -Gr4MAX;
          returnTrue;
       }
       else if (strIsEqual(4, buffer, "Z4+I"))
       {
-         miff->value.isR4 = miffTRUE;
+         miff->value.isR4 = gbTRUE;
          miff->value.inr4.r = HUGE_VALF;
          returnTrue;
       }
       else if (strIsEqual(4, buffer, "Z4-I"))
       {
-         miff->value.isR4 = miffTRUE;
+         miff->value.isR4 = gbTRUE;
          miff->value.inr4.r = -HUGE_VALF;
          returnTrue;
       }
       else if (strIsEqual(3, buffer, "Z4?"))
       {
-         miff->value.isR4 = miffTRUE;
-         miff->value.inr4.r = NAN;
+         miff->value.isR4 = gbTRUE;
+         miff->value.inr4.r = GrNAN;
          returnTrue;
       }
       // unknown Z value
@@ -234,7 +234,7 @@ Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer
    // float values always use lower case letters.
    else if (count == 8)
    {
-      miff->value.isR4   = miffTRUE;
+      miff->value.isR4   = gbTRUE;
       miff->value.inr4.n = (Gn4) value;
       _MiffByteSwap4(miff, &miff->value.inr4);
    }
@@ -270,7 +270,7 @@ Gb _MiffGetPart(Gmiff * const miff, Gb const trimLeadingTabs)
       }
       else
       {
-         trimTabs = miffFALSE;
+         trimTabs = gbFALSE;
       }
 
       // End of line or part, we are done reading.
@@ -289,10 +289,10 @@ Gb _MiffGetPart(Gmiff * const miff, Gb const trimLeadingTabs)
    miff->readData[index] = 0;
    miff->readCount       = index;
 
-   miff->isPartDone = miffTRUE;
+   miff->isPartDone = gbTRUE;
    if (byte == '\n')
    {
-      miff->isRecordDone = miffTRUE;
+      miff->isRecordDone = gbTRUE;
    }
 
    returnTrue;
@@ -337,10 +337,10 @@ Gb _MiffGetPartRest(Gmiff * const miff, Gn1 const start)
    miff->readData[index] = 0;
    miff->readCount       = index;
 
-   miff->isPartDone = miffTRUE;
+   miff->isPartDone = gbTRUE;
    if (byte == '\n')
    {
-      miff->isRecordDone = miffTRUE;
+      miff->isRecordDone = gbTRUE;
    }
 
    returnTrue;
@@ -375,10 +375,10 @@ Gb _MiffGetPartEnd(Gmiff * const miff)
               byte == '\t');
    }
 
-   miff->isPartDone = miffTRUE;
+   miff->isPartDone = gbTRUE;
    if (byte == '\n')
    {
-      miff->isRecordDone = miffTRUE;
+      miff->isRecordDone = gbTRUE;
    }
 
    returnTrue;
@@ -389,22 +389,22 @@ func: _MiffGetStrLetter
 ******************************************************************************/
 GmiffData _MiffGetStrLetter(Gmiff * const miff, Gstr * const letter)
 {
-   returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), miffDataERROR);
+   returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), gmiffDataERROR);
 
    // Escape single character slash, tab, and newline characters.
    switch (*letter)
    {
    case '\t':
-      miff->isPartDone = miffTRUE;
-      return miffDataIS_PART_DONE;
+      miff->isPartDone = gbTRUE;
+      return gmiffDataIS_PART_DONE;
 
    case '\n':
       // An actual tab or cursor return character should never be inside a string.
-      miff->isRecordDone = miffTRUE;
-      return miffDataIS_RECORD_DONE;
+      miff->isRecordDone = gbTRUE;
+      return gmiffDataIS_RECORD_DONE;
 
    case '\\':
-      returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), miffDataERROR);
+      returnIf(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) letter), gmiffDataERROR);
       switch (*letter)
       {
       case '\\':
@@ -425,7 +425,7 @@ GmiffData _MiffGetStrLetter(Gmiff * const miff, Gstr * const letter)
       break;
    }
 
-   return miffDataIS_DATA;
+   return gmiffDataIS_DATA;
 }
 
 /******************************************************************************
@@ -443,10 +443,10 @@ Gstr _MiffGetValueHeader(Gmiff * const miff)
 /******************************************************************************
 func: _MiffGetValueBufferCount
 ******************************************************************************/
-Gn8 _MiffGetValueBufferCount(Gmiff * const miff)
+Gcount _MiffGetValueBufferCount(Gmiff * const miff)
 {
-   Gn8     index;
-   Gstr   buffer[32];
+   Gindex     index;
+   Gstr       buffer[32];
    GmiffValue value;
 
    forCount(index, 32)
@@ -461,7 +461,7 @@ Gn8 _MiffGetValueBufferCount(Gmiff * const miff)
 
    _GetNumInt(miff, &value, (Gn4) index, (Gn1 *) buffer);
 
-   return value.inr.n;
+   return (Gcount) value.inr.n;
 }
 
 /******************************************************************************
@@ -479,7 +479,7 @@ static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 c
    // Out of range.
    // If positive, nTemp can't be larger than UINT64_MAX.
    // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
-   returnFalseIf(value->inr.n > ((Gn8) MiffI_MAX) + 1);
+   returnFalseIf(value->inr.n > ((Gn8) Gi8MAX) + 1);
 
    value->inr.i = -((Gi8) value->inr.n - 1) - 1;
 

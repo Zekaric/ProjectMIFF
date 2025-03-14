@@ -34,7 +34,7 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "json_local.h"
+#include "gjson_local.h"
 
 /******************************************************************************
 local:
@@ -90,10 +90,10 @@ GjsonType _JsonGetFalse(Gjson * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeCONSTANT_FALSE;
+      return gjsonTypeCONSTANT_FALSE;
    }
 
-   return jsonTypeERROR_CONSTANT_FALSE_EXPECTED;
+   return gjsonTypeERROR_CONSTANT_FALSE_EXPECTED;
 }
 
 /******************************************************************************
@@ -114,10 +114,10 @@ GjsonType _JsonGetNull(Gjson * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeCONSTANT_NULL;
+      return gjsonTypeCONSTANT_NULL;
    }
 
-   return jsonTypeERROR_CONSTANT_NULL_EXPECTED;
+   return gjsonTypeERROR_CONSTANT_NULL_EXPECTED;
 }
 
 /******************************************************************************
@@ -152,21 +152,21 @@ GjsonType _JsonGetNumber(Gjson * const json)
       if (!_JsonGetChar(json))
       {
          returnIf(isIntegerNumberFound, _JsonGetNumberInteger(json, numberStr));
-         return jsonTypeERROR_NUMBER_EXPECTED;
+         return gjsonTypeERROR_NUMBER_EXPECTED;
       }
 
       // Number is a Real
       if (json->lastByte == '.')
       {
          gotoIf(isIntegerNumberFound, GET_FRACTION);
-         return jsonTypeERROR_NUMBER_EXPECTED;
+         return gjsonTypeERROR_NUMBER_EXPECTED;
       }
       // Number is Real with an exponent
       if (json->lastByte == 'e' ||
           json->lastByte == 'E')
       {
          gotoIf(isIntegerNumberFound, GET_EXPONENT);
-         return jsonTypeERROR_NUMBER_EXPECTED;
+         return gjsonTypeERROR_NUMBER_EXPECTED;
       }
          
       // Add to the integer portion.
@@ -179,7 +179,7 @@ GjsonType _JsonGetNumber(Gjson * const json)
       else
       {
          returnIf(isIntegerNumberFound, _JsonGetNumberInteger(json, numberStr));
-         return jsonTypeERROR_NUMBER_EXPECTED;
+         return gjsonTypeERROR_NUMBER_EXPECTED;
       }
    }
 
@@ -193,7 +193,7 @@ GET_FRACTION:
       if (!_JsonGetChar(json))
       {
          returnIf(isFractionalNumberFound, _JsonGetNumberReal(json, numberStr));
-         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+         return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
       }
 
       // Exponent defined
@@ -201,7 +201,7 @@ GET_FRACTION:
           json->lastByte == 'E')
       {
          gotoIf(isFractionalNumberFound, GET_EXPONENT);
-         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+         return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
       }
 
       // Add to the fractional portion.
@@ -214,7 +214,7 @@ GET_FRACTION:
       else
       {
          returnIf(isFractionalNumberFound, _JsonGetNumberReal(json, numberStr));
-         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+         return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
       }
    }
 
@@ -224,7 +224,7 @@ GET_EXPONENT:
    numberStr[index++]    = 'e';
 
    // End of file in the middle of a number!
-   returnIf(!_JsonGetChar(json), jsonTypeERROR_NUMBER_REAL_EXPECTED);
+   returnIf(!_JsonGetChar(json), gjsonTypeERROR_NUMBER_REAL_EXPECTED);
 
    // Get the sign.
    if      ('0' <= json->lastByte && json->lastByte <= '9')
@@ -240,7 +240,7 @@ GET_EXPONENT:
    // Wasn't a sign or a digit after the 'e'.
    else if (json->lastByte != '+')
    {
-      return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+      return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
    }
    // If it was a "+" sign we just eat it.  Unnecessary.
 
@@ -250,7 +250,7 @@ GET_EXPONENT:
       if (!_JsonGetChar(json))
       {
          returnIf(isExponentNumberFound, _JsonGetNumberReal(json, numberStr));
-         return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+         return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
       }
 
       if ('0' <= json->lastByte && json->lastByte <= '9')
@@ -265,7 +265,7 @@ GET_EXPONENT:
    }
 
    returnIf(isExponentNumberFound, _JsonGetNumberReal(json, numberStr));
-   return jsonTypeERROR_NUMBER_REAL_EXPECTED;
+   return gjsonTypeERROR_NUMBER_REAL_EXPECTED;
 }
 
 /******************************************************************************
@@ -276,17 +276,17 @@ GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
    GjsonType type;
 
    // Default number type.
-   type = jsonTypeNUMBER_INTEGER;
+   type = gjsonTypeNUMBER_INTEGER;
 
    // This is a negative number.  Definitely not a natural number.
    if (numberStr[0] == '-')
    {
       json->value.n = _JsonStrToN(&numberStr[1]);
-      if      (json->value.n == ((Gn8) JsonI_MAX) + 1)
+      if      (json->value.n == ((Gn8) Gi8MAX) + 1)
       {
-         json->value.i = JsonI_MIN;
+         json->value.i = Gi8MIN;
       }
-      else if (json->value.n <= JsonI_MAX)
+      else if (json->value.n <= Gi8MAX)
       {
          json->value.i = - (Gi8) json->value.n;
       }
@@ -301,7 +301,7 @@ GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
 
    json->value.n = _JsonStrToN(numberStr);
    // This unsigned integer is small enough to be a signed integer.
-   if (json->value.n <= JsonI_MAX)
+   if (json->value.n <= Gi8MAX)
    {
       json->value.i = json->value.n;
    }
@@ -309,7 +309,7 @@ GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
    else
    {
       json->value.i = 0;
-      type          = jsonTypeNUMBER_NATURAL;
+      type          = gjsonTypeNUMBER_NATURAL;
    }
 
    json->value.r  = (Gr8)  json->value.n;
@@ -329,9 +329,9 @@ GjsonType _JsonGetNumberReal(Gjson * const json, Gstr * const str)
    json->value.n    = 0;
    json->value.r    = _atof_l(str, _JsonLocaleGet());
    json->value.r4   = (float) json->value.r;
-   json->value.type = jsonTypeNUMBER_REAL;
+   json->value.type = gjsonTypeNUMBER_REAL;
 
-   return jsonTypeNUMBER_REAL;
+   return gjsonTypeNUMBER_REAL;
 }
 
 /******************************************************************************
@@ -352,10 +352,10 @@ GjsonType _JsonGetTrue(Gjson * const json)
 
       json->lastByte = 0;
 
-      return jsonTypeCONSTANT_TRUE;
+      return gjsonTypeCONSTANT_TRUE;
    }
 
-   return jsonTypeERROR_CONSTANT_TRUE_EXPECTED;
+   return gjsonTypeERROR_CONSTANT_TRUE_EXPECTED;
 }
 
 /******************************************************************************

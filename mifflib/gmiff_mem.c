@@ -1,11 +1,10 @@
 /******************************************************************************
-file:       string
+file:       mem
 author:     Robbert de Groot
-company:    
 copyright:  2021, Robbert de Groot
 
 description:
-String functions
+memory functions
 ******************************************************************************/
 
 /******************************************************************************
@@ -35,80 +34,51 @@ SOFTWARE.
 /******************************************************************************
 include:
 ******************************************************************************/
-#include "json_local.h"
+#include "gmiff_local.h"
 
 /******************************************************************************
 local:
 variable:
 ******************************************************************************/
-static Gn1 _hex[128];
+static GmemCloc   _memCloc = NULL;
+static GmemDloc   _memDloc = NULL;
 
 /******************************************************************************
 global:
 function:
 ******************************************************************************/
 /******************************************************************************
-func: _JsonStrStart
+func: _MiffMemCloc
 ******************************************************************************/
-Gb _JsonStrStart(void)
+void *_MiffMemCloc(Gcount const memByteCount)
 {
-   _hex['0']    = 0x0;
-   _hex['1']    = 0x1;
-   _hex['2']    = 0x2;
-   _hex['3']    = 0x3;
-   _hex['4']    = 0x4;
-   _hex['5']    = 0x5;
-   _hex['6']    = 0x6;
-   _hex['7']    = 0x7;
-   _hex['8']    = 0x8;
-   _hex['9']    = 0x9;
-   _hex['a']    = 
-      _hex['A'] = 0xa;
-   _hex['b']    =
-      _hex['B'] = 0xb;
-   _hex['c']    =
-      _hex['C'] = 0xc;
-   _hex['d']    =
-      _hex['D'] = 0xd;
-   _hex['e']    =
-      _hex['E'] = 0xe;
-   _hex['f']    =
-      _hex['F'] = 0xf;
+   returnNullIf(memByteCount < 0);
 
-   returnTrue;
+   return _memCloc(memByteCount);
 }
 
 /******************************************************************************
-func: _JsonStrStop
+func: _MiffMemDloc
 ******************************************************************************/
-void _JsonStrStop(void)
+void _MiffMemDloc(void * const mem)
 {
-   return;
+   _memDloc(mem);
 }
 
 /******************************************************************************
-func: _JsonStrToHex
+func: _MiffMemStart
 ******************************************************************************/
-Gn1 _JsonStrToHex(Gn1 const value)
+void _MiffMemStart(GmemCloc const memClocFunc, GmemDloc const memDlocFunc)
 {
-   return _hex[value];
+   _memCloc = memClocFunc;
+   _memDloc = memDlocFunc;
 }
 
 /******************************************************************************
-func: _JsonStrToN
+func: _MiffMemStop
 ******************************************************************************/
-Gn8 _JsonStrToN(Gstr const * const str)
+void _MiffMemStop(void)
 {
-   Gi4  index;
-   Gn8   value;
-
-   value = 0;
-   for (index = 0;; index++)
-   {
-      breakIf(str[index] == 0);
-
-      value = value * 10 + str[index] - '0';
-   }
-
-   return value;
+   _memCloc = NULL;
+   _memDloc = NULL;
 }

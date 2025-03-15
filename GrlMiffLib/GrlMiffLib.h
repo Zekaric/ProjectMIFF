@@ -138,7 +138,7 @@ macro:
 // help in readability.
 // for* - finite loops.
 #define forCount(INDEX, COUNT)      for ((INDEX) = 0;           (INDEX) <  (COUNT); (INDEX) += 1)
-#define forCountDown(INDEX, COUNT)  for ((INDEX) = (COUNT) - 1; (INDEX) >= (COUNT); (INDEX) -= 1)
+#define forCountDown(INDEX, COUNT)  for ((INDEX) = (COUNT) - 1; (INDEX) >= 0;       (INDEX) -= 1)
 // loop* - infinite loop.
 #define loop                        for (;;)
 #define loopCount(INDEX)            for ((INDEX) = 0;            ; (INDEX) += 1)

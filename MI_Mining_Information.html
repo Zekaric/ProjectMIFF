@@ -260,7 +260,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
   - Surface model information.
     - Sub-blocked
 </code></pre>
-<p>File naming can help in file importing.  It is suggested to use the following file extensions...</p>
+<p>File extsion for the file is either...</p>
 <table>
 <thead>
 <tr>
@@ -270,28 +270,15 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 </thead>
 <tbody>
 <tr>
-<td>*.miff, *.json</td>
-<td>Still valid but can be anything.  What is it?</td>
+<td>*.MIMIFF</td>
+<td>For a MineInfo file using MIFF format</td>
 </tr>
 <tr>
-<td>*.miffMI, *.jsonMI</td>
-<td>for a very general Mine Information of anything mine related.</td>
-</tr>
-<tr>
-<td>*.miffMIDrill, *.jsonMIDrill</td>
-<td>for only Drillhole related data.</td>
-</tr>
-<tr>
-<td>*.miffMIGeom, *.jsonMIGeom</td>
-<td>for only Geometry related data.</td>
-</tr>
-<tr>
-<td>*.miffMIModel, *.jsonMIModel</td>
-<td>for only Model related data.</td>
+<td>*.MIJSON</td>
+<td>For a MineInfo file using JSON format</td>
 </tr>
 </tbody>
 </table>
-<p>This information is duplicated inside the file so reading in the file should match the extension but it will help the user if the extension is properly set and will make it easier on the software on how to read in the file if these are properly set.</p>
 <h2 id="21---header">2.1 - Header</h2>
 <p>MIFF has fields for a Sub-Format Name and Version.  For an MI file this will be set to...</p>
 <table>

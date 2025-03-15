@@ -126,18 +126,12 @@ The data mining companies need to keep track of and transfer around.
     - Sub-blocked
 ```
 
-File naming can help in file importing.  It is suggested to use the following file extensions...
+File extsion for the file is either...
 
 | Extension | File Contents |
 | --- | --- |
-| &#42;.miff, &#42;.json | Still valid but can be anything.  What is it? |
-| &#42;.miffMI, &#42;.jsonMI | for a very general Mine Information of anything mine related. |
-| &#42;.miffMIDrill, &#42;.jsonMIDrill | for only Drillhole related data. |
-| &#42;.miffMIGeom, &#42;.jsonMIGeom | for only Geometry related data. |
-| &#42;.miffMIModel, &#42;.jsonMIModel | for only Model related data. |
-
-
-This information is duplicated inside the file so reading in the file should match the extension but it will help the user if the extension is properly set and will make it easier on the software on how to read in the file if these are properly set.
+| &#42;.MIMIFF | For a MineInfo file using MIFF format |
+| &#42;.MIJSON | For a MineInfo file using JSON format |
 
 ## 2.1 - Header
 

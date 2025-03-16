@@ -60,15 +60,18 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-GmineInfo   *gmineInfoClocReader(                                                                        GgetBuffer getBufferFunc, void * const dataRepo);
-Gb           gmineInfoClocReaderContent(  GmineInfo * const gmineInfo,                                   GgetBuffer getBufferFunc, void * const dataRepo);
-GmineInfo   *gmineInfoClocWriter(                                      GmineInfoFileType const fileType, GsetBuffer setBufferFunc, void * const dataRepo);
-Gb           gmineInfoClocWriterContent(  GmineInfo * const gmineInfo, GmineInfoFileType const fileType, GsetBuffer setBufferFunc, void * const dataRepo);
+GmineInfo         *gmineInfoClocReader(                                                                                             GgetBuffer getBufferFunc, void * const dataRepo);
+Gb                 gmineInfoClocReaderContent(                 GmineInfo       * const gmineInfo,                                   GgetBuffer getBufferFunc, void * const dataRepo);
+GmineInfo         *gmineInfoClocWriter(                                                           GmineInfoFileType const fileType, GsetBuffer setBufferFunc, void * const dataRepo);
+Gb                 gmineInfoClocWriterContent(                 GmineInfo       * const gmineInfo, GmineInfoFileType const fileType, GsetBuffer setBufferFunc, void * const dataRepo);
 
-void         gmineInfoDloc(               GmineInfo * const gmineInfo);
-void         gmineInfoDlocContent(        GmineInfo * const gmineInfo);
+void               gmineInfoDloc(                              GmineInfo       * const gmineInfo);
+void               gmineInfoDlocContent(                       GmineInfo       * const gmineInfo);
 
-Gb           gmineInfoStart(              GmemCloc memClocFunc, GmemDloc memDlocFunc);
-void         gmineInfoStop(               void);
+GmineInfoBlockType gmineInfoGetCurrentBlockType(               GmineInfo const * const gmineInfo);
+
+GmineInfoBlockType gmineInfoSetCurrentBlockTypeToNextBlockType(GmineInfo       * const gmineInfo);
+Gb                 gmineInfoStart(                             GmemCloc memClocFunc, GmemDloc memDlocFunc);
+void               gmineInfoStop(                              void);
 
 #endif

@@ -90,7 +90,7 @@ GjsonType _JsonGetFalse(Gjson * const json)
 
       json->lastByte = 0;
 
-      return gjsonTypeCONSTANT_FALSE;
+      return gjsonTypeVALUE_FALSE;
    }
 
    return gjsonTypeERROR_CONSTANT_FALSE_EXPECTED;
@@ -114,7 +114,7 @@ GjsonType _JsonGetNull(Gjson * const json)
 
       json->lastByte = 0;
 
-      return gjsonTypeCONSTANT_NULL;
+      return gjsonTypeVALUE_NULL;
    }
 
    return gjsonTypeERROR_CONSTANT_NULL_EXPECTED;
@@ -276,7 +276,7 @@ GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
    GjsonType type;
 
    // Default number type.
-   type = gjsonTypeNUMBER_INTEGER;
+   type = gjsonTypeVALUE_NUMBER_INTEGER;
 
    // This is a negative number.  Definitely not a natural number.
    if (numberStr[0] == '-')
@@ -309,7 +309,7 @@ GjsonType _JsonGetNumberInteger(Gjson * const json, Gstr * const numberStr)
    else
    {
       json->value.i = 0;
-      type          = gjsonTypeNUMBER_NATURAL;
+      type          = gjsonTypeVALUE_NUMBER_NATURAL;
    }
 
    json->value.r  = (Gr8)  json->value.n;
@@ -329,9 +329,9 @@ GjsonType _JsonGetNumberReal(Gjson * const json, Gstr * const str)
    json->value.n    = 0;
    json->value.r    = _atof_l(str, _JsonLocaleGet());
    json->value.r4   = (float) json->value.r;
-   json->value.type = gjsonTypeNUMBER_REAL;
+   json->value.type = gjsonTypeVALUE_NUMBER_REAL;
 
-   return gjsonTypeNUMBER_REAL;
+   return gjsonTypeVALUE_NUMBER_REAL;
 }
 
 /**************************************************************************************************
@@ -352,7 +352,7 @@ GjsonType _JsonGetTrue(Gjson * const json)
 
       json->lastByte = 0;
 
-      return gjsonTypeCONSTANT_TRUE;
+      return gjsonTypeVALUE_TRUE;
    }
 
    return gjsonTypeERROR_CONSTANT_TRUE_EXPECTED;

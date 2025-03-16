@@ -171,9 +171,9 @@ void gjsonDlocContent(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonGetTypeElem
+func: gjsonGetType_ArrayValueOrEnd
 **************************************************************************************************/
-GjsonType gjsonGetTypeElem(Gjson * const json)
+GjsonType gjsonGetType_ArrayNextOrEnd(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -197,7 +197,36 @@ GjsonType gjsonGetTypeElem(Gjson * const json)
 
    case jsonSEPARATOR_CHAR:
       json->lastByte = 0;
-      return gjsonTypeSEPARATOR;
+      return gjsonGetType_ArrayValueOrEnd(json);
+   }
+
+   return gjsonTypeERROR_UNEXPECTED_CHAR;
+}
+
+/**************************************************************************************************
+func: gjsonGetType_ArrayValueOrEnd
+**************************************************************************************************/
+GjsonType gjsonGetType_ArrayValueOrEnd(Gjson * const json)
+{
+   returnIf(
+         !_isStarted ||
+         !json,
+      gjsonTypeNONE);
+
+   // Reset the value type.
+   json->value.type = gjsonTypeNONE;
+
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
+   {
+   case jsonARRAY_STOP_CHAR:
+      json->scope--;
+      json->method   =  json->scopeType[json->scope].method;
+      json->lastByte = 0;
+      return gjsonTypeARRAY_STOP;
 
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++].type = gjsonScopeTypeOBJECT;
@@ -212,7 +241,7 @@ GjsonType gjsonGetTypeElem(Gjson * const json)
 
    case jsonSTRING_QUOTE_CHAR:
       json->lastByte = 0;
-      return gjsonTypeSTRING_START;
+      return gjsonTypeVALUE_STRING_START;
 
    case '0':
    case '1':
@@ -241,12 +270,12 @@ GjsonType gjsonGetTypeElem(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonGetTypeFile
+func: gjsonGetType_FileElement
 
 The first function you should be calling to obtain the value initial start of
 the JSON file.
 **************************************************************************************************/
-GjsonType gjsonGetTypeFile(Gjson * const json)
+GjsonType gjsonGetType_FileElement(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -274,7 +303,7 @@ GjsonType gjsonGetTypeFile(Gjson * const json)
 
    case jsonSTRING_QUOTE_CHAR:
       json->lastByte = 0;
-      return gjsonTypeSTRING_START;
+      return gjsonTypeVALUE_STRING_START;
 
    case '0':
    case '1':
@@ -303,9 +332,83 @@ GjsonType gjsonGetTypeFile(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonGetTypeObj
+func: gjsonGetType_ObjectKeyOrEnd
 **************************************************************************************************/
-GjsonType gjsonGetTypeObj(Gjson * const json)
+GjsonType gjsonGetType_ObjectKeyOrEnd(Gjson * const json)
+{
+   returnIf(
+         !_isStarted ||
+         !json,
+      gjsonTypeNONE);
+
+   // Reset the value type.
+   json->value.type = gjsonTypeNONE;
+
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
+   {
+   case jsonOBJECT_STOP_CHAR:
+      json->scope--;
+      json->method   =  json->scopeType[json->scope].method;
+      json->lastByte = 0;
+      return gjsonTypeOBJECT_STOP;
+
+   case jsonSTRING_QUOTE_CHAR:
+      // Reading in the key and the key value separator.
+      json->lastByte = 0;
+
+      returnIf(!gjsonGetStr(json, GkeyBYTE_COUNT, json->key), gjsonTypeERROR_UNEXPECTED_CHAR);
+
+      _JsonEatSpace(json);
+
+      returnIf(json->lastByte != jsonKEY_VALUE_SEPARATOR_CHAR, gjsonTypeERROR_UNEXPECTED_CHAR);
+
+      return gjsonTypeOBJECT_KEY;
+   }
+
+   return gjsonTypeERROR_UNEXPECTED_CHAR;
+}
+
+/**************************************************************************************************
+func: gjsonGetType_ObjectNextOrEnd
+**************************************************************************************************/
+GjsonType gjsonGetType_ObjectNextOrEnd(Gjson * const json)
+{
+   returnIf(
+         !_isStarted ||
+         !json,
+      gjsonTypeNONE);
+
+   // Reset the value type.
+   json->value.type = gjsonTypeNONE;
+
+   // Eat space.
+   _JsonEatSpace(json);
+
+   // What do we have as a value.
+   switch (json->lastByte)
+   {
+   case jsonOBJECT_STOP_CHAR:
+      json->scope--;
+      json->method   =  json->scopeType[json->scope].method;
+      json->lastByte = 0;
+      return gjsonTypeOBJECT_STOP;
+
+   case jsonSEPARATOR_CHAR:
+      json->lastByte = 0;
+      return gjsonTypeSEPARATOR;
+   }
+
+   return gjsonTypeERROR_UNEXPECTED_CHAR;
+}
+
+/**************************************************************************************************
+func: gjsonGetType_ObjectValue
+**************************************************************************************************/
+GjsonType gjsonGetType_ObjectValue(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -329,7 +432,7 @@ GjsonType gjsonGetTypeObj(Gjson * const json)
 
    case jsonKEY_VALUE_SEPARATOR_CHAR:
       json->lastByte = 0;
-      return gjsonTypeKEY_VALUE_SEPARATOR;
+      return gjsonTypeINTERNAL_KEY_VALUE_SEPARATOR;
 
    case jsonSEPARATOR_CHAR:
       json->lastByte = 0;
@@ -347,7 +450,7 @@ GjsonType gjsonGetTypeObj(Gjson * const json)
 
    case jsonSTRING_QUOTE_CHAR:
       json->lastByte = 0;
-      return gjsonTypeSTRING_START;
+      return gjsonTypeVALUE_STRING_START;
 
    case '0':
    case '1':
@@ -378,16 +481,13 @@ GjsonType gjsonGetTypeObj(Gjson * const json)
 /**************************************************************************************************
 func: gjsonGetKey
 **************************************************************************************************/
-Gb gjsonGetKey(Gjson * const json, Gstr ** const key)
+Gstr const *gjsonGetKey(Gjson * const json)
 {
-   returnFalseIf(
+   returnNullIf(
       !_isStarted ||
-      !json       ||
-      !key);
+      !json);
 
-   *key = json->key;
-
-   returnTrue;
+   return json->key;
 }
 
 /**************************************************************************************************
@@ -400,7 +500,7 @@ Gb gjsonGetI(Gjson * const json, Gi8 * const value)
    returnFalseIf(
       !_isStarted ||
       !json       ||
-      json->value.type != gjsonTypeNUMBER_INTEGER);
+      json->value.type != gjsonTypeVALUE_NUMBER_INTEGER);
 
    *value = json->value.i;
 
@@ -422,8 +522,8 @@ Gb gjsonGetN(Gjson * const json, Gn8 *  const value)
 
    // Return is false if the type of the number is no a natural or if it is a negative integer.
    returnFalseIf(
-      !(json->value.type == gjsonTypeNUMBER_NATURAL    ||
-        (json->value.type == gjsonTypeNUMBER_INTEGER &&
+      !(json->value.type == gjsonTypeVALUE_NUMBER_NATURAL    ||
+        (json->value.type == gjsonTypeVALUE_NUMBER_INTEGER &&
          json->value.i    == (Gi8) json->value.n)));
 
    returnTrue;

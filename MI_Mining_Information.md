@@ -183,7 +183,6 @@ Inside the information block we have the following possible key values.  Not all
 
 | Name | Description |
 | --- | --- |
-| type | The type of the MI file.  See further down. |
 | company | The name of the company related to the mine. |
 | copyright | Copyright information |
 | author | Author or person who prepared this data. |
@@ -195,17 +194,6 @@ Inside the information block we have the following possible key values.  Not all
 | projectMin | Array of 3 real values in the given project system. |
 | projectMax | Array of 3 real values in the given project system. |
 | other | A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values. |
-
-Most keys are self explanatory.
-
-**[Type]** is one of...
-
-| Value | Description |
-| --- | --- |
-| Mixed | Combination of any of the types below. |
-| Drillhole | Only holds drillhole data. |
-| Geometry | Only holds geometry data. |
-| Model | Only holds model data. |
 
 **projectMin** and **projectMax** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.
 

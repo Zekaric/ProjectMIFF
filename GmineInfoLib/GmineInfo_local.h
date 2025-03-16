@@ -49,6 +49,19 @@ include:
 local:
 constant:
 **************************************************************************************************/
+#define STRINGIFY(x) #x
+
+#define HEADER_TYPE_STR       "Mining Information"
+#define HEADER_TYPE_LEN       18
+#define HEADER_VERSION_NUM    1
+#define HEADER_VERSION_STR    STRINGIFY(HEADER_VERSION_NUMBER)
+#define HEADER_VERSION_LEN    1
+#define KEY_FORMAT_STR        "format"
+#define KEY_FORMAT_LEN        6
+#define KEY_NAME_STR          "name"
+#define KEY_NAME_LEN          4
+#define KEY_VERSION_STR       "version"
+#define KEY_VERSION_LEN       7
 
 /**************************************************************************************************
 type:
@@ -66,6 +79,11 @@ prototype:
 global:
 function:
 **************************************************************************************************/
+Gb                 _MiIoClocReader(       GmineInfo       * const mineInfo);
+Gb                 _MiIoClocWriter(       GmineInfo       * const mineInfo);
+
+void               _MiIoDloc(             GmineInfo       * const mineInfo);
+
 void              *_MiMemCloc(            Gcount const memByteCount);
 void               _MiMemDloc(            void * const mem);
 void               _MiMemStart(           GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
@@ -73,8 +91,10 @@ void               _MiMemStop(            void);
 
 #define            _MiMemClearType(       MEM, TYPE)                      memset((MEM), 0,               sizeof(TYPE))
 #define            _MiMemClearTypeArray(  MEM, TYPE, COUNT)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
-#define            _MiMemCopyTypeArray(   MEM, COUNT, TYPE, SRC)          memcpy((MEM), (SRC), (COUNT) * sizeof(TYPE))
 #define            _MiMemClocType(               TYPE)           (TYPE *) _MiMemCloc(                    sizeof(TYPE))
 #define            _MiMemClocTypeArray(   COUNT, TYPE)           (TYPE *) _MiMemCloc(          (COUNT) * sizeof(TYPE))
-
+#define            _MiMemCopyTypeArray(   MEM, COUNT, TYPE, SRC)          memcpy((MEM), (SRC), (COUNT) * sizeof(TYPE))
+#define            _MiMemIsEqual(         COUNT, MEM, COUNT_ALT, MEM_ALT) (memcmp(MEM, MEM_ALT, COUNT) == 0)
+#define            _MiStrGetCount(        STR, MAX_LEN)                   strnlen(STR, MAX_LEN)
+#define            _MiStrIsEqual(         STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, GkeyBYTE_COUNT), STR, _MiStrGetCount(STR_ALT, GkeyBYTE_COUNT), STR_ALT)
 #endif

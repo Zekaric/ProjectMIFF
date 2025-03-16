@@ -49,24 +49,28 @@ typedef enum
    gmineInfoFileTypeMIFF,
 } GmineInfoFileType;
 
-// Blocks are written out in this order as well.
+// Order of these items are in the order of the blocks in a MineInfo file.
 typedef enum
 {
    gmineInfoBlockTypeNONE,
 
-   gmineInfoBlockTypeINFO,
-   gmineInfoBlockTypePROP,
+   gmineInfoBlockTypeINFORMATION,
+   gmineInfoBlockTypePROPERTIES,
    gmineInfoBlockTypeITEM,
    gmineInfoBlockTypeIMAGE,
    gmineInfoBlockTypeGEOMETRY,
    gmineInfoBlockTypeDRILL_HOLE,
    gmineInfoBlockTypeMODEL,
 
+   // No more block types.
+   gmineInfoBlockType_END,
+
    gmineInfoBlockTypeCOUNT
 } GmineInfoBlockType;
 
 typedef struct
 {
+   Gb                 isWriting;
    Gb                 isByteSwapping;
    GgetBuffer         getBuffer;
    GsetBuffer         setBuffer;
@@ -74,7 +78,7 @@ typedef struct
    void              *dataRepo;
 
    GmineInfoFileType  fileType;
-   GmineInfoBlockType currBlock;
+   GmineInfoBlockType currentBlockType;
 
    Gmiff             *miffFile;
    Gjson             *jsonFile;

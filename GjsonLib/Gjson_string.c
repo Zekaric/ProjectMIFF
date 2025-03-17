@@ -61,7 +61,7 @@ Gb _JsonStrStart(void)
    _hex['7']    = 0x7;
    _hex['8']    = 0x8;
    _hex['9']    = 0x9;
-   _hex['a']    = 
+   _hex['a']    =
       _hex['A'] = 0xa;
    _hex['b']    =
       _hex['B'] = 0xb;

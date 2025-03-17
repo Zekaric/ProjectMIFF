@@ -1349,8 +1349,6 @@ Gb gjsonStart(GmemCloc const memClocFunc, GmemDloc const memDlocFunc)
 {
    returnTrueIf(_isStarted);
 
-   // We can live without compress. (sometimes)
-   // we can't live without dynamic memory.
    returnFalseIf(
       !memClocFunc ||
       !memDlocFunc)

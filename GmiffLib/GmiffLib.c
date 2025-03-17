@@ -738,22 +738,20 @@ Gb gmiffStart(GmemCloc const memClocFunc, GmemDloc const memDlocFunc)
 {
    Gmiff4 value;
 
+   returnTrueIf(_isStarted);
+
+   returnFalseIf(
+      !memClocFunc ||
+      !memDlocFunc)
+
+   _MiffMemStart(memClocFunc, memDlocFunc);
+
    // Check if we need to byte swap.  Little Endian vs Big Endian.
    value.n = 1;
    if (value.byte[0] == 1)
    {
       _isByteSwapping = gbTRUE;
    }
-
-   returnTrueIf(_isStarted);
-
-   // We can live without compress.  (sometimes)
-   // we can't live without dynamic memory.
-   returnFalseIf(
-      !memClocFunc ||
-      !memDlocFunc)
-
-   _MiffMemStart(memClocFunc, memDlocFunc);
 
 #if 0
    _locale = _create_locale(LC_ALL, "C");

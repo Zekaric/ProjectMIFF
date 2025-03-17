@@ -197,7 +197,7 @@ Gb              gjsonSetValueStr(               Gjson       * const json,       
 Gb              gjsonSetValueStrLetter(         Gjson       * const json,                     Gstr         const value);
 Gb              gjsonSetValueStrStart(          Gjson       * const json);
 Gb              gjsonSetValueStrStop(           Gjson       * const json);
-Gb              gjsonStart(                     GmemCloc const memCreate, GmemDloc const memDestroy);
+Gb              gjsonStart(                     GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
 void            gjsonStop(                      void);
 
 #define gjsonSetArrayValueArrayStart(   JSON)                  gjsonSetArrayStart(     JSON)
@@ -210,14 +210,14 @@ void            gjsonStop(                      void);
 #define gjsonSetArrayValueI(            JSON,       VALUE)     gjsonSetValueI(         JSON,       VALUE)
 #define gjsonSetArrayValueN(            JSON,       VALUE)     gjsonSetValueN(         JSON,       VALUE)
 #define gjsonSetArrayValueNull(         JSON)                  gjsonSetValueNull(      JSON)
+#define gjsonSetArrayValueObjectStart(  JSON)                  gjsonSetObjectStart(    JSON)
+#define gjsonSetArrayValueObjectStop(   JSON)                  gjsonSetObjectStop(     JSON)
 #define gjsonSetArrayValueR(            JSON,       VALUE)     gjsonSetValueR(         JSON,       VALUE)
 #define gjsonSetArrayValueR4(           JSON,       VALUE)     gjsonSetValueR4(        JSON,       VALUE)
 #define gjsonSetArrayValueStr(          JSON,       VALUE)     gjsonSetValueStr(       JSON,       VALUE)
 #define gjsonSetArrayValueStrLetter(    JSON,       VALUE)     gjsonSetValueStrLetter( JSON,       VALUE)
 #define gjsonSetArrayValueStrStart(     JSON)                  gjsonSetValueStrStart(  JSON)
 #define gjsonSetArrayValueStrStop(      JSON)                  gjsonSetValueStrStop(   JSON)
-#define gjsonSetArrayValueObjectStart(  JSON)                  gjsonSetObjectStart(    JSON)
-#define gjsonSetArrayValueObjectStop(   JSON)                  gjsonSetObjectStop(     JSON)
 
 #define gjsonSetFileValueArrayStart(   JSON)                   gjsonSetArrayStart(     JSON)
 #define gjsonSetFileValueArrayStop(    JSON)                   gjsonSetArrayStop(      JSON)
@@ -229,32 +229,32 @@ void            gjsonStop(                      void);
 #define gjsonSetFileValueI(            JSON,       VALUE)      gjsonSetValueI(         JSON,       VALUE)
 #define gjsonSetFileValueN(            JSON,       VALUE)      gjsonSetValueN(         JSON,       VALUE)
 #define gjsonSetFileValueNull(         JSON)                   gjsonSetValueNull(      JSON)
+#define gjsonSetFileValueObjectStart(  JSON)                   gjsonSetObjectStart(    JSON)
+#define gjsonSetFileValueObjectStop(   JSON)                   gjsonSetObjectStop(     JSON)
 #define gjsonSetFileValueR(            JSON,       VALUE)      gjsonSetValueR(         JSON,       VALUE)
 #define gjsonSetFileValueR4(           JSON,       VALUE)      gjsonSetValueR4(        JSON,       VALUE)
 #define gjsonSetFileValueStr(          JSON,       VALUE)      gjsonSetValueStr(       JSON,       VALUE)
 #define gjsonSetFileValueStrLetter(    JSON,       VALUE)      gjsonSetValueStrLetter( JSON,       VALUE)
 #define gjsonSetFileValueStrStart(     JSON)                   gjsonSetValueStrStart(  JSON)
 #define gjsonSetFileValueStrStop(      JSON)                   gjsonSetValueStrStop(   JSON)
-#define gjsonSetFileValueObjectStart(  JSON)                   gjsonSetObjectStart(    JSON)
-#define gjsonSetFileValueObjectStop(   JSON)                   gjsonSetObjectStop(     JSON)
 
-#define gjsonSetObjectValueArrayStart( JSON, KEY)              { gjsonSetKey(          JSON, KEY); gjsonSetArrayStart(   JSON);              }
+#define gjsonSetObjectValueArrayStart( JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetArrayStart(   JSON))
 #define gjsonSetObjectValueArrayStop(  JSON)                   gjsonSetArrayStop(      JSON)
-#define gjsonSetObjectValueBin(        JSON, KEY, SIZE, VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueBin(     JSON, SIZE, VALUE); }
+#define gjsonSetObjectValueBin(        JSON, KEY, SIZE, VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueBin(     JSON, SIZE, VALUE))
 #define gjsonSetObjectValueBinByte(    JSON,            VALUE) gjsonSetValueBinByte(   JSON,       VALUE)
-#define gjsonSetObjectValueBinStart(   JSON, KEY)              { gjsonSetKey(          JSON, KEY); gjsonSetValueBinStart(JSON, SIZE, VALUE); }
+#define gjsonSetObjectValueBinStart(   JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetValueBinStart(JSON, SIZE, VALUE))
 #define gjsonSetObjectValueBinStop(    JSON)                   gjsonSetValueBinStop(   JSON)
-#define gjsonSetObjectValueBool(       JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueBool(    JSON,       VALUE); }
-#define gjsonSetObjectValueI(          JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueI(       JSON,       VALUE); }
-#define gjsonSetObjectValueN(          JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueN(       JSON,       VALUE); }
-#define gjsonSetObjectValueNull(       JSON, KEY)              { gjsonSetKey(          JSON, KEY); gjsonSetValueNull(    JSON);              }
-#define gjsonSetObjectValueR(          JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueR(       JSON,       VALUE); }
-#define gjsonSetObjectValueR4(         JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueR4(      JSON,       VALUE); }
-#define gjsonSetObjectValueStr(        JSON, KEY,       VALUE) { gjsonSetKey(          JSON, KEY); gjsonSetValueStr(     JSON,       VALUE); }
-#define gjsonSetObjectValueStrLetter(  JSON,            VALUE) gjsonSetValueStr(       JSON,       VALUE)
-#define gjsonSetObjectValueStrStart(   JSON, KEY)              { gjsonSetKey(          JSON, KEY); gjsonSetValueStrStart(JSON);              }
-#define gjsonSetObjectValueStrStop(    JSON)                   gjsonSetValueStrStop(   JSON)
-#define gjsonSetObjectValueObjectStart(JSON, KEY)              { gjsonSetKey(          JSON, KEY); gjsonSetObjectStart(  JSON);              }
+#define gjsonSetObjectValueBool(       JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueBool(    JSON,       VALUE))
+#define gjsonSetObjectValueI(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueI(       JSON,       VALUE))
+#define gjsonSetObjectValueN(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueN(       JSON,       VALUE))
+#define gjsonSetObjectValueNull(       JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetValueNull(    JSON))
+#define gjsonSetObjectValueObjectStart(JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetObjectStart(  JSON))
 #define gjsonSetObjectValueObjectStop( JSON)                   gjsonSetObjectStop(     JSON)
+#define gjsonSetObjectValueR(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueR(       JSON,       VALUE))
+#define gjsonSetObjectValueR4(         JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueR4(      JSON,       VALUE))
+#define gjsonSetObjectValueStr(        JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueStr(     JSON,       VALUE))
+#define gjsonSetObjectValueStrLetter(  JSON,            VALUE) gjsonSetValueStr(       JSON,       VALUE)
+#define gjsonSetObjectValueStrStart(   JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetValueStrStart(JSON))
+#define gjsonSetObjectValueStrStop(    JSON)                   gjsonSetValueStrStop(   JSON)
 
 #endif

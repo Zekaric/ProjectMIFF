@@ -62,7 +62,8 @@ function:
 /**************************************************************************************************
 func: gmineInfoClocReader
 **************************************************************************************************/
-GmineInfo *gmineInfoClocReader(GgetBuffer getBufferFunc, void * const dataRepo)
+GmineInfo *gmineInfoClocReader(GmineInfoFileType const fileType, GgetBuffer getBufferFunc,
+   void * const dataRepo)
 {
    GmineInfo *gmineInfo;
 
@@ -71,7 +72,7 @@ GmineInfo *gmineInfoClocReader(GgetBuffer getBufferFunc, void * const dataRepo)
    gmineInfo = _MiMemClocType(GmineInfo);
    returnNullIf(!gmineInfo);
 
-   if (!gmineInfoClocReaderContent(gmineInfo, getBufferFunc, dataRepo))
+   if (!gmineInfoClocReaderContent(gmineInfo, fileType, getBufferFunc, dataRepo))
    {
       _MiMemDloc(gmineInfo);
       return NULL;
@@ -83,8 +84,8 @@ GmineInfo *gmineInfoClocReader(GgetBuffer getBufferFunc, void * const dataRepo)
 /**************************************************************************************************
 func: gmineInfoClocReaderContent
 **************************************************************************************************/
-Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GgetBuffer getBufferFunc,
-   void * const dataRepo)
+Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GmineInfoFileType const fileType,
+   GgetBuffer getBufferFunc, void * const dataRepo)
 {
    returnFalseIf(
       !_isStarted ||
@@ -92,13 +93,13 @@ Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GgetBuffer getBufferF
 
    _MiMemClearType(gmineInfo, GmineInfo);
 
+   gmineInfo->fileType         = fileType;
    gmineInfo->dataRepo         = dataRepo;
    gmineInfo->getBuffer        = getBufferFunc;
    gmineInfo->currentBlockType = gmineInfoBlockTypeNONE;
 
-   // returnFalseIf(!_miClocReader(gmineInfo));
-
-   return gbTRUE;
+   // Start reading the file header.
+   return _MiIoClocReader(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -139,9 +140,8 @@ Gb gmineInfoClocWriterContent(GmineInfo * const gmineInfo, GmineInfoFileType con
    gmineInfo->setBuffer        = setBufferFunc;
    gmineInfo->currentBlockType = gmineInfoBlockTypeINFORMATION;
 
-   returnFalseIf(!_MiIoClocWriter(gmineInfo));
-
-   return gbTRUE;
+   // Start by writing out the header for the file.
+   return _MiIoClocWriter(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -216,6 +216,11 @@ Gb gmineInfoStart(GmemCloc memClocFunc, GmemDloc memDlocFunc)
    returnFalseIf(
       !memClocFunc ||
       !memDlocFunc)
+
+   // Start support libraries.
+   returnFalseIf(
+      !gjsonStart(memClocFunc, memDlocFunc) ||
+      !gmiffStart(memClocFunc, memDlocFunc));
 
    _isStarted = gbTRUE;
 

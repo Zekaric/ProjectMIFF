@@ -168,7 +168,7 @@ GjsonType _JsonGetNumber(Gjson * const json)
          gotoIf(isIntegerNumberFound, GET_EXPONENT);
          return gjsonTypeERROR_NUMBER_EXPECTED;
       }
-         
+
       // Add to the integer portion.
       if ('0' <= json->lastByte && json->lastByte <= '9')
       {

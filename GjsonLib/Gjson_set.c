@@ -102,7 +102,7 @@ Gb _JsonSetN(Gjson * const json, Gn8 const value)
    Gn1 string[32];
 
    temp = value;
-   for (index = 0; ; index++)
+   loopCount(index)
    {
       digit = temp % 10;
       temp  = temp / 10;

@@ -607,170 +607,77 @@ static Gb _SetBuffer(void * const dataRepo, Gcount const byteCount, Gn1 const * 
 }
 
 /**************************************************************************************************
-func: _JsonTestRead
+func: _JsonTestInt
 **************************************************************************************************/
-static Gb _JsonTestKey(Gjson * const JSON, char const * const KEY)
-{
-   returnFalseIf(strcmp(gjsonGetKey(JSON), KEY) == 0);
-   returnTrue;
-}
-
-static Gb _JsonTestInt(Gjson * const JSON, Gi8 const VALUE)
+static Gb _JsonTestInt(Gjson * const json, Gi8 const value)
 {
    Gi8 itemp;
 
    returnFalseIf(
-      gjsonGetType_ObjectValue(JSON) != gjsonTypeVALUE_NUMBER_INTEGER ||
-      !gjsonGetI(JSON, &itemp)                                        ||
-      itemp != VALUE);
+      !gjsonGetI(json, &itemp) ||
+      itemp != value);
    returnTrue;
 }
 
-static Gb _JsonTestNat(Gjson * const JSON, Gn8 const VALUE)
+/**************************************************************************************************
+func: _JsonTestNat
+**************************************************************************************************/
+static Gb _JsonTestNat(Gjson * const json, Gn8 const value)
 {
-   GjsonType type;
-   Gn8    ntemp;
-
-   type = gjsonGetType_ObjectValue(JSON);
+   Gn8 ntemp;
 
    returnFalseIf(
-      !(type == gjsonTypeVALUE_NUMBER_INTEGER ||
-        type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-      !gjsonGetN(JSON, &ntemp)                  ||
-      ntemp != VALUE);
+      !gjsonGetN(json, &ntemp) ||
+      ntemp != value);
 
    returnTrue;
 }
 
-static Gb _JsonTestReal(Gjson * const JSON, Gr8 VALUE)
+/**************************************************************************************************
+func: _JsonTestReal
+**************************************************************************************************/
+static Gb _JsonTestReal(Gjson * const json, Gr8 const value)
 {
-   GjsonType        type;
-   Gr8           rtemp;
-   GjsonStrLetter   jletter;
-   int             sindex;
-   Gstr         sletter,
-                   stemp[256];
+   Gr8 rtemp;
 
-   type = gjsonGetType_ObjectValue(JSON);
-
-   // potential for a constant
-   if (type == gjsonTypeVALUE_STRING_START)
-   {
-      for (sindex = 0; ; sindex++)
-      {
-         jletter = gjsonGetStrLetter(JSON, &sletter);
-         if (jletter == gjsonStrLetterDONE)  break;
-         if (jletter == gjsonStrLetterERROR) break;
-         stemp[sindex] = sletter;
-      }
-      stemp[sindex] = 0;
-
-      if      (strcmp(stemp, "Infinity") == 0)
-      {
-         rtemp = HUGE_VAL;
-      }
-      else if (strcmp(stemp, "-Infinity") == 0)
-      {
-         rtemp = -HUGE_VAL;
-      }
-      else if (strcmp(stemp, "NaN") == 0)
-      {
-         rtemp = GrNAN;
-      }
-      else
-      {
-         returnFalse;
-      }
-
-      goto CHECK_VAL;
-   }
+   returnFalseIf(!gjsonGetR(json, &rtemp));
 
    returnFalseIf(
-      !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-        type == gjsonTypeVALUE_NUMBER_INTEGER ||
-        type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-      !gjsonGetR(JSON, &rtemp));
-
-CHECK_VAL:
-   returnFalseIf(
-      ( isnan(VALUE) && !isnan(rtemp)) ||
-      (!isnan(VALUE) && rtemp != VALUE));
+      ( isnan(value) && !isnan(rtemp)) ||
+      (!isnan(value) && rtemp != value));
 
    returnTrue;
 }
 
-static Gb _JsonTestReal4(Gjson * const JSON, Gr4 VALUE)
+/**************************************************************************************************
+func: _JsonTestReal4
+**************************************************************************************************/
+static Gb _JsonTestReal4(Gjson * const json, Gr4 value)
 {
-   GjsonType       type;
-   Gr4             r4temp;
-   GjsonStrLetter  jletter;
-   int             sindex;
-   Gstr            sletter,
-                   stemp[256];
+   Gr4 r4temp;
 
-   type = gjsonGetType_ObjectValue(JSON);
-
-   // potential for a constant
-   if (type == gjsonTypeVALUE_STRING_START)
-   {
-      for (sindex = 0; ; sindex++)
-      {
-         jletter = gjsonGetStrLetter(JSON, &sletter);
-
-         breakIf(
-            jletter == gjsonStrLetterDONE ||
-            jletter == gjsonStrLetterERROR);
-
-         stemp[sindex] = sletter;
-      }
-      stemp[sindex] = 0;
-
-      if      (strcmp(stemp, "Infinity") == 0)
-      {
-         r4temp = HUGE_VAL;
-      }
-      else if (strcmp(stemp, "-Infinity") == 0)
-      {
-         r4temp = -HUGE_VAL;
-      }
-      else if (strcmp(stemp, "NaN") == 0)
-      {
-         r4temp = GrNAN;
-      }
-      else
-      {
-         returnFalse;
-      }
-
-      goto CHECK_VAL;
-   }
+   returnFalseIf(!gjsonGetR4(json, &r4temp));
 
    returnFalseIf(
-      !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-        type == gjsonTypeVALUE_NUMBER_INTEGER ||
-        type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-      !gjsonGetR4(     JSON, &r4temp));
-
-CHECK_VAL:
-   returnFalseIf(
-      ( isnan(VALUE) && !isnan(r4temp)) ||
-      (!isnan(VALUE) && r4temp != VALUE));
+      ( isnan(value) && !isnan(r4temp)) ||
+      (!isnan(value) && r4temp != value));
 
    returnTrue;
 }
 
-static Gb _JsonTestStr(Gjson * const JSON, char const * const VALUE)
+/**************************************************************************************************
+func: _JsonTestStr
+**************************************************************************************************/
+static Gb _JsonTestStr(Gjson * const json, char const * const value)
 {
    int            sindex;
    GjsonStrLetter jletter;
    Gstr           sletter,
                   stemp[256];
 
-   returnFalseIf(gjsonGetType_ObjectValue(JSON) != gjsonTypeVALUE_STRING_START);
-
-   for (sindex = 0; ; sindex++)
+   loopCount(sindex)
    {
-      jletter = gjsonGetStrLetter(JSON, &sletter);
+      jletter = gjsonGetStrLetter(json, &sletter);
 
       breakIf(
          jletter == gjsonStrLetterDONE ||
@@ -781,94 +688,36 @@ static Gb _JsonTestStr(Gjson * const JSON, char const * const VALUE)
    returnFalseIf(jletter == gjsonStrLetterERROR);
 
    stemp[sindex] = 0;
-   returnFalseIf(strcmp(stemp, VALUE) != 0);
+   returnFalseIf(strcmp(stemp, value) != 0);
 
    returnTrue;
 }
 
-static Gb _JsonTestBin(Gjson * const JSON, int binCount, Gn1 const * const binData)
+/**************************************************************************************************
+func: _JsonTestBin
+**************************************************************************************************/
+static Gb _JsonTestBin(Gjson * const json, int binCount, Gn1 const * const binData)
 {
    int bindex;
    Gn1 byte;
-   Gn1 binBuffer[3*256];
+   Gn1 binBuffer[3 * 256];
 
-
-   returnFalseIf(gjsonGetType_ObjectValue(JSON) != gjsonTypeVALUE_STRING_START);
-   for (bindex = 0; bindex < binCount; bindex++)
+   forCount(bindex, binCount)
    {
-      returnFalseIf(gjsonGetStrBinByte(JSON, &byte) != gjsonStrLetterNORMAL);
+      returnFalseIf(gjsonGetStrBinByte(json, &byte) != gjsonStrLetterNORMAL);
 
       binBuffer[bindex] = byte;
    }
-   returnFalseIf(gjsonGetStrLetter(JSON, (Gstr *) &byte) != gjsonStrLetterDONE);
+   returnFalseIf(gjsonGetStrLetter(json, (Gstr *) &byte) != gjsonStrLetterDONE);
 
    returnFalseIf(memcmp(binBuffer, binData, binCount) != 0);
 
    returnTrue;
 }
 
-static Gb _JsonTestGetNull(Gjson * const json, char const * const key)
-{
-   returnFalseIf(
-      !_JsonTestKey(json, key) ||
-      gjsonGetType_ObjectValue(json) != gjsonTypeVALUE_NULL);
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetBool(Gjson * const json, char const * const key, Gb const value)
-{
-   GjsonType type;
-
-   returnFalseIf(!_JsonTestKey(json, key));
-
-   type = gjsonGetType_ObjectValue(json);
-   returnFalseIf(value == gbTRUE  && type != gjsonTypeVALUE_TRUE);
-   returnFalseIf(value == gbFALSE && type != gjsonTypeVALUE_FALSE);
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetInt(Gjson * const json, char const * const key, Gi8 const value)
-{
-   returnFalseIf(!_JsonTestKey(json, key));
-   returnFalseIf(!_JsonTestInt(json, value));
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetNat(Gjson * const json, char const * const key, Gn8 const value)
-{
-   returnFalseIf(!_JsonTestKey(json, key));
-   returnFalseIf(!_JsonTestNat(json, value));
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetReal(Gjson * const json, char const * const key, Gr8 const value)
-{
-   returnFalseIf(!_JsonTestKey(json, key));
-   returnFalseIf(!_JsonTestReal(json, value));
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetReal4(Gjson * const json, char const * const key, Gr4 const value)
-{
-   returnFalseIf(!_JsonTestKey(json, key));
-   returnFalseIf(!_JsonTestReal4(json, value));
-
-   returnTrue;
-}
-
-static Gb _JsonTestGetStr(Gjson * const json, char const * const key, Gstr const * const value)
-{
-   returnFalseIf(!_JsonTestKey(json, key));
-   returnFalseIf(!_JsonTestStr(json, value));
-
-   returnTrue;
-}
-
+/**************************************************************************************************
+func: _JsonTestRead
+**************************************************************************************************/
 static Gb _JsonTestRead(Gstr const * const fileName)
 {
    int           index;
@@ -887,7 +736,7 @@ static Gb _JsonTestRead(Gstr const * const fileName)
    json   = NULL;
    result = gbFALSE;
 
-   loop
+   breakScope
    {
       msg = "Open file";
       breakIf(fopen_s(&file, fileName, "rb") != 0);
@@ -901,731 +750,782 @@ static Gb _JsonTestRead(Gstr const * const fileName)
       msg = "Looking for object start";
       breakIf(gjsonGetType_FileElement( json) != gjsonTypeOBJECT_START);
 
-      breakIf(gjsonGetType_ObjectKeyOrEnd(JSON) == gjsonTypeOBJECT_STOP);
-
       msg = "Null";
-      breakIf(!_JsonTestGetNull(json, msg));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_NULL);
 
       msg = "True";
-      breakIf(!_JsonTestGetBool(json, msg, gbTRUE));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_TRUE);
 
       msg = "False";
-      breakIf(!_JsonTestGetBool(json, msg, gbFALSE));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_FALSE);
 
       msg = "I 0";
-      breakIf(!_JsonTestGetInt(json, msg, 0));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestInt(json, 0));
 
       msg = "I 1";
-      breakIf(!_JsonTestGetInt(json, msg, 1));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestInt(json, 1));
 
       msg = "I -1";
-      breakIf(!_JsonTestGetInt(json, msg, -1));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestInt(json, -1));
 
       msg = "I MAX";
-      breakIf(!_JsonTestGetInt(json, msg, Gi8MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestInt(json, Gi8MAX));
 
       msg = "I MIN";
-      breakIf(!_JsonTestGetInt(json, msg, Gi8MIN));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestInt(json, Gi8MIN));
 
       msg = "N 0";
-      breakIf(!_JsonTestGetNat(json, msg, 0));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestNat(json, 0));
 
       msg = "N 1";
-      breakIf(!_JsonTestGetNat(json, msg, 1));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestNat(json, 1));
 
       msg = "N MAX";
-      breakIf(!_JsonTestGetNat(json, msg, Gn8MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestNat(json, Gn8MAX));
 
       msg = "R 0";
-      breakIf(!_JsonTestGetReal(json, msg, 0.0));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, 0.0));
 
       msg = "R 1";
-      breakIf(!_JsonTestGetReal(json, msg, 1.0));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, 1.0));
 
       msg = "R -1";
-      breakIf(!_JsonTestGetReal(json, msg, -1.0));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, -1.0));
 
       msg = "R PI";
-      breakIf(!_JsonTestGetReal(json, msg, 3.1415926535897932));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
       msg = "R EPS";
-      breakIf(!_JsonTestGetReal(json, msg, Gr8EPSILON));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, Gr8EPSILON));
 
       msg = "R MAX";
-      breakIf(!_JsonTestGetReal(json, msg, Gr8MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, Gr8MAX));
 
       msg = "R -MAX";
-      breakIf(!_JsonTestGetReal(json, msg, -Gr8MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, -Gr8MAX));
 
       msg = "R INF";
-      breakIf(!_JsonTestGetReal(json, msg, HUGE_VAL));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, Gr8INF));
 
       msg = "R -INF";
-      breakIf(!_JsonTestGetReal(json, msg, -HUGE_VAL));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, -Gr8INF));
 
       msg = "R GrNAN";
-      breakIf(!_JsonTestGetReal(json, msg, GrNAN));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal(json, GrNAN));
 
       msg = "R4 0";
-      breakIf(!_JsonTestGetReal4(json, msg, 0.0f));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, 0.0f));
 
       msg = "R4 1";
-      breakIf(!_JsonTestGetReal4(json, msg, 1.0f));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, 1.0f));
 
       msg = "R4 -1";
-      breakIf(!_JsonTestGetReal4(json, msg, -1.0f));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, -1.0f));
 
       msg = "R4 PI";
-      breakIf(!_JsonTestGetReal4(json, msg, 3.1415926535897932f));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, 3.1415926535897932f));
 
       msg = "R4 EPS";
-      breakIf(!_JsonTestGetReal4(json, msg, Gr4EPSILON));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, Gr4EPSILON));
 
       msg = "R4 MAX";
-      breakIf(!_JsonTestGetReal4(json, msg, Gr4MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, Gr4MAX));
 
       msg = "R4 -MAX";
-      breakIf(!_JsonTestGetReal4(json, msg, -Gr4MAX));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, -Gr4MAX));
 
       msg = "R4 INF";
-      breakIf(!_JsonTestGetReal4(json, msg, HUGE_VALF));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, Gr4INF));
 
       msg = "R4 -INF";
-      breakIf(!_JsonTestGetReal4(json, msg, -HUGE_VALF));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, -Gr4INF));
 
       msg = "R4 GrNAN";
-      breakIf(!_JsonTestGetReal4(json, msg, GrNAN));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestReal4(json, GrNAN));
 
       msg = "String";
-      breakIf(
-         !_JsonTestGetStr(
-            json,
-            msg,
-            "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeStr(gjsonGetType_ObjectValue(json)));
+      breakIf(!_JsonTestStr(json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
 
 #if defined(INCLUDE_BIN)
       msg = "Binary";
-      breakIf(!_JsonTestKey(json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
+      breakIf(!gjsonIsTypeBin(gjsonGetType_ObjectValue(json)));
       breakIf(!_JsonTestBin(json, 3 * 256, _binary));
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 #endif
 
       msg = "Bool Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 100; index++)
+      loopCount(index)
       {
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 100);
+
          breakIf(
             !((type == gjsonTypeVALUE_TRUE  && _bools[index] == 1) ||
               (type == gjsonTypeVALUE_FALSE && _bools[index] == 0)));
-
-         type = gjsonGetType_ArrayNextOrEnd(json);
-         breakIf(
-            (index <  99 && type == gjsonTypeARRAY_STOP) ||
-            (index == 99 && type != gjsonTypeARRAY_STOP));
       }
       breakIf(index != 100);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "I Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 256; index++)
+      loopCount(index)
       {
-         breakIf(
-            type != gjsonTypeVALUE_NUMBER_INTEGER ||
-            !gjsonGetI(json, &itemp)              ||
-            (Gi8) _narray[index] != itemp);
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 256);
 
-         type = gjsonGetType_ArrayNextOrEnd(json);
          breakIf(
-            (index <  255 && type == gjsonTypeARRAY_STOP) ||
-            (index == 255 && type != gjsonTypeARRAY_STOP));
+            !gjsonIsTypeI(type)        ||
+            !gjsonGetI(json, &itemp)   ||
+            (Gi8) _narray[index] != itemp);
       }
       breakIf(index != 256);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "N Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 256; index++)
+      loopCount(index)
       {
-         breakIf(
-            !(type == gjsonTypeVALUE_NUMBER_NATURAL ||
-              type == gjsonTypeVALUE_NUMBER_INTEGER)  ||
-            !gjsonGetN(json, &ntemp)            ||
-            _narray[index] != ntemp);
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 256);
 
-         type = gjsonGetType_ArrayNextOrEnd(json);
          breakIf(
-            (index <  255 && type == gjsonTypeARRAY_STOP) ||
-            (index == 255 && type != gjsonTypeARRAY_STOP));
+            !gjsonIsTypeN(type)        ||
+            !gjsonGetN(json, &ntemp)   ||
+            _narray[index] != ntemp);
       }
       breakIf(index != 256);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "R Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 300; index++)
+      loopCount(index)
       {
-         breakIf(
-            !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-              type == gjsonTypeVALUE_NUMBER_INTEGER ||
-              type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-            !gjsonGetR(json, &rtemp)            ||
-            _reals8[index] != rtemp);
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 300);
 
-         type = gjsonGetTypeElem(json);
          breakIf(
-            (index <  299 && type == gjsonTypeARRAY_STOP) ||
-            (index == 299 && type != gjsonTypeARRAY_STOP));
+            !gjsonIsTypeR(type) ||
+            !_JsonTestReal(json, _reals8[index]));
       }
       breakIf(index != 300);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "R4 Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 300; index++)
+      loopCount(index)
       {
-         breakIf(
-            !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-              type == gjsonTypeVALUE_NUMBER_INTEGER ||
-              type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-            !gjsonGetR4(json, &r4temp)          ||
-            _reals4[index] != r4temp);
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 300);
 
-         type = gjsonGetTypeElem(json);
          breakIf(
-            (index <  299 && type == gjsonTypeARRAY_STOP) ||
-            (index == 299 && type != gjsonTypeARRAY_STOP));
+            !gjsonIsTypeR(type) ||
+            !_JsonTestReal4(json, _reals4[index]));
       }
       breakIf(index != 300);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "String Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 10; index++)
+      loopCount(index)
       {
-         breakIf(
-            type != gjsonTypeVALUE_STRING_START  ||
-            !gjsonGetStr(json, 256, stemp)       ||
-            strcmp(stemp, _strings[index]) != 0);
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 10);
 
-         type = gjsonGetTypeElem(json);
          breakIf(
-            (index <  9 && type == gjsonTypeARRAY_STOP) ||
-            (index == 9 && type != gjsonTypeARRAY_STOP))
-            break;
+            !gjsonIsTypeStr(type)            ||
+            !gjsonGetStr(json, 256, stemp)   ||
+            strcmp(stemp, _strings[index]) != 0);
       }
       breakIf(index != 10);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
 #if defined(INCLUDE_BIN)
       msg = "Binary Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-      type = gjsonGetType_ArrayValueOrEnd(json);
-      for (index = 0; index < 3; index++)
+      loopCount(index)
       {
-         breakIf(!_JsonTestBin(json, 3 * 256, _binary));
+         type = gjsonGetType_ArrayValueOrStop(json);
+         breakIf(type == gjsonTypeARRAY_STOP);
+         continueIf(index >= 3);
 
-         type = gjsonGetType_ArrayNextOrEnd(json);
          breakIf(
-            (index <  2 && type == gjsonTypeARRAY_STOP) ||
-            (index == 2 && type != gjsonTypeARRAY_STOP))
-            break;
+            !gjsonIsTypeBin(type) ||
+            !_JsonTestBin(json, 3 * 256, _binary));
       }
       breakIf(index != 3);
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 #endif
 
       msg = "User Type IntStrReal";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
       {
-         breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-         breakIf(!gjsonGetI(json, &itemp));
-         breakIf(itemp != 42);
+         breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+         breakIf(!_JsonTestInt(json, 42));
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-         breakIf(!gjsonGetStr(json, 256, stemp));
-         breakIf(strcmp(stemp, "Yes, but what is the question?"));
+         breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+         breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-         breakIf(!gjsonGetR(json, &rtemp));
-         breakIf(rtemp != 3.1415926535897932);
+         breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+         breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+         breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
       }
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "User Type IntStrReal Array";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
       {
-         breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeARRAY_START);
+         breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
          {
-            breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-            breakIf(!gjsonGetI(json, &itemp));
-            breakIf(itemp != 42);
+            breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestInt(json, 42));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-            breakIf(!gjsonGetStr(json, 256, stemp));
-            breakIf(strcmp(stemp, "Yes, but what is the question?"));
+            breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-            breakIf(!gjsonGetR(json, &rtemp));
-            breakIf(rtemp != 3.1415926535897932);
+            breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
          }
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_START);
+         breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
          {
-            breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-            breakIf(!gjsonGetI(json, &itemp));
-            breakIf(itemp != 42);
+            breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestInt(json, 42));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-            breakIf(!gjsonGetStr(json, 256, stemp));
-            breakIf(strcmp(stemp, "Yes, but what is the question?"));
+            breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-            breakIf(!gjsonGetR(json, &rtemp));
-            breakIf(rtemp != 3.1415926535897932);
+            breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
          }
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_START);
+         breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
          {
-            breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-            breakIf(!gjsonGetI(json, &itemp));
-            breakIf(itemp != 42);
+            breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestInt(json, 42));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-            breakIf(!gjsonGetStr(json, 256, stemp));
-            breakIf(strcmp(stemp, "Yes, but what is the question?"));
+            breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-            breakIf(!gjsonGetR(json, &rtemp));
-            breakIf(rtemp != 3.1415926535897932);
+            breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
          }
 
-         breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+         breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
       }
-      breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
       msg = "Block";
-      breakIf(!_JsonTestKey(  json, msg));
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+      breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(gjsonGetType_ObjectValue(json) != gjsonTypeOBJECT_START);
       {
-         breakIf(gjsonGetType_ObjectKeyOrEnd(JSON) == gjsonTypeOBJECT_STOP);
-
          msg = "Null";
-         breakIf(!_JsonTestGetNull(json, msg));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_NULL);
 
          msg = "True";
-         breakIf(!_JsonTestGetBool(json, msg, gbTRUE));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_TRUE);
 
          msg = "False";
-         breakIf(!_JsonTestGetBool(json, msg, gbFALSE));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(gjsonGetType_ObjectValue(    json) != gjsonTypeVALUE_FALSE);
 
          msg = "I 0";
-         breakIf(!_JsonTestGetInt(json, msg, 0));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestInt(json, 0));
 
          msg = "I 1";
-         breakIf(!_JsonTestGetInt(json, msg, 1));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestInt(json, 1));
 
          msg = "I -1";
-         breakIf(!_JsonTestGetInt(json, msg, -1));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestInt(json, -1));
 
          msg = "I MAX";
-         breakIf(!_JsonTestGetInt(json, msg, Gi8MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestInt(json, Gi8MAX));
 
          msg = "I MIN";
-         breakIf(!_JsonTestGetInt(json, msg, Gi8MIN));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeI(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestInt(json, Gi8MIN));
 
          msg = "N 0";
-         breakIf(!_JsonTestGetNat(json, msg, 0));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestNat(json, 0));
 
          msg = "N 1";
-         breakIf(!_JsonTestGetNat(json, msg, 1));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestNat(json, 1));
 
          msg = "N MAX";
-         breakIf(!_JsonTestGetNat(json, msg, Gn8MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestNat(json, Gn8MAX));
 
          msg = "R 0";
-         breakIf(!_JsonTestGetReal(json, msg, 0.0));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, 0.0));
 
          msg = "R 1";
-         breakIf(!_JsonTestGetReal(json, msg, 1.0));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, 1.0));
 
          msg = "R -1";
-         breakIf(!_JsonTestGetReal(json, msg, -1.0));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, -1.0));
 
          msg = "R PI";
-         breakIf(!_JsonTestGetReal(json, msg, 3.1415926535897932));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
          msg = "R EPS";
-         breakIf(!_JsonTestGetReal(json, msg, Gr8EPSILON));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, Gr8EPSILON));
 
          msg = "R MAX";
-         breakIf(!_JsonTestGetReal(json, msg, Gr8MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, Gr8MAX));
 
          msg = "R -MAX";
-         breakIf(!_JsonTestGetReal(json, msg, -Gr8MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, -Gr8MAX));
 
          msg = "R INF";
-         breakIf(!_JsonTestGetReal(json, msg, HUGE_VAL));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, Gr8INF));
 
          msg = "R -INF";
-         breakIf(!_JsonTestGetReal(json, msg, -HUGE_VAL));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, -Gr8INF));
 
          msg = "R GrNAN";
-         breakIf(!_JsonTestGetReal(json, msg, GrNAN));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal(json, GrNAN));
 
          msg = "R4 0";
-         breakIf(!_JsonTestGetReal4(json, msg, 0.0f));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, 0.0f));
 
          msg = "R4 1";
-         breakIf(!_JsonTestGetReal4(json, msg, 1.0f));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, 1.0f));
 
          msg = "R4 -1";
-         breakIf(!_JsonTestGetReal4(json, msg, -1.0f));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, -1.0f));
 
          msg = "R4 PI";
-         breakIf(!_JsonTestGetReal4(json, msg, 3.1415926535897932f));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, 3.1415926535897932f));
 
          msg = "R4 EPS";
-         breakIf(!_JsonTestGetReal4(json, msg, Gr4EPSILON));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, Gr4EPSILON));
 
          msg = "R4 MAX";
-         breakIf(!_JsonTestGetReal4(json, msg, Gr4MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, Gr4MAX));
 
          msg = "R4 -MAX";
-         breakIf(!_JsonTestGetReal4(json, msg, -Gr4MAX));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, -Gr4MAX));
 
          msg = "R4 INF";
-         breakIf(!_JsonTestGetReal4(json, msg, HUGE_VALF));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, Gr4INF));
 
          msg = "R4 -INF";
-         breakIf(!_JsonTestGetReal4(json, msg, -HUGE_VALF));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, -Gr4INF));
 
          msg = "R4 GrNAN";
-         breakIf(!_JsonTestGetReal4(json, msg, GrNAN));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestReal4(json, GrNAN));
 
          msg = "String";
-         breakIf(
-            !_JsonTestGetStr(
-               json,
-               msg,
-               "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeStr(gjsonGetType_ObjectValue(json)));
+         breakIf(!_JsonTestStr(json, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
 
    #if defined(INCLUDE_BIN)
          msg = "Binary";
-         breakIf(!_JsonTestKey(json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
+         breakIf(!gjsonIsTypeBin(gjsonGetType_ObjectValue(json)));
          breakIf(!_JsonTestBin(json, 3 * 256, _binary));
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
    #endif
 
          msg = "Bool Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 100; index++)
+         loopCount(index)
          {
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 100);
+
             breakIf(
                !((type == gjsonTypeVALUE_TRUE  && _bools[index] == 1) ||
                  (type == gjsonTypeVALUE_FALSE && _bools[index] == 0)));
-
-            type = gjsonGetType_ArrayNextOrEnd(json);
-            breakIf(
-               (index <  99 && type == gjsonTypeARRAY_STOP) ||
-               (index == 99 && type != gjsonTypeARRAY_STOP));
          }
          breakIf(index != 100);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "I Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 256; index++)
+         loopCount(index)
          {
-            breakIf(
-               type != gjsonTypeVALUE_NUMBER_INTEGER ||
-               !gjsonGetI(json, &itemp)              ||
-               (Gi8) _narray[index] != itemp);
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 256);
 
-            type = gjsonGetType_ArrayNextOrEnd(json);
             breakIf(
-               (index <  255 && type == gjsonTypeARRAY_STOP) ||
-               (index == 255 && type != gjsonTypeARRAY_STOP));
+               !gjsonIsTypeI(type)        ||
+               !gjsonGetI(json, &itemp)   ||
+               (Gi8) _narray[index] != itemp);
          }
          breakIf(index != 256);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "N Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 256; index++)
+         loopCount(index)
          {
-            breakIf(
-               !(type == gjsonTypeVALUE_NUMBER_NATURAL ||
-                 type == gjsonTypeVALUE_NUMBER_INTEGER)  ||
-               !gjsonGetN(json, &ntemp)            ||
-               _narray[index] != ntemp);
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 256);
 
-            type = gjsonGetType_ArrayNextOrEnd(json);
             breakIf(
-               (index <  255 && type == gjsonTypeARRAY_STOP) ||
-               (index == 255 && type != gjsonTypeARRAY_STOP));
+               !gjsonIsTypeN(type)        ||
+               !gjsonGetN(json, &ntemp)   ||
+               _narray[index] != ntemp);
          }
          breakIf(index != 256);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "R Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 300; index++)
+         loopCount(index)
          {
-            breakIf(
-               !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-                 type == gjsonTypeVALUE_NUMBER_INTEGER ||
-                 type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-               !gjsonGetR(json, &rtemp)            ||
-               _reals8[index] != rtemp);
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 300);
 
-            type = gjsonGetTypeElem(json);
             breakIf(
-               (index <  299 && type == gjsonTypeARRAY_STOP) ||
-               (index == 299 && type != gjsonTypeARRAY_STOP));
+               !gjsonIsTypeR(type)        ||
+               !gjsonGetR(json, &rtemp)   ||
+               _reals8[index] != rtemp);
          }
          breakIf(index != 300);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "R4 Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 300; index++)
+         loopCount(index)
          {
-            breakIf(
-               !(type == gjsonTypeVALUE_NUMBER_REAL    ||
-                 type == gjsonTypeVALUE_NUMBER_INTEGER ||
-                 type == gjsonTypeVALUE_NUMBER_NATURAL)  ||
-               !gjsonGetR4(json, &r4temp)          ||
-               _reals4[index] != r4temp);
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 300);
 
-            type = gjsonGetTypeElem(json);
             breakIf(
-               (index <  299 && type == gjsonTypeARRAY_STOP) ||
-               (index == 299 && type != gjsonTypeARRAY_STOP));
+               !gjsonIsTypeR(type)        ||
+               !gjsonGetR4(json, &r4temp) ||
+               _reals4[index] != r4temp);
          }
          breakIf(index != 300);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "String Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 10; index++)
+         loopCount(index)
          {
-            breakIf(
-               type != gjsonTypeVALUE_STRING_START  ||
-               !gjsonGetStr(json, 256, stemp)       ||
-               strcmp(stemp, _strings[index]) != 0);
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 10);
 
-            type = gjsonGetTypeElem(json);
             breakIf(
-               (index <  9 && type == gjsonTypeARRAY_STOP) ||
-               (index == 9 && type != gjsonTypeARRAY_STOP))
-               break;
+               !gjsonIsTypeStr(type)            ||
+               !gjsonGetStr(json, 256, stemp)   ||
+               strcmp(stemp, _strings[index]) != 0);
          }
          breakIf(index != 10);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
    #if defined(INCLUDE_BIN)
          msg = "Binary Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
-         type = gjsonGetType_ArrayValueOrEnd(json);
-         for (index = 0; index < 3; index++)
+         loopCount(index)
          {
-            breakIf(!_JsonTestBin(json, 3 * 256, _binary));
+            type = gjsonGetType_ArrayValueOrStop(json);
+            breakIf(type == gjsonTypeARRAY_STOP);
+            continueIf(index >= 3);
 
-            type = gjsonGetType_ArrayNextOrEnd(json);
             breakIf(
-               (index <  2 && type == gjsonTypeARRAY_STOP) ||
-               (index == 2 && type != gjsonTypeARRAY_STOP))
-               break;
+               !gjsonIsTypeBin(type) ||
+               !_JsonTestBin(json, 3 * 256, _binary));
          }
          breakIf(index != 3);
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
    #endif
 
          msg = "User Type IntStrReal";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
          {
-            breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-            breakIf(!gjsonGetI(json, &itemp));
-            breakIf(itemp != 42);
+            breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestInt(json, 42));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-            breakIf(!gjsonGetStr(json, 256, stemp));
-            breakIf(strcmp(stemp, "Yes, but what is the question?"));
+            breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-            breakIf(!gjsonGetR(json, &rtemp));
-            breakIf(rtemp != 3.1415926535897932);
+            breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+            breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
          }
-         breakIf(gjsonGetType_ObjectNextOrEnd(JSON) == gjsonTypeOBJECT_STOP);
 
          msg = "User Type IntStrReal Array";
-         breakIf(!_JsonTestKey(  json, msg));
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(gjsonGetType_ObjectValue(  json) != gjsonTypeARRAY_START);
          {
-            breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeARRAY_START);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
             {
-               breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-               breakIf(!gjsonGetI(json, &itemp));
-               breakIf(itemp != 42);
+               breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestInt(json, 42));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-               breakIf(!gjsonGetStr(json, 256, stemp));
-               breakIf(strcmp(stemp, "Yes, but what is the question?"));
+               breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-               breakIf(!gjsonGetR(json, &rtemp));
-               breakIf(rtemp != 3.1415926535897932);
+               breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+               breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
             }
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_START);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
             {
-               breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-               breakIf(!gjsonGetI(json, &itemp));
-               breakIf(itemp != 42);
+               breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestInt(json, 42));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-               breakIf(!gjsonGetStr(json, 256, stemp));
-               breakIf(strcmp(stemp, "Yes, but what is the question?"));
+               breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-               breakIf(!gjsonGetR(json, &rtemp));
-               breakIf(rtemp != 3.1415926535897932);
+               breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+               breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
             }
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_START);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_START);
             {
-               breakIf(gjsonGetType_ArrayValueOrEnd(json) != gjsonTypeVALUE_NUMBER_INTEGER);
-               breakIf(!gjsonGetI(json, &itemp));
-               breakIf(itemp != 42);
+               breakIf(!gjsonIsTypeI(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestInt(json, 42));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_STRING_START);
-               breakIf(!gjsonGetStr(json, 256, stemp));
-               breakIf(strcmp(stemp, "Yes, but what is the question?"));
+               breakIf(!gjsonIsTypeStr(gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestStr(json, "Yes, but what is the question?"));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeVALUE_NUMBER_REAL);
-               breakIf(!gjsonGetR(json, &rtemp));
-               breakIf(rtemp != 3.1415926535897932);
+               breakIf(!gjsonIsTypeR(  gjsonGetType_ArrayValueOrStop(json)));
+               breakIf(!_JsonTestReal(json, 3.1415926535897932));
 
-               breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+               breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
             }
 
-            breakIf(gjsonGetType_ArrayNextOrEnd(json) != gjsonTypeARRAY_STOP);
+            breakIf(gjsonGetType_ArrayValueOrStop(json) != gjsonTypeARRAY_STOP);
          }
 
-         breakIf(gjsonGetType_ObjectNextOrEnd(json) != gjsonTypeOBJECT_STOP);
+         breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_STOP);
       }
 
-      breakIf(gjsonGetType_ObjectNextOrEnd(json) != gjsonTypeOBJECT_STOP);
+      breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_STOP);
 
       msg    = "NO";
       result = gbTRUE;
-      break;
    }
    printf("JSON Read: %s ERROR\n", msg);
 
@@ -1649,7 +1549,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
    json   = NULL;
    result = gbFALSE;
 
-   loop
+   breakScope
    {
       breakIf(fopen_s(&file, fileName, "wb") != 0);
 
@@ -1682,8 +1582,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          gjsonSetObjectValueR(      json, "R EPS",     Gr8EPSILON);
          gjsonSetObjectValueR(      json, "R MAX",     Gr8MAX);
          gjsonSetObjectValueR(      json, "R -MAX",   -Gr8MAX);
-         gjsonSetObjectValueR(      json, "R INF",     HUGE_VAL);
-         gjsonSetObjectValueR(      json, "R -INF",   -HUGE_VAL);
+         gjsonSetObjectValueR(      json, "R INF",     Gr8INF);
+         gjsonSetObjectValueR(      json, "R -INF",   -Gr8INF);
          gjsonSetObjectValueR(      json, "R GrNAN",   GrNAN);
 
          gjsonSetObjectValueR4(     json, "R4 0",      0.0f);
@@ -1693,8 +1593,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          gjsonSetObjectValueR4(     json, "R4 EPS",    Gr4EPSILON);
          gjsonSetObjectValueR4(     json, "R4 MAX",    Gr4MAX);
          gjsonSetObjectValueR4(     json, "R4 -MAX",  -Gr4MAX);
-         gjsonSetObjectValueR4(     json, "R4 INF",    HUGE_VALF);
-         gjsonSetObjectValueR4(     json, "R4 -INF",  -HUGE_VALF);
+         gjsonSetObjectValueR4(     json, "R4 INF",    Gr4INF);
+         gjsonSetObjectValueR4(     json, "R4 -INF",  -Gr4INF);
          gjsonSetObjectValueR4(     json, "R4 GrNAN",  GrNAN);
 
          gjsonSetObjectValueStr(    json, "String",    "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
@@ -1704,90 +1604,90 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
 #endif
 
          gjsonSetObjectValueArrayStart(json, "Bool Array");
-         for (index = 0; index < 100; index++)
+         forCount(index, 100)
          {
-            gjsonSetValueBool(      json, _bools[index]);
+            gjsonSetArrayValueBool(    json, _bools[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
          gjsonSetObjectValueArrayStart(json, "I Array");
-         for (index = 0; index < 256; index++)
+         forCount(index, 256)
          {
-            gjsonSetValueI(         json, _narray[index]);
+            gjsonSetArrayValueI(       json, _narray[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
          gjsonSetObjectValueArrayStart(json, "N Array");
-         for (index = 0; index < 256; index++)
+         forCount(index, 256)
          {
-            gjsonSetValueN(         json, _narray[index]);
+            gjsonSetArrayValueN(       json, _narray[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
          gjsonSetObjectValueArrayStart(json, "R Array");
-         for (index = 0; index < 300; index++)
+         forCount(index, 300)
          {
-            gjsonSetValueR(         json, _reals8[index]);
+            gjsonSetArrayValueR(       json, _reals8[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
          gjsonSetObjectValueArrayStart(json, "R4 Array");
-         for (index = 0; index < 300; index++)
+         forCount(index, 300)
          {
-            gjsonSetValueR4(        json, _reals4[index]);
+            gjsonSetArrayValueR4(      json, _reals4[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
          gjsonSetObjectValueArrayStart(json, "String Array");
-         for (index = 0; index < 10; index++)
+         forCount(index, 10)
          {
-            gjsonSetValueStr(       json, _strings[index]);
+            gjsonSetArrayValueStr(     json, _strings[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
 #if defined(INCLUDE_BIN)
          gjsonSetObjectValueArrayStart(json, "Binary Array");
-         for (index = 0; index < 3; index++)
+         forCount(index, 3)
          {
-            gjsonSetValueBin(       json, 3 * 256, _binary);
+            gjsonSetArrayValueBin(     json, 3 * 256, _binary);
          }
          gjsonSetObjectValueArrayStop( json);
 #endif
 
          gjsonSetObjectValueArrayStart(json, "User Type IntStrReal");
          {
-            gjsonSetValueI(         json, 42);
-            gjsonSetValueStr(       json, "Yes, but what is the question?");
-            gjsonSetValueR(         json, 3.1415926535897932);
+            gjsonSetArrayValueI(       json, 42);
+            gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+            gjsonSetArrayValueR(       json, 3.1415926535897932);
          }
          gjsonSetObjectValueArrayStop( json);
 
 
          gjsonSetObjectValueArrayStart(json, "User Type IntStrReal Array");
          {
-            gjsonSetArrayStart(     json);
+            gjsonSetArrayValueArrayStart( json);
             {
-               gjsonSetValueI(      json, 42);
-               gjsonSetValueStr(    json, "Yes, but what is the question?");
-               gjsonSetValueR(      json, 3.1415926535897932);
+               gjsonSetArrayValueI(       json, 42);
+               gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+               gjsonSetArrayValueR(       json, 3.1415926535897932);
             }
-            gjsonSetArrayStop(      json);
+            gjsonSetArrayValueArrayStop(  json);
 
-            gjsonSetArrayStart(     json);
+            gjsonSetArrayValueArrayStart( json);
             {
-               gjsonSetValueI(      json, 42);
-               gjsonSetValueStr(    json, "Yes, but what is the question?");
-               gjsonSetValueR(      json, 3.1415926535897932);
+               gjsonSetArrayValueI(       json, 42);
+               gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+               gjsonSetArrayValueR(       json, 3.1415926535897932);
             }
-            gjsonSetArrayStop(      json);
+            gjsonSetArrayValueArrayStop(  json);
 
-            gjsonSetArrayStart(     json);
+            gjsonSetArrayValueArrayStart( json);
             {
-               gjsonSetValueI(      json, 42);
-               gjsonSetValueStr(    json, "Yes, but what is the question?");
-               gjsonSetValueR(      json, 3.1415926535897932);
+               gjsonSetArrayValueI(       json, 42);
+               gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+               gjsonSetArrayValueR(       json, 3.1415926535897932);
             }
-            gjsonSetArrayStop(      json);
+            gjsonSetArrayValueArrayStop(  json);
          }
          gjsonSetObjectValueArrayStop( json);
 
@@ -1815,8 +1715,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
             gjsonSetObjectValueR(      json, "R EPS",     Gr8EPSILON);
             gjsonSetObjectValueR(      json, "R MAX",     Gr8MAX);
             gjsonSetObjectValueR(      json, "R -MAX",   -Gr8MAX);
-            gjsonSetObjectValueR(      json, "R INF",     HUGE_VAL);
-            gjsonSetObjectValueR(      json, "R -INF",   -HUGE_VAL);
+            gjsonSetObjectValueR(      json, "R INF",     Gr8INF);
+            gjsonSetObjectValueR(      json, "R -INF",   -Gr8INF);
             gjsonSetObjectValueR(      json, "R GrNAN",   GrNAN);
 
             gjsonSetObjectValueR4(     json, "R4 0",      0.0f);
@@ -1826,8 +1726,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
             gjsonSetObjectValueR4(     json, "R4 EPS",    Gr4EPSILON);
             gjsonSetObjectValueR4(     json, "R4 MAX",    Gr4MAX);
             gjsonSetObjectValueR4(     json, "R4 -MAX",  -Gr4MAX);
-            gjsonSetObjectValueR4(     json, "R4 INF",    HUGE_VALF);
-            gjsonSetObjectValueR4(     json, "R4 -INF",  -HUGE_VALF);
+            gjsonSetObjectValueR4(     json, "R4 INF",    Gr4INF);
+            gjsonSetObjectValueR4(     json, "R4 -INF",  -Gr4INF);
             gjsonSetObjectValueR4(     json, "R4 GrNAN",  GrNAN);
 
             gjsonSetObjectValueStr(    json, "String",    "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
@@ -1837,89 +1737,90 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
 #endif
 
             gjsonSetObjectValueArrayStart(json, "Bool Array");
-            for (index = 0; index < 100; index++)
+            forCount(index, 100)
             {
-               gjsonSetValueBool(      json, _bools[index]);
+               gjsonSetArrayValueBool(    json, _bools[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
             gjsonSetObjectValueArrayStart(json, "I Array");
-            for (index = 0; index < 256; index++)
+            forCount(index, 256)
             {
-               gjsonSetValueI(         json, _narray[index]);
+               gjsonSetArrayValueI(       json, _narray[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
             gjsonSetObjectValueArrayStart(json, "N Array");
-            for (index = 0; index < 256; index++)
+            forCount(index, 256)
             {
-               gjsonSetValueN(         json, _narray[index]);
+               gjsonSetArrayValueN(       json, _narray[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
             gjsonSetObjectValueArrayStart(json, "R Array");
-            for (index = 0; index < 300; index++)
+            forCount(index, 300)
             {
-               gjsonSetValueR(         json, _reals8[index]);
+               gjsonSetArrayValueR(       json, _reals8[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
             gjsonSetObjectValueArrayStart(json, "R4 Array");
-            for (index = 0; index < 300; index++)
+            forCount(index, 300)
             {
-               gjsonSetValueR4(        json, _reals4[index]);
+               gjsonSetArrayValueR4(      json, _reals4[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
             gjsonSetObjectValueArrayStart(json, "String Array");
-            for (index = 0; index < 10; index++)
+            forCount(index, 10)
             {
-               gjsonSetValueStr(       json, _strings[index]);
+               gjsonSetArrayValueStr(     json, _strings[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
-#if defined(INCLUDE_BIN)
+   #if defined(INCLUDE_BIN)
             gjsonSetObjectValueArrayStart(json, "Binary Array");
-            for (index = 0; index < 3; index++)
+            forCount(index, 3)
             {
-               gjsonSetValueBin(       json, 3 * 256, _binary);
+               gjsonSetArrayValueBin(     json, 3 * 256, _binary);
             }
             gjsonSetObjectValueArrayStop( json);
-#endif
+   #endif
 
             gjsonSetObjectValueArrayStart(json, "User Type IntStrReal");
             {
-               gjsonSetValueI(         json, 42);
-               gjsonSetValueStr(       json, "Yes, but what is the question?");
-               gjsonSetValueR(         json, 3.1415926535897932);
+               gjsonSetArrayValueI(       json, 42);
+               gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+               gjsonSetArrayValueR(       json, 3.1415926535897932);
             }
             gjsonSetObjectValueArrayStop( json);
 
+
             gjsonSetObjectValueArrayStart(json, "User Type IntStrReal Array");
             {
-               gjsonSetArrayStart(     json);
+               gjsonSetArrayValueArrayStart( json);
                {
-                  gjsonSetValueI(      json, 42);
-                  gjsonSetValueStr(    json, "Yes, but what is the question?");
-                  gjsonSetValueR(      json, 3.1415926535897932);
+                  gjsonSetArrayValueI(       json, 42);
+                  gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+                  gjsonSetArrayValueR(       json, 3.1415926535897932);
                }
-               gjsonSetArrayStop(      json);
+               gjsonSetArrayValueArrayStop(  json);
 
-               gjsonSetArrayStart(     json);
+               gjsonSetArrayValueArrayStart( json);
                {
-                  gjsonSetValueI(      json, 42);
-                  gjsonSetValueStr(    json, "Yes, but what is the question?");
-                  gjsonSetValueR(      json, 3.1415926535897932);
+                  gjsonSetArrayValueI(       json, 42);
+                  gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+                  gjsonSetArrayValueR(       json, 3.1415926535897932);
                }
-               gjsonSetArrayStop(      json);
+               gjsonSetArrayValueArrayStop(  json);
 
-               gjsonSetArrayStart(     json);
+               gjsonSetArrayValueArrayStart( json);
                {
-                  gjsonSetValueI(      json, 42);
-                  gjsonSetValueStr(    json, "Yes, but what is the question?");
-                  gjsonSetValueR(      json, 3.1415926535897932);
+                  gjsonSetArrayValueI(       json, 42);
+                  gjsonSetArrayValueStr(     json, "Yes, but what is the question?");
+                  gjsonSetArrayValueR(       json, 3.1415926535897932);
                }
-               gjsonSetArrayStop(      json);
+               gjsonSetArrayValueArrayStop(  json);
             }
             gjsonSetObjectValueArrayStop( json);
          }
@@ -1928,7 +1829,6 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
       gjsonSetFileValueObjectStop(json);
 
       result = gbTRUE;
-      break;
    }
 
    gjsonDloc(json);
@@ -1947,8 +1847,9 @@ static Gb _MiffTestKey(Gmiff *miff, char const * const KEY, GmiffRecType *recTyp
 
    memset(key, 0, GkeySIZE);
 
-   if (!gmiffGetRecordStart(miff, recType, arrayCount, key)) return gbFALSE;
-   if (!streq(key, KEY))                                    return gbFALSE;
+   returnFalseIf(!gmiffGetRecordStart(miff, recType, arrayCount, key));
+   returnFalseIf(!streq(key, KEY));
+
    returnTrue;
 }
 
@@ -1957,7 +1858,7 @@ static Gb _MiffTestNullValue(Gmiff *miff)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNULL)        return gbFALSE;
+   returnFalseIf(gmiffValueGetType(value) != gmiffValueTypeNULL);
    returnTrue;
 }
 
@@ -1966,8 +1867,10 @@ static Gb _MiffTestBValue(Gmiff *miff, Gb testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
-       gmiffValueGetB(   value) != testValue)                return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
+      gmiffValueGetB(   value) != testValue);
+
    returnTrue;
 }
 
@@ -1976,8 +1879,10 @@ static Gb _MiffTestIValue(Gmiff *miff, Gi8 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
-       gmiffValueGetI(   value) != testValue)                return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
+      gmiffValueGetI(   value) != testValue);
+
    returnTrue;
 }
 
@@ -1986,8 +1891,10 @@ static Gb _MiffTestNValue(Gmiff *miff, Gn8 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
-       gmiffValueGetN(   value) != testValue)                return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeNUM_INT ||
+      gmiffValueGetN(   value) != testValue);
+
    returnTrue;
 }
 
@@ -1996,10 +1903,12 @@ static Gb _MiffTestRValue(Gmiff *miff, Gr8 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
-       gmiffValueIs4(    value))                             return gbFALSE;
-   if ( isnan(testValue) && !isnan(gmiffValueGetR(value)))   return gbFALSE;
-   if (!isnan(testValue) && gmiffValueGetR(value) != testValue) return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
+      gmiffValueIs4(    value));
+   returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR(value)));
+   returnFalseIf(!isnan(testValue) && gmiffValueGetR(value) != testValue);
+
    returnTrue;
 }
 
@@ -2008,10 +1917,12 @@ static Gb _MiffTestR4Value(Gmiff *miff, Gr4 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
-       !gmiffValueIs4(   value))                             return gbFALSE;
-   if ( isnan(testValue) && !isnan(gmiffValueGetR4(value)))  return gbFALSE;
-   if (!isnan(testValue) && gmiffValueGetR4(value) != testValue) return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
+      !gmiffValueIs4(   value));
+   returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR4(value)));
+   returnFalseIf(!isnan(testValue) && gmiffValueGetR4(value) != testValue);
+
    returnTrue;
 }
 
@@ -2021,10 +1932,12 @@ static Gb _MiffTestBinValue(Gmiff *miff, Gcount testCount, Gn1 *testValue)
    Gn1    svalue[256 * 3];
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeBIN &&
-       testCount               != gmiffValueGetBinCount(value))        return gbFALSE;
-   if (!gmiffGetValueBin(miff, gmiffValueGetBinCount(value), svalue))   return gbFALSE;
-   if (memcmp(svalue, testValue, testCount) != 0)           return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeBIN &&
+      testCount                != gmiffValueGetBinCount(value));
+   returnFalseIf(!gmiffGetValueBin(miff, gmiffValueGetBinCount(value), svalue));
+   returnFalseIf(memcmp(svalue, testValue, testCount) != 0);
+
    returnTrue;
 }
 
@@ -2037,112 +1950,116 @@ static Gb _MiffTestStrValue(Gmiff *miff, Gstr const *testValue)
    testValueLen = strlen(testValue);
 
    value = gmiffGetValue(miff);
-   if (gmiffValueGetType(value) != gmiffValueTypeSTR &&
-       testValueLen            != gmiffValueGetStrCount(value))        return gbFALSE;
-   if (!gmiffGetValueStr(miff, gmiffValueGetStrCount(value), svalue))   return gbFALSE;
-   if (strcmp(testValue, svalue) != 0)                      return gbFALSE;
+   returnFalseIf(
+      gmiffValueGetType(value) != gmiffValueTypeSTR &&
+      testValueLen            != gmiffValueGetStrCount(value));
+   returnFalseIf(!gmiffGetValueStr(miff, gmiffValueGetStrCount(value), svalue));
+   returnFalseIf(strcmp(testValue, svalue) != 0);
+
    returnTrue;
 }
 
 static Gb _MiffTestCount(Gn8 COUNT, Gn8 arrayCount)
 {
-   if (COUNT != arrayCount) return gbFALSE;
+   returnFalseIf(COUNT != arrayCount);
+
    returnTrue;
 }
 
 static Gb _MiffTestNext(Gmiff *miff)
 {
-   if (!gmiffGetRecordEnd(miff)) return gbFALSE;
+   returnFalseIf(!gmiffGetRecordEnd(miff));
+
    returnTrue;
 }
 
 static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType   recType;
+   Gcount         arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestNullValue(miff))                        return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestNullValue(miff));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetBool(Gmiff *miff, char const *key, Gb const value)
 {
-   GmiffRecType     recType;
-   Gcount        arrayCount;
+   GmiffRecType   recType;
+   Gcount         arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestBValue(miff, value))                    return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestBValue(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetI(Gmiff *miff, char const *key, Gi8 const value)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType  recType;
+   Gcount        arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestIValue(miff, value))                    return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestIValue(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetN(Gmiff *miff, char const *key, Gn8 const value)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType  recType;
+   Gcount        arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestNValue(miff, value))                    return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestNValue(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetR(Gmiff *miff, char const *key, Gr8 const value)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType  recType;
+   Gcount        arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestRValue(miff, value))                    return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestRValue(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetR4(Gmiff *miff, char const *key, Gr4 const value)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType  recType;
+   Gcount        arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestR4Value(miff, value))                   return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestR4Value(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetStr(Gmiff *miff, char const *key, Gstr const *value)
 {
-   GmiffRecType     recType;
-   Gcount           arrayCount;
+   GmiffRecType  recType;
+   Gcount        arrayCount;
 
-   if (!_MiffTestKey(miff, key, &recType, &arrayCount))  return gbFALSE;
-   if (!_MiffTestCount(1, arrayCount))                   return gbFALSE;
-   if (!_MiffTestStrValue(miff, value))                  return gbFALSE;
-   if (!_MiffTestNext(miff))                             return gbFALSE;
+   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestCount(1, arrayCount));
+   returnFalseIf(!_MiffTestStrValue(miff, value));
+   returnFalseIf(!_MiffTestNext(miff));
 
    returnTrue;
 }
@@ -2163,7 +2080,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
    miff   = NULL;
    result = gbFALSE;
 
-   for (;;)
+   breakScope
    {
       msg = "Open file";
       if (fopen_s(&file, fileName, "rb") != 0) break;
@@ -2179,400 +2096,398 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       // Unless you are in full control of the format, do not assume that there will be an order
       // to the values.
       msg = "Null";
-      if (!_MiffTestGetNull(miff, msg))                     break;
+      breakIf(!_MiffTestGetNull(miff, msg));
 
       msg = "True";
-      if (!_MiffTestGetBool(miff, msg, gbTRUE))           break;
+      breakIf(!_MiffTestGetBool(miff, msg, gbTRUE));
 
       msg = "False";
-      if (!_MiffTestGetBool(miff, msg, gbFALSE))          break;
+      breakIf(!_MiffTestGetBool(miff, msg, gbFALSE));
 
       msg = "I 0";
-      if (!_MiffTestGetI(miff, msg, 0))                     break;
+      breakIf(!_MiffTestGetI(miff, msg, 0));
 
       msg = "I 1";
-      if (!_MiffTestGetI(miff, msg, 1))                     break;
+      breakIf(!_MiffTestGetI(miff, msg, 1));
 
       msg = "I -1";
-      if (!_MiffTestGetI(miff, msg, -1))                    break;
+      breakIf(!_MiffTestGetI(miff, msg, -1));
 
       msg = "I MAX";
-      if (!_MiffTestGetI(miff, msg, Gi8MAX))             break;
+      breakIf(!_MiffTestGetI(miff, msg, Gi8MAX));
 
       msg = "I MIN";
-      if (!_MiffTestGetI(miff, msg, Gi8MIN))             break;
+      breakIf(!_MiffTestGetI(miff, msg, Gi8MIN));
 
       msg = "N 0";
-      if (!_MiffTestGetN(miff, msg, 0))                     break;
+      breakIf(!_MiffTestGetN(miff, msg, 0));
 
       msg = "N 1";
-      if (!_MiffTestGetN(miff, msg, 1))                     break;
+      breakIf(!_MiffTestGetN(miff, msg, 1));
 
       msg = "N MAX";
-      if (!_MiffTestGetN(miff, msg, Gn8MAX))             break;
+      breakIf(!_MiffTestGetN(miff, msg, Gn8MAX));
 
       msg = "R 0";
-      if (!_MiffTestGetR(miff, msg, 0.0))                   break;
+      breakIf(!_MiffTestGetR(miff, msg, 0.0));
 
       msg = "R 1";
-      if (!_MiffTestGetR(miff, msg, 1.0))                   break;
+      breakIf(!_MiffTestGetR(miff, msg, 1.0));
 
       msg = "R -1";
-      if (!_MiffTestGetR(miff, msg, -1.0))                  break;
+      breakIf(!_MiffTestGetR(miff, msg, -1.0));
 
       msg = "R PI";
-      if (!_MiffTestGetR(miff, msg, 3.1415926535897932))    break;
+      breakIf(!_MiffTestGetR(miff, msg, 3.1415926535897932));
 
       msg = "R EPS";
-      if (!_MiffTestGetR(miff, msg, Gr8EPSILON))         break;
+      breakIf(!_MiffTestGetR(miff, msg, Gr8EPSILON));
 
       msg = "R MAX";
-      if (!_MiffTestGetR(miff, msg, Gr8MAX))             break;
+      breakIf(!_MiffTestGetR(miff, msg, Gr8MAX));
 
       msg = "R -MAX";
-      if (!_MiffTestGetR(miff, msg, -Gr8MAX))            break;
+      breakIf(!_MiffTestGetR(miff, msg, -Gr8MAX));
 
       msg = "R INF";
-      if (!_MiffTestGetR(miff, msg, HUGE_VAL))              break;
+      breakIf(!_MiffTestGetR(miff, msg, Gr8INF));
 
       msg = "R -INF";
-      if (!_MiffTestGetR(miff, msg, -HUGE_VAL))             break;
+      breakIf(!_MiffTestGetR(miff, msg, -Gr8INF));
 
       msg = "R GrNAN";
-      if (!_MiffTestGetR(miff, msg, GrNAN))                   break;
+      breakIf(!_MiffTestGetR(miff, msg, GrNAN));
 
       msg = "R4 0";
-      if (!_MiffTestGetR4(miff, msg, 0.0))                  break;
+      breakIf(!_MiffTestGetR4(miff, msg, 0.0));
 
       msg = "R4 1";
-      if (!_MiffTestGetR4(miff, msg, 1.0))                  break;
+      breakIf(!_MiffTestGetR4(miff, msg, 1.0));
 
       msg = "R4 -1";
-      if (!_MiffTestGetR4(miff, msg, -1.0))                 break;
+      breakIf(!_MiffTestGetR4(miff, msg, -1.0));
 
       msg = "R4 PI";
-      if (!_MiffTestGetR4(miff, msg, 3.1415926535897932f))  break;
+      breakIf(!_MiffTestGetR4(miff, msg, 3.1415926535897932f));
 
       msg = "R4 EPS";
-      if (!_MiffTestGetR4(miff, msg, Gr4EPSILON))       break;
+      breakIf(!_MiffTestGetR4(miff, msg, Gr4EPSILON));
 
       msg = "R4 MAX";
-      if (!_MiffTestGetR4(miff, msg, Gr4MAX))           break;
+      breakIf(!_MiffTestGetR4(miff, msg, Gr4MAX));
 
       msg = "R4 -MAX";
-      if (!_MiffTestGetR4(miff, msg, -Gr4MAX))          break;
+      breakIf(!_MiffTestGetR4(miff, msg, -Gr4MAX));
 
       msg = "R4 INF";
-      if (!_MiffTestGetR4(miff, msg, HUGE_VALF))            break;
+      breakIf(!_MiffTestGetR4(miff, msg, Gr4INF));
 
       msg = "R4 -INF";
-      if (!_MiffTestGetR4(miff, msg, -HUGE_VALF))           break;
+      breakIf(!_MiffTestGetR4(miff, msg, -Gr4INF));
 
       msg = "R4 GrNAN";
-      if (!_MiffTestGetR4(miff, msg, GrNAN))                  break;
+      breakIf(!_MiffTestGetR4(miff, msg, GrNAN));
 
       msg = "String";
-      if (!_MiffTestGetStr(miff, msg, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./")) break;
+      breakIf(!_MiffTestGetStr(miff, msg, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
 
 #if defined(INCLUDE_BIN)
       msg = "Binary";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(1, arrayCount))                   break;
-      if (!_MiffTestBinValue(miff, 256 * 3, _binary))       break;
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(1, arrayCount));
+      breakIf(!_MiffTestBinValue(miff, 256 * 3, _binary));
+      breakIf(!_MiffTestNext(miff));
 #endif
 
       msg = "Bool Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(100, arrayCount))                 break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(100, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestBValue(miff, _bools[index]))         break;
+         breakIf(!_MiffTestBValue(miff, _bools[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
       msg = "I Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(256, arrayCount))                 break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(256, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestIValue(miff, (int) _narray[index]))  break;
+         breakIf(!_MiffTestIValue(miff, (int) _narray[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
       msg = "N Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(256, arrayCount))                 break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(256, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestNValue(miff, _narray[index]))        break;
+         breakIf(!_MiffTestNValue(miff, _narray[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
       msg = "R Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(300, arrayCount))                 break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(300, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestRValue(miff, _reals8[index]))        break;
+         breakIf(!_MiffTestRValue(miff, _reals8[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
       msg = "R4 Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(300, arrayCount))                 break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(300, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestR4Value(miff, _reals4[index]))       break;
+         breakIf(!_MiffTestR4Value(miff, _reals4[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
       msg = "String Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(10, arrayCount))                  break;
-      for (index = 0; index < arrayCount; index++)
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(10, arrayCount));
+      forCount(index, arrayCount)
       {
-         if (!_MiffTestStrValue(miff, _strings[index]))     break;
+         breakIf(!_MiffTestStrValue(miff, _strings[index]));
       }
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestNext(miff));
 
 #if defined(INCLUDE_BIN)
       msg = "Binary Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(3, arrayCount))                   break;
-      if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-      if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-      if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(3, arrayCount));
+      breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+      breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+      breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+      breakIf(!_MiffTestNext(miff));
 #endif
 
       msg = "User Type IntStrReal";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(1, arrayCount))                   break;
-      if (!_MiffTestIValue(  miff, 42))                     break;
-      if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-      if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(1, arrayCount));
+      breakIf(!_MiffTestIValue(  miff, 42));
+      breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+      breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+      breakIf(!_MiffTestNext(miff));
 
       msg = "User Type IntStrReal Array";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (!_MiffTestCount(3, arrayCount))                   break;
-      if (!_MiffTestIValue(  miff, 42))                     break;
-      if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-      if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-      if (!_MiffTestIValue(  miff, 42))                     break;
-      if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-      if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-      if (!_MiffTestIValue(  miff, 42))                     break;
-      if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-      if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(!_MiffTestCount(3, arrayCount));
+      breakIf(!_MiffTestIValue(  miff, 42));
+      breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+      breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+      breakIf(!_MiffTestIValue(  miff, 42));
+      breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+      breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+      breakIf(!_MiffTestIValue(  miff, 42));
+      breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+      breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+      breakIf(!_MiffTestNext(miff));
 
       msg = "Block";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-      if (recType != gmiffRecTypeBLOCK_START)                break;
-      if (!_MiffTestNext(miff))                             break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(recType != gmiffRecTypeBLOCK_START);
+      breakIf(!_MiffTestNext(miff));
       {
          msg = "Null";
-         if (!_MiffTestGetNull(miff, msg))                     break;
+         breakIf(!_MiffTestGetNull(miff, msg));
 
          msg = "True";
-         if (!_MiffTestGetBool(miff, msg, gbTRUE))           break;
+         breakIf(!_MiffTestGetBool(miff, msg, gbTRUE));
 
          msg = "False";
-         if (!_MiffTestGetBool(miff, msg, gbFALSE))          break;
+         breakIf(!_MiffTestGetBool(miff, msg, gbFALSE));
 
          msg = "I 0";
-         if (!_MiffTestGetI(miff, msg, 0))                     break;
+         breakIf(!_MiffTestGetI(miff, msg, 0));
 
          msg = "I 1";
-         if (!_MiffTestGetI(miff, msg, 1))                     break;
+         breakIf(!_MiffTestGetI(miff, msg, 1));
 
          msg = "I -1";
-         if (!_MiffTestGetI(miff, msg, -1))                    break;
+         breakIf(!_MiffTestGetI(miff, msg, -1));
 
          msg = "I MAX";
-         if (!_MiffTestGetI(miff, msg, Gi8MAX))             break;
+         breakIf(!_MiffTestGetI(miff, msg, Gi8MAX));
 
          msg = "I MIN";
-         if (!_MiffTestGetI(miff, msg, Gi8MIN))             break;
+         breakIf(!_MiffTestGetI(miff, msg, Gi8MIN));
 
          msg = "N 0";
-         if (!_MiffTestGetN(miff, msg, 0))                     break;
+         breakIf(!_MiffTestGetN(miff, msg, 0));
 
          msg = "N 1";
-         if (!_MiffTestGetN(miff, msg, 1))                     break;
+         breakIf(!_MiffTestGetN(miff, msg, 1));
 
          msg = "N MAX";
-         if (!_MiffTestGetN(miff, msg, Gn8MAX))             break;
+         breakIf(!_MiffTestGetN(miff, msg, Gn8MAX));
 
          msg = "R 0";
-         if (!_MiffTestGetR(miff, msg, 0.0))                   break;
+         breakIf(!_MiffTestGetR(miff, msg, 0.0));
 
          msg = "R 1";
-         if (!_MiffTestGetR(miff, msg, 1.0))                   break;
+         breakIf(!_MiffTestGetR(miff, msg, 1.0));
 
          msg = "R -1";
-         if (!_MiffTestGetR(miff, msg, -1.0))                  break;
+         breakIf(!_MiffTestGetR(miff, msg, -1.0));
 
          msg = "R PI";
-         if (!_MiffTestGetR(miff, msg, 3.1415926535897932))    break;
+         breakIf(!_MiffTestGetR(miff, msg, 3.1415926535897932));
 
          msg = "R EPS";
-         if (!_MiffTestGetR(miff, msg, Gr8EPSILON))         break;
+         breakIf(!_MiffTestGetR(miff, msg, Gr8EPSILON));
 
          msg = "R MAX";
-         if (!_MiffTestGetR(miff, msg, Gr8MAX))             break;
+         breakIf(!_MiffTestGetR(miff, msg, Gr8MAX));
 
          msg = "R -MAX";
-         if (!_MiffTestGetR(miff, msg, -Gr8MAX))            break;
+         breakIf(!_MiffTestGetR(miff, msg, -Gr8MAX));
 
          msg = "R INF";
-         if (!_MiffTestGetR(miff, msg, HUGE_VAL))              break;
+         breakIf(!_MiffTestGetR(miff, msg, Gr8INF));
 
          msg = "R -INF";
-         if (!_MiffTestGetR(miff, msg, -HUGE_VAL))             break;
+         breakIf(!_MiffTestGetR(miff, msg, -Gr8INF));
 
          msg = "R GrNAN";
-         if (!_MiffTestGetR(miff, msg, GrNAN))                   break;
+         breakIf(!_MiffTestGetR(miff, msg, GrNAN));
 
          msg = "R4 0";
-         if (!_MiffTestGetR4(miff, msg, 0.0))                  break;
+         breakIf(!_MiffTestGetR4(miff, msg, 0.0));
 
          msg = "R4 1";
-         if (!_MiffTestGetR4(miff, msg, 1.0))                  break;
+         breakIf(!_MiffTestGetR4(miff, msg, 1.0));
 
          msg = "R4 -1";
-         if (!_MiffTestGetR4(miff, msg, -1.0))                 break;
+         breakIf(!_MiffTestGetR4(miff, msg, -1.0));
 
          msg = "R4 PI";
-         if (!_MiffTestGetR4(miff, msg, 3.1415926535897932f))  break;
+         breakIf(!_MiffTestGetR4(miff, msg, 3.1415926535897932f));
 
          msg = "R4 EPS";
-         if (!_MiffTestGetR4(miff, msg, Gr4EPSILON))       break;
+         breakIf(!_MiffTestGetR4(miff, msg, Gr4EPSILON));
 
          msg = "R4 MAX";
-         if (!_MiffTestGetR4(miff, msg, Gr4MAX))           break;
+         breakIf(!_MiffTestGetR4(miff, msg, Gr4MAX));
 
          msg = "R4 -MAX";
-         if (!_MiffTestGetR4(miff, msg, -Gr4MAX))          break;
+         breakIf(!_MiffTestGetR4(miff, msg, -Gr4MAX));
 
          msg = "R4 INF";
-         if (!_MiffTestGetR4(miff, msg, HUGE_VALF))            break;
+         breakIf(!_MiffTestGetR4(miff, msg, Gr4INF));
 
          msg = "R4 -INF";
-         if (!_MiffTestGetR4(miff, msg, -HUGE_VALF))           break;
+         breakIf(!_MiffTestGetR4(miff, msg, -Gr4INF));
 
          msg = "R4 GrNAN";
-         if (!_MiffTestGetR4(miff, msg, GrNAN))                  break;
+         breakIf(!_MiffTestGetR4(miff, msg, GrNAN));
 
          msg = "String";
-         if (!_MiffTestGetStr(miff, msg, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./")) break;
+         breakIf(!_MiffTestGetStr(miff, msg, "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"));
 
    #if defined(INCLUDE_BIN)
          msg = "Binary";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(1, arrayCount))                   break;
-         if (!_MiffTestBinValue(miff, 256 * 3, _binary))       break;
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(1, arrayCount));
+         breakIf(!_MiffTestBinValue(miff, 256 * 3, _binary));
+         breakIf(!_MiffTestNext(miff));
    #endif
 
          msg = "Bool Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(100, arrayCount))                 break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(100, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestBValue(miff, _bools[index]))         break;
+            breakIf(!_MiffTestBValue(miff, _bools[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
          msg = "I Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(256, arrayCount))                 break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(256, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestIValue(miff, (int) _narray[index]))  break;
+            breakIf(!_MiffTestIValue(miff, (int) _narray[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
          msg = "N Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(256, arrayCount))                 break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(256, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestNValue(miff, _narray[index]))        break;
+            breakIf(!_MiffTestNValue(miff, _narray[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
          msg = "R Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(300, arrayCount))                 break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(300, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestRValue(miff, _reals8[index]))        break;
+            breakIf(!_MiffTestRValue(miff, _reals8[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
          msg = "R4 Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(300, arrayCount))                 break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(300, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestR4Value(miff, _reals4[index]))       break;
+            breakIf(!_MiffTestR4Value(miff, _reals4[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
          msg = "String Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(10, arrayCount))                  break;
-         for (index = 0; index < arrayCount; index++)
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(10, arrayCount));
+         forCount(index, arrayCount)
          {
-            if (!_MiffTestStrValue(miff, _strings[index]))     break;
+            breakIf(!_MiffTestStrValue(miff, _strings[index]));
          }
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestNext(miff));
 
    #if defined(INCLUDE_BIN)
          msg = "Binary Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(3, arrayCount))                   break;
-         if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-         if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-         if (!_MiffTestBinValue(miff, 3 * 256, _binary))       break;
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(3, arrayCount));
+         breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+         breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+         breakIf(!_MiffTestBinValue(miff, 3 * 256, _binary));
+         breakIf(!_MiffTestNext(miff));
    #endif
 
          msg = "User Type IntStrReal";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(1, arrayCount))                   break;
-         if (!_MiffTestIValue(  miff, 42))                     break;
-         if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-         if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(1, arrayCount));
+         breakIf(!_MiffTestIValue(  miff, 42));
+         breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+         breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+         breakIf(!_MiffTestNext(miff));
 
          msg = "User Type IntStrReal Array";
-         if (!_MiffTestKey(miff, msg, &recType, &arrayCount))  break;
-         if (!_MiffTestCount(3, arrayCount))                   break;
-         if (!_MiffTestIValue(  miff, 42))                     break;
-         if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-         if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-         if (!_MiffTestIValue(  miff, 42))                     break;
-         if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-         if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-         if (!_MiffTestIValue(  miff, 42))                     break;
-         if (!_MiffTestStrValue(miff, "Yes, but what is the question?")) break;
-         if (!_MiffTestRValue(  miff, 3.1415926535897932))     break;
-         if (!_MiffTestNext(miff))                             break;
+         breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+         breakIf(!_MiffTestCount(3, arrayCount));
+         breakIf(!_MiffTestIValue(  miff, 42));
+         breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+         breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+         breakIf(!_MiffTestIValue(  miff, 42));
+         breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+         breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+         breakIf(!_MiffTestIValue(  miff, 42));
+         breakIf(!_MiffTestStrValue(miff, "Yes, but what is the question?"));
+         breakIf(!_MiffTestRValue(  miff, 3.1415926535897932));
+         breakIf(!_MiffTestNext(miff));
       }
 
       msg = "";
-      if (!_MiffTestKey(miff, msg, &recType, &arrayCount))     break;
-      if (recType != gmiffRecTypeBLOCK_STOP)                    break;
-      if (!_MiffTestNext(miff))                                break;
+      breakIf(!_MiffTestKey(miff, msg, &recType, &arrayCount));
+      breakIf(recType != gmiffRecTypeBLOCK_STOP);
+      breakIf(!_MiffTestNext(miff));
 
       msg = "NO";
       result = gbTRUE;
-
-      break;
    }
 
    printf("MIFF Read: %s ERROR\n", msg);
@@ -2596,7 +2511,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
    miff   = NULL;
    result = gbFALSE;
 
-   for (;;)
+   breakScope
    {
       if (fopen_s(&file, fileName, "wb") != 0)
       {
@@ -2632,8 +2547,8 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordR(              miff, "R EPS",   Gr8EPSILON);
       gmiffSetRecordR(              miff, "R MAX",   Gr8MAX);
       gmiffSetRecordR(              miff, "R -MAX",  -Gr8MAX);
-      gmiffSetRecordR(              miff, "R INF",   HUGE_VAL);
-      gmiffSetRecordR(              miff, "R -INF",  -HUGE_VAL);
+      gmiffSetRecordR(              miff, "R INF",   Gr8INF);
+      gmiffSetRecordR(              miff, "R -INF",  -Gr8INF);
       gmiffSetRecordR(              miff, "R GrNAN",   GrNAN);
 
       gmiffSetRecordR4(             miff, "R4 0",    0.0);
@@ -2643,8 +2558,8 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordR4(             miff, "R4 EPS",  Gr4EPSILON);
       gmiffSetRecordR4(             miff, "R4 MAX",  Gr4MAX);
       gmiffSetRecordR4(             miff, "R4 -MAX", -Gr4MAX);
-      gmiffSetRecordR4(             miff, "R4 INF",  HUGE_VALF);
-      gmiffSetRecordR4(             miff, "R4 -INF", -HUGE_VALF);
+      gmiffSetRecordR4(             miff, "R4 INF",  Gr4INF);
+      gmiffSetRecordR4(             miff, "R4 -INF", -Gr4INF);
       gmiffSetRecordR4(             miff, "R4 GrNAN",  GrNAN);
 
       gmiffSetRecordStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
@@ -2714,8 +2629,8 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordR(              miff, "R EPS",    Gr8EPSILON);
          gmiffSetRecordR(              miff, "R MAX",    Gr8MAX);
          gmiffSetRecordR(              miff, "R -MAX",   -Gr8MAX);
-         gmiffSetRecordR(              miff, "R INF",    HUGE_VAL);
-         gmiffSetRecordR(              miff, "R -INF",   -HUGE_VAL);
+         gmiffSetRecordR(              miff, "R INF",    Gr8INF);
+         gmiffSetRecordR(              miff, "R -INF",   -Gr8INF);
          gmiffSetRecordR(              miff, "R GrNAN",    GrNAN);
 
          gmiffSetRecordR4(             miff, "R4 0",     0.0);
@@ -2725,8 +2640,8 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordR4(             miff, "R4 EPS",   Gr4EPSILON);
          gmiffSetRecordR4(             miff, "R4 MAX",   Gr4MAX);
          gmiffSetRecordR4(             miff, "R4 -MAX",  -Gr4MAX);
-         gmiffSetRecordR4(             miff, "R4 INF",   HUGE_VALF);
-         gmiffSetRecordR4(             miff, "R4 -INF",  -HUGE_VALF);
+         gmiffSetRecordR4(             miff, "R4 INF",   Gr4INF);
+         gmiffSetRecordR4(             miff, "R4 -INF",  -Gr4INF);
          gmiffSetRecordR4(             miff, "R4 GrNAN",   GrNAN);
 
          gmiffSetRecordStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
@@ -2775,7 +2690,6 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordBlockStop(miff);
 
       result = gbTRUE;
-      break;
    }
 
    gmiffDloc(miff);

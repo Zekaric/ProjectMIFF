@@ -102,7 +102,7 @@ Gn8 _JsonStrToN(Gstr const * const str)
    Gn8   value;
 
    value = 0;
-   for (index = 0;; index++)
+   loopCount(index)
    {
       breakIf(str[index] == 0);
 

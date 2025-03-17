@@ -241,11 +241,11 @@ GmiffValue      gmiffValueSetStrCount( Gcount const strCount);
 #define gmiffSetRecordStartValueArray(     MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
 #define gmiffSetRecordStartValue(          MIFF,       NAME)                   gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME);
 
-#define gmiffSetRecordBoolArray(           MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartBoolArray(MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueB(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordIArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartIArray(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueI(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordNArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartNArray(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueN(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordRArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartRArray(   MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueR(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordR4Array(             MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartR4Array(  MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueR4( MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordStrArray(            MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartStrArray( MIFF, NAME, COUNT); for (int __index__ = 0; __index__ < COUNT; __index__++) { gmiffSetRecordValueStr(MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordBoolArray(           MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartBoolArray(MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueB(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordIArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartIArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueI(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordNArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartNArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueN(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordRArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartRArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueR(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordR4Array(             MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartR4Array(  MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueR4( MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordStrArray(            MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartStrArray( MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueStr(MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
 
 #endif

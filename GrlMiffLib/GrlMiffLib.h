@@ -46,6 +46,8 @@ constant:
 #define GrNAN                 NAN
 #define Gr4EPSILON            FLT_EPSILON
 #define Gr8EPSILON            DBL_EPSILON
+#define Gr8INF                HUGE_VAL
+#define Gr4INF                HUGE_VALF
 
 #define GcountMAX             Gi4MAX
 

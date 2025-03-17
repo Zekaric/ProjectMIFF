@@ -60,7 +60,6 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
    else
    {
       GjsonType type;
-      Gstr      key[GkeySIZE];
       Gb        isTypeOk,
                 isVersionOk;
       Gn8       version;
@@ -77,9 +76,8 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
       isVersionOk = gbFALSE;
       loop
       {
-         type = gjsonGetType_ObjectKeyOrEnd(mineInfo->jsonFile);
-
-         breakIf(type != gjsonTypeOBJECT_STOP);
+         type = gjsonGetType_ObjectKeyOrStop(mineInfo->jsonFile);
+         breakIf(type == gjsonTypeOBJECT_STOP);
 
          if      (_MiStrIsEqual(gjsonGetKey(mineInfo->jsonFile), KEY_FORMAT_STR))
          {
@@ -87,6 +85,8 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
             returnFalseIf(type != gjsonTypeVALUE_STRING_START);
             gjsonGetStr(mineInfo->jsonFile, GkeyBYTE_COUNT, headerTypeStr);
             returnFalseIf(!_MiStrIsEqual(headerTypeStr, HEADER_TYPE_STR));
+
+            isTypeOk = gbTRUE;
          }
          else if (_MiStrIsEqual(gjsonGetKey(mineInfo->jsonFile), KEY_VERSION_STR))
          {
@@ -96,6 +96,8 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
                  type == gjsonTypeVALUE_NUMBER_NATURAL));
             returnFalseIf(!gjsonGetN(mineInfo->jsonFile, &version));
             returnFalseIf(version != HEADER_VERSION_NUM);
+
+            isVersionOk = gbTRUE;
          }
          else
          {
@@ -103,6 +105,11 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
             returnFalse;
          }
       }
+
+      // Format block is not quite right.
+      returnFalseIf(
+         !isTypeOk ||
+         !isVersionOk);
    }
 
    returnTrue;

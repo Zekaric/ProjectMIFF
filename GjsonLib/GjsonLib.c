@@ -171,9 +171,9 @@ void gjsonDlocContent(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonGetType_ArrayValueOrEnd
+func: gjsonGetType_ArrayValueOrStop
 **************************************************************************************************/
-GjsonType gjsonGetType_ArrayNextOrEnd(Gjson * const json)
+GjsonType gjsonGetType_ArrayValueOrStop(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -186,48 +186,26 @@ GjsonType gjsonGetType_ArrayNextOrEnd(Gjson * const json)
    // Eat space.
    _JsonEatSpace(json);
 
-   // What do we have as a value.
-   switch (json->lastByte)
+   if (json->lastByte == jsonARRAY_STOP_CHAR)
    {
-   case jsonARRAY_STOP_CHAR:
       json->scope--;
       json->method   =  json->scopeType[json->scope].method;
       json->lastByte = 0;
       return gjsonTypeARRAY_STOP;
-
-   case jsonSEPARATOR_CHAR:
-      json->lastByte = 0;
-      return gjsonGetType_ArrayValueOrEnd(json);
    }
 
-   return gjsonTypeERROR_UNEXPECTED_CHAR;
-}
+   // If called after the first item in the array, then a separator between array elements is
+   // possible.  Eat this separator and get to the next value.
+   if (json->lastByte == jsonSEPARATOR_CHAR)
+   {
+      json->lastByte = 0;
 
-/**************************************************************************************************
-func: gjsonGetType_ArrayValueOrEnd
-**************************************************************************************************/
-GjsonType gjsonGetType_ArrayValueOrEnd(Gjson * const json)
-{
-   returnIf(
-         !_isStarted ||
-         !json,
-      gjsonTypeNONE);
-
-   // Reset the value type.
-   json->value.type = gjsonTypeNONE;
-
-   // Eat space.
-   _JsonEatSpace(json);
+      _JsonEatSpace(json);
+   }
 
    // What do we have as a value.
    switch (json->lastByte)
    {
-   case jsonARRAY_STOP_CHAR:
-      json->scope--;
-      json->method   =  json->scopeType[json->scope].method;
-      json->lastByte = 0;
-      return gjsonTypeARRAY_STOP;
-
    case jsonOBJECT_START_CHAR:
       json->scopeType[json->scope++].type = gjsonScopeTypeOBJECT;
       json->lastByte = 0;
@@ -240,7 +218,8 @@ GjsonType gjsonGetType_ArrayValueOrEnd(Gjson * const json)
       return gjsonTypeARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
-      json->lastByte = 0;
+      json->lastByte   = 0;
+      json->value.type = gjsonTypeVALUE_STRING_START;
       return gjsonTypeVALUE_STRING_START;
 
    case '0':
@@ -302,7 +281,8 @@ GjsonType gjsonGetType_FileElement(Gjson * const json)
       return gjsonTypeARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
-      json->lastByte = 0;
+      json->lastByte   = 0;
+      json->value.type = gjsonTypeVALUE_STRING_START;
       return gjsonTypeVALUE_STRING_START;
 
    case '0':
@@ -332,9 +312,9 @@ GjsonType gjsonGetType_FileElement(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonGetType_ObjectKeyOrEnd
+func: gjsonGetType_ObjectKeyOrStop
 **************************************************************************************************/
-GjsonType gjsonGetType_ObjectKeyOrEnd(Gjson * const json)
+GjsonType gjsonGetType_ObjectKeyOrStop(Gjson * const json)
 {
    returnIf(
          !_isStarted ||
@@ -347,16 +327,26 @@ GjsonType gjsonGetType_ObjectKeyOrEnd(Gjson * const json)
    // Eat space.
    _JsonEatSpace(json);
 
-   // What do we have as a value.
-   switch (json->lastByte)
+   if (json->lastByte == jsonOBJECT_STOP_CHAR)
    {
-   case jsonOBJECT_STOP_CHAR:
       json->scope--;
       json->method   =  json->scopeType[json->scope].method;
       json->lastByte = 0;
       return gjsonTypeOBJECT_STOP;
+   }
 
-   case jsonSTRING_QUOTE_CHAR:
+   // If called after the first key value pair, then a separator between object key values is
+   // possible.  Eat this separator and get to the next key value.
+   if (json->lastByte == jsonSEPARATOR_CHAR)
+   {
+      json->lastByte = 0;
+
+      _JsonEatSpace(json);
+   }
+
+   // Found a key for a value.
+   if (json->lastByte == jsonSTRING_QUOTE_CHAR)
+   {
       // Reading in the key and the key value separator.
       json->lastByte = 0;
 
@@ -366,40 +356,9 @@ GjsonType gjsonGetType_ObjectKeyOrEnd(Gjson * const json)
 
       returnIf(json->lastByte != jsonKEY_VALUE_SEPARATOR_CHAR, gjsonTypeERROR_UNEXPECTED_CHAR);
 
+      json->lastByte = 0;
+
       return gjsonTypeOBJECT_KEY;
-   }
-
-   return gjsonTypeERROR_UNEXPECTED_CHAR;
-}
-
-/**************************************************************************************************
-func: gjsonGetType_ObjectNextOrEnd
-**************************************************************************************************/
-GjsonType gjsonGetType_ObjectNextOrEnd(Gjson * const json)
-{
-   returnIf(
-         !_isStarted ||
-         !json,
-      gjsonTypeNONE);
-
-   // Reset the value type.
-   json->value.type = gjsonTypeNONE;
-
-   // Eat space.
-   _JsonEatSpace(json);
-
-   // What do we have as a value.
-   switch (json->lastByte)
-   {
-   case jsonOBJECT_STOP_CHAR:
-      json->scope--;
-      json->method   =  json->scopeType[json->scope].method;
-      json->lastByte = 0;
-      return gjsonTypeOBJECT_STOP;
-
-   case jsonSEPARATOR_CHAR:
-      json->lastByte = 0;
-      return gjsonTypeSEPARATOR;
    }
 
    return gjsonTypeERROR_UNEXPECTED_CHAR;
@@ -449,7 +408,8 @@ GjsonType gjsonGetType_ObjectValue(Gjson * const json)
       return gjsonTypeARRAY_START;
 
    case jsonSTRING_QUOTE_CHAR:
-      json->lastByte = 0;
+      json->lastByte   = 0;
+      json->value.type = gjsonTypeVALUE_STRING_START;
       return gjsonTypeVALUE_STRING_START;
 
    case '0':
@@ -536,8 +496,56 @@ All numbers can be real.  However not all integers or naturals can be propely
 or accurately be represented in real.  Up to the caller to determine if they
 are doing something right in that situation.
 **************************************************************************************************/
-Gb gjsonGetR(Gjson * const json, Gr8 *  const value)
+Gb gjsonGetR(Gjson * const json, Gr8 * const value)
 {
+   // The string may be a constant that represents some real value.  Attempt to parse it.
+   if (json->value.type == gjsonTypeVALUE_STRING_START)
+   {
+      GjsonStrLetter  jletter;
+      int             index;
+      Gstr            letter,
+                      stemp[16];
+
+      loopCount(index)
+      {
+         jletter = gjsonGetStrLetter(json, &letter);
+         breakIf(jletter == gjsonStrLetterDONE);
+
+         // Encountered a letter we aren't expening or the string is much larger than the constants
+         // we know about.
+         returnFalseIf(
+            jletter == gjsonStrLetterERROR ||
+            index >= 10);
+
+         stemp[index] = letter;
+      }
+      returnFalseIf(jletter == gjsonStrLetterERROR);
+
+      // Null terminate the string.
+      stemp[index] = 0;
+
+      if      (strcmp(stemp, "Infinity") == 0)
+      {
+         *value = Gr8INF;
+      }
+      else if (strcmp(stemp, "-Infinity") == 0)
+      {
+         *value = -Gr8INF;
+      }
+      else if (strcmp(stemp, "NaN") == 0)
+      {
+         *value = GrNAN;
+      }
+      // Not a constant we are familiar with.
+      else
+      {
+         returnFalse;
+      }
+
+      returnTrue;
+   }
+
+   // Real value already parse and set in the value variable.
    *value = json->value.r;
 
    returnTrue;
@@ -548,6 +556,54 @@ func: gjsonGetR4
 **************************************************************************************************/
 Gb gjsonGetR4(Gjson * const json, Gr4 *  const value)
 {
+   // The string may be a constant that represents some real value.  Attempt to parse it.
+   if (json->value.type == gjsonTypeVALUE_STRING_START)
+   {
+      GjsonStrLetter  jletter;
+      int             index;
+      Gstr            letter,
+                      stemp[16];
+
+      loopCount(index)
+      {
+         jletter = gjsonGetStrLetter(json, &letter);
+         breakIf(jletter == gjsonStrLetterDONE);
+
+         // Encountered a letter we aren't expening or the string is much larger than the constants
+         // we know about.
+         returnFalseIf(
+            jletter == gjsonStrLetterERROR ||
+            index >= 10);
+
+         stemp[index] = letter;
+      }
+      returnFalseIf(jletter == gjsonStrLetterERROR);
+
+      // Null terminate the string.
+      stemp[index] = 0;
+
+      if      (strcmp(stemp, "Infinity") == 0)
+      {
+         *value = Gr4INF;
+      }
+      else if (strcmp(stemp, "-Infinity") == 0)
+      {
+         *value = -Gr4INF;
+      }
+      else if (strcmp(stemp, "NaN") == 0)
+      {
+         *value = GrNAN;
+      }
+      // Not a constant we are familiar with.
+      else
+      {
+         returnFalse;
+      }
+
+      returnTrue;
+   }
+
+   // Real value already parse and set in the value variable.
    *value = json->value.r4;
 
    returnTrue;
@@ -562,7 +618,7 @@ Gb gjsonGetStr(Gjson * const json, Gi4 const maxCount, Gstr *value)
    GjsonStrLetter letterType;
 
    // Get the letters.
-   for (index = 0; index < maxCount; index++)
+   forCount(index, maxCount)
    {
       letterType = gjsonGetStrLetter(json, &value[index]);
       breakIf(letterType == gjsonStrLetterDONE);
@@ -786,6 +842,79 @@ Gb gjsonGetStrHex(Gjson * const json, Gstr * const h1, Gstr * const h2, Gstr * c
 }
 
 /**************************************************************************************************
+func: gjsonIsKeyEqual
+**************************************************************************************************/
+Gb gjsonIsKeyEqual(Gjson const * const json, Gstr const * const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json       ||
+      !value);
+
+   return (strncmp(json->key, value, GkeyBYTE_COUNT) == 0);
+}
+
+/**************************************************************************************************
+func: gjsonIsTypeBin
+**************************************************************************************************/
+Gb gjsonIsTypeBin(GjsonType const type)
+{
+   returnFalseIf(!_isStarted);
+
+   // Binary blobs with this library is stored in a hex dump in a stirng.
+   return (type == gjsonTypeVALUE_STRING_START);
+}
+
+/**************************************************************************************************
+func: gjsonIsTypeI
+**************************************************************************************************/
+Gb gjsonIsTypeI(GjsonType const type)
+{
+   returnFalseIf(!_isStarted);
+
+   return (type == gjsonTypeVALUE_NUMBER_INTEGER);
+}
+
+/**************************************************************************************************
+func: gjsonIsTypeN
+**************************************************************************************************/
+Gb gjsonIsTypeN(GjsonType const type)
+{
+   returnFalseIf(!_isStarted);
+
+   return
+      (type == gjsonTypeVALUE_NUMBER_INTEGER ||
+       type == gjsonTypeVALUE_NUMBER_NATURAL);
+}
+
+/**************************************************************************************************
+func: gjsonIsTypeR
+**************************************************************************************************/
+Gb gjsonIsTypeR(GjsonType const type)
+{
+   returnFalseIf(!_isStarted);
+
+   return
+      (type == gjsonTypeVALUE_NUMBER_INTEGER || // Integerss can be Reals
+       type == gjsonTypeVALUE_NUMBER_NATURAL || // Naturals can be Reals
+       type == gjsonTypeVALUE_NUMBER_REAL    ||
+       type == gjsonTypeVALUE_STRING_START);    // Without actually parsing the string we won't
+                                                // really know but there are a few constants that
+                                                // are in strings.  So there is a possibility.
+}
+
+/**************************************************************************************************
+func: gjsonIsTypeStr
+**************************************************************************************************/
+Gb gjsonIsTypeStr(GjsonType const type)
+{
+   returnFalseIf(!_isStarted);
+
+   // Binary blobs with this library is stored in a hex dump in a stirng.
+   return (type == gjsonTypeVALUE_STRING_START);
+}
+
+/**************************************************************************************************
 func: gjsonSetArrayStart
 **************************************************************************************************/
 Gb gjsonSetArrayStart(Gjson * const json)
@@ -853,7 +982,7 @@ Gb gjsonSetKey(Gjson * const json, Gstr const * const key)
    json->isFirstItem = gbFALSE;
 
    returnFalseIf(!gjsonSetValueStrStart(json));
-   for (index = 0; ; index++)
+   loopCount(index)
    {
       breakIf(key[index] == 0);
 
@@ -945,10 +1074,56 @@ Gb gjsonSetValueBin(Gjson * const json, Gcount const count, Gn1 const * const va
       !value);
 
    returnFalseIf(!gjsonSetValueStrStart(json));
-   for (index = 0; index < count; index++)
+   forCount(index, count)
    {
-      returnFalseIf(!gjsonSetValueStrBinByte(json, value[index]));
+      returnFalseIf(!gjsonSetValueBinByte(json, value[index]));
    }
+   returnFalseIf(!gjsonSetValueStrStop(json));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gjsonSetValueBinByte
+**************************************************************************************************/
+Gb gjsonSetValueBinByte(Gjson * const json, Gn1 const value)
+{
+   Gstr letters[] = "0123456789ABCDEF";
+   Gn1  output[2];
+
+   returnFalseIf(!json);
+
+   output[0] = letters[value >> 4];
+   output[1] = letters[value & 0x0F];
+
+   returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) output));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gjsonSetValueBinStart
+**************************************************************************************************/
+Gb gjsonSetValueBinStart(Gjson * const json)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
+
+   returnFalseIf(!gjsonSetValueStrStart(json));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gjsonSetValueBinStop
+**************************************************************************************************/
+Gb gjsonSetValueBinStop(Gjson * const json)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !json);
+
    returnFalseIf(!gjsonSetValueStrStop(json));
 
    returnTrue;
@@ -1076,31 +1251,13 @@ Gb gjsonSetValueStr(Gjson * const json, Gstr const * const str)
       !str);
 
    returnFalseIf(!gjsonSetValueStrStart(json));
-   for (index = 0; ; index++)
+   loopCount(index)
    {
       breakIf(str[index] == 0);
 
       returnFalseIf(!gjsonSetValueStrLetter(json, str[index]));
    }
    returnFalseIf(!gjsonSetValueStrStop(json));
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gjsonSetValueStrBinByte
-**************************************************************************************************/
-Gb gjsonSetValueStrBinByte(Gjson * const json, Gn1 const value)
-{
-   Gstr letters[] = "0123456789ABCDEF";
-   Gn1  output[2];
-
-   returnFalseIf(!json);
-
-   output[0] = letters[value >> 4];
-   output[1] = letters[value & 0x0F];
-
-   returnFalseIf(!_JsonSetBuffer(json, 2, (Gn1 *) output));
 
    returnTrue;
 }

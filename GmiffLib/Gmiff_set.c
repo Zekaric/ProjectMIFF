@@ -400,7 +400,7 @@ static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
       _MiffByteSwap4(&value.inr4);
 
       // Fill in the buffer.
-      for (index = 0; index < count; index++)
+      forCount(index, count)
       {
          ntemp         = (int) ((value.inr4.n & mask) >> shift);
          string[index] = letters[ntemp];
@@ -418,7 +418,7 @@ static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
       _MiffByteSwap8(&value.inr);
 
       // Fill in the buffer.
-      for (index = 0; index < count; index++)
+      forCount(index, count)
       {
          ntemp         = (int) ((value.inr.n & mask) >> shift);
          string[index] = letters[ntemp];

@@ -2,5 +2,20 @@
 	"format":{
 		"name":"Mining Information",
 		"version":1
+	},
+	"data":{
+		
+	},
+	"item":{
+		
+	},
+	"geometry":{
+		
+	},
+	"drillhole":{
+		
+	},
+	"model":{
+		
 	}
 }

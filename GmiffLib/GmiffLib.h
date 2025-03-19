@@ -210,8 +210,8 @@ GmiffValue      gmiffValueSetStrCount( Gcount const strCount);
 // Convenience macroes
 #define gmiffValueSetStr(                  VALUE)                              gmiffValueSetStrBuffer((Gcount) strlen(VALUE), VALUE)
 
-#define gmiffSetRecordBlockStart(          MIFF, NAME)                       { gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_START, 0, NAME); gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordBlockStop(           MIFF)                             { gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_STOP,  0, NULL); gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordBlockStart(          MIFF, NAME)                       ( gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_START, 0, NAME), gmiffSetRecordStop(MIFF) )
+#define gmiffSetRecordBlockStop(           MIFF)                             ( gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_STOP,  0, NULL), gmiffSetRecordStop(MIFF) )
 
 #define gmiffSetRecordValueNull(           MIFF)                             { GmiffValue __value__; __value__ = gmiffValueSetNull(                     ); gmiffSetValue(MIFF, __value__); }
 #define gmiffSetRecordValueB(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetB(                 (VALUE)); gmiffSetValue(MIFF, __value__); }

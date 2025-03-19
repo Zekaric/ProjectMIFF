@@ -54,10 +54,10 @@ typedef enum
 {
    gmineInfoBlockTypeNONE,
 
-   gmineInfoBlockTypeINFORMATION,
-   gmineInfoBlockTypePROPERTIES,
+   gmineInfoBlockTypeDATA,
+   //gmineInfoBlockTypeIMAGE,
+   //gmineInfoBlockTypePROPERTIES,
    gmineInfoBlockTypeITEM,
-   gmineInfoBlockTypeIMAGE,
    gmineInfoBlockTypeGEOMETRY,
    gmineInfoBlockTypeDRILL_HOLE,
    gmineInfoBlockTypeMODEL,
@@ -67,6 +67,73 @@ typedef enum
 
    gmineInfoBlockTypeCOUNT
 } GmineInfoBlockType;
+
+typedef struct
+{
+   // Using x, y, z because these can be interpreted differently depending on coordinate system used
+   double x, // Easting, longitude
+          y, // Northing, latitude,
+          z; // Elevation
+} GmineInfoPoint;
+
+typedef struct
+{
+   // Using x, y, z because these can be interpreted differently depending on coordinate system used
+   double x, // Easting, longitude
+          y, // Northing, latitude,
+          z; // Elevation
+} GmineInfoVector;
+
+typedef struct
+{
+   Gstr              *key,
+                     *value;
+} GmineInfoKeyValue;
+
+typedef struct
+{
+   Gstr              *authorName,
+                     *comment,
+                     *companyName,
+                     *copyright,
+                     *softwareName,
+                     *softwareVersion,
+                     *projectName,
+                     *projectSystem;
+   GmineInfoPoint     projectMax,
+                      projectMin;
+   Gcount             otherCount;
+   GmineInfoKeyValue *otherList;
+} GmineInfoData;
+
+typedef struct
+{
+   Gstr              *id;
+} GmineInfoItem;
+
+typedef struct
+{
+   Gstr              *id;
+} GmineInfoGeometry;
+
+typedef struct
+{
+   Gstr              *id;
+} GmineInfoDrillHole;
+
+typedef struct
+{
+   Gstr              *id;
+} GmineInfoModel;
+
+typedef union
+{
+   GmineInfoData      data;
+   GmineInfoItem      item;
+   GmineInfoGeometry  geometry;
+   GmineInfoDrillHole drillhole;
+   GmineInfoModel     model;
+} GmineInfoUnion;
 
 typedef struct
 {
@@ -82,6 +149,8 @@ typedef struct
 
    Gmiff             *miffFile;
    Gjson             *jsonFile;
+
+   GmineInfoUnion    *block;
 } GmineInfo;
 
 /**************************************************************************************************

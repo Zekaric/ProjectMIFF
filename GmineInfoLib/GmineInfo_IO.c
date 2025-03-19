@@ -33,7 +33,7 @@ prototype:
 global:
 function:
 **************************************************************************************************/
-Gb _MiIoClocReader(GmineInfo * const mineInfo)
+Gb _MiIoClocReader(GmineInfo * const gmineInfo)
 {
    Gstr headerTypeStr[   GkeySIZE],
         headerVersionStr[GkeySIZE];
@@ -44,15 +44,15 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
    _MiMemClearTypeArray(headerVersionStr, Gstr, GkeySIZE);
 
    // MIFF
-   if (mineInfo->fileType == gmineInfoFileTypeMIFF)
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      mineInfo->miffFile = gmiffClocReader(
-         mineInfo->getBuffer,
+      gmineInfo->miffFile = gmiffClocReader(
+         gmineInfo->getBuffer,
          headerTypeStr,
          headerVersionStr,
-         mineInfo->dataRepo);
+         gmineInfo->dataRepo);
       returnFalseIf(
-         !mineInfo->miffFile                                ||
+         !gmineInfo->miffFile                                ||
          !_MiStrIsEqual(headerTypeStr,    HEADER_TYPE_STR)  ||
          !_MiStrIsEqual(headerVersionStr, HEADER_VERSION_STR));
    }
@@ -69,36 +69,36 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
 
       breakScope
       {
-         mineInfo->jsonFile = gjsonClocReader(mineInfo->getBuffer, mineInfo->dataRepo);
-         breakIf(!mineInfo->jsonFile);
+         gmineInfo->jsonFile = gjsonClocReader(gmineInfo->getBuffer, gmineInfo->dataRepo);
+         breakIf(!gmineInfo->jsonFile);
 
          // Get the parent object.
-         type = gjsonGetType_FileElement(mineInfo->jsonFile);
+         type = gjsonGetType_FileElement(gmineInfo->jsonFile);
          breakIf(type != gjsonTypeOBJECT_START);
 
          // Get the format block which should be the first block in the JSON.
-         breakIf(gjsonGetType_ObjectKeyOrStop(mineInfo->jsonFile) != gjsonTypeOBJECT_KEY);
-         breakIf(!gjsonIsKeyEqual(mineInfo->jsonFile, KEY_FORMAT_STR));
-         breakIf(gjsonGetType_ObjectValue(mineInfo->jsonFile) != gjsonTypeOBJECT_START);
+         breakIf(gjsonGetType_ObjectKeyOrStop(gmineInfo->jsonFile) != gjsonTypeOBJECT_KEY);
+         breakIf(!gjsonIsKeyEqual(gmineInfo->jsonFile, KEY_FORMAT_STR));
+         breakIf(gjsonGetType_ObjectValue(gmineInfo->jsonFile) != gjsonTypeOBJECT_START);
          {
             loop
             {
-               type = gjsonGetType_ObjectKeyOrStop(mineInfo->jsonFile);
+               type = gjsonGetType_ObjectKeyOrStop(gmineInfo->jsonFile);
                breakIf(type == gjsonTypeOBJECT_STOP);
                breakIf(type != gjsonTypeOBJECT_KEY);
 
-               if      (gjsonIsKeyEqual(mineInfo->jsonFile, KEY_NAME_STR))
+               if      (gjsonIsKeyEqual(gmineInfo->jsonFile, KEY_NAME_STR))
                {
-                  breakIf(!gjsonIsTypeStr(gjsonGetType_ObjectValue(mineInfo->jsonFile)));
-                  breakIf(!gjsonGetStr(mineInfo->jsonFile, GkeyBYTE_COUNT, headerTypeStr));
+                  breakIf(!gjsonIsTypeStr(gjsonGetType_ObjectValue(gmineInfo->jsonFile)));
+                  breakIf(!gjsonGetStr(gmineInfo->jsonFile, GkeyBYTE_COUNT, headerTypeStr));
                   breakIf(!_MiStrIsEqual(headerTypeStr, HEADER_TYPE_STR));
 
                   isTypeOk = gbTRUE;
                }
-               else if (gjsonIsKeyEqual(mineInfo->jsonFile, KEY_VERSION_STR))
+               else if (gjsonIsKeyEqual(gmineInfo->jsonFile, KEY_VERSION_STR))
                {
-                  breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(mineInfo->jsonFile)));
-                  breakIf(!gjsonGetN(mineInfo->jsonFile, &version));
+                  breakIf(!gjsonIsTypeN(gjsonGetType_ObjectValue(gmineInfo->jsonFile)));
+                  breakIf(!gjsonGetN(gmineInfo->jsonFile, &version));
                   breakIf(version != HEADER_VERSION_NUM);
 
                   isVersionOk = gbTRUE;
@@ -124,34 +124,34 @@ Gb _MiIoClocReader(GmineInfo * const mineInfo)
 /**************************************************************************************************
 func: _MiIoClocWriter
 **************************************************************************************************/
-Gb _MiIoClocWriter(GmineInfo * const mineInfo)
+Gb _MiIoClocWriter(GmineInfo * const gmineInfo)
 {
    // MIFF
-   if (mineInfo->fileType == gmineInfoFileTypeMIFF)
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      mineInfo->miffFile = gmiffClocWriter(
-         mineInfo->setBuffer,
+      gmineInfo->miffFile = gmiffClocWriter(
+         gmineInfo->setBuffer,
          HEADER_TYPE_STR,
          HEADER_VERSION_STR,
-         mineInfo->dataRepo);
-      returnFalseIf(!mineInfo->miffFile);
+         gmineInfo->dataRepo);
+      returnFalseIf(!gmineInfo->miffFile);
    }
    // JSON
    else
    {
-      mineInfo->jsonFile = gjsonClocWriter(mineInfo->setBuffer, mineInfo->dataRepo, gbTRUE);
-      returnFalseIf(!mineInfo->jsonFile);
+      gmineInfo->jsonFile = gjsonClocWriter(gmineInfo->setBuffer, gmineInfo->dataRepo, gbTRUE);
+      returnFalseIf(!gmineInfo->jsonFile);
 
       // Start an unnamed parent object.  This will be closed on Dloc.
-      returnFalseIf(!gjsonSetFileValueObjectStart(mineInfo->jsonFile));
+      returnFalseIf(!gjsonSetFileValueObjectStart(gmineInfo->jsonFile));
       {
          // Create a format information object block
-         returnFalseIf(!gjsonSetObjectValueObjectStart(mineInfo->jsonFile, KEY_FORMAT_STR));
+         returnFalseIf(!gjsonSetObjectValueObjectStart(gmineInfo->jsonFile, KEY_FORMAT_STR));
          {
-            returnFalseIf(!gjsonSetObjectValueStr(mineInfo->jsonFile, KEY_NAME_STR,    HEADER_TYPE_STR));
-            returnFalseIf(!gjsonSetObjectValueN(  mineInfo->jsonFile, KEY_VERSION_STR, HEADER_VERSION_NUM));
+            returnFalseIf(!gjsonSetObjectValueStr(gmineInfo->jsonFile, KEY_NAME_STR,    HEADER_TYPE_STR));
+            returnFalseIf(!gjsonSetObjectValueN(  gmineInfo->jsonFile, KEY_VERSION_STR, HEADER_VERSION_NUM));
          }
-         returnFalseIf(!gjsonSetObjectValueObjectStop( mineInfo->jsonFile));
+         returnFalseIf(!gjsonSetObjectValueObjectStop( gmineInfo->jsonFile));
       }
    }
 
@@ -161,23 +161,53 @@ Gb _MiIoClocWriter(GmineInfo * const mineInfo)
 /**************************************************************************************************
 func: _MiIODloc
 **************************************************************************************************/
-void _MiIoDloc(GmineInfo * const mineInfo)
+void _MiIoDloc(GmineInfo * const gmineInfo)
 {
    // MIFF
-   if (mineInfo->fileType == gmineInfoFileTypeMIFF)
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      gmiffDloc(mineInfo->miffFile);
+      gmiffDloc(gmineInfo->miffFile);
    }
    // JSON
    else
    {
       // If writing...
-      if (mineInfo->isWriting)
+      if (gmineInfo->isWriting)
       {
          // Close the unnamed parent object.
-         returnVoidIf(!gjsonSetObjectStop(mineInfo->jsonFile));
+         returnVoidIf(!gjsonSetObjectStop(gmineInfo->jsonFile));
       }
 
-      gjsonDloc(mineInfo->jsonFile);
+      gjsonDloc(gmineInfo->jsonFile);
    }
+}
+
+/**************************************************************************************************
+func: _MiIoWriteBlockStart
+**************************************************************************************************/
+Gb _MiIoWriteBlockStart(GmineInfo * const gmineInfo, Gstr * const key)
+{
+   // MIFF
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
+   {
+      return gmiffSetRecordBlockStart(gmineInfo->miffFile, key);
+   }
+
+   //JSON
+   return gjsonSetObjectValueObjectStart(gmineInfo->jsonFile, key);
+}
+
+/**************************************************************************************************
+func: _MiIoWriteBlockStop
+**************************************************************************************************/
+Gb _MiIoWriteBlockStop(GmineInfo * const gmineInfo)
+{
+   // MIFF
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
+   {
+      return gmiffSetRecordBlockStop(gmineInfo->miffFile);
+   }
+
+   // JSON
+   return gjsonSetObjectValueObjectStop(gmineInfo->jsonFile);
 }

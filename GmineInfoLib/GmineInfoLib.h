@@ -60,6 +60,8 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
+GmineInfoBlockType gmineInfoBlockTypeNext(                     GmineInfo       * const gmineInfo);
+
 GmineInfo         *gmineInfoClocReader(                                                           GmineInfoFileType const fileType, GgetBuffer getBufferFunc, void * const dataRepo);
 Gb                 gmineInfoClocReaderContent(                 GmineInfo       * const gmineInfo, GmineInfoFileType const fileType, GgetBuffer getBufferFunc, void * const dataRepo);
 GmineInfo         *gmineInfoClocWriter(                                                           GmineInfoFileType const fileType, GsetBuffer setBufferFunc, void * const dataRepo);
@@ -68,9 +70,18 @@ Gb                 gmineInfoClocWriterContent(                 GmineInfo       *
 void               gmineInfoDloc(                              GmineInfo       * const gmineInfo);
 void               gmineInfoDlocContent(                       GmineInfo       * const gmineInfo);
 
-GmineInfoBlockType gmineInfoGetCurrentBlockType(               GmineInfo const * const gmineInfo);
-
 GmineInfoBlockType gmineInfoSetCurrentBlockTypeToNextBlockType(GmineInfo       * const gmineInfo);
+Gb                 gmineInfoSetDataAuthorName(                 GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataComment(                    GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataCompanyName(                GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataCopyright(                  GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataProjectMax(                 GmineInfo       * const gmineInfo, GmineInfoPoint const * const value);
+Gb                 gmineInfoSetDataProjectMin(                 GmineInfo       * const gmineInfo, GmineInfoPoint const * const value);
+Gb                 gmineInfoSetDataProjectName(                GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataProjectSystem(              GmineInfo       * const gmineInfo, Gstr const * const value);
+Gb                 gmineInfoSetDataSoftwareName(               GmineInfo       * const gmineInfo, Gstr const * const value, Gstr * const version);
+Gb                 gmineInfoSetDataOther(                      GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+
 Gb                 gmineInfoStart(                             GmemCloc memClocFunc, GmemDloc memDlocFunc);
 void               gmineInfoStop(                              void);
 

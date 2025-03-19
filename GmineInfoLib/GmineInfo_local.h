@@ -62,6 +62,11 @@ constant:
 #define KEY_NAME_LEN          4
 #define KEY_VERSION_STR       "version"
 #define KEY_VERSION_LEN       7
+#define KEY_BLOCK_DATA        "data"
+#define KEY_BLOCK_ITEM        "item"
+#define KEY_BLOCK_GEOMETRY    "geometry"
+#define KEY_BLOCK_DRILL_HOLE  "drillhole"
+#define KEY_BLOCK_MODEL       "model"
 
 /**************************************************************************************************
 type:
@@ -83,6 +88,9 @@ Gb                 _MiIoClocReader(       GmineInfo       * const mineInfo);
 Gb                 _MiIoClocWriter(       GmineInfo       * const mineInfo);
 
 void               _MiIoDloc(             GmineInfo       * const mineInfo);
+
+Gb                 _MiIoWriteBlockStart(  GmineInfo       * const gmineInfo, Gstr * const key);
+Gb                 _MiIoWriteBlockStop(   GmineInfo       * const gmineInfo);
 
 void              *_MiMemCloc(            Gcount const memByteCount);
 void               _MiMemDloc(            void * const mem);

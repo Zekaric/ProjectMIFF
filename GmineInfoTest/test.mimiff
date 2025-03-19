@@ -2,3 +2,13 @@ MIFF
 1
 Mining Information
 HEADER_VERSION_NUMBER
+{	data
+}
+{	item
+}
+{	geometry
+}
+{	drillhole
+}
+{	model
+}

@@ -164,9 +164,9 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <li><a href="#21---header">2.1 - Header</a></li>
 </ul>
 </li>
-<li><a href="#3---mine-information-block-mib">3 - Mine Information Block (MIB)</a>
+<li><a href="#3---mine-information-blocks">3 - Mine Information Blocks</a>
 <ul>
-<li><a href="#31---information-block">3.1 - Information Block</a></li>
+<li><a href="#31---data-block">3.1 - Data Block</a></li>
 <li><a href="#32---property-block">3.2 - Property Block</a></li>
 <li><a href="#33---item-block">3.3 - Item Block</a></li>
 <li><a href="#34---image-block">3.4 - Image Block</a></li>
@@ -254,11 +254,6 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
       - Multi-level sub-blocked
     - Seam
     - Surface
-  - Seam model information.
-    - Regular
-    - Sub-blocked
-  - Surface model information.
-    - Sub-blocked
 </code></pre>
 <p>File extsion for the file is either...</p>
 <table>
@@ -302,27 +297,26 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <p>For a JSON file, since it doesn't have a header, create base object for all the blocks in the file.  First block should be the &quot;format&quot; block.</p>
 <pre><code>{
    &quot;format&quot;:{
-      &quot;name&quot;:   &quot;Mining Information&quot;,
+      &quot;name&quot;:&quot;Mining Information&quot;,
       &quot;version&quot;:1,
    },
    ...
 }
 </code></pre>
-<h1 id="3---mine-information-block-mib">3 - Mine Information Block (MIB)</h1>
-<p><strong>Block Name</strong>: mine</p>
-<p>An MI file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.</p>
-<p>Each mine block in a file separates information related to one specific mine.  Meaning, you could have more than one mine in a MI file.  One mine could be a gold mine in Australia while another could be a bitumen mine in Africa.  This will probably not happen often because the file size just for one mine could be very large so adding more than one mine would probably not be a good idea, but it is doable.</p>
-<p>Inside a MIB you will have the following blocks.</p>
+<h1 id="3---mine-information-blocks">3 - Mine Information Blocks</h1>
+<p>An MI file can only have information for just one mining project or project area.  Use multiple files for different mines, sites, projects, or however you separate the information.</p>
+<p>Every MI file contains a few specified blocks.  Order of these blocks are important for being able to read the file in one pass.  This means that types, limits or information that is required for other data in the file needs to be defined before it is used.</p>
 <ul>
 <li><strong>Information block</strong> to hold general information about the project.  This must be the first block.</li>
-<li><strong>Item list block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
 <li><strong>Image list block</strong> to hold the images.  Images can be used for texturing, symbols, etc.</li>
-<li><strong>Geometry block</strong> to hold geometry information.  There can be more than one Geoemtry block.</li>
-<li><strong>Drillhole block</strong> to hold drillhole information.  Item List block must already be defined or else you are not providing assay or survey values with your drillhole data.  There can be more than one Drillhole block.</li>
-<li><strong>Model block</strong> to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.</li>
+<li><strong>Property list block</strong> to hold display properties for geometry or data.</li>
+<li><strong>Item list block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
+<li><strong>Geometry list block</strong> to hold geometry information.  Depends on item, image, and property blocks.</li>
+<li><strong>Drillhole list block</strong> to hold drillhole information.  Depends on item, image, and property blocks.</li>
+<li><strong>Model list block</strong> to hold model information.  Depends on item, image, and property blocks.</li>
 </ul>
-<h2 id="31---information-block">3.1 - Information Block</h2>
-<p><strong>Block Name</strong>: info</p>
+<h2 id="31---data-block">3.1 - Data Block</h2>
+<p><strong>Block Name</strong>: data</p>
 <p>Common to all MI files for any of the types above, there will be an information block providing general, project wide information.</p>
 <p>This information block should be before other blocks.</p>
 <p>Inside the information block we have the following possible key values.  Not all are required.</p>
@@ -360,7 +354,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 </tr>
 <tr>
 <td>projectSystem</td>
-<td>Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like &quot;WGS84&quot; or &quot;NAD27&quot;.  Even the [projectMin] and [projectMax] will be in this system.  Use &quot;local&quot; to indicate that the project coordinates are in a local flat earth space.</td>
+<td>Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like <strong>WGS84</strong> or <strong>NAD27</strong>.  Use <strong>local</strong> to indicate that the project coordinates are in a local flat earth space.</td>
 </tr>
 <tr>
 <td>projectName</td>
@@ -380,7 +374,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 </tr>
 </tbody>
 </table>
-<p><strong>projectMin</strong> and <strong>projectMax</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.</p>
+<p><strong>projectMin</strong> and <strong>projectMax</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by <strong>projectSystem</strong>.</p>
 <h2 id="32---property-block">3.2 - Property Block</h2>
 <p><strong>Block Name</strong>: prop</p>
 <p>This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.</p>

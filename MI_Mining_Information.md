@@ -18,8 +18,8 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
   - [1.3 - Disclosure](#13---disclosure)
 - [2 - MI Format](#2---mi-format)
   - [2.1 - Header](#21---header)
-- [3 - Mine Information Block (MIB)](#3---mine-information-block-mib)
-  - [3.1 - Information Block](#31---information-block)
+- [3 - Mine Information Blocks](#3---mine-information-blocks)
+  - [3.1 - Data Block](#31---data-block)
   - [3.2 - Property Block](#32---property-block)
   - [3.3 - Item Block](#33---item-block)
   - [3.4 - Image Block](#34---image-block)
@@ -119,11 +119,6 @@ The data mining companies need to keep track of and transfer around.
       - Multi-level sub-blocked
     - Seam
     - Surface
-  - Seam model information.
-    - Regular
-    - Sub-blocked
-  - Surface model information.
-    - Sub-blocked
 ```
 
 File extsion for the file is either...
@@ -147,33 +142,30 @@ For a JSON file, since it doesn't have a header, create base object for all the 
 ```
 {
    "format":{
-      "name":   "Mining Information",
+      "name":"Mining Information",
       "version":1,
    },
    ...
 }
 ```
 
-# 3 - Mine Information Block (MIB)
+# 3 - Mine Information Blocks
 
-**Block Name**: mine
+An MI file can only have information for just one mining project or project area.  Use multiple files for different mines, sites, projects, or however you separate the information.
 
-An MI file can have 1 or more MIBs.  One MIB represents a unique mining project or project area.
-
-Each mine block in a file separates information related to one specific mine.  Meaning, you could have more than one mine in a MI file.  One mine could be a gold mine in Australia while another could be a bitumen mine in Africa.  This will probably not happen often because the file size just for one mine could be very large so adding more than one mine would probably not be a good idea, but it is doable.
-
-Inside a MIB you will have the following blocks.
+Every MI file contains a few specified blocks.  Order of these blocks are important for being able to read the file in one pass.  This means that types, limits or information that is required for other data in the file needs to be defined before it is used.
 
 * **Information block** to hold general information about the project.  This must be the first block.
-* **Item list block** to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
 * **Image list block** to hold the images.  Images can be used for texturing, symbols, etc.
-* **Geometry block** to hold geometry information.  There can be more than one Geoemtry block.
-* **Drillhole block** to hold drillhole information.  Item List block must already be defined or else you are not providing assay or survey values with your drillhole data.  There can be more than one Drillhole block.
-* **Model block** to hold model information.  Item List block must already be defined or else you are not providing any values with your model data.  There can be more than one Model block.
+* **Property list block** to hold display properties for geometry or data.
+* **Item list block** to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
+* **Geometry list block** to hold geometry information.  Depends on item, image, and property blocks.
+* **Drillhole list block** to hold drillhole information.  Depends on item, image, and property blocks.
+* **Model list block** to hold model information.  Depends on item, image, and property blocks.
 
-## 3.1 - Information Block
+## 3.1 - Data Block
 
-**Block Name**: info
+**Block Name**: data
 
 Common to all MI files for any of the types above, there will be an information block providing general, project wide information.
 
@@ -189,13 +181,13 @@ Inside the information block we have the following possible key values.  Not all
 | software | The software that was used to prepare this data. |
 | softwareVersion | The version of the above software. |
 | comment | Any comments provided by the author or software about the data.  This comment should hold no information that needs to be parsed by an importer of the data. |
-| projectSystem | Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like "WGS84" or "NAD27".  Even the [projectMin] and [projectMax] will be in this system.  Use "local" to indicate that the project coordinates are in a local flat earth space. |
+| projectSystem | Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  Use **local** to indicate that the project coordinates are in a local flat earth space. |
 | projectName | The name of the project. |
 | projectMin | Array of 3 real values in the given project system. |
 | projectMax | Array of 3 real values in the given project system. |
 | other | A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values. |
 
-**projectMin** and **projectMax** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.
+**projectMin** and **projectMax** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by **projectSystem**.
 
 ## 3.2 - Property Block
 

@@ -35,12 +35,20 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
+static Gb       _BlockWrite(        GmineInfo * const gmineInfo);
+
 static Gb       _GetBuffer(         void * const dataRepo, Gcount const byteCount, Gn1       * const byteData);
 
 static void    *_MemCloc(           Gcount const memByteCount);
 static void     _MemDloc(           void * const mem);
 
+static Gb       _ReadMiJson(        void);
+static Gb       _ReadMiMiff(        void);
+
 static Gb       _SetBuffer(         void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData);
+
+static Gb       _WriteMiJson(       void);
+static Gb       _WriteMiMiff(       void);
 
 /**************************************************************************************************
 global:
@@ -51,13 +59,13 @@ func: main
 **************************************************************************************************/
 int main(int acount, char ** alist)
 {
-   GmineInfo *mi;
+   GmineInfo *gmineInfo;
    FILE      *file;
    char      *msg;
 
    acount;
    alist;
-   mi   = NULL;
+   gmineInfo   = NULL;
    file = NULL;
 
    returnIf(!gmineInfoStart(_MemCloc, _MemDloc), 1);
@@ -66,59 +74,19 @@ int main(int acount, char ** alist)
    {
       // Create a MIMIFF file.
       msg = "MIMIFF Create";
-      fopen_s(&file, "test.mimiff", "wb");
-      breakIf(!file);
-
-      mi = gmineInfoClocWriter(gmineInfoFileTypeMIFF, _SetBuffer, (void *) file);
-      breakIf(!mi);
-
-      gmineInfoDloc(mi);
-      mi = NULL;
-
-      fclose(file);
-      file = NULL;
+      breakIf(!_WriteMiMiff());
 
       // Create a MIJSON file.
       msg = "MIJSON Create";
-      fopen_s(&file, "test.mijson", "wb");
-      breakIf(!file);
-
-      mi = gmineInfoClocWriter(gmineInfoFileTypeJSON, _SetBuffer, (void *) file);
-      breakIf(!mi);
-
-      gmineInfoDloc(mi);
-      mi = NULL;
-
-      fclose(file);
-      file = NULL;
+      breakIf(!_WriteMiJson());
 
       // Read in the MIMIFF file.
       msg = "MIMIFF Read";
-      fopen_s(&file, "test.mimiff", "rb");
-      breakIf(!file);
-
-      mi = gmineInfoClocReader(gmineInfoFileTypeMIFF, _GetBuffer, (void *) file);
-      breakIf(!mi);
-
-      gmineInfoDloc(mi);
-      mi = NULL;
-
-      fclose(file);
-      file = NULL;
+      breakIf(!_ReadMiMiff());
 
       // Read in the MIJSON file.
       msg = "MIJSON Read";
-      fopen_s(&file, "test.mijson", "rb");
-      breakIf(!file);
-
-      mi = gmineInfoClocReader(gmineInfoFileTypeJSON, _GetBuffer, (void *) file);
-      breakIf(!mi);
-
-      gmineInfoDloc(mi);
-      mi = NULL;
-
-      fclose(file);
-      file = NULL;
+      breakIf(!_ReadMiJson());
 
       // No errors if we reached here.
       msg = "NO";
@@ -127,7 +95,7 @@ int main(int acount, char ** alist)
    printf("MI: %s ERROR.\n", msg);
 
    // Clean up
-   gmineInfoDloc(mi);
+   gmineInfoDloc(gmineInfo);
 
    if (file)
    {
@@ -143,6 +111,48 @@ int main(int acount, char ** alist)
 local:
 function:
 **************************************************************************************************/
+/**************************************************************************************************
+func: _BlockWrite
+**************************************************************************************************/
+static Gb _BlockWrite(GmineInfo * const gmineInfo)
+{
+   GmineInfoBlockType block;
+
+   // For all the blocks...
+   loop
+   {
+      // Get the block we are writing out now.
+      block = gmineInfoBlockTypeNext(gmineInfo);
+      breakIf(block == gmineInfoBlockType_END);
+
+      // Write out the block.
+      switch (block)
+      {
+      //case gmineInfoBlockTypeDATA:
+      //   _BlockSetData(gmineInfo);
+      //   break;
+      //
+      //case gmineInfoBlockTypeITEM:
+      //   _BlockSetItem(gmineInfo);
+      //   break;
+      //
+      //case gmineInfoBlockTypeGEOMETRY:
+      //   _BlockSetGeometry(gmineInfo);
+      //   break;
+      //
+      //case gmineInfoBlockTypeDRILL_HOLE:
+      //   _BlockSetDrillHole(gmineInfo);
+      //   break;
+      //
+      //case gmineInfoBlockTypeMODEL:
+      //   _BlockSetModel(gmineInfo);
+      //   break;
+      }
+   }
+
+   returnTrue;
+}
+
 /**************************************************************************************************
 func: _GetBuffer
 **************************************************************************************************/
@@ -174,6 +184,72 @@ void _MemDloc(void * const mem)
 }
 
 /**************************************************************************************************
+func: _ReadMiJson
+**************************************************************************************************/
+static Gb _ReadMiJson(void)
+{
+   GmineInfo *gmineInfo;
+   FILE      *file;
+   Gb         result;
+
+   gmineInfo = NULL;
+   result    = gbFALSE;
+   breakScope
+   {
+      fopen_s(&file, "test.mijson", "rb");
+      breakIf(!file);
+
+      gmineInfo = gmineInfoClocReader(gmineInfoFileTypeJSON, _GetBuffer, (void *) file);
+      breakIf(!gmineInfo);
+
+      result = gbTRUE;
+   }
+
+   // Clean up
+   gmineInfoDloc(gmineInfo);
+
+   if (file)
+   {
+      fclose(file);
+   }
+
+   return result;
+}
+
+/**************************************************************************************************
+func: _ReadMiMiff
+**************************************************************************************************/
+static Gb _ReadMiMiff(void)
+{
+   GmineInfo *gmineInfo;
+   FILE      *file;
+   Gb         result;
+
+   gmineInfo = NULL;
+   result    = gbFALSE;
+   breakScope
+   {
+      fopen_s(&file, "test.mimiff", "rb");
+      breakIf(!file);
+
+      gmineInfo = gmineInfoClocReader(gmineInfoFileTypeMIFF, _GetBuffer, (void *) file);
+      breakIf(!gmineInfo);
+
+      result = gbTRUE;
+   }
+
+   // Clean up
+   gmineInfoDloc(gmineInfo);
+
+   if (file)
+   {
+      fclose(file);
+   }
+
+   return result;
+}
+
+/**************************************************************************************************
 func: _SetBuffer
 **************************************************************************************************/
 static Gb _SetBuffer(void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData)
@@ -181,5 +257,75 @@ static Gb _SetBuffer(void * const dataRepo, Gcount const byteCount, Gn1 const * 
    returnFalseIf(byteCount <= 0);
 
    return (_fwrite_nolock(byteData, 1, byteCount, (FILE *) dataRepo) == (size_t) byteCount);
+}
+
+/**************************************************************************************************
+func: _WriteMiJson
+**************************************************************************************************/
+static Gb _WriteMiJson(void)
+{
+   GmineInfo *gmineInfo;
+   FILE      *file;
+   Gb         result;
+
+   gmineInfo = NULL;
+   result    = gbFALSE;
+   breakScope
+   {
+      fopen_s(&file, "test.mijson", "wb");
+      breakIf(!file);
+
+      gmineInfo = gmineInfoClocWriter(gmineInfoFileTypeJSON, _SetBuffer, (void *) file);
+      breakIf(!gmineInfo);
+
+      breakIf(!_BlockWrite(gmineInfo));
+
+      result = gbTRUE;
+   }
+
+   // Clean up
+   gmineInfoDloc(gmineInfo);
+
+   if (file)
+   {
+      fclose(file);
+   }
+
+   return result;
+}
+
+/**************************************************************************************************
+func: _WriteMiMiff
+**************************************************************************************************/
+static Gb _WriteMiMiff(void)
+{
+   GmineInfo         *gmineInfo;
+   FILE              *file;
+   Gb                 result;
+
+   gmineInfo = NULL;
+   result    = gbFALSE;
+   breakScope
+   {
+      fopen_s(&file, "test.mimiff", "wb");
+      breakIf(!file);
+
+      gmineInfo = gmineInfoClocWriter(gmineInfoFileTypeMIFF, _SetBuffer, (void *) file);
+      breakIf(!gmineInfo);
+
+      breakIf(!_BlockWrite(gmineInfo));
+
+      result = gbTRUE;
+   }
+
+   // Clean up
+   gmineInfoDloc(gmineInfo);
+
+   if (file)
+   {
+      fclose(file);
+   }
+
+   return result;
 }
 

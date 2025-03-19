@@ -60,6 +60,70 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
+func: gmineInfoBlockTypeNext
+
+Block order is important for reading in the MineInfo file in one go.  Some data needs to be defined
+before it is being referred to.  This is why writing out blocks in a specific order is important.
+This function is only necessary for writing.  Reading will a MineInfo file works differently.
+**************************************************************************************************/
+GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
+{
+   returnIf(
+         !_isStarted ||
+         !gmineInfo  ||
+         gmineInfo->currentBlockType == gmineInfoBlockType_END,
+      gmineInfoBlockType_END);
+
+   // If writing...
+   if (gmineInfo->isWriting)
+   {
+      // Close up the previous block
+      switch (gmineInfo->currentBlockType)
+      {
+      case gmineInfoBlockTypeDATA:
+      //case gmineInfoBlockTypeIMAGE:
+      //case gmineInfoBlockTypePROPERTIES:
+      case gmineInfoBlockTypeITEM:
+      case gmineInfoBlockTypeGEOMETRY:
+      case gmineInfoBlockTypeDRILL_HOLE:
+      case gmineInfoBlockTypeMODEL:
+         _MiIoWriteBlockStop(gmineInfo);
+         break;
+      }
+   }
+
+   // Move to the next block
+   gmineInfo->currentBlockType++;
+
+   switch (gmineInfo->currentBlockType)
+   {
+   case gmineInfoBlockTypeDATA:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DATA);
+      break;
+
+   //case gmineInfoBlockTypeIMAGE:
+   //case gmineInfoBlockTypePROPERTIES:
+   case gmineInfoBlockTypeITEM:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM);
+      break;
+
+   case gmineInfoBlockTypeGEOMETRY:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_GEOMETRY);
+      break;
+
+   case gmineInfoBlockTypeDRILL_HOLE:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DRILL_HOLE);
+      break;
+
+   case gmineInfoBlockTypeMODEL:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_MODEL);
+      break;
+   }
+
+   return gmineInfo->currentBlockType;
+}
+
+/**************************************************************************************************
 func: gmineInfoClocReader
 **************************************************************************************************/
 GmineInfo *gmineInfoClocReader(GmineInfoFileType const fileType, GgetBuffer getBufferFunc,
@@ -93,10 +157,9 @@ Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GmineInfoFileType con
 
    _MiMemClearType(gmineInfo, GmineInfo);
 
-   gmineInfo->fileType         = fileType;
-   gmineInfo->dataRepo         = dataRepo;
-   gmineInfo->getBuffer        = getBufferFunc;
-   gmineInfo->currentBlockType = gmineInfoBlockTypeNONE;
+   gmineInfo->fileType  = fileType;
+   gmineInfo->dataRepo  = dataRepo;
+   gmineInfo->getBuffer = getBufferFunc;
 
    // Start reading the file header.
    return _MiIoClocReader(gmineInfo);
@@ -134,11 +197,10 @@ Gb gmineInfoClocWriterContent(GmineInfo * const gmineInfo, GmineInfoFileType con
 
    _MiMemClearType(gmineInfo, GmineInfo);
 
-   gmineInfo->isWriting        = gbTRUE;
-   gmineInfo->fileType         = fileType;
-   gmineInfo->dataRepo         = dataRepo;
-   gmineInfo->setBuffer        = setBufferFunc;
-   gmineInfo->currentBlockType = gmineInfoBlockTypeINFORMATION;
+   gmineInfo->isWriting = gbTRUE;
+   gmineInfo->fileType  = fileType;
+   gmineInfo->dataRepo  = dataRepo;
+   gmineInfo->setBuffer = setBufferFunc;
 
    // Start by writing out the header for the file.
    return _MiIoClocWriter(gmineInfo);
@@ -170,40 +232,6 @@ void gmineInfoDlocContent(GmineInfo * const gmineInfo)
    _MiIoDloc(gmineInfo);
 
    _MiMemClearType(gmineInfo, GmineInfo);
-}
-
-/**************************************************************************************************
-func: gmineInfoGetCurrentBlockType
-**************************************************************************************************/
-GmineInfoBlockType gmineInfoGetCurrentBlockType(GmineInfo const * const gmineInfo)
-{
-   returnIf(
-         !_isStarted ||
-         !gmineInfo,
-      gmineInfoBlockTypeNONE);
-
-   return gmineInfo->currentBlockType;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetCurrentBlockTypeToNextBlockType
-
-Block order is important for reading in the MineInfo file in one go.  Some data needs to be defined
-before it is being referred to.  This is why writing out blocks in a specific order is important.
-This function is only necessary for writing.  Reading will a MineInfo file works differently.
-**************************************************************************************************/
-GmineInfoBlockType gmineInfoSetCurrentBlockTypeToNextBlockType(GmineInfo * const gmineInfo)
-{
-   returnIf(
-         !_isStarted ||
-         !gmineInfo  ||
-         gmineInfo->currentBlockType == gmineInfoBlockType_END,
-      gmineInfoBlockType_END);
-
-   // Move to the next block
-   gmineInfo->currentBlockType++;
-
-   return gmineInfo->currentBlockType;
 }
 
 /**************************************************************************************************

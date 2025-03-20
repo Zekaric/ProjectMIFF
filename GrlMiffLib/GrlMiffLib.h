@@ -104,6 +104,10 @@ typedef Gi4                Gsize;
 // UTF8
 typedef char               Gstr;
 
+// Because bit fields in a structure definition always trips me up.  Needs to be
+// unsigned.
+typedef unsigned int       Gbit;
+
 typedef enum
 {
    gformatNONE,

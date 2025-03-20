@@ -70,7 +70,6 @@ Gb                 gmineInfoClocWriterContent(                 GmineInfo       *
 void               gmineInfoDloc(                              GmineInfo       * const gmineInfo);
 void               gmineInfoDlocContent(                       GmineInfo       * const gmineInfo);
 
-GmineInfoBlockType gmineInfoSetCurrentBlockTypeToNextBlockType(GmineInfo       * const gmineInfo);
 Gb                 gmineInfoSetDataAuthorName(                 GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataComment(                    GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataCompanyName(                GmineInfo       * const gmineInfo, Gstr const * const value);
@@ -81,6 +80,8 @@ Gb                 gmineInfoSetDataProjectName(                GmineInfo       *
 Gb                 gmineInfoSetDataProjectSystem(              GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataSoftwareName(               GmineInfo       * const gmineInfo, Gstr const * const value, Gstr * const version);
 Gb                 gmineInfoSetDataOther(                      GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+
+Gb                 gmineInfoWriteData(                         GmineInfo       * const gmineInfo);
 
 Gb                 gmineInfoStart(                             GmemCloc memClocFunc, GmemDloc memDlocFunc);
 void               gmineInfoStop(                              void);

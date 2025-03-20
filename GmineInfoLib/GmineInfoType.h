@@ -37,6 +37,7 @@ SOFTWARE.
 /**************************************************************************************************
 constant:
 **************************************************************************************************/
+#define gmineInfoPROJECT_SYSTEM_LOCAL  "local"
 
 /**************************************************************************************************
 type:
@@ -55,12 +56,13 @@ typedef enum
    gmineInfoBlockTypeNONE,
 
    gmineInfoBlockTypeDATA,
-   //gmineInfoBlockTypeIMAGE,
-   //gmineInfoBlockTypePROPERTIES,
    gmineInfoBlockTypeITEM,
    gmineInfoBlockTypeGEOMETRY,
    gmineInfoBlockTypeDRILL_HOLE,
    gmineInfoBlockTypeMODEL,
+
+   //gmineInfoBlockTypeIMAGE,
+   //gmineInfoBlockTypePROPERTIES,
 
    // No more block types.
    gmineInfoBlockType_END,
@@ -84,14 +86,25 @@ typedef struct
           z; // Elevation
 } GmineInfoVector;
 
-typedef struct
+typedef struct GmineInfoKeyValue GmineInfoKeyValue;
+struct GmineInfoKeyValue
 {
    Gstr              *key,
                      *value;
-} GmineInfoKeyValue;
+   GmineInfoKeyValue *next;
+};
 
 typedef struct
 {
+   Gbit               isSetAuthorName        : 1,
+                      isSetComment           : 1,
+                      isSetCompanyName       : 1,
+                      isSetCopyright         : 1,
+                      isSetSoftware          : 1,
+                      isSetProjectName       : 1,
+                      isSetProjectSystem     : 1,
+                      isSetProjectMax        : 1,
+                      isSetProjectMin        : 1;
    Gstr              *authorName,
                      *comment,
                      *companyName,
@@ -102,8 +115,8 @@ typedef struct
                      *projectSystem;
    GmineInfoPoint     projectMax,
                       projectMin;
-   Gcount             otherCount;
-   GmineInfoKeyValue *otherList;
+   GmineInfoKeyValue *otherListHead,
+                     *otherListTail;
 } GmineInfoData;
 
 typedef struct
@@ -150,7 +163,7 @@ typedef struct
    Gmiff             *miffFile;
    Gjson             *jsonFile;
 
-   GmineInfoUnion    *block;
+   GmineInfoUnion     block;
 } GmineInfo;
 
 /**************************************************************************************************

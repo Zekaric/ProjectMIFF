@@ -35,20 +35,25 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-static Gb       _BlockWrite(        GmineInfo * const gmineInfo);
+static Gb       _BlockWrite(           GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteData(       GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteDrillHole(  GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteGeometry(   GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteItem(       GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteModel(      GmineInfo       * const gmineInfo);
 
-static Gb       _GetBuffer(         void * const dataRepo, Gcount const byteCount, Gn1       * const byteData);
+static Gb       _GetBuffer(            void * const dataRepo, Gcount const byteCount, Gn1       * const byteData);
 
-static void    *_MemCloc(           Gcount const memByteCount);
-static void     _MemDloc(           void * const mem);
+static void    *_MemCloc(              Gcount const memByteCount);
+static void     _MemDloc(              void * const mem);
 
-static Gb       _ReadMiJson(        void);
-static Gb       _ReadMiMiff(        void);
+static Gb       _ReadMiJson(           void);
+static Gb       _ReadMiMiff(           void);
 
-static Gb       _SetBuffer(         void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData);
+static Gb       _SetBuffer(            void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData);
 
-static Gb       _WriteMiJson(       void);
-static Gb       _WriteMiMiff(       void);
+static Gb       _WriteMiJson(          void);
+static Gb       _WriteMiMiff(          void);
 
 /**************************************************************************************************
 global:
@@ -126,30 +131,86 @@ static Gb _BlockWrite(GmineInfo * const gmineInfo)
       breakIf(block == gmineInfoBlockType_END);
 
       // Write out the block.
-      switch (block)
+      if      (block == gmineInfoBlockTypeDATA)
       {
-      //case gmineInfoBlockTypeDATA:
-      //   _BlockSetData(gmineInfo);
-      //   break;
-      //
-      //case gmineInfoBlockTypeITEM:
-      //   _BlockSetItem(gmineInfo);
-      //   break;
-      //
-      //case gmineInfoBlockTypeGEOMETRY:
-      //   _BlockSetGeometry(gmineInfo);
-      //   break;
-      //
-      //case gmineInfoBlockTypeDRILL_HOLE:
-      //   _BlockSetDrillHole(gmineInfo);
-      //   break;
-      //
-      //case gmineInfoBlockTypeMODEL:
-      //   _BlockSetModel(gmineInfo);
-      //   break;
+         breakIf(!_BlockWriteData(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeITEM)
+      {
+         breakIf(!_BlockWriteItem(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeGEOMETRY)
+      {
+         breakIf(!_BlockWriteGeometry(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeDRILL_HOLE)
+      {
+         breakIf(!_BlockWriteDrillHole(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeMODEL)
+      {
+         breakIf(!_BlockWriteModel(gmineInfo));
       }
    }
 
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _BlockWriteData
+**************************************************************************************************/
+static Gb _BlockWriteData(GmineInfo * const gmineInfo)
+{
+   GmineInfoPoint min = {1000, 2000, 3000},
+                  max = {2500, 3500, 3100};
+
+   gmineInfoSetDataAuthorName(   gmineInfo, "Robbert de Groot");
+   gmineInfoSetDataComment(      gmineInfo, "This is a comment\nLine 1\nLines only include a new line character.");
+   gmineInfoSetDataCompanyName(  gmineInfo, "Zekaric");
+   gmineInfoSetDataCopyright(    gmineInfo, "2025 (c) Robbert de Groot");
+   gmineInfoSetDataProjectMax(   gmineInfo, &max);
+   gmineInfoSetDataProjectMin(   gmineInfo, &min);
+   gmineInfoSetDataProjectName(  gmineInfo, "Mines Of Moria");
+   gmineInfoSetDataProjectSystem(gmineInfo, gmineInfoPROJECT_SYSTEM_LOCAL);
+   gmineInfoSetDataSoftwareName( gmineInfo, "GmineInfoTest.exe", "v1.0");
+   gmineInfoSetDataOther(        gmineInfo, "project lead",  "Ghimli");
+   gmineInfoSetDataOther(        gmineInfo, "project sme",   "Gandalf The Grey");
+   gmineInfoSetDataOther(        gmineInfo, "project theif", "Bilbo Baggins");
+   gmineInfoSetDataOther(        gmineInfo, "risk 1",        "Gollum");
+   gmineInfoSetDataOther(        gmineInfo, "risk 2",        "The Balrog");
+
+   return gmineInfoWriteData(gmineInfo);
+}
+
+/**************************************************************************************************
+func: _BlockWriteDrillHole
+**************************************************************************************************/
+static Gb _BlockWriteDrillHole(GmineInfo * const gmineInfo)
+{
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _BlockWriteGeometry
+**************************************************************************************************/
+static Gb _BlockWriteGeometry(GmineInfo * const gmineInfo)
+{
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _BlockWriteItem
+**************************************************************************************************/
+static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
+{
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _BlockWriteModel
+**************************************************************************************************/
+static Gb _BlockWriteModel(GmineInfo * const gmineInfo)
+{
    returnTrue;
 }
 

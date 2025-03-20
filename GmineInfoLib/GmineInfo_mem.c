@@ -82,3 +82,22 @@ void _MiMemStop(void)
    _memCloc = NULL;
    _memDloc = NULL;
 }
+
+/**************************************************************************************************
+func: _MiStrClone
+**************************************************************************************************/
+Gstr *_MiStrClone(Gstr const * const value)
+{
+   Gcount byteCount;
+   Gstr  *str;
+
+   returnNullIf(!value);
+
+   byteCount = _MiStrGetCount(value, Gn4MAX);
+   str       = _MiMemClocTypeArray(byteCount + 1, Gstr);
+   returnNullIf(!str);
+
+   _MiMemCopyTypeArray(str, byteCount, Gstr, value);
+
+   return str;
+}

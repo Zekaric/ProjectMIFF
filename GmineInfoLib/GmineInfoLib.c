@@ -81,13 +81,28 @@ GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
       switch (gmineInfo->currentBlockType)
       {
       case gmineInfoBlockTypeDATA:
-      //case gmineInfoBlockTypeIMAGE:
-      //case gmineInfoBlockTypePROPERTIES:
+         //_MiUnionDlocData(       gmineInfo);
+         _MiIoWriteBlockStop(    gmineInfo);
+         break;
+
       case gmineInfoBlockTypeITEM:
+         //_MiUnionDlocItem(       gmineInfo);
+         _MiIoWriteBlockStop(    gmineInfo);
+         break;
+
       case gmineInfoBlockTypeGEOMETRY:
+         //_MiUnionDlocGeometry(   gmineInfo);
+         _MiIoWriteBlockStop(    gmineInfo);
+         break;
+
       case gmineInfoBlockTypeDRILL_HOLE:
+         //_MiUnionDlocDrillHole(  gmineInfo);
+         _MiIoWriteBlockStop(    gmineInfo);
+         break;
+
       case gmineInfoBlockTypeMODEL:
-         _MiIoWriteBlockStop(gmineInfo);
+         //_MiUniontDlocModel(     gmineInfo);
+         _MiIoWriteBlockStop(    gmineInfo);
          break;
       }
    }
@@ -95,14 +110,15 @@ GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
    // Move to the next block
    gmineInfo->currentBlockType++;
 
+   // Clear the memory for the next block.
+   _MiMemClearType(gmineInfo->block, GmineInfoUnion);
+
    switch (gmineInfo->currentBlockType)
    {
    case gmineInfoBlockTypeDATA:
       _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DATA);
       break;
 
-   //case gmineInfoBlockTypeIMAGE:
-   //case gmineInfoBlockTypePROPERTIES:
    case gmineInfoBlockTypeITEM:
       _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM);
       break;
@@ -232,6 +248,248 @@ void gmineInfoDlocContent(GmineInfo * const gmineInfo)
    _MiIoDloc(gmineInfo);
 
    _MiMemClearType(gmineInfo, GmineInfo);
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataAuthorName
+**************************************************************************************************/
+Gb gmineInfoSetDataAuthorName(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.authorName      = _MiStrClone(value);
+   gmineInfo->block.data.isSetAuthorName = (gmineInfo->block.data.authorName != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataComment
+**************************************************************************************************/
+Gb gmineInfoSetDataComment(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.comment      = _MiStrClone(value);
+   gmineInfo->block.data.isSetComment = (gmineInfo->block.data.comment != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataCompanyName
+**************************************************************************************************/
+Gb gmineInfoSetDataCompanyName(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.companyName      = _MiStrClone(value);
+   gmineInfo->block.data.isSetCompanyName = (gmineInfo->block.data.companyName != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataCopyright
+**************************************************************************************************/
+Gb gmineInfoSetDataCopyright(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.copyright      = _MiStrClone(value);
+   gmineInfo->block.data.isSetCopyright = (gmineInfo->block.data.copyright != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataProjectMax
+**************************************************************************************************/
+Gb gmineInfoSetDataProjectMax(GmineInfo * const gmineInfo, GmineInfoPoint const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value);
+
+   gmineInfo->block.data.projectMax      = *value;
+   gmineInfo->block.data.isSetProjectMax = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataProjectMin
+**************************************************************************************************/
+Gb gmineInfoSetDataProjectMin(GmineInfo * const gmineInfo, GmineInfoPoint const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value);
+
+   gmineInfo->block.data.projectMin      = *value;
+   gmineInfo->block.data.isSetProjectMin = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataProjectName
+**************************************************************************************************/
+Gb gmineInfoSetDataProjectName(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.projectName      = _MiStrClone(value);
+   gmineInfo->block.data.isSetProjectName = (gmineInfo->block.data.projectName != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataProjectSystem
+**************************************************************************************************/
+Gb gmineInfoSetDataProjectSystem(GmineInfo * const gmineInfo, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfo ||
+      !value     ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   gmineInfo->block.data.projectSystem      = _MiStrClone(value);
+   gmineInfo->block.data.isSetProjectSystem = (gmineInfo->block.data.projectSystem != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataSoftwareName
+**************************************************************************************************/
+Gb gmineInfoSetDataSoftwareName(GmineInfo * const gmineInfo, Gstr const * const value, Gstr * const version)
+{
+   returnFalseIf(
+      !gmineInfo                       ||
+      !value                           ||
+      !_MiStrGetCount(value,   Gn4MAX) ||
+      !version                         ||
+      !_MiStrGetCount(version, Gn4MAX));
+
+   gmineInfo->block.data.softwareName    = _MiStrClone(value);
+   gmineInfo->block.data.softwareVersion = _MiStrClone(value);
+   gmineInfo->block.data.isSetSoftware   =
+      (gmineInfo->block.data.softwareName    != NULL &&
+       gmineInfo->block.data.softwareVersion != NULL);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoSetDataOther
+**************************************************************************************************/
+Gb gmineInfoSetDataOther(GmineInfo * const gmineInfo, Gstr const * const key, Gstr const * const value)
+{
+   GmineInfoKeyValue *keyValue;
+
+   returnFalseIf(
+      !gmineInfo                     ||
+      !key                           ||
+      !_MiStrGetCount(key,   Gn4MAX) ||
+      !value                         ||
+      !_MiStrGetCount(value, Gn4MAX));
+
+   keyValue = _MiMemClocType(GmineInfoKeyValue);
+   returnFalseIf(!keyValue);
+
+   keyValue->key   = _MiStrClone(key);
+   keyValue->value = _MiStrClone(value);
+
+   if (!gmineInfo->block.data.otherListHead)
+   {
+      // Start the list.
+      gmineInfo->block.data.otherListHead    =
+         gmineInfo->block.data.otherListTail = keyValue;
+   }
+   else
+   {
+      // Append to the list.
+      gmineInfo->block.data.otherListTail->next = keyValue;
+      gmineInfo->block.data.otherListTail       = keyValue;
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteData
+**************************************************************************************************/
+Gb gmineInfoWriteData(GmineInfo * const gmineInfo)
+{
+   GmineInfoKeyValue *keyValue;
+
+   if (gmineInfo->block.data.isSetAuthorName)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,     gmineInfo->block.data.companyName);
+   }
+   if (gmineInfo->block.data.isSetCopyright)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,        gmineInfo->block.data.copyright);
+   }
+   if (gmineInfo->block.data.isSetProjectName)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,     gmineInfo->block.data.projectName);
+   }
+   if (gmineInfo->block.data.isSetProjectSystem)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM,   gmineInfo->block.data.projectSystem);
+   }
+   if (gmineInfo->block.data.isSetProjectMin)
+   {
+      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,     &gmineInfo->block.data.projectMin);
+   }
+   if (gmineInfo->block.data.isSetProjectMax)
+   {
+      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,     &gmineInfo->block.data.projectMax);
+   }
+   if (gmineInfo->block.data.isSetAuthorName)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,      gmineInfo->block.data.authorName);
+   }
+   if (gmineInfo->block.data.isSetComment)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMMENT,          gmineInfo->block.data.comment);
+   }
+   if (gmineInfo->block.data.isSetSoftware)
+   {
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_SOFTWARE_NAME,    gmineInfo->block.data.softwareName);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_SOFTWARE_VERSION, gmineInfo->block.data.softwareVersion);
+   }
+
+   keyValue = gmineInfo->block.data.otherListHead;
+   loop
+   {
+      breakIf(!keyValue);
+
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_OTHER_KEY,   keyValue->key);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_OTHER_VALUE, keyValue->value);
+
+      keyValue = keyValue->next;
+   }
+
+   returnTrue;
 }
 
 /**************************************************************************************************

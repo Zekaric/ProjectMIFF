@@ -207,45 +207,45 @@ GmiffValue      gmiffValueSetR4(       Gr4 const rvalue);
 GmiffValue      gmiffValueSetStrBuffer(Gcount const strCount, Gstr * const strBuffer);
 GmiffValue      gmiffValueSetStrCount( Gcount const strCount);
 
-// Convenience macroes
-#define gmiffValueSetStr(                  VALUE)                              gmiffValueSetStrBuffer((Gcount) strlen(VALUE), VALUE)
+// Convenience utils and macroes
+Gb              gmiffSetRecordBlockStart( Gmiff       * const miff, Gstr const * const name);
+Gb              gmiffSetRecordBlockStop(  Gmiff       * const miff);
 
-#define gmiffSetRecordBlockStart(          MIFF, NAME)                       ( gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_START, 0, NAME), gmiffSetRecordStop(MIFF) )
-#define gmiffSetRecordBlockStop(           MIFF)                             ( gmiffSetRecordStart(MIFF, gmiffRecTypeBLOCK_STOP,  0, NULL), gmiffSetRecordStop(MIFF) )
+Gb              gmiffSetRecordNull(       Gmiff       * const miff, Gstr const * const name);
+Gb              gmiffSetRecordBool(       Gmiff       * const miff, Gstr const * const name, Gb const value);
+Gb              gmiffSetRecordI(          Gmiff       * const miff, Gstr const * const name, Gi8 const value);
+Gb              gmiffSetRecordN(          Gmiff       * const miff, Gstr const * const name, Gn8 const value);
+Gb              gmiffSetRecordR(          Gmiff       * const miff, Gstr const * const name, Gr8 const value);
+Gb              gmiffSetRecordR4(         Gmiff       * const miff, Gstr const * const name, Gr4 const value);
+Gb              gmiffSetRecordStr(        Gmiff       * const miff, Gstr const * const name, Gstr * const value);
+Gb              gmiffSetRecordBinBuffer(  Gmiff       * const miff, Gstr const * const name, Gcount const count, Gn1 * const value);
 
-#define gmiffSetRecordValueNull(           MIFF)                             { GmiffValue __value__; __value__ = gmiffValueSetNull(                     ); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueB(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetB(                 (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueI(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetI(                 (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueN(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetN(                 (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueR(              MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetR(                 (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueR4(             MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetR4(                (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueStr(            MIFF,        VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetStr(               (VALUE)); gmiffSetValue(MIFF, __value__); }
-#define gmiffSetRecordValueBinBuffer(      MIFF, COUNT, VALUE)               { GmiffValue __value__; __value__ = gmiffValueSetBinBuffer((COUNT), (VALUE)); gmiffSetValue(MIFF, __value__); }
+Gb              gmiffSetRecordBoolArray(  Gmiff       * const miff, Gstr const * const name, Gcount const count, Gb const * const array);
+Gb              gmiffSetRecordIArray(     Gmiff       * const miff, Gstr const * const name, Gcount const count, Gi8 const * const array);
+Gb              gmiffSetRecordNArray(     Gmiff       * const miff, Gstr const * const name, Gcount const count, Gn8 const * const array);
+Gb              gmiffSetRecordRArray(     Gmiff       * const miff, Gstr const * const name, Gcount const count, Gr8 const * const array);
+Gb              gmiffSetRecordR4Array(    Gmiff       * const miff, Gstr const * const name, Gcount const count, Gr4 const * const array);
+Gb              gmiffSetRecordStrArray(   Gmiff       * const miff, Gstr const * const name, Gcount const count, Gstr ** const array);
 
-#define gmiffSetRecordNull(                MIFF,       NAME)                 { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueNull(     MIFF                  ); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordBool(                MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueB(        MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordI(                   MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueI(        MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordN(                   MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueN(        MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordR(                   MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueR(        MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordR4(                  MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueR4(       MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordStr(                 MIFF,       NAME,        VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueStr(      MIFF,          (VALUE)); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordBinBuffer(           MIFF,       NAME, COUNT, VALUE)   { gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME); { gmiffSetRecordValueBinBuffer(MIFF, (COUNT), (VALUE)); } gmiffSetRecordStop(MIFF); }
+#define gmiffValueSetStr(                  VALUE)                              gmiffValueSetStrBuffer((Gcount) strlen(VALUE), (VALUE))
 
-#define gmiffSetRecordStartBinArray(       MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartBoolArray(      MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartIArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartNArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartRArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartR4Array(        MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartStrArray(       MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartValueArray(     MIFF,       NAME, COUNT)            gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, COUNT, NAME)
-#define gmiffSetRecordStartValue(          MIFF,       NAME)                   gmiffSetRecordStart(MIFF, gmiffRecTypeVALUE, 1,     NAME);
+#define gmiffSetRecordValueNull(           MIFF)                               gmiffSetValue((MIFF), gmiffValueSetNull(                     ))
+#define gmiffSetRecordValueB(              MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetB(                 (VALUE)))
+#define gmiffSetRecordValueI(              MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetI(                 (VALUE)))
+#define gmiffSetRecordValueN(              MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetN(                 (VALUE)))
+#define gmiffSetRecordValueR(              MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetR(                 (VALUE)))
+#define gmiffSetRecordValueR4(             MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetR4(                (VALUE)))
+#define gmiffSetRecordValueStr(            MIFF,        VALUE)                 gmiffSetValue((MIFF), gmiffValueSetStr(               (VALUE)))
+#define gmiffSetRecordValueBinBuffer(      MIFF, COUNT, VALUE)                 gmiffSetValue((MIFF), gmiffValueSetBinBuffer((COUNT), (VALUE)))
 
-#define gmiffSetRecordBoolArray(           MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartBoolArray(MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueB(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordIArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartIArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueI(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordNArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartNArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueN(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordRArray(              MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartRArray(   MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueR(  MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordR4Array(             MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartR4Array(  MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueR4( MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
-#define gmiffSetRecordStrArray(            MIFF, NAME, COUNT, ARRAY)         { gmiffSetRecordStartStrArray( MIFF, NAME, COUNT); int __index__; forCount(__index__, (COUNT)) { gmiffSetRecordValueStr(MIFF, (ARRAY[__index__])); } gmiffSetRecordStop(MIFF); }
+#define gmiffSetRecordStartBinArray(       MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartBoolArray(      MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartIArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartNArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartRArray(         MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartR4Array(        MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartStrArray(       MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartValueArray(     MIFF,       NAME, COUNT)            gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, (COUNT), (NAME))
+#define gmiffSetRecordStartValue(          MIFF,       NAME)                   gmiffSetRecordStart((MIFF), gmiffRecTypeVALUE, 1,       (NAME))
 
 #endif

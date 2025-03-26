@@ -75,8 +75,6 @@ constant:
 #define KEY_BLOCK_DATA_PROJECT_SYSTEM     "project system"
 #define KEY_BLOCK_DATA_SOFTWARE_NAME      "software name"
 #define KEY_BLOCK_DATA_SOFTWARE_VERSION   "software version"
-#define KEY_BLOCK_DATA_OTHER_KEY          "key"
-#define KEY_BLOCK_DATA_OTHER_VALUE        "value"
 
 #define KEY_BLOCK_ITEM                    "item"
 #define KEY_BLOCK_GEOMETRY                "geometry"
@@ -107,7 +105,7 @@ void               _MiIoDloc(             GmineInfo       * const mineInfo);
 Gb                 _MiIoWriteBlockStart(  GmineInfo       * const gmineInfo, Gstr       * const key);
 Gb                 _MiIoWriteBlockStop(   GmineInfo       * const gmineInfo);
 Gb                 _MiIoWritePoint(       GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);
-Gb                 _MiIoWriteString(      GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+Gb                 _MiIoWriteString(      GmineInfo       * const gmineInfo, Gstr const * const key, Gstr * const value);
 
 void              *_MiMemCloc(            Gcount const memByteCount);
 void               _MiMemDloc(            void * const mem);
@@ -121,7 +119,7 @@ void               _MiMemStop(            void);
 #define            _MiMemCopyTypeArray(   MEM, COUNT, TYPE, SRC)          memcpy((MEM), (SRC), (COUNT) * sizeof(TYPE))
 #define            _MiMemIsEqual(         COUNT, MEM, COUNT_ALT, MEM_ALT) (memcmp(MEM, MEM_ALT, COUNT) == 0)
 
-#define            _MiStrGetCount(        STR, MAX_LEN)                   strnlen(STR, MAX_LEN)
+#define            _MiStrGetCount(        STR, MAX_LEN)                   (Gcount) (strnlen(STR, (size_t) (MAX_LEN)))
 #define            _MiStrIsEqual(         STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, GkeyBYTE_COUNT), STR, _MiStrGetCount(STR_ALT, GkeyBYTE_COUNT), STR_ALT)
 Gstr              *_MiStrClone(           Gstr const * const value);
 

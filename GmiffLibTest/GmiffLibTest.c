@@ -2569,7 +2569,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
       gmiffSetRecordBoolArray(      miff, "Bool Array",   100,  _bools);
 
-      gmiffSetRecordIArray(         miff, "I Array",      256,  _narray);
+      gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
       gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
 
       gmiffSetRecordRArray(         miff, "R Array",      300,  _reals8);
@@ -2651,7 +2651,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
          gmiffSetRecordBoolArray(      miff, "Bool Array",   100,  _bools);
 
-         gmiffSetRecordIArray(         miff, "I Array",      256,  _narray);
+         gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
          gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
 
          gmiffSetRecordRArray(         miff, "R Array",      300,  _reals8);

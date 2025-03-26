@@ -111,7 +111,7 @@ GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
    gmineInfo->currentBlockType++;
 
    // Clear the memory for the next block.
-   _MiMemClearType(gmineInfo->block, GmineInfoUnion);
+   _MiMemClearType(&gmineInfo->block, GmineInfoUnion);
 
    switch (gmineInfo->currentBlockType)
    {
@@ -389,7 +389,7 @@ Gb gmineInfoSetDataSoftwareName(GmineInfo * const gmineInfo, Gstr const * const 
       !_MiStrGetCount(version, Gn4MAX));
 
    gmineInfo->block.data.softwareName    = _MiStrClone(value);
-   gmineInfo->block.data.softwareVersion = _MiStrClone(value);
+   gmineInfo->block.data.softwareVersion = _MiStrClone(version);
    gmineInfo->block.data.isSetSoftware   =
       (gmineInfo->block.data.softwareName    != NULL &&
        gmineInfo->block.data.softwareVersion != NULL);
@@ -483,8 +483,7 @@ Gb gmineInfoWriteData(GmineInfo * const gmineInfo)
    {
       breakIf(!keyValue);
 
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_OTHER_KEY,   keyValue->key);
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_OTHER_VALUE, keyValue->value);
+      _MiIoWriteString(gmineInfo, keyValue->key, keyValue->value);
 
       keyValue = keyValue->next;
    }

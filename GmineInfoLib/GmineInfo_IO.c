@@ -221,29 +221,31 @@ Gb _MiIoWritePoint(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      gmiffSetRecordStartValue(gmineInfo->miffFile, key);
+      returnFalseIf(!gmiffSetRecordStartValue(gmineInfo->miffFile, key));
       {
-         gmiffSetRecordValueR( gmineInfo->miffFile, value->x);
-         gmiffSetRecordValueR( gmineInfo->miffFile, value->y);
-         gmiffSetRecordValueR( gmineInfo->miffFile, value->z);
+         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->x));
+         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->y));
+         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->z));
       }
-      gmiffSetRecordStop(      gmineInfo->miffFile);
+
+      return gmiffSetRecordStop(      gmineInfo->miffFile);
    }
 
    // JSON
-   gjsonSetObjectValueArrayStart(gmineInfo->jsonFile, key);
+   returnFalseIf(!gjsonSetObjectValueArrayStart(gmineInfo->jsonFile, key));
    {
-      gjsonSetArrayValueR(       gmineInfo->jsonFile, value->x);
-      gjsonSetArrayValueR(       gmineInfo->jsonFile, value->y);
-      gjsonSetArrayValueR(       gmineInfo->jsonFile, value->z);
+      returnFalseIf(!gjsonSetArrayValueR(       gmineInfo->jsonFile, value->x));
+      returnFalseIf(!gjsonSetArrayValueR(       gmineInfo->jsonFile, value->y));
+      returnFalseIf(!gjsonSetArrayValueR(       gmineInfo->jsonFile, value->z));
    }
-   gjsonSetObjectValueArrayStop( gmineInfo->jsonFile);
+
+   return gjsonSetObjectValueArrayStop( gmineInfo->jsonFile);
 }
 
 /**************************************************************************************************
 func: _MiIoWriteString
 **************************************************************************************************/
-Gb _MiIoWriteString(GmineInfo * const gmineInfo, Gstr const * const key, Gstr const * const value)
+Gb _MiIoWriteString(GmineInfo * const gmineInfo, Gstr const * const key, Gstr * const value)
 {
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
@@ -252,5 +254,5 @@ Gb _MiIoWriteString(GmineInfo * const gmineInfo, Gstr const * const key, Gstr co
    }
 
    // JSON
-   return gjsonSetObjectValueStr(gmineInfo->miffFile, key, value);
+   return gjsonSetObjectValueStr(gmineInfo->jsonFile, key, value);
 }

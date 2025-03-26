@@ -173,6 +173,7 @@
     <ClCompile Include="GmiffLib.c" />
     <ClCompile Include="Gmiff_get.c" />
     <ClCompile Include="Gmiff_set.c" />
+    <ClCompile Include="Gmiff_util.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gmiff_local.h" />

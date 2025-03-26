@@ -70,6 +70,17 @@ typedef enum
    gmineInfoBlockTypeCOUNT
 } GmineInfoBlockType;
 
+typedef enum
+{
+   gmineInfoItemTypeNONE,
+
+   gmineInfoItemTypeI,
+   gmineInfoItemTypeN,
+   gmineInfoItemTypeR,
+   gmineInfoItemTypeSTR,
+   gmineInfoItemType
+};
+
 typedef struct
 {
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
@@ -118,6 +129,18 @@ typedef struct
    GmineInfoKeyValue *otherListHead,
                      *otherListTail;
 } GmineInfoData;
+
+typedef struct GmineInfoItem;
+struct GmineInfoItem
+{
+   // Unique id for this item, library created.
+   Gn4                id;
+   Gstr              *name;
+   Gstr              *description;
+   // Unique id for this item, client provided.
+   Gstr              *uid;
+   GmineInfoItemType  type;
+};
 
 typedef struct
 {

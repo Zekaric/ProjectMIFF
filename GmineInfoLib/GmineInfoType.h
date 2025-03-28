@@ -78,23 +78,44 @@ typedef enum
    gmineInfoItemTypeN,
    gmineInfoItemTypeR,
    gmineInfoItemTypeSTR,
-   gmineInfoItemType
-};
+   gmineInfoItemTypeDATE,
+   gmineInfoItemTypeTIME,
+   gmineInfoItemTypeDATETIME,
+   gmineInfoItemTypePERCENT,
+
+   gmineInfoItemTypeFORMULA,
+
+   gmineInfoItemTypeCOUNT
+} GmineInfoItemType;
+
+typedef union
+{
+   Gn8                n;
+   Gi8                i;
+   Gr8                r;
+   Gstr              *str;
+} GmineInfoUnion;
+
+typedef struct
+{
+   Gb                 isSet;
+   GmineInfoUnion     value;
+} GmineInfoValue;
 
 typedef struct
 {
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
-   double x, // Easting, longitude
-          y, // Northing, latitude,
-          z; // Elevation
+   double             x, // Easting, longitude
+                      y, // Northing, latitude,
+                      z; // Elevation
 } GmineInfoPoint;
 
 typedef struct
 {
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
-   double x, // Easting, longitude
-          y, // Northing, latitude,
-          z; // Elevation
+   double             x, // Easting, longitude
+                      y, // Northing, latitude,
+                      z; // Elevation
 } GmineInfoVector;
 
 typedef struct GmineInfoKeyValue GmineInfoKeyValue;
@@ -102,6 +123,7 @@ struct GmineInfoKeyValue
 {
    Gstr              *key,
                      *value;
+
    GmineInfoKeyValue *next;
 };
 
@@ -116,6 +138,7 @@ typedef struct
                       isSetProjectSystem     : 1,
                       isSetProjectMax        : 1,
                       isSetProjectMin        : 1;
+
    Gstr              *authorName,
                      *comment,
                      *companyName,
@@ -126,6 +149,7 @@ typedef struct
                      *projectSystem;
    GmineInfoPoint     projectMax,
                       projectMin;
+
    GmineInfoKeyValue *otherListHead,
                      *otherListTail;
 } GmineInfoData;
@@ -133,13 +157,32 @@ typedef struct
 typedef struct GmineInfoItem;
 struct GmineInfoItem
 {
-   // Unique id for this item, library created.
+   Gbit               isSetDefault     : 1,
+                      isSetDescription : 1,
+                      isSetMax         : 1,
+                      isSetMin         : 1,
+                      isSetName        : 1,
+                      isSetPrecision   : 1,
+                      isSetType        : 1,
+                      isSetUid         : 1;
+
+   // Unique id for this item, library provided.
    Gn4                id;
+   
+   // User provided
    Gstr              *name;
    Gstr              *description;
-   // Unique id for this item, client provided.
    Gstr              *uid;
    GmineInfoItemType  type;
+   GmineInfoValue     default;
+   GmineInfoValue     max;
+   GmineInfoValue     min;
+   Gr8                precision;
+
+   GmineInfoKeyValue *otherListHead,
+                     *otherListTail;
+
+   GmineInfoItem     *next;
 };
 
 typedef struct

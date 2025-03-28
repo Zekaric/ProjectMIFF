@@ -420,7 +420,6 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
    case 'T': // D
    case 'U': // E
    case 'V': // F
-   case 'Z': // constant
    case 'g': // 0
    case 'h': // 1
    case 'i': // 2
@@ -437,10 +436,15 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
    case 't': // D
    case 'u': // E
    case 'v': // F
-   case 'z': // constant
       miff->value.type        = gmiffValueTypeNUM_REAL;
       _MiffGetPartRest(miff, header);
       _MiffGetNumReal( miff, miff->readCount, miff->readData);
+      break;
+
+   case 'Z': // constant
+   case 'z': // constant
+      _MiffGetPartRest(miff, header);
+      _MiffGetConstant(miff, miff->readCount, miff->readData);
       break;
 
    case '*':
@@ -827,12 +831,12 @@ Gr8 gmiffValueGetR(GmiffValue const value)
 {
    return0If(value.type != gmiffValueTypeNUM_REAL);
 
-   if (value.isR4)
+   if (value.isR8)
    {
-      return (Gr8) value.inr4.r;
+      return value.inr.r;
    }
 
-   return value.inr.r;
+   return (Gr8) value.inr4.r;
 }
 
 /**************************************************************************************************
@@ -869,16 +873,29 @@ GmiffValueType gmiffValueGetType(GmiffValue const value)
 }
 
 /**************************************************************************************************
-func: gmiffValueIs4
+func: gmiffValueIsR4
 
 Return the Real value byte count.
 True if Gr4
 **************************************************************************************************/
-Gb gmiffValueIs4(GmiffValue const value)
+Gb gmiffValueIsR4(GmiffValue const value)
 {
    returnFalseIf(value.type != gmiffValueTypeNUM_REAL);
 
    return value.isR4;
+}
+
+/**************************************************************************************************
+func: gmiffValueIsR8
+
+Return the Real value byte count.
+True if Gr8
+**************************************************************************************************/
+Gb gmiffValueIsR8(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeNUM_REAL);
+
+   return value.isR8;
 }
 
 /**************************************************************************************************
@@ -982,6 +999,7 @@ GmiffValue gmiffValueSetR(Gr8 const ivalue)
    _MiffMemClearType(&value, GmiffValue);
 
    value.type  = gmiffValueTypeNUM_REAL;
+   value.isR8  = gbTRUE;
    value.inr.r = ivalue;
 
    return value;

@@ -119,7 +119,7 @@ Gb gmiffSetRecordN(Gmiff * const miff, Gstr const * const name, Gn8 const value)
 
    returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
 
-   returnFalseIf(gmiffSetRecordValueN(miff, value));
+   returnFalseIf(!gmiffSetRecordValueN(miff, value));
 
    return gmiffSetRecordStop(miff);
 }
@@ -275,7 +275,7 @@ Gb gmiffSetRecordRArray(Gmiff * const miff, Gstr const * const name, Gcount cons
 
    forCount(index, count)
    {
-      returnFalseIf(gmiffSetRecordValueR(miff, array[index]));
+      returnFalseIf(!gmiffSetRecordValueR(miff, array[index]));
    }
 
    return gmiffSetRecordStop(miff);

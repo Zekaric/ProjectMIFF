@@ -108,6 +108,7 @@ typedef struct
    GmiffValueType  type;
    Gstr            header;
    Gb              isI;
+   Gb              isR8;
    Gb              isR4;
    Gmiff4          inr4;
    Gmiff8          inr;
@@ -194,7 +195,8 @@ Gr4             gmiffValueGetR4(       GmiffValue const value);
 Gcount          gmiffValueGetStrCount( GmiffValue const value);
 GmiffValueType  gmiffValueGetType(     GmiffValue const value);
 
-Gb              gmiffValueIs4(         GmiffValue const value);
+Gb              gmiffValueIsR4(        GmiffValue const value);
+Gb              gmiffValueIsR8(        GmiffValue const value);
 
 GmiffValue      gmiffValueSetB(        Gb  const bvalue);
 GmiffValue      gmiffValueSetBinBuffer(Gcount const binCount, Gn1  * const binBuffer);

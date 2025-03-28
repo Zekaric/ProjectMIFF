@@ -40,10 +40,10 @@ include:
 local:
 prototype:
 **************************************************************************************************/
-static void   _GetNumInt(        Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer);
-static Gb  _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer);
+static void  _GetNumInt(        Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
+static Gb    _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
 
-static Gn1 _ValueFromHexInt(  Gn1 const value);
+static Gn1   _ValueFromHexInt(  Gn1 const value);
 
 /**************************************************************************************************
 global:
@@ -63,6 +63,100 @@ Gb _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
    miff->valueIndex++;
 
    returnTrue;
+}
+
+/**************************************************************************************************
+func: _MiffGetConstant
+**************************************************************************************************/
+Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const buffer)
+{
+   returnFalseIf(count < 2);
+
+   if (strIsEqual(2, buffer, "Z0"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = 0;
+      miff->value.inr4.r = 0;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "ZR"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = Gr8MAX;
+      miff->value.inr4.r = Gr4MAX;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "Zr"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = -Gr8MAX;
+      miff->value.inr4.r = -Gr4MAX;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "Z+"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = HUGE_VAL;
+      miff->value.inr4.r = HUGE_VALF;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "Z-"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = -HUGE_VAL;
+      miff->value.inr4.r = -HUGE_VALF;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "Z?"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_REAL;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = GrNAN;
+      miff->value.inr4.r = GrNAN;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "ZI"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_INT;
+      miff->value.isI    = gbTRUE;
+      miff->value.inr.i  = Gi8MAX;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "Zi"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_INT;
+      miff->value.isI    = gbTRUE;
+      miff->value.inr.i  = Gi8MIN;
+      returnTrue;
+   }
+
+   if (strIsEqual(2, buffer, "ZN"))
+   {
+      miff->value.type   = gmiffValueTypeNUM_INT;
+      miff->value.inr.n  = Gn8MAX;
+      returnTrue;
+   }
+
+   // unknown Z value
+   returnFalse;
 }
 
 /**************************************************************************************************
@@ -99,7 +193,7 @@ Gb _MiffGetLineSkip(Gmiff * const miff)
 /**************************************************************************************************
 func: _MiffGetNumInt
 **************************************************************************************************/
-Gb _MiffGetNumInt(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer)
+Gb _MiffGetNumInt(Gmiff * const miff, Gcount const count, Gn1 const * const buffer)
 {
    // Negative number.
    if (buffer[0] == '-')
@@ -115,83 +209,13 @@ Gb _MiffGetNumInt(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer)
 /**************************************************************************************************
 func: _MiffGetNumReal
 **************************************************************************************************/
-Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer)
+Gb _MiffGetNumReal(Gmiff * const miff, Gcount const count, Gn1 const * const buffer)
 {
    Gn8 index;
    Gn8 value;
    Gn8 letterValue;
 
    // Constants
-   if      (buffer[0] == 'Z')
-   {
-      if      (strIsEqual(3, buffer, "Z80"))
-      {
-         miff->value.inr.r = 0;
-      }
-      if      (strIsEqual(4, buffer, "Z8+M"))
-      {
-         miff->value.inr.r = Gr8MAX;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z8-M"))
-      {
-         miff->value.inr.r = -Gr8MAX;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z8+I"))
-      {
-         miff->value.inr.r = HUGE_VAL;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z8-I"))
-      {
-         miff->value.inr.r = -HUGE_VAL;
-         returnTrue;
-      }
-      else if (strIsEqual(3, buffer, "Z8?"))
-      {
-         miff->value.inr.r = GrNAN;
-         returnTrue;
-      }
-      else if (strIsEqual(3, buffer, "Z40"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = 0;
-      }
-      else if (strIsEqual(4, buffer, "Z4+M"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = Gr4MAX;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z4-M"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = -Gr4MAX;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z4+I"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = HUGE_VALF;
-         returnTrue;
-      }
-      else if (strIsEqual(4, buffer, "Z4-I"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = -HUGE_VALF;
-         returnTrue;
-      }
-      else if (strIsEqual(3, buffer, "Z4?"))
-      {
-         miff->value.isR4 = gbTRUE;
-         miff->value.inr4.r = GrNAN;
-         returnTrue;
-      }
-      // unknown Z value
-      returnFalse;
-   }
-
    value = 0;
    forCount(index, count)
    {
@@ -228,6 +252,7 @@ Gb _MiffGetNumReal(Gmiff * const miff, Gn4 const count, Gn1 const * const buffer
    // double values always user upper case letters.
    if      (count == 16)
    {
+      miff->value.isR8  = gbTRUE;
       miff->value.inr.n = value;
       _MiffByteSwap8(&miff->value.inr);
    }
@@ -471,7 +496,7 @@ function:
 /**************************************************************************************************
 func: _GetNumIntNegative
 **************************************************************************************************/
-static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 const count,
+static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gcount const count,
    Gn1 const * const buffer)
 {
    _GetNumInt(miff, value, count, buffer);
@@ -489,7 +514,7 @@ static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gn4 c
 /**************************************************************************************************
 func: _GetNumInt
 **************************************************************************************************/
-static void _GetNumInt(Gmiff * const miff, GmiffValue * const value, Gn4 const count, Gn1 const * const buffer)
+static void _GetNumInt(Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer)
 {
    Gn8 index;
    Gn8 ntemp;
@@ -534,6 +559,27 @@ static void _GetNumInt(Gmiff * const miff, GmiffValue * const value, Gn4 const c
       case 'f':
          letterValue = 0xA + letterValue - 'a';
          break;
+
+      case 'Z':
+         // Constants
+         index++;
+         letterValue = buffer[index];
+         switch (letterValue)
+         {
+         case 'I':
+            value->isI   = gbTRUE;
+            value->inr.i = Gi8MAX;
+            return;
+
+         case 'i':
+            value->isI   = gbTRUE;
+            value->inr.i = -Gi8MAX;
+            return;
+
+         case 'N':
+            value->inr.n = Gn8MAX;
+            return;
+         }
 
       default:
          letterValue = 0;

@@ -867,7 +867,7 @@ static Gb _JsonTestRead(Gstr const * const fileName)
       breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
       breakIf(!_JsonTestReal(json, -Gr8INF));
 
-      msg = "R GrNAN";
+      msg = "R NAN";
       breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
       breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
@@ -927,7 +927,7 @@ static Gb _JsonTestRead(Gstr const * const fileName)
       breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
       breakIf(!_JsonTestReal4(json, -Gr4INF));
 
-      msg = "R4 GrNAN";
+      msg = "R4 NAN";
       breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
       breakIf(!gjsonIsKeyEqual(json, msg));
       breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
@@ -1253,7 +1253,7 @@ static Gb _JsonTestRead(Gstr const * const fileName)
          breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
          breakIf(!_JsonTestReal(json, -Gr8INF));
 
-         msg = "R GrNAN";
+         msg = "R NAN";
          breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
          breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
@@ -1313,7 +1313,7 @@ static Gb _JsonTestRead(Gstr const * const fileName)
          breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
          breakIf(!_JsonTestReal4(json, -Gr4INF));
 
-         msg = "R4 GrNAN";
+         msg = "R4 NAN";
          breakIf(gjsonGetType_ObjectKeyOrStop(json) != gjsonTypeOBJECT_KEY);
          breakIf(!gjsonIsKeyEqual(json, msg));
          breakIf(!gjsonIsTypeR(gjsonGetType_ObjectValue(json)));
@@ -1584,7 +1584,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          gjsonSetObjectValueR(      json, "R -MAX",   -Gr8MAX);
          gjsonSetObjectValueR(      json, "R INF",     Gr8INF);
          gjsonSetObjectValueR(      json, "R -INF",   -Gr8INF);
-         gjsonSetObjectValueR(      json, "R GrNAN",   GrNAN);
+         gjsonSetObjectValueR(      json, "R NAN",     GrNAN);
 
          gjsonSetObjectValueR4(     json, "R4 0",      0.0f);
          gjsonSetObjectValueR4(     json, "R4 1",      1.0f);
@@ -1595,7 +1595,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          gjsonSetObjectValueR4(     json, "R4 -MAX",  -Gr4MAX);
          gjsonSetObjectValueR4(     json, "R4 INF",    Gr4INF);
          gjsonSetObjectValueR4(     json, "R4 -INF",  -Gr4INF);
-         gjsonSetObjectValueR4(     json, "R4 GrNAN",  GrNAN);
+         gjsonSetObjectValueR4(     json, "R4 NAN",    GrNAN);
 
          gjsonSetObjectValueStr(    json, "String",    "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
@@ -1717,7 +1717,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
             gjsonSetObjectValueR(      json, "R -MAX",   -Gr8MAX);
             gjsonSetObjectValueR(      json, "R INF",     Gr8INF);
             gjsonSetObjectValueR(      json, "R -INF",   -Gr8INF);
-            gjsonSetObjectValueR(      json, "R GrNAN",   GrNAN);
+            gjsonSetObjectValueR(      json, "R NAN",     GrNAN);
 
             gjsonSetObjectValueR4(     json, "R4 0",      0.0f);
             gjsonSetObjectValueR4(     json, "R4 1",      1.0f);
@@ -1728,7 +1728,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
             gjsonSetObjectValueR4(     json, "R4 -MAX",  -Gr4MAX);
             gjsonSetObjectValueR4(     json, "R4 INF",    Gr4INF);
             gjsonSetObjectValueR4(     json, "R4 -INF",  -Gr4INF);
-            gjsonSetObjectValueR4(     json, "R4 GrNAN",  GrNAN);
+            gjsonSetObjectValueR4(     json, "R4 NAN",    GrNAN);
 
             gjsonSetObjectValueStr(    json, "String",    "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
@@ -1905,7 +1905,7 @@ static Gb _MiffTestRValue(Gmiff *miff, Gr8 testValue)
    value = gmiffGetValue(miff);
    returnFalseIf(
       gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
-      gmiffValueIs4(    value));
+      !gmiffValueIsR8(  value));
    returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR(value)));
    returnFalseIf(!isnan(testValue) && gmiffValueGetR(value) != testValue);
 
@@ -1919,7 +1919,7 @@ static Gb _MiffTestR4Value(Gmiff *miff, Gr4 testValue)
    value = gmiffGetValue(miff);
    returnFalseIf(
       gmiffValueGetType(value) != gmiffValueTypeNUM_REAL ||
-      !gmiffValueIs4(   value));
+      !gmiffValueIsR4(  value));
    returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR4(value)));
    returnFalseIf(!isnan(testValue) && gmiffValueGetR4(value) != testValue);
 
@@ -2155,7 +2155,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "R -INF";
       breakIf(!_MiffTestGetR(miff, msg, -Gr8INF));
 
-      msg = "R GrNAN";
+      msg = "R NAN";
       breakIf(!_MiffTestGetR(miff, msg, GrNAN));
 
       msg = "R4 0";
@@ -2185,7 +2185,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "R4 -INF";
       breakIf(!_MiffTestGetR4(miff, msg, -Gr4INF));
 
-      msg = "R4 GrNAN";
+      msg = "R4 NAN";
       breakIf(!_MiffTestGetR4(miff, msg, GrNAN));
 
       msg = "String";
@@ -2350,7 +2350,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "R -INF";
          breakIf(!_MiffTestGetR(miff, msg, -Gr8INF));
 
-         msg = "R GrNAN";
+         msg = "R NAN";
          breakIf(!_MiffTestGetR(miff, msg, GrNAN));
 
          msg = "R4 0";
@@ -2380,7 +2380,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "R4 -INF";
          breakIf(!_MiffTestGetR4(miff, msg, -Gr4INF));
 
-         msg = "R4 GrNAN";
+         msg = "R4 NAN";
          breakIf(!_MiffTestGetR4(miff, msg, GrNAN));
 
          msg = "String";
@@ -2549,7 +2549,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordR(              miff, "R -MAX",  -Gr8MAX);
       gmiffSetRecordR(              miff, "R INF",   Gr8INF);
       gmiffSetRecordR(              miff, "R -INF",  -Gr8INF);
-      gmiffSetRecordR(              miff, "R GrNAN",   GrNAN);
+      gmiffSetRecordR(              miff, "R NAN",   GrNAN);
 
       gmiffSetRecordR4(             miff, "R4 0",    0.0);
       gmiffSetRecordR4(             miff, "R4 1",    1.0);
@@ -2560,7 +2560,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordR4(             miff, "R4 -MAX", -Gr4MAX);
       gmiffSetRecordR4(             miff, "R4 INF",  Gr4INF);
       gmiffSetRecordR4(             miff, "R4 -INF", -Gr4INF);
-      gmiffSetRecordR4(             miff, "R4 GrNAN",  GrNAN);
+      gmiffSetRecordR4(             miff, "R4 NAN",  GrNAN);
 
       gmiffSetRecordStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 #if defined(INCLUDE_BIN)
@@ -2631,7 +2631,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordR(              miff, "R -MAX",   -Gr8MAX);
          gmiffSetRecordR(              miff, "R INF",    Gr8INF);
          gmiffSetRecordR(              miff, "R -INF",   -Gr8INF);
-         gmiffSetRecordR(              miff, "R GrNAN",    GrNAN);
+         gmiffSetRecordR(              miff, "R NAN",    GrNAN);
 
          gmiffSetRecordR4(             miff, "R4 0",     0.0);
          gmiffSetRecordR4(             miff, "R4 1",     1.0);
@@ -2642,7 +2642,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordR4(             miff, "R4 -MAX",  -Gr4MAX);
          gmiffSetRecordR4(             miff, "R4 INF",   Gr4INF);
          gmiffSetRecordR4(             miff, "R4 -INF",  -Gr4INF);
-         gmiffSetRecordR4(             miff, "R4 GrNAN",   GrNAN);
+         gmiffSetRecordR4(             miff, "R4 NAN",   GrNAN);
 
          gmiffSetRecordStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 #if defined(INCLUDE_BIN)

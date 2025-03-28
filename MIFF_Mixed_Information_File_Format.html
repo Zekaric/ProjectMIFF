@@ -298,12 +298,12 @@ License (Document): Creative Commons Attribution-NoDerivs.[LINK](https://creativ
 <td>The value data is unset/null.  Nothing else follows the header.</td>
 </tr>
 <tr>
-<td>0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, -</td>
-<td>A hexidecimal number.  If a boolean value this will be 0 (false) or 1 (true).  If an integer or natural then it will be that number in hexidecimal form.  Leading 0's will be trimmed off.  If a real value then it will be the byte value of the real (8 characters for a float, 16 characters for a double).  For integers we can have a negative hexidecimal.</td>
+<td>0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F, -,<br /> ZI, Zi, ZN</td>
+<td>A hexidecimal number.  If a boolean value this will be 0 (false) or 1 (true).  If an integer or natural then it will be that number in hexidecimal form.  Leading 0's will be trimmed off.  If a real value then it will be the byte value of the real (8 characters for a float, 16 characters for a double).  For integers we can have a negative hexidecimal. There are a few constants to make life a little easier.  ZI for maximum positive integer value, Zi for maximum negative integer value, and ZN is maximum natural value.</td>
 </tr>
 <tr>
-<td>G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V,<br />Z80, Z8+M, Z8-M, Z8+I, Z8-I, Z8?,<br />Z40, Z4+M, Z4-M, Z4+I, Z4-I, Z4?</td>
-<td>A hexidecimal representation of a real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for 0, maximum positive value, maximum negative value, positive infinity, negative infinity, and not a number for doubles (8) and floats (4).  They are to save a little bit of space when written out.  All real values follow IEEE 754 formats.</td>
+<td>G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V,<br />Z0, ZR, Zr, Z+, Z-, Z?</td>
+<td>A hexidecimal representation of a real value (double).  Leading 0 half bytes are removed (G characters).  The Z values are constants for 0, maximum positive value, maximum negative value, positive infinity, negative infinity, and not a number.  They are to save a little bit of space when written out.  All real values follow IEEE 754 formats.</td>
 </tr>
 <tr>
 <td>&quot;[count]</td>

@@ -161,7 +161,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GmineInfoLib.c" />
-    <ClCompile Include="GmineInfo_IO.c" />
+    <ClCompile Include="GmineInfo_array.c" />
+    <ClCompile Include="GmineInfo_io.c" />
     <ClCompile Include="GmineInfo_mem.c" />
   </ItemGroup>
   <ItemGroup>

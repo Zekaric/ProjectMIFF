@@ -69,19 +69,47 @@ void               gmineInfoDloc(                              GmineInfo       *
 void               gmineInfoDlocContent(                       GmineInfo       * const gmineInfo);
 
 Gb                 gmineInfoSetDataAuthorName(                 GmineInfo       * const gmineInfo, Gstr const * const value);
-Gb                 gmineInfoSetDataComment(                    GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataCompanyName(                GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataCopyright(                  GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataProjectMax(                 GmineInfo       * const gmineInfo, GmineInfoPoint const * const value);
 Gb                 gmineInfoSetDataProjectMin(                 GmineInfo       * const gmineInfo, GmineInfoPoint const * const value);
 Gb                 gmineInfoSetDataProjectName(                GmineInfo       * const gmineInfo, Gstr const * const value);
 Gb                 gmineInfoSetDataProjectSystem(              GmineInfo       * const gmineInfo, Gstr const * const value);
-Gb                 gmineInfoSetDataSoftwareName(               GmineInfo       * const gmineInfo, Gstr const * const value, Gstr * const version);
 Gb                 gmineInfoSetDataOther(                      GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+
+Gb                 gmineInfoSetItemAppend(                     GmineInfo       * const gmineInfo, GmineInfoItem * const gmineInfoItem);
 
 Gb                 gmineInfoWriteData(                         GmineInfo       * const gmineInfo);
 
 Gb                 gmineInfoStart(                             GmemCloc memClocFunc, GmemDloc memDlocFunc);
 void               gmineInfoStop(                              void);
+
+// Item structure functions.
+GmineInfoItem     *gmineInfoItemCloc(                          void);
+Gb                 gmineInfoItemClocContent(                   GmineInfoItem       * const gmineInfoItem);
+
+void               gmineInfoItemDloc(                          GmineInfoItem       * const gmineInfoItem);
+void               gmineInfoItemDlocContent(                   GmineInfoItem       * const gmineInfoItem);
+
+Gb                 gmineInfoItemSetDefaultDate(                GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetDefaultDateTime(            GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetDefaultFormula(             GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetDefaultI(                   GmineInfoItem       * const gmineInfoItem, Gi8 const value);
+Gb                 gmineInfoItemSetDefaultN(                   GmineInfoItem       * const gmineInfoItem, Gn8 const value);
+Gb                 gmineInfoItemSetDefaultPercent(             GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                 gmineInfoItemSetDefaultR(                   GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                 gmineInfoItemSetDefaultStr(                 GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetDefaultTime(                GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetKey(                        GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetMaxI(                       GmineInfoItem       * const gmineInfoItem, Gi8 const value);
+Gb                 gmineInfoItemSetMaxN(                       GmineInfoItem       * const gmineInfoItem, Gn8 const value);
+Gb                 gmineInfoItemSetMaxR(                       GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                 gmineInfoItemSetMinI(                       GmineInfoItem       * const gmineInfoItem, Gi8 const value);
+Gb                 gmineInfoItemSetMinN(                       GmineInfoItem       * const gmineInfoItem, Gn8 const value);
+Gb                 gmineInfoItemSetMinR(                       GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                 gmineInfoItemSetName(                       GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
+Gb                 gmineInfoItemSetOther(                      GmineInfoItem       * const gmineInfoItem, Gstr const * const key, Gstr const * const value);
+Gb                 gmineInfoItemSetPrecision(                  GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                 gmineInfoItemSetType(                       GmineInfoItem       * const gmineInfoItem, GmineInfoItemType const value);
 
 #endif

@@ -165,14 +165,12 @@ static Gb _BlockWriteData(GmineInfo * const gmineInfo)
                   max = {2500, 3500, 3100};
 
    gmineInfoSetDataAuthorName(   gmineInfo, "Robbert de Groot");
-   gmineInfoSetDataComment(      gmineInfo, "This is a comment\nLine 1\nLines only include a new line character.");
    gmineInfoSetDataCompanyName(  gmineInfo, "Zekaric");
    gmineInfoSetDataCopyright(    gmineInfo, "2025 (c) Robbert de Groot");
    gmineInfoSetDataProjectMax(   gmineInfo, &max);
    gmineInfoSetDataProjectMin(   gmineInfo, &min);
    gmineInfoSetDataProjectName(  gmineInfo, "Mines Of Moria");
    gmineInfoSetDataProjectSystem(gmineInfo, gmineInfoPROJECT_SYSTEM_LOCAL);
-   gmineInfoSetDataSoftwareName( gmineInfo, "GmineInfoTest.exe", "v1.0");
    gmineInfoSetDataOther(        gmineInfo, "project lead",  "Ghimli");
    gmineInfoSetDataOther(        gmineInfo, "project sme",   "Gandalf The Grey");
    gmineInfoSetDataOther(        gmineInfo, "project theif", "Bilbo Baggins");
@@ -187,6 +185,7 @@ func: _BlockWriteDrillHole
 **************************************************************************************************/
 static Gb _BlockWriteDrillHole(GmineInfo * const gmineInfo)
 {
+   gmineInfo;
    returnTrue;
 }
 
@@ -195,6 +194,7 @@ func: _BlockWriteGeometry
 **************************************************************************************************/
 static Gb _BlockWriteGeometry(GmineInfo * const gmineInfo)
 {
+   gmineInfo;
    returnTrue;
 }
 
@@ -203,6 +203,60 @@ func: _BlockWriteItem
 **************************************************************************************************/
 static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
 {
+   GmineInfoItem *item;
+
+   // Create the list of items.
+   item = gmineInfoItemCloc();
+   returnFalseIf(!item);
+
+   returnFalseIf(!gmineInfoItemSetName(    item, "copper"));
+   returnFalseIf(!gmineInfoItemSetKey(     item, "CU"));
+   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeR));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "Comment", "Cold Copper Tears."));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "unit",    "ppm"));
+   // No default set, then default value is "missing".
+   // No min or max set, then min and max are full range of reals.
+
+   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+
+
+   item = gmineInfoItemCloc();
+   returnFalseIf(!item);
+
+   returnFalseIf(!gmineInfoItemSetName(    item, "gold"));
+   returnFalseIf(!gmineInfoItemSetKey(     item, "AU"));
+   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeR));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "Saying",  "All that glitters is not gold."));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "unit",    "ppm"));
+   returnFalseIf(!gmineInfoItemSetDefaultR(item, 0.0));
+   returnFalseIf(!gmineInfoItemSetMinR(    item, 0.0));
+   returnFalseIf(!gmineInfoItemSetMaxR(    item, 5.0));
+
+   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+
+
+   item = gmineInfoItemCloc();
+   returnFalseIf(!item);
+
+   returnFalseIf(!gmineInfoItemSetName(    item, "topography percent"));
+   returnFalseIf(!gmineInfoItemSetKey(     item, "topo%"));
+   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypePERCENT));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "Saying",  "Top o' da' world baby!"));
+   returnFalseIf(!gmineInfoItemSetDefaultR(item, 100.0));
+
+   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+
+
+   item = gmineInfoItemCloc();
+   returnFalseIf(!item);
+
+   returnFalseIf(!gmineInfoItemSetName(    item, "rock type"));
+   returnFalseIf(!gmineInfoItemSetKey(     item, "rtype"));
+   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeN));
+   returnFalseIf(!gmineInfoItemSetOther(   item, "ship",    "It go pew pew!"));
+
+   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+
    returnTrue;
 }
 
@@ -211,6 +265,7 @@ func: _BlockWriteModel
 **************************************************************************************************/
 static Gb _BlockWriteModel(GmineInfo * const gmineInfo)
 {
+   gmineInfo;
    returnTrue;
 }
 

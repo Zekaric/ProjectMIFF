@@ -94,13 +94,20 @@ typedef union
    Gi8                i;
    Gr8                r;
    Gstr              *str;
-} GmineInfoUnion;
+} GmineInfoValue;
+
+typedef struct
+{
+   Gcount             count,
+                      countMax;
+   void             **buffer;
+} GmineInfoArray;
 
 typedef struct
 {
    Gb                 isSet;
-   GmineInfoUnion     value;
-} GmineInfoValue;
+   GmineInfoValue     value;
+} GmineInfoValuable;
 
 typedef struct
 {
@@ -112,83 +119,115 @@ typedef struct
 
 typedef struct
 {
+   float              r,
+                      g,
+                      b,
+                      a;
+} GmineInfoRGBA;
+
+typedef struct
+{
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
    double             x, // Easting, longitude
                       y, // Northing, latitude,
                       z; // Elevation
 } GmineInfoVector;
 
-typedef struct GmineInfoKeyValue GmineInfoKeyValue;
-struct GmineInfoKeyValue
+typedef struct
 {
    Gstr              *key,
                      *value;
+} GmineInfoKeyValue;
 
-   GmineInfoKeyValue *next;
+typedef struct
+{
+   Gb                 isVisibleDrillHole,
+                      isVisibleModel,
+                      isVisibleGeometry,
+                      isVisibleNode,
+                      isVisibleLine,
+                      isVisibleFace,
+                      isVisibleText;
+
+   GmineInfoRGBA      colorDrillHole,
+                      colorModel,
+                      colorGeometry,
+                      colorNode,
+                      colorLine,
+                      colorFace,
+                      colorFacePattern,
+                      colorText;
+
+   Gstr              *patternNode,
+                     *patternLine,
+                     *patternFace;
+
+   Gr4                faceTransparency;
+
+   Gstr              *font;
+   Gr4                fontSize;
+   Gb                 fontIsBold,
+                      fontIsItalic,
+                      fontIsUnderline,
+                      fontIsStrikeout;
+} GmineInfoProperty;
+
+typedef struct
+{
+   GmineInfoValuable  value;
+   GmineInfoProperty  property;
 };
 
 typedef struct
 {
-   Gbit               isSetAuthorName        : 1,
-                      isSetComment           : 1,
-                      isSetCompanyName       : 1,
-                      isSetCopyright         : 1,
-                      isSetSoftware          : 1,
-                      isSetProjectName       : 1,
-                      isSetProjectSystem     : 1,
-                      isSetProjectMax        : 1,
-                      isSetProjectMin        : 1;
+   Gbit               isSetAuthorName     : 1,
+                      isSetCompanyName    : 1,
+                      isSetCopyright      : 1,
+                      isSetProjectName    : 1,
+                      isSetProjectSystem  : 1,
+                      isSetProjectMax     : 1,
+                      isSetProjectMin     : 1;
 
    Gstr              *authorName,
-                     *comment,
                      *companyName,
                      *copyright,
-                     *softwareName,
-                     *softwareVersion,
                      *projectName,
                      *projectSystem;
    GmineInfoPoint     projectMax,
                       projectMin;
 
-   GmineInfoKeyValue *otherListHead,
-                     *otherListTail;
+   GmineInfoArray     keyValueArray;
 } GmineInfoData;
 
-typedef struct GmineInfoItem;
+typedef struct GmineInfoItem GmineInfoItem;
 struct GmineInfoItem
 {
-   Gbit               isSetDefault     : 1,
-                      isSetDescription : 1,
-                      isSetMax         : 1,
-                      isSetMin         : 1,
-                      isSetName        : 1,
-                      isSetPrecision   : 1,
-                      isSetType        : 1,
-                      isSetUid         : 1;
+   Gbit               isSetDefault        : 1,
+                      isSetMax            : 1,
+                      isSetMin            : 1,
+                      isSetName           : 1,
+                      isSetPrecision      : 1,
+                      isSetType           : 1,
+                      isSetUid            : 1;
 
    // Unique id for this item, library provided.
    Gn4                id;
-   
-   // User provided
-   Gstr              *name;
-   Gstr              *description;
-   Gstr              *uid;
-   GmineInfoItemType  type;
-   GmineInfoValue     default;
-   GmineInfoValue     max;
-   GmineInfoValue     min;
-   Gr8                precision;
 
-   GmineInfoKeyValue *otherListHead,
-                     *otherListTail;
+   // User provided
+   GmineInfoValuable  defaultValue;
+   Gstr              *key;
+   GmineInfoValuable  max;
+   GmineInfoValuable  min;
+   Gstr              *name;
+   Gr8                precision;
+   GmineInfoItemType  type;
+
+   GmineInfoArray     keyValueArray;
+   GmineInfoArray     valueArray;
+   GmineInfoArray     binArray;
 
    GmineInfoItem     *next;
 };
-
-typedef struct
-{
-   Gstr              *id;
-} GmineInfoItem;
 
 typedef struct
 {
@@ -205,15 +244,6 @@ typedef struct
    Gstr              *id;
 } GmineInfoModel;
 
-typedef union
-{
-   GmineInfoData      data;
-   GmineInfoItem      item;
-   GmineInfoGeometry  geometry;
-   GmineInfoDrillHole drillhole;
-   GmineInfoModel     model;
-} GmineInfoUnion;
-
 typedef struct
 {
    Gb                 isWriting;
@@ -229,7 +259,12 @@ typedef struct
    Gmiff             *miffFile;
    Gjson             *jsonFile;
 
-   GmineInfoUnion     block;
+   GmineInfoData      data;
+   GmineInfoItem     *itemHead,
+                     *itemTail;
+   GmineInfoGeometry  geometry;
+   GmineInfoDrillHole drillhole;
+   GmineInfoModel     model;
 } GmineInfo;
 
 /**************************************************************************************************

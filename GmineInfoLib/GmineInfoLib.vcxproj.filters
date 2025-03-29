@@ -21,7 +21,10 @@
     <ClCompile Include="GmineInfo_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GmineInfo_IO.c">
+    <ClCompile Include="GmineInfo_io.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfo_array.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

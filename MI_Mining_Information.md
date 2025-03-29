@@ -218,11 +218,11 @@ Items need to be defined before they are used elsewhere in the MI file.
 | key | A unique key for the item.  This is stored as a string even if it is a number by the software that sets it.  This key needs to be unique so that no two items have the same key value. |
 | name | The name of the item.  A UTF8 string limited to 255 bytes.  Not necessarily unique but generally, it would be a good idea. |
 | type | The type of the item.  See lower down. |
-| range | If a number type, the minimum and maximum value for the item. |
+| max, min | If a number type, the maximum and minimum value for the item. |
 | value | If the item has limited number of values, list the array of values here. |
 | precision | If a real type, how many decimal places is this values accurrate to. |
 | default | The default value for something that did not have a value assigned. |
-| calculation | The formula used to calculate the value of this item.  In other words, this item has not stored value.  The value will be calculated when needed. |
+| formula | The formula used to calculate the value of this item.  In other words, this item has no stored value.  The value will be calculated when needed. |
 | prop list | An array of properties for rendering purposes in a view.  See Display block for what this might mean.  First property in this array will define the properties for something that does not match any other prop block's values.  The prop blocks in this array should be in order of increasing value if the item type is a number value. |
 | other | A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values. |
 
@@ -230,15 +230,15 @@ Each item will be given an index value starting at 0 and incrementing with every
 
 **type** will define the value being stored for this item.  Type is one of string, real, real4, natural, integer, date, time, dateTime, or formula (formula meaning the item's value is calculated.)
 
-**range** defines the limits for an item.  Only applicable if item type is a real, real4, natural, or integer.  If these are missing then the range is the full range as defined by the type.
+**max, min** defines the limits for an item.  Only applicable if item type is a real, natural, or integer.  If these are missing then the range is the full range as defined by the type.
 
-**valueList** defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.
+**valueList** defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.
 
 **precision** is the accuracy of the number.  Only applicable if item type is a real and real4.
 
 **default** will define the default value for this item if block is skipped.  If this value is not set then the default value is 'unset'.
 
-**calculation** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item key]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.
+**formula** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item key]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.
 
 When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'unset value' as well.  If this is all the values that need to be recorded, then we do not really need to use a full real or real4 value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recover the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.
 

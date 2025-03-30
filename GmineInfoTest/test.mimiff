@@ -10,9 +10,6 @@ HEADER_VERSION_NUMBER
  1	project min	GGGGGGGGGGKGOVKG	GGGGGGGGGGKGPVKG	GGGGGGGGGGNGQNKG
  1	project max	GGGGGGGGGGOOQJKG	GGGGGGGGGGLOQRKG	GGGGGGGGGGJOQOKG
  1	author name	"10 Robbert de Groot
- 1	comment	"41 This is a comment\nLine 1\nLines only include a new line character.
- 1	software name	"11 GmineInfoTest.exe
- 1	software version	"4 v1.0
  1	project lead	"6 Ghimli
  1	project sme	"10 Gandalf The Grey
  1	project theif	"D Bilbo Baggins

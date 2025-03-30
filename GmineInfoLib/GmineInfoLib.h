@@ -85,8 +85,22 @@ Gstr const              *gmineInfoKeyValueGetValue(                        Gmine
 Gb                       gmineInfoKeyValueSetKey(                          GmineInfoKeyValue       * const gmineInfoKeyValue, Gstr const * const value);
 Gb                       gmineInfoKeyValueSetValue(                        GmineInfoKeyValue       * const gmineInfoKeyValue, Gstr const * const value);
 
+Gb                       gmineInfoKeyValueArrayAdd(                        GmineInfoArray       * const array, Gstr const * const key, Gstr const * const value);
+Gb                       gmineInfoKeyValueArrayGetAt(                      GmineInfoArray const * const array, Gindex const index, Gstr const ** const key, Gstr const ** const value);
+Gb                       gmineInfoKeyValueArrayGetCount(                   GmineInfoArray const * const array);
+
+#define gmineInfoBlockKeyValueArrayAdd(     DATA,        KEY, VALUE)   gmineInfoKeyValueArrayAdd(     &(DATA)->keyValueArray,          (KEY), (VALUE))
+#define gmineInfoBlockKeyValueArrayCloc(    DATA)                      gmineInfoArrayClocContent(     &(DATA)->keyValueArray);
+#define gmineInfoBlockKeyValueArrayDloc(    DATA)                      {                                                                                 \
+                                                                          gmineInfoArrayForEach(      &(DATA)->keyValueArray, gmineInfoKeyValueDloc); \
+                                                                          gmineInfoArrayDlocContent(  &(DATA)->keyValueArray);                        \
+                                                                       }
+#define gmineInfoBlockKeyValueArrayGetAt(   DATA, INDEX, KEY, VALUE)   gmineInfoKeyValueArrayGetAt(   &(DATA)->keyValueArray, (INDEX), (KEY), (VALUE))
+#define gmineInfoBlockKeyValueArrayGetCount(DATA)                      gmineInfoKeyValueArrayGetCount(&(DATA)->keyValueArray)
 
 // Main GmineInfo functions
+Gb                       gmineInfoAddImage(                                GmineInfo       * const gmineInfo, GmineInfoImage * const image);
+
 GmineInfoBlockType       gmineInfoBlockTypeNext(                           GmineInfo       * const gmineInfo);
 
 GmineInfo               *gmineInfoClocReader(                                                                 GmineInfoFileType const fileType, GgetBuffer getBufferFunc, void * const dataRepo);
@@ -109,7 +123,7 @@ Gb                       gmineInfoWriteDataBlock(                          Gmine
 //Gb                       gmineInfoWriteGeometryBlockStart(                 GmineInfo       * const gmineInfo, GmineInfoGeometry * const gmineInfoGeometry);
 //Gb                       gmineInfoWriteGeometryBlockData(                  GmineInfo       * const gmineInfo, ...);
 //Gb                       gmineInfoWriteGeometryBlockStop(                  GmineInfo       * const gmineInfo);
-//Gb                       gmineInfoWriteImageBlock(                         GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteImageBlock(                         GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteItemBlock(                          GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteModelBlockStart(                    GmineInfo       * const gmineInfo, GmineInfoModel * const gmineInfoModel);
 //Gb                       gmineInfoWriteModelBlockData(                     GmineInfo       * const gmineInfo, ...);
@@ -120,8 +134,6 @@ Gb                       gmineInfoStart(                                   GmemC
 void                     gmineInfoStop(                                    void);
 
 // GmineInfoData functions
-Gb                       gmineInfoDataAddKeyValue(                         GmineInfoData       * const gmineInfoData, Gstr const * const key, Gstr const * const value);
-
 GmineInfoData           *gmineInfoDataCloc(                                void);
 Gb                       gmineInfoDataClocContent(                         GmineInfoData       * const gmineInfoData);
 
@@ -131,7 +143,6 @@ void                     gmineInfoDataDlocContent(                         Gmine
 Gstr const              *gmineInfoDataGetAuthorName(                       GmineInfoData const * const gmineInfoData);
 Gstr const              *gmineInfoDataGetCompanyName(                      GmineInfoData const * const gmineInfoData);
 Gstr const              *gmineInfoDataGetCopyright(                        GmineInfoData const * const gmineInfoData);
-Gb                       gmineInfoDataGetKeyValueAt(                       GmineInfoData const * const gmineInfoData, Gindex const index, Gstr const ** const key, Gstr const ** const value);
 GmineInfoPoint const    *gmineInfoDataGetProjectMax(                       GmineInfoData const * const gmineInfoData);
 GmineInfoPoint const    *gmineInfoDataGetProjectMin(                       GmineInfoData const * const gmineInfoData);
 Gstr const              *gmineInfoDataGetProjectName(                      GmineInfoData const * const gmineInfoData);
@@ -153,9 +164,34 @@ Gb                       gmineInfoDataSetProjectMin(                       Gmine
 Gb                       gmineInfoDataSetProjectName(                      GmineInfoData       * const gmineInfoData, Gstr const * const value);
 Gb                       gmineInfoDataSetProjectSystem(                    GmineInfoData       * const gmineInfoData, Gstr const * const value);
 
-// GmineInfoItem functions.
-Gb                       gmineInfoItemAddKeyValue(                         GmineInfoItem       * const gmineInfoItem, Gstr const * const key, Gstr const * const value);
 
+// GmineInfoImage functions.
+GmineInfoImage          *gmineInfoImageCloc(                               void);
+Gb                       gmineInfoImageClocContent(                        GmineInfoImage       * const gmineInfoImage);
+
+void                     gmineInfoImageDloc(                               GmineInfoImage       * const gmineInfoImage);
+void                     gmineInfoImageDlocContent(                        GmineInfoImage       * const gmineInfoImage);
+
+Gstr const              *gmineInfoImageGetFileName(                        GmineInfoImage const * const gmineInfoImage);
+Gstr const              *gmineInfoImageGetFilePath(                        GmineInfoImage const * const gmineInfoImage);
+Gstr const              *gmineInfoImageGetKey(                             GmineInfoImage const * const gmineInfoImage);
+Gstr const              *gmineInfoImageGetName(                            GmineInfoImage const * const gmineInfoImage);
+
+Gb                       gmineInfoImageIsInline(                           GmineInfoImage const * const gmineInfoImage);
+Gb                       gmineInfoImageIsSetFileName(                      GmineInfoImage const * const gmineInfoImage);
+Gb                       gmineInfoImageIsSetFilePath(                      GmineInfoImage const * const gmineInfoImage);
+Gb                       gmineInfoImageIsSetIsInline(                      GmineInfoImage const * const gmineInfoImage);
+Gb                       gmineInfoImageIsSetKey(                           GmineInfoImage const * const gmineInfoImage);
+Gb                       gmineInfoImageIsSetName(                          GmineInfoImage const * const gmineInfoImage);
+
+Gb                       gmineInfoImageSetFileName(                        GmineInfoImage       * const gmineInfoImage, Gstr const * const value);
+Gb                       gmineInfoImageSetFilePath(                        GmineInfoImage       * const gmineInfoImage, Gstr const * const value);
+Gb                       gmineInfoImageSetIsInline(                        GmineInfoImage       * const gmineInfoImage, Gb const value);
+Gb                       gmineInfoImageSetKey(                             GmineInfoImage       * const gmineInfoImage, Gstr const * const value);
+Gb                       gmineInfoImageSetName(                            GmineInfoImage       * const gmineInfoImage, Gstr const * const value);
+
+
+// GmineInfoItem functions.
 GmineInfoItem           *gmineInfoItemCloc(                                void);
 Gb                       gmineInfoItemClocContent(                         GmineInfoItem       * const gmineInfoItem);
 
@@ -173,7 +209,6 @@ Gr8                      gmineInfoItemGetDefaultValueR(                    Gmine
 Gstr const              *gmineInfoItemGetDefaultValueStr(                  GmineInfoItem const * const gmineInfoItem);
 Gstr const              *gmineInfoItemGetDefaultValueTime(                 GmineInfoItem const * const gmineInfoItem);
 Gstr const              *gmineInfoItemGetKey(                              GmineInfoItem const * const gmineInfoItem);
-Gb                       gmineInfoItemGetKeyValueAt(                       GmineInfoItem const * const gmineInfoItem, Gindex const index, Gstr const ** const key, Gstr const ** const value);
 Gi8                      gmineInfoItemGetMaxI(                             GmineInfoItem const * const gmineInfoItem);
 Gn8                      gmineInfoItemGetMaxN(                             GmineInfoItem const * const gmineInfoItem);
 Gr8                      gmineInfoItemGetMaxR(                             GmineInfoItem const * const gmineInfoItem);
@@ -210,13 +245,10 @@ Gb                       gmineInfoItemSetMinI(                             Gmine
 Gb                       gmineInfoItemSetMinN(                             GmineInfoItem       * const gmineInfoItem, Gn8 const value);
 Gb                       gmineInfoItemSetMinR(                             GmineInfoItem       * const gmineInfoItem, Gr8 const value);
 Gb                       gmineInfoItemSetName(                             GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
-Gb                       gmineInfoItemSetOther(                            GmineInfoItem       * const gmineInfoItem, Gstr const * const key, Gstr const * const value);
 Gb                       gmineInfoItemSetPrecision(                        GmineInfoItem       * const gmineInfoItem, Gr8 const value);
 Gb                       gmineInfoItemSetType(                             GmineInfoItem       * const gmineInfoItem, GmineInfoItemType const value);
 
 // GmineInfoProperty
-Gb                       gmineInfoPropertyAddKeyValue(                     GmineInfoProperty       * const gmineInfoProperty, Gstr const * const key, Gstr const * const value);
-
 GmineInfoProperty       *gmineInfoPropertyCloc(                            void);
 Gb                       gmineInfoPropertyClocContent(                     GmineInfoProperty       * const gmineInfoProperty);
 
@@ -235,7 +267,6 @@ Gr4                      gmineInfoPropertyGetFaceTransparency(             Gmine
 Gstr const              *gmineInfoPropertyGetFontName(                     GmineInfoProperty const * const gmineInfoProperty);
 Gr4                      gmineInfoPropertyGetFontSize(                     GmineInfoProperty const * const gmineInfoProperty);
 Gstr const              *gmineInfoPropertyGetKey(                          GmineInfoProperty const * const gmineInfoProperty);
-Gb                       gmineInfoPropertyGetKeyValueAt(                   GmineInfoProperty const * const gmineInfoProperty, Gindex const index, Gstr const ** const key, Gstr const ** const value);
 Gstr const              *gmineInfoPropertyGetLabelData(                    GmineInfoProperty const * const gmineInfoProperty, Gindex const index);
 Gstr const              *gmineInfoPropertyGetLabelLine(                    GmineInfoProperty const * const gmineInfoProperty, Gindex const index);
 Gstr const              *gmineInfoPropertyGetLabelNode(                    GmineInfoProperty const * const gmineInfoProperty, Gindex const index);
@@ -330,91 +361,95 @@ Gb                       gmineInfoPropertySetPatternFace(                  Gmine
 Gb                       gmineInfoPropertySetPatternLine(                  GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
 Gb                       gmineInfoPropertySetPatternNode(                  GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
 
-// GmineInfoPropertyItem
-GmineInfoPropertyItem   *gmineInfoPropertyItemCloc(                        void);
-Gb                       gmineInfoPropertyItemClocContent(                 GmineInfoPropertyItem       * const gmineInfoPropertyItem);
-void                     gmineInfoPropertyItemDloc(                        GmineInfoPropertyItem       * const gmineInfoPropertyItem);
-void                     gmineInfoPropertyItemDlocContent(                 GmineInfoPropertyItem       * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorDilllHole(           GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorDrillHoleFace(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorDrillHoleLine(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorDrillHoleNode(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorGeometry(            GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorGeometryFace(        GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorGeometryLine(        GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorGeometryNode(        GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorModel(               GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorModelFace(           GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorModelLine(           GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoColor const    *gmineInfoPropertyItemGetColorModelNode(           GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-GmineInfoProperty       *gmineInfoPropertyItemGetProperty(                 GmineInfoPropertyItem       * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemGetValueB(                   GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gi8                      gmineInfoPropertyItemGetValueI(                   GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gn8                      gmineInfoPropertyItemGetValueN(                   GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gr8                      gmineInfoPropertyItemGetValueR(                   GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gstr const              *gmineInfoPropertyItemGetValueStr(                 GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleDrillHole(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleDrillHoleFace( GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleDrillHoleLine( GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleDrillHoleNode( GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleGeometry(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleGeometryFace(  GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleGeometryLine(  GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleGeometryNode(  GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleModel(         GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleModelFace(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleModelLine(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetIsVisibleModelNode(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorDrillHole(         GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorDrillHoleFace(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorDrillHoleLine(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorDrillHoleNode(     GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorGeometry(          GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorGeometryFace(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorGeometryLine(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorGeometryNode(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorModelFace(         GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorModelLine(         GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsSetColorModelNode(         GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleDrillHole(          GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleDrillHoleFace(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleDrillHoleLine(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleDrillHoleNode(      GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleGeometry(           GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleGeometryFace(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleGeometryLine(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleGeometryNode(       GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleModelFace(          GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleModelLine(          GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemIsVisibleModelNode(          GmineInfoPropertyItem const * const gmineInfoPropertyItem);
-Gb                       gmineInfoPropertyItemSetColorDrillHole(           GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorDrillHoleFace(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorDrillHoleLine(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorDrillHoleNode(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorGeometry(            GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorGeometryFace(        GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorGeometryLine(        GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorGeometryNode(        GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorModel(               GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorModelFace(           GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorModelLine(           GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetColorModelNode(           GmineInfoPropertyItem       * const gmineInfoPropertyItem, GmineInfoColor const * const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleDrillHole(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleDrillHoleFace(   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleDrillHoleLine(   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleDrillHoleNode(   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleGeometry(        GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleGeometryFace(    GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleGeometryLine(    GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleGeometryNode(    GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleModel(           GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleModelFace(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleModelLine(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetIsVisibleModelNode(       GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetValueB(                   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gb const value);
-Gb                       gmineInfoPropertyItemSetValueI(                   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gi8 const value);
-Gb                       gmineInfoPropertyItemSetValueN(                   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gn8 const value);
-Gb                       gmineInfoPropertyItemSetValueR(                   GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gr8 const value);
-Gb                       gmineInfoPropertyItemSetValueStr(                 GmineInfoPropertyItem       * const gmineInfoPropertyItem, Gstr const * const value);
+// GmineInfoItemBin
+GmineInfoItemBin        *gmineInfoItemBinCloc(                             void);
+Gb                       gmineInfoItemBinClocContent(                      GmineInfoItemBin       * const gmineInfoItemBin);
+
+void                     gmineInfoItemBinDloc(                             GmineInfoItemBin       * const gmineInfoItemBin);
+void                     gmineInfoItemBinDlocContent(                      GmineInfoItemBin       * const gmineInfoItemBin);
+
+GmineInfoColor const    *gmineInfoItemBinGetColorDilllHole(                GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorDrillHoleFace(            GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorDrillHoleLine(            GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorDrillHoleNode(            GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorGeometry(                 GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorGeometryFace(             GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorGeometryLine(             GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorGeometryNode(             GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorModel(                    GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorModelFace(                GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorModelLine(                GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoColor const    *gmineInfoItemBinGetColorModelNode(                GmineInfoItemBin const * const gmineInfoItemBin);
+GmineInfoProperty       *gmineInfoItemBinGetProperty(                      GmineInfoItemBin       * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinGetValueB(                        GmineInfoItemBin const * const gmineInfoItemBin);
+Gi8                      gmineInfoItemBinGetValueI(                        GmineInfoItemBin const * const gmineInfoItemBin);
+Gn8                      gmineInfoItemBinGetValueN(                        GmineInfoItemBin const * const gmineInfoItemBin);
+Gr8                      gmineInfoItemBinGetValueR(                        GmineInfoItemBin const * const gmineInfoItemBin);
+Gstr const              *gmineInfoItemBinGetValueStr(                      GmineInfoItemBin const * const gmineInfoItemBin);
+
+Gb                       gmineInfoItemBinIsSetIsVisibleDrillHole(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleDrillHoleFace(      GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleDrillHoleLine(      GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleDrillHoleNode(      GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleGeometry(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleGeometryFace(       GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleGeometryLine(       GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleGeometryNode(       GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleModel(              GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleModelFace(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleModelLine(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetIsVisibleModelNode(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorDrillHole(              GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorDrillHoleFace(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorDrillHoleLine(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorDrillHoleNode(          GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorGeometry(               GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorGeometryFace(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorGeometryLine(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorGeometryNode(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorModelFace(              GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorModelLine(              GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsSetColorModelNode(              GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleDrillHole(               GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleDrillHoleFace(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleDrillHoleLine(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleDrillHoleNode(           GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleGeometry(                GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleGeometryFace(            GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleGeometryLine(            GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleGeometryNode(            GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleModelFace(               GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleModelLine(               GmineInfoItemBin const * const gmineInfoItemBin);
+Gb                       gmineInfoItemBinIsVisibleModelNode(               GmineInfoItemBin const * const gmineInfoItemBin);
+
+Gb                       gmineInfoItemBinSetColorDrillHole(                GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorDrillHoleFace(            GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorDrillHoleLine(            GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorDrillHoleNode(            GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorGeometry(                 GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorGeometryFace(             GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorGeometryLine(             GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorGeometryNode(             GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorModel(                    GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorModelFace(                GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorModelLine(                GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetColorModelNode(                GmineInfoItemBin       * const gmineInfoItemBin, GmineInfoColor const * const value);
+Gb                       gmineInfoItemBinSetIsVisibleDrillHole(            GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleDrillHoleFace(        GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleDrillHoleLine(        GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleDrillHoleNode(        GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleGeometry(             GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleGeometryFace(         GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleGeometryLine(         GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleGeometryNode(         GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleModel(                GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleModelFace(            GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleModelLine(            GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetIsVisibleModelNode(            GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetValueB(                        GmineInfoItemBin       * const gmineInfoItemBin, Gb const value);
+Gb                       gmineInfoItemBinSetValueI(                        GmineInfoItemBin       * const gmineInfoItemBin, Gi8 const value);
+Gb                       gmineInfoItemBinSetValueN(                        GmineInfoItemBin       * const gmineInfoItemBin, Gn8 const value);
+Gb                       gmineInfoItemBinSetValueR(                        GmineInfoItemBin       * const gmineInfoItemBin, Gr8 const value);
+Gb                       gmineInfoItemBinSetValueStr(                      GmineInfoItemBin       * const gmineInfoItemBin, Gstr const * const value);
 
 #endif

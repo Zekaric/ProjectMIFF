@@ -160,3 +160,58 @@ Gb gmineInfoKeyValueSetValue(GmineInfoKeyValue * const gmineInfoKeyValue, Gstr c
 
    return (gmineInfoKeyValue->value) ? gbTRUE : gbFALSE;
 }
+
+/**************************************************************************************************
+KeyValueArray
+**************************************************************************************************/
+/**************************************************************************************************
+func: gmineInfoKeyValueArrayAdd
+**************************************************************************************************/
+Gb gmineInfoKeyValueArrayAdd(GmineInfoArray * const array, Gstr const * const key,
+   Gstr const * const value)
+{
+   GmineInfoKeyValue *kv;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !array);
+
+   kv = gmineInfoKeyValueCloc(key, value);
+   returnFalseIf(!kv);
+
+   return gmineInfoArrayAddLast(array, kv);
+}
+
+/**************************************************************************************************
+func: gmineInfoKeyValueArrayGetAt
+**************************************************************************************************/
+Gb gmineInfoKeyValueArrayGetAt(GmineInfoArray const * const array, Gindex const index,
+   Gstr const ** const key, Gstr const ** const value)
+{
+   GmineInfoKeyValue *kv;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !array);
+
+   kv = (GmineInfoKeyValue *) gmineInfoArrayGetAt(array, index);
+   returnFalseIf(!kv);
+
+   *key   = gmineInfoKeyValueGetKey(  kv);
+   *value = gmineInfoKeyValueGetValue(kv);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoKeyValueArrayGetCount
+**************************************************************************************************/
+Gb gmineInfoKeyValueArrayGetCount(GmineInfoArray const * const array)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !array);
+
+   return gmineInfoArrayGetCount(array);
+}
+

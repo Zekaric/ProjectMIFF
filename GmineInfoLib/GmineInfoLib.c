@@ -60,6 +60,14 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
+func: gmineInfoAddImage
+**************************************************************************************************/
+Gb gmineInfoAddImage(GmineInfo * const gmineInfo, GmineInfoImage * const image)
+{
+   return gmineInfoArrayAddLast(&gmineInfo->imageArray, image);
+}
+
+/**************************************************************************************************
 func: gmineInfoBlockTypeNext
 
 Block order is important for reading in the MineInfo file in one go.  Some data needs to be defined
@@ -81,22 +89,12 @@ GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
       switch (gmineInfo->currentBlockType)
       {
       case gmineInfoBlockTypeDATA:
-         _MiIoWriteBlockStop(    gmineInfo);
-         break;
-
-      case gmineInfoBlockTypeITEM:
-         _MiIoWriteBlockStop(    gmineInfo);
-         break;
-
-      case gmineInfoBlockTypeGEOMETRY:
-         _MiIoWriteBlockStop(    gmineInfo);
-         break;
-
-      case gmineInfoBlockTypeDRILL_HOLE:
-         _MiIoWriteBlockStop(    gmineInfo);
-         break;
-
-      case gmineInfoBlockTypeMODEL:
+      case gmineInfoBlockTypePROPERTY_LIST:
+      case gmineInfoBlockTypeIMAGE_LIST:
+      case gmineInfoBlockTypeITEM_LIST:
+      case gmineInfoBlockTypeGEOMETRY_LIST:
+      case gmineInfoBlockTypeDRILL_HOLE_LIST:
+      case gmineInfoBlockTypeMODEL_LIST:
          _MiIoWriteBlockStop(    gmineInfo);
          break;
       }
@@ -112,20 +110,28 @@ GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
       _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DATA);
       break;
 
-   case gmineInfoBlockTypeITEM:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM);
+   case gmineInfoBlockTypePROPERTY_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_PROPERTY_LIST);
       break;
 
-   case gmineInfoBlockTypeGEOMETRY:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_GEOMETRY);
+   case gmineInfoBlockTypeIMAGE_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE_LIST);
       break;
 
-   case gmineInfoBlockTypeDRILL_HOLE:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DRILL_HOLE);
+   case gmineInfoBlockTypeITEM_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM_LIST);
       break;
 
-   case gmineInfoBlockTypeMODEL:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_MODEL);
+   case gmineInfoBlockTypeGEOMETRY_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_GEOMETRY_LIST);
+      break;
+
+   case gmineInfoBlockTypeDRILL_HOLE_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DRILL_HOLE_LIST);
+      break;
+
+   case gmineInfoBlockTypeMODEL_LIST:
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_MODEL_LIST);
       break;
    }
 
@@ -171,6 +177,8 @@ Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GmineInfoFileType con
    gmineInfo->getBuffer = getBufferFunc;
 
    returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->itemArray));
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->imageArray));
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->propertyArray));
 
    // Start reading the file header.
    return _MiIoClocReader(gmineInfo);
@@ -214,6 +222,8 @@ Gb gmineInfoClocWriterContent(GmineInfo * const gmineInfo, GmineInfoFileType con
    gmineInfo->setBuffer = setBufferFunc;
 
    returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->itemArray));
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->imageArray));
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->propertyArray));
 
    // Start by writing out the header for the file.
    return _MiIoClocWriter(gmineInfo);
@@ -247,7 +257,11 @@ void gmineInfoDlocContent(GmineInfo * const gmineInfo)
    gmineInfoArrayForEach(    &gmineInfo->itemArray, gmineInfoItemDloc);
    gmineInfoArrayDlocContent(&gmineInfo->itemArray);
 
-   _MiIoDloc(gmineInfo);
+   gmineInfoArrayForEach(    &gmineInfo->imageArray, gmineInfoImageDloc);
+   gmineInfoArrayDlocContent(&gmineInfo->imageArray);
+
+   gmineInfoArrayForEach(    &gmineInfo->propertyArray, gmineInfoPropertyDloc);
+   gmineInfoArrayDlocContent(&gmineInfo->propertyArray);
 
    _MiMemClearType(gmineInfo, GmineInfo);
 }
@@ -333,11 +347,47 @@ Gb gmineInfoWriteDataBlock(GmineInfo * const gmineInfo)
    count = gmineInfoArrayGetCount(&gmineInfo->data->keyValueArray);
    forCount(index, count);
    {
-      kv = gmineInfoArrayGetAt(&gmineInfo->data->keyValueArray, index);
+      kv = (GmineInfoKeyValue *) gmineInfoArrayGetAt(&gmineInfo->data->keyValueArray, index);
       _MiIoWriteString(gmineInfo, kv->key, kv->value);
    }
 
    returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteImageBlock
+**************************************************************************************************/
+Gb gmineInfoWriteImageBlock(GmineInfo * const gmineInfo)
+{
+   Gcount          count;
+   Gindex          index;
+   GmineInfoImage *image;
+   FILE           *file;
+
+   // Ensure writing in order
+   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeIMAGE_LIST);
+
+   count = gmineInfoArrayGetCount(&gmineInfo->imageArray);
+   forCount(index, count)
+   {
+      image = (GmineInfoImage *) gmineInfoArrayGetAt(&gmineInfo->imageArray, index);
+
+      // File path is mandatory.  An image without an image is not an image.
+      returnFalseIf(!gmineInfoImageGetFilePath(image));
+
+      // Check if the image should be inlined.
+      if (gmineInfoImageIsInline(image))
+      {
+         // If it does, then see if we can open the file.
+         returnFalseIf(!fopen_s(&file, gmineInfoImageGetFilePath(image), "rb"));
+      }
+
+      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE);
+
+
+
+      _MiIoWriteBlockStop(gmineInfo);
+   }
 }
 
 /**************************************************************************************************

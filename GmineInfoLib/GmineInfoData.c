@@ -35,24 +35,6 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
-func: gmineInfoDataAddKeyValue
-**************************************************************************************************/
-Gb gmineInfoDataAddKeyValue(GmineInfoData * const gmineInfoData, Gstr const * const key,
-   Gstr const * const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoData);
-
-   kv = gmineInfoKeyValueCloc(key, value);
-   returnFalseIf(!kv);
-
-   return gmineInfoArrayAddLast(&gmineInfoData->keyValueArray, kv);
-}
-
-/**************************************************************************************************
 func: gmineInfoDataCloc
 **************************************************************************************************/
 GmineInfoData *gmineInfoDataCloc(void)
@@ -84,9 +66,7 @@ Gb gmineInfoDataClocContent(GmineInfoData * const gmineInfoData)
 
    _MiMemClearType(gmineInfoData, GmineInfoData);
 
-   gmineInfoArrayClocContent(&gmineInfoData->keyValueArray);
-
-   returnTrue;
+   return gmineInfoBlockKeyValueArrayCloc(gmineInfoData);
 }
 
 /**************************************************************************************************
@@ -118,8 +98,7 @@ void gmineInfoDataDlocContent(GmineInfoData * const gmineInfoData)
    _MiMemDloc(gmineInfoData->projectName);
    _MiMemDloc(gmineInfoData->projectSystem);
 
-   gmineInfoArrayForEach(    &gmineInfoData->keyValueArray, gmineInfoKeyValueDloc);
-   gmineInfoArrayDlocContent(&gmineInfoData->keyValueArray);
+   gmineInfoBlockKeyValueArrayDloc(gmineInfoData);
 
    _MiMemClearType(gmineInfoData, GmineInfoData);
 }
@@ -158,27 +137,6 @@ Gstr const * gmineInfoDataGetCopyright(GmineInfoData const * const gmineInfoData
       !gmineInfoData);
 
    return gmineInfoData->copyright;
-}
-
-/**************************************************************************************************
-func: gmineInfoDataGetKeyValueAt
-**************************************************************************************************/
-Gb gmineInfoDataGetKeyValueAt(GmineInfoData const * const gmineInfoData, Gindex const index,
-   Gstr const ** const key, Gstr const ** const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoData);
-
-   kv = gmineInfoArrayGetAt(&gmineInfoData->keyValueArray, index);
-   returnFalseIf(!kv);
-
-   *key   = gmineInfoKeyValueGetKey(  kv);
-   *value = gmineInfoKeyValueGetValue(kv);
-
-   returnTrue;
 }
 
 /**************************************************************************************************

@@ -35,24 +35,6 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
-func: gmineInfoPropertyAddKeyValue
-**************************************************************************************************/
-Gb gmineInfoPropertyAddKeyValue(GmineInfoProperty * const gmineInfoProperty, Gstr const * const key,
-   Gstr const * const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoProperty);
-
-   kv = gmineInfoKeyValueCloc(key, value);
-   returnFalseIf(!kv);
-
-   return gmineInfoArrayAddLast(&gmineInfoProperty->keyValueArray, kv);
-}
-
-/**************************************************************************************************
 func: gmineInfoPropertyCloc
 **************************************************************************************************/
 GmineInfoProperty *gmineInfoPropertyCloc(void)
@@ -84,7 +66,7 @@ Gb gmineInfoPropertyClocContent(GmineInfoProperty * const gmineInfoProperty)
 
    _MiMemClearType(gmineInfoProperty, GmineInfoProperty);
 
-   return gmineInfoArrayClocContent(&gmineInfoProperty->keyValueArray);
+   return gmineInfoBlockKeyValueArrayCloc(gmineInfoProperty);
 }
 
 /**************************************************************************************************
@@ -96,7 +78,7 @@ void gmineInfoPropertyDloc(GmineInfoProperty * const gmineInfoProperty)
       !gmineInfoIsStarted() ||
       !gmineInfoProperty);
 
-   gmineInfoPropertyDlocContent(gmineInfoProperty);
+   gmineInfoBlockKeyValueArrayDloc(gmineInfoProperty);
 
    _MiMemDloc(gmineInfoProperty);
 }
@@ -277,27 +259,6 @@ Gstr const * gmineInfoPropertyGetKey(GmineInfoProperty const * const gmineInfoPr
       !gmineInfoProperty);
 
    return gmineInfoProperty->key;
-}
-
-/**************************************************************************************************
-func: gmineInfoPropertyGetKeyValueAt
-**************************************************************************************************/
-Gb gmineInfoPropertyGetKeyValueAt(GmineInfoProperty const * const gmineInfoProperty, Gindex const index,
-   Gstr const ** const key, Gstr const ** const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoProperty);
-
-   kv = gmineInfoArrayGetAt(&gmineInfoProperty->keyValueArray, index);
-   returnFalseIf(!kv);
-
-   *key   = gmineInfoKeyValueGetKey(  kv);
-   *value = gmineInfoKeyValueGetValue(kv);
-
-   returnTrue;
 }
 
 /**************************************************************************************************

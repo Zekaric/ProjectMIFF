@@ -60,24 +60,6 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
-func: gmineInfoItemAddKeyValue
-**************************************************************************************************/
-Gb gmineInfoItemAddKeyValue(GmineInfoItem * const gmineInfoItem, Gstr const * const key,
-   Gstr const * const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoItem);
-
-   kv = gmineInfoKeyValueCloc(key, value);
-   returnFalseIf(!kv);
-
-   return gmineInfoArrayAddLast(&gmineInfoItem->keyValueArray, kv);
-}
-
-/**************************************************************************************************
 func: gmineInfoItemCloc
 **************************************************************************************************/
 GmineInfoItem *gmineInfoItemCloc(void)
@@ -297,27 +279,6 @@ Gstr const * gmineInfoItemGetKey(GmineInfoItem const * const gmineInfoItem)
       !gmineInfoItem);
 
    return gmineInfoItem->key;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemGetKeyValueAt
-**************************************************************************************************/
-Gb gmineInfoItemGetKeyValueAt(GmineInfoItem const * const gmineInfoItem, Gindex const index,
-   Gstr const ** const key, Gstr const ** const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoItem);
-
-   kv = gmineInfoArrayGetAt(&gmineInfoItem->keyValueArray, index);
-   returnFalseIf(!kv);
-
-   *key   = gmineInfoKeyValueGetKey(  kv);
-   *value = gmineInfoKeyValueGetValue(kv);
-
-   returnTrue;
 }
 
 /**************************************************************************************************
@@ -810,29 +771,6 @@ Gb gmineInfoItemSetName(GmineInfoItem * const gmineInfoItem, Gstr const * const 
    gmineInfoItem->isSetName = (gmineInfoItem->name) ? gbTRUE : gbFALSE;
 
    return gmineInfoItem->isSetName;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetOther
-**************************************************************************************************/
-Gb gmineInfoItemSetOther(GmineInfoItem * const gmineInfoItem, Gstr const * const key, Gstr const * const value)
-{
-   GmineInfoKeyValue *kv;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoItem        ||
-      !key                  ||
-      !_MiStrIsEmpty(key)   ||
-      !value                ||
-      !_MiStrIsEmpty(value));
-
-   kv = gmineInfoKeyValueCloc(key, value);
-   returnFalseIf(!kv);
-
-   returnFalseIf(!gmineInfoArrayAddLast(&gmineInfoItem->keyValueArray, kv));
-
-   returnTrue;
 }
 
 /**************************************************************************************************

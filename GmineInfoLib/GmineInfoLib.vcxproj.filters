@@ -39,7 +39,10 @@
     <ClCompile Include="GmineInfoProperty.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GmineInfoPropertyItem.c">
+    <ClCompile Include="GmineInfoItemBin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoImage.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

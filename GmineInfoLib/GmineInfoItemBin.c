@@ -1,5 +1,5 @@
 /**************************************************************************************************
-file:       GmineInfoPropertyItem
+file:       GmineInfoItemBin
 author:     Robbert de Groot
 company:    Robbert de Groot
 copyright:  2025, Robbert de Groot
@@ -35,1123 +35,1123 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
-func: gmineInfoPropertyItemCloc
+func: gmineInfoItemBinCloc
 **************************************************************************************************/
-GmineInfoPropertyItem *gmineInfoPropertyItemCloc(void)
+GmineInfoItemBin *gmineInfoItemBinCloc(void)
 {
-   GmineInfoPropertyItem *gmineInfoPropertyItem;
+   GmineInfoItemBin *gmineInfoItemBin;
 
    returnNullIf(!gmineInfoIsStarted());
 
-   gmineInfoPropertyItem = _MiMemClocType(GmineInfoPropertyItem);
-   returnNullIf(!gmineInfoPropertyItem);
+   gmineInfoItemBin = _MiMemClocType(GmineInfoItemBin);
+   returnNullIf(!gmineInfoItemBin);
 
-   if (!gmineInfoPropertyItemClocContent(gmineInfoPropertyItem))
+   if (!gmineInfoItemBinClocContent(gmineInfoItemBin))
    {
-      _MiMemDloc(   gmineInfoPropertyItem);
+      _MiMemDloc(   gmineInfoItemBin);
       return NULL;
    }
 
-   return gmineInfoPropertyItem;
+   return gmineInfoItemBin;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemClocContent
+func: gmineInfoItemBinClocContent
 **************************************************************************************************/
-Gb gmineInfoPropertyItemClocContent(GmineInfoPropertyItem * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinClocContent(GmineInfoItemBin * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   _MiMemClearType(gmineInfoPropertyItem, GmineInfoPropertyItem);
+   _MiMemClearType(gmineInfoItemBin, GmineInfoItemBin);
 
-   return gmineInfoPropertyClocContent(&gmineInfoPropertyItem->property);
+   return gmineInfoPropertyClocContent(&gmineInfoItemBin->property);
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemDloc
+func: gmineInfoItemBinDloc
 **************************************************************************************************/
-void gmineInfoPropertyItemDloc(GmineInfoPropertyItem * const gmineInfoPropertyItem)
+void gmineInfoItemBinDloc(GmineInfoItemBin * const gmineInfoItemBin)
 {
    returnVoidIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItemDlocContent(   gmineInfoPropertyItem);
+   gmineInfoItemBinDlocContent(gmineInfoItemBin);
 
-   _MiMemDloc(   gmineInfoPropertyItem);
+   _MiMemDloc(gmineInfoItemBin);
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemDlocContent
+func: gmineInfoItemBinDlocContent
 **************************************************************************************************/
-void gmineInfoPropertyItemDlocContent(GmineInfoPropertyItem * const gmineInfoPropertyItem)
+void gmineInfoItemBinDlocContent(GmineInfoItemBin * const gmineInfoItemBin)
 {
    returnVoidIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyDlocContent(&gmineInfoPropertyItem->property);
+   gmineInfoPropertyDlocContent(&gmineInfoItemBin->property);
 
    // TODO Clean up value str
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorDilllHole
+func: gmineInfoItemBinGetColorDilllHole
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorDilllHole(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorDilllHole(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorDrillHole;
+   return &gmineInfoItemBin->colorDrillHole;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorDrillHoleFace
+func: gmineInfoItemBinGetColorDrillHoleFace
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorDrillHoleFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorDrillHoleFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorDrillHoleFace;
+   return &gmineInfoItemBin->colorDrillHoleFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorDrillHoleLine
+func: gmineInfoItemBinGetColorDrillHoleLine
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorDrillHoleLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorDrillHoleLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorDrillHoleLine;
+   return &gmineInfoItemBin->colorDrillHoleLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorDrillHoleNode
+func: gmineInfoItemBinGetColorDrillHoleNode
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorDrillHoleNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorDrillHoleNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorDrillHoleNode;
+   return &gmineInfoItemBin->colorDrillHoleNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorGeometry
+func: gmineInfoItemBinGetColorGeometry
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorGeometry(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorGeometry(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorGeometry;
+   return &gmineInfoItemBin->colorGeometry;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorGeometryFace
+func: gmineInfoItemBinGetColorGeometryFace
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorGeometryFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorGeometryFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorGeometryFace;
+   return &gmineInfoItemBin->colorGeometryFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorGeometryLine
+func: gmineInfoItemBinGetColorGeometryLine
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorGeometryLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorGeometryLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorGeometryLine;
+   return &gmineInfoItemBin->colorGeometryLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorGeometryNode
+func: gmineInfoItemBinGetColorGeometryNode
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorGeometryNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorGeometryNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorGeometryNode;
+   return &gmineInfoItemBin->colorGeometryNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorModel
+func: gmineInfoItemBinGetColorModel
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorModel(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorModel(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorModel;
+   return &gmineInfoItemBin->colorModel;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorModelFace
+func: gmineInfoItemBinGetColorModelFace
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorModelFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorModelFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorModelFace;
+   return &gmineInfoItemBin->colorModelFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorModelLine
+func: gmineInfoItemBinGetColorModelLine
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorModelLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorModelLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorModelLine;
+   return &gmineInfoItemBin->colorModelLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetColorModelNode
+func: gmineInfoItemBinGetColorModelNode
 **************************************************************************************************/
-GmineInfoColor const * gmineInfoPropertyItemGetColorModelNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+GmineInfoColor const * gmineInfoItemBinGetColorModelNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->colorModelNode;
+   return &gmineInfoItemBin->colorModelNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetProperty
+func: gmineInfoItemBinGetProperty
 **************************************************************************************************/
-GmineInfoProperty *gmineInfoPropertyItemGetProperty(GmineInfoPropertyItem * const gmineInfoPropertyItem)
+GmineInfoProperty *gmineInfoItemBinGetProperty(GmineInfoItemBin * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return &gmineInfoPropertyItem->property;
+   return &gmineInfoItemBin->property;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetValueB
+func: gmineInfoItemBinGetValueB
 **************************************************************************************************/
-Gb gmineInfoPropertyItemGetValueB(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinGetValueB(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->value.b;
+   return gmineInfoItemBin->value.b;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetValueI
+func: gmineInfoItemBinGetValueI
 **************************************************************************************************/
-Gi8 gmineInfoPropertyItemGetValueI(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gi8 gmineInfoItemBinGetValueI(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    return0If(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->value.i;
+   return gmineInfoItemBin->value.i;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetValueN
+func: gmineInfoItemBinGetValueN
 **************************************************************************************************/
-Gn8 gmineInfoPropertyItemGetValueN(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gn8 gmineInfoItemBinGetValueN(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    return0If(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->value.n;
+   return gmineInfoItemBin->value.n;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetValueR
+func: gmineInfoItemBinGetValueR
 **************************************************************************************************/
-Gr8 gmineInfoPropertyItemGetValueR(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gr8 gmineInfoItemBinGetValueR(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    return0If(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->value.r;
+   return gmineInfoItemBin->value.r;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemGetValueStr
+func: gmineInfoItemBinGetValueStr
 **************************************************************************************************/
-Gstr const * gmineInfoPropertyItemGetValueStr(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gstr const * gmineInfoItemBinGetValueStr(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnNullIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->value.str;
+   return gmineInfoItemBin->value.str;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleDrillHole
+func: gmineInfoItemBinIsSetIsVisibleDrillHole
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleDrillHole(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleDrillHole(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleDrillHole;
+   return gmineInfoItemBin->isSetIsVisibleDrillHole;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleDrillHoleFace
+func: gmineInfoItemBinIsSetIsVisibleDrillHoleFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleDrillHoleFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleDrillHoleFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleDrillHoleFace;
+   return gmineInfoItemBin->isSetIsVisibleDrillHoleFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleDrillHoleLine
+func: gmineInfoItemBinIsSetIsVisibleDrillHoleLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleDrillHoleLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleDrillHoleLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleDrillHoleLine;
+   return gmineInfoItemBin->isSetIsVisibleDrillHoleLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleDrillHoleNode
+func: gmineInfoItemBinIsSetIsVisibleDrillHoleNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleDrillHoleNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleDrillHoleNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleDrillHoleNode;
+   return gmineInfoItemBin->isSetIsVisibleDrillHoleNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleGeometry
+func: gmineInfoItemBinIsSetIsVisibleGeometry
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleGeometry(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleGeometry(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleGeometry;
+   return gmineInfoItemBin->isSetIsVisibleGeometry;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleGeometryFace
+func: gmineInfoItemBinIsSetIsVisibleGeometryFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleGeometryFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleGeometryFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleGeometryFace;
+   return gmineInfoItemBin->isSetIsVisibleGeometryFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleGeometryLine
+func: gmineInfoItemBinIsSetIsVisibleGeometryLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleGeometryLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleGeometryLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleGeometryLine;
+   return gmineInfoItemBin->isSetIsVisibleGeometryLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleGeometryNode
+func: gmineInfoItemBinIsSetIsVisibleGeometryNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleGeometryNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleGeometryNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleGeometryNode;
+   return gmineInfoItemBin->isSetIsVisibleGeometryNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleModel
+func: gmineInfoItemBinIsSetIsVisibleModel
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleModel(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleModel(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleModel;
+   return gmineInfoItemBin->isSetIsVisibleModel;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleModelFace
+func: gmineInfoItemBinIsSetIsVisibleModelFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleModelFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleModelFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleModelFace;
+   return gmineInfoItemBin->isSetIsVisibleModelFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleModelLine
+func: gmineInfoItemBinIsSetIsVisibleModelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleModelLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleModelLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleModelLine;
+   return gmineInfoItemBin->isSetIsVisibleModelLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetIsVisibleModelNode
+func: gmineInfoItemBinIsSetIsVisibleModelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetIsVisibleModelNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetIsVisibleModelNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetIsVisibleModelNode;
+   return gmineInfoItemBin->isSetIsVisibleModelNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorDrillHole
+func: gmineInfoItemBinIsSetColorDrillHole
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorDrillHole(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorDrillHole(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorDrillHole;
+   return gmineInfoItemBin->isSetColorDrillHole;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorDrillHoleFace
+func: gmineInfoItemBinIsSetColorDrillHoleFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorDrillHoleFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorDrillHoleFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorDrillHoleFace;
+   return gmineInfoItemBin->isSetColorDrillHoleFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorDrillHoleLine
+func: gmineInfoItemBinIsSetColorDrillHoleLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorDrillHoleLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorDrillHoleLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorDrillHoleLine;
+   return gmineInfoItemBin->isSetColorDrillHoleLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorDrillHoleNode
+func: gmineInfoItemBinIsSetColorDrillHoleNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorDrillHoleNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorDrillHoleNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorDrillHoleNode;
+   return gmineInfoItemBin->isSetColorDrillHoleNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorGeometry
+func: gmineInfoItemBinIsSetColorGeometry
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorGeometry(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorGeometry(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorGeometry;
+   return gmineInfoItemBin->isSetColorGeometry;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorGeometryFace
+func: gmineInfoItemBinIsSetColorGeometryFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorGeometryFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorGeometryFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorGeometryFace;
+   return gmineInfoItemBin->isSetColorGeometryFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorGeometryLine
+func: gmineInfoItemBinIsSetColorGeometryLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorGeometryLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorGeometryLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorGeometryLine;
+   return gmineInfoItemBin->isSetColorGeometryLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorGeometryNode
+func: gmineInfoItemBinIsSetColorGeometryNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorGeometryNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorGeometryNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorGeometryNode;
+   return gmineInfoItemBin->isSetColorGeometryNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorModelFace
+func: gmineInfoItemBinIsSetColorModelFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorModelFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorModelFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorModelFace;
+   return gmineInfoItemBin->isSetColorModelFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorModelLine
+func: gmineInfoItemBinIsSetColorModelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorModelLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorModelLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorModelLine;
+   return gmineInfoItemBin->isSetColorModelLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsSetColorModelNode
+func: gmineInfoItemBinIsSetColorModelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsSetColorModelNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsSetColorModelNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isSetColorModelNode;
+   return gmineInfoItemBin->isSetColorModelNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleDrillHole
+func: gmineInfoItemBinIsVisibleDrillHole
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleDrillHole(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleDrillHole(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleDrillHole;
+   return gmineInfoItemBin->isVisibleDrillHole;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleDrillHoleFace
+func: gmineInfoItemBinIsVisibleDrillHoleFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleDrillHoleFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleDrillHoleFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleDrillHoleFace;
+   return gmineInfoItemBin->isVisibleDrillHoleFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleDrillHoleLine
+func: gmineInfoItemBinIsVisibleDrillHoleLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleDrillHoleLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleDrillHoleLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleDrillHoleLine;
+   return gmineInfoItemBin->isVisibleDrillHoleLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleDrillHoleNode
+func: gmineInfoItemBinIsVisibleDrillHoleNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleDrillHoleNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleDrillHoleNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleDrillHoleNode;
+   return gmineInfoItemBin->isVisibleDrillHoleNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleGeometry
+func: gmineInfoItemBinIsVisibleGeometry
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleGeometry(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleGeometry(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleGeometry;
+   return gmineInfoItemBin->isVisibleGeometry;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleGeometryFace
+func: gmineInfoItemBinIsVisibleGeometryFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleGeometryFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleGeometryFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleGeometryFace;
+   return gmineInfoItemBin->isVisibleGeometryFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleGeometryLine
+func: gmineInfoItemBinIsVisibleGeometryLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleGeometryLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleGeometryLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleGeometryLine;
+   return gmineInfoItemBin->isVisibleGeometryLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleGeometryNode
+func: gmineInfoItemBinIsVisibleGeometryNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleGeometryNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleGeometryNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleGeometryNode;
+   return gmineInfoItemBin->isVisibleGeometryNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleModelFace
+func: gmineInfoItemBinIsVisibleModelFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleModelFace(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleModelFace(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleModelFace;
+   return gmineInfoItemBin->isVisibleModelFace;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleModelLine
+func: gmineInfoItemBinIsVisibleModelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleModelLine(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleModelLine(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleModelLine;
+   return gmineInfoItemBin->isVisibleModelLine;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemIsVisibleModelNode
+func: gmineInfoItemBinIsVisibleModelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemIsVisibleModelNode(GmineInfoPropertyItem const * const gmineInfoPropertyItem)
+Gb gmineInfoItemBinIsVisibleModelNode(GmineInfoItemBin const * const gmineInfoItemBin)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   return gmineInfoPropertyItem->isVisibleModelNode;
+   return gmineInfoItemBin->isVisibleModelNode;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorDrillHole
+func: gmineInfoItemBinSetColorDrillHole
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorDrillHole(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorDrillHole(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorDrillHole      = *value;
-   gmineInfoPropertyItem->isSetColorDrillHole = gbTRUE;
+   gmineInfoItemBin->colorDrillHole      = *value;
+   gmineInfoItemBin->isSetColorDrillHole = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorDrillHoleFace
+func: gmineInfoItemBinSetColorDrillHoleFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorDrillHoleFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorDrillHoleFace(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorDrillHoleFace      = *value;
-   gmineInfoPropertyItem->isSetColorDrillHoleFace = gbTRUE;
+   gmineInfoItemBin->colorDrillHoleFace      = *value;
+   gmineInfoItemBin->isSetColorDrillHoleFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorDrillHoleLine
+func: gmineInfoItemBinSetColorDrillHoleLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorDrillHoleLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorDrillHoleLine(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorDrillHoleLine      = *value;
-   gmineInfoPropertyItem->isSetColorDrillHoleLine = gbTRUE;
+   gmineInfoItemBin->colorDrillHoleLine      = *value;
+   gmineInfoItemBin->isSetColorDrillHoleLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorDrillHoleNode
+func: gmineInfoItemBinSetColorDrillHoleNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorDrillHoleNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorDrillHoleNode(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorDrillHoleNode      = *value;
-   gmineInfoPropertyItem->isSetColorDrillHoleNode = gbTRUE;
+   gmineInfoItemBin->colorDrillHoleNode      = *value;
+   gmineInfoItemBin->isSetColorDrillHoleNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorGeometry
+func: gmineInfoItemBinSetColorGeometry
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorGeometry(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorGeometry(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorGeometry      = *value;
-   gmineInfoPropertyItem->isSetColorGeometry = gbTRUE;
+   gmineInfoItemBin->colorGeometry      = *value;
+   gmineInfoItemBin->isSetColorGeometry = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorGeometryFace
+func: gmineInfoItemBinSetColorGeometryFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorGeometryFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorGeometryFace(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorGeometryFace      = *value;
-   gmineInfoPropertyItem->isSetColorGeometryFace = gbTRUE;
+   gmineInfoItemBin->colorGeometryFace      = *value;
+   gmineInfoItemBin->isSetColorGeometryFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorGeometryLine
+func: gmineInfoItemBinSetColorGeometryLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorGeometryLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorGeometryLine(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorGeometryLine      = *value;
-   gmineInfoPropertyItem->isSetColorGeometryLine = gbTRUE;
+   gmineInfoItemBin->colorGeometryLine      = *value;
+   gmineInfoItemBin->isSetColorGeometryLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorGeometryNode
+func: gmineInfoItemBinSetColorGeometryNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorGeometryNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorGeometryNode(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorGeometryNode      = *value;
-   gmineInfoPropertyItem->isSetColorGeometryNode = gbTRUE;
+   gmineInfoItemBin->colorGeometryNode      = *value;
+   gmineInfoItemBin->isSetColorGeometryNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorModel
+func: gmineInfoItemBinSetColorModel
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorModel(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorModel(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorModel      = *value;
-   gmineInfoPropertyItem->isSetColorModel = gbTRUE;
+   gmineInfoItemBin->colorModel      = *value;
+   gmineInfoItemBin->isSetColorModel = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorModelFace
+func: gmineInfoItemBinSetColorModelFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorModelFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorModelFace(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorModelFace      = *value;
-   gmineInfoPropertyItem->isSetColorModelFace = gbTRUE;
+   gmineInfoItemBin->colorModelFace      = *value;
+   gmineInfoItemBin->isSetColorModelFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorModelLine
+func: gmineInfoItemBinSetColorModelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorModelLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorModelLine(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorModelLine      = *value;
-   gmineInfoPropertyItem->isSetColorModelLine = gbTRUE;
+   gmineInfoItemBin->colorModelLine      = *value;
+   gmineInfoItemBin->isSetColorModelLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetColorModelNode
+func: gmineInfoItemBinSetColorModelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetColorModelNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, GmineInfoColor const * const value)
+Gb gmineInfoItemBinSetColorModelNode(GmineInfoItemBin * const gmineInfoItemBin, GmineInfoColor const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->colorModelNode      = *value;
-   gmineInfoPropertyItem->isSetColorModelNode = gbTRUE;
+   gmineInfoItemBin->colorModelNode      = *value;
+   gmineInfoItemBin->isSetColorModelNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleDrillHole
+func: gmineInfoItemBinSetIsVisibleDrillHole
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleDrillHole(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleDrillHole(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleDrillHole      = value;
-   gmineInfoPropertyItem->isSetIsVisibleDrillHole = gbTRUE;
+   gmineInfoItemBin->isVisibleDrillHole      = value;
+   gmineInfoItemBin->isSetIsVisibleDrillHole = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleDrillHoleFace
+func: gmineInfoItemBinSetIsVisibleDrillHoleFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleDrillHoleFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleDrillHoleFace(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleDrillHoleFace      = value;
-   gmineInfoPropertyItem->isSetIsVisibleDrillHoleFace = gbTRUE;
+   gmineInfoItemBin->isVisibleDrillHoleFace      = value;
+   gmineInfoItemBin->isSetIsVisibleDrillHoleFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleDrillHoleLine
+func: gmineInfoItemBinSetIsVisibleDrillHoleLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleDrillHoleLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleDrillHoleLine(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleDrillHoleLine      = value;
-   gmineInfoPropertyItem->isSetIsVisibleDrillHoleLine = gbTRUE;
+   gmineInfoItemBin->isVisibleDrillHoleLine      = value;
+   gmineInfoItemBin->isSetIsVisibleDrillHoleLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleDrillHoleNode
+func: gmineInfoItemBinSetIsVisibleDrillHoleNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleDrillHoleNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleDrillHoleNode(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleDrillHoleNode      = value;
-   gmineInfoPropertyItem->isSetIsVisibleDrillHoleNode = gbTRUE;
+   gmineInfoItemBin->isVisibleDrillHoleNode      = value;
+   gmineInfoItemBin->isSetIsVisibleDrillHoleNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleGeometry
+func: gmineInfoItemBinSetIsVisibleGeometry
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleGeometry(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleGeometry(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleGeometry      = value;
-   gmineInfoPropertyItem->isSetIsVisibleGeometry = gbTRUE;
+   gmineInfoItemBin->isVisibleGeometry      = value;
+   gmineInfoItemBin->isSetIsVisibleGeometry = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleGeometryFace
+func: gmineInfoItemBinSetIsVisibleGeometryFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleGeometryFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleGeometryFace(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleGeometryFace      = value;
-   gmineInfoPropertyItem->isSetIsVisibleGeometryFace = gbTRUE;
+   gmineInfoItemBin->isVisibleGeometryFace      = value;
+   gmineInfoItemBin->isSetIsVisibleGeometryFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleGeometryLine
+func: gmineInfoItemBinSetIsVisibleGeometryLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleGeometryLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleGeometryLine(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleGeometryLine      = value;
-   gmineInfoPropertyItem->isSetIsVisibleGeometryLine = gbTRUE;
+   gmineInfoItemBin->isVisibleGeometryLine      = value;
+   gmineInfoItemBin->isSetIsVisibleGeometryLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleGeometryNode
+func: gmineInfoItemBinSetIsVisibleGeometryNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleGeometryNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleGeometryNode(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleGeometryNode      = value;
-   gmineInfoPropertyItem->isSetIsVisibleGeometryNode = gbTRUE;
+   gmineInfoItemBin->isVisibleGeometryNode      = value;
+   gmineInfoItemBin->isSetIsVisibleGeometryNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleModel
+func: gmineInfoItemBinSetIsVisibleModel
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleModel(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleModel(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleModel      = value;
-   gmineInfoPropertyItem->isSetIsVisibleModel = gbTRUE;
+   gmineInfoItemBin->isVisibleModel      = value;
+   gmineInfoItemBin->isSetIsVisibleModel = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleModelFace
+func: gmineInfoItemBinSetIsVisibleModelFace
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleModelFace(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleModelFace(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleModelFace      = value;
-   gmineInfoPropertyItem->isSetIsVisibleModelFace = gbTRUE;
+   gmineInfoItemBin->isVisibleModelFace      = value;
+   gmineInfoItemBin->isSetIsVisibleModelFace = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleModelLine
+func: gmineInfoItemBinSetIsVisibleModelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleModelLine(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleModelLine(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleModelLine      = value;
-   gmineInfoPropertyItem->isSetIsVisibleModelLine = gbTRUE;
+   gmineInfoItemBin->isVisibleModelLine      = value;
+   gmineInfoItemBin->isSetIsVisibleModelLine = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetIsVisibleModelNode
+func: gmineInfoItemBinSetIsVisibleModelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetIsVisibleModelNode(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetIsVisibleModelNode(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->isVisibleModelNode      = value;
-   gmineInfoPropertyItem->isSetIsVisibleModelNode = gbTRUE;
+   gmineInfoItemBin->isVisibleModelNode      = value;
+   gmineInfoItemBin->isSetIsVisibleModelNode = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetValueB
+func: gmineInfoItemBinSetValueB
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetValueB(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gb const value)
+Gb gmineInfoItemBinSetValueB(GmineInfoItemBin * const gmineInfoItemBin, Gb const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->value.b    = value;
-   gmineInfoPropertyItem->isSetValue = gbTRUE;
+   gmineInfoItemBin->value.b    = value;
+   gmineInfoItemBin->isSetValue = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetValueI
+func: gmineInfoItemBinSetValueI
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetValueI(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gi8 const value)
+Gb gmineInfoItemBinSetValueI(GmineInfoItemBin * const gmineInfoItemBin, Gi8 const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->value.i    = value;
-   gmineInfoPropertyItem->isSetValue = gbTRUE;
+   gmineInfoItemBin->value.i    = value;
+   gmineInfoItemBin->isSetValue = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetValueN
+func: gmineInfoItemBinSetValueN
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetValueN(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gn8 const value)
+Gb gmineInfoItemBinSetValueN(GmineInfoItemBin * const gmineInfoItemBin, Gn8 const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->value.n    = value;
-   gmineInfoPropertyItem->isSetValue = gbTRUE;
+   gmineInfoItemBin->value.n    = value;
+   gmineInfoItemBin->isSetValue = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetValueR
+func: gmineInfoItemBinSetValueR
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetValueR(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gr8 const value)
+Gb gmineInfoItemBinSetValueR(GmineInfoItemBin * const gmineInfoItemBin, Gr8 const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->value.r    = value;
-   gmineInfoPropertyItem->isSetValue = gbTRUE;
+   gmineInfoItemBin->value.r    = value;
+   gmineInfoItemBin->isSetValue = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyItemSetValueStr
+func: gmineInfoItemBinSetValueStr
 **************************************************************************************************/
-Gb gmineInfoPropertyItemSetValueStr(GmineInfoPropertyItem * const gmineInfoPropertyItem, Gstr const * const value)
+Gb gmineInfoItemBinSetValueStr(GmineInfoItemBin * const gmineInfoItemBin, Gstr const * const value)
 {
    returnFalseIf(
       !gmineInfoIsStarted() ||
-      !gmineInfoPropertyItem);
+      !gmineInfoItemBin);
 
-   gmineInfoPropertyItem->value.str  = _MiStrClone(value);
-   gmineInfoPropertyItem->isSetValue = gbTRUE;
+   gmineInfoItemBin->value.str  = _MiStrClone(value);
+   gmineInfoItemBin->isSetValue = gbTRUE;
 
    returnTrue;
 }

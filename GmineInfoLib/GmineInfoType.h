@@ -57,13 +57,13 @@ typedef enum
    gmineInfoBlockTypeNONE,
 
    gmineInfoBlockTypeDATA,
-   gmineInfoBlockTypeITEM,
-   gmineInfoBlockTypeGEOMETRY,
-   gmineInfoBlockTypeDRILL_HOLE,
-   gmineInfoBlockTypeMODEL,
+   gmineInfoBlockTypePROPERTY_LIST,
+   gmineInfoBlockTypeIMAGE_LIST,
+   gmineInfoBlockTypeITEM_LIST,
+   gmineInfoBlockTypeGEOMETRY_LIST,
+   gmineInfoBlockTypeDRILL_HOLE_LIST,
+   gmineInfoBlockTypeMODEL_LIST,
 
-   //gmineInfoBlockTypeIMAGE,
-   //gmineInfoBlockTypePROPERTIES,
 
    // No more block types.
    gmineInfoBlockType_END,
@@ -177,6 +177,23 @@ typedef struct
 
    GmineInfoArray        keyValueArray;
 } GmineInfoData;
+
+typedef struct
+{
+   Gb                    isInline,
+                         isSetFileName,
+                         isSetFilePath,
+                         isSetIsInline,
+                         isSetKey,
+                         isSetName;
+
+   Gstr                 *fileName;
+   Gstr                 *filePath;
+   Gstr                 *key;
+   Gstr                 *name;
+
+   GmineInfoArray        keyValueArray;
+} GmineInfoImage;
 
 typedef struct
 {
@@ -320,7 +337,7 @@ typedef struct
    GmineInfoProperty     property;
 
    GmineInfoValueBase    value;
-} GmineInfoPropertyItem;
+} GmineInfoItemBin;
 
 typedef struct
 {
@@ -340,9 +357,9 @@ typedef struct
    Gr8                   precision;
    GmineInfoItemType     type;
 
+   GmineInfoArray        BinArray;
    GmineInfoArray        keyValueArray;
    GmineInfoArray        valueArray;
-   GmineInfoArray        propertyItemArray;
 } GmineInfoItem;
 
 typedef struct
@@ -380,14 +397,5 @@ typedef struct
    GmineInfoArray        itemArray;
    GmineInfoArray        propertyArray;
 } GmineInfo;
-
-/**************************************************************************************************
-variable:
-**************************************************************************************************/
-
-/**************************************************************************************************
-prototype:
-**************************************************************************************************/
-
 
 #endif

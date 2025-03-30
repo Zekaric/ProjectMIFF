@@ -35,25 +35,27 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-static Gb       _BlockWrite(           GmineInfo       * const gmineInfo);
-static Gb       _BlockWriteData(       GmineInfo       * const gmineInfo);
-static Gb       _BlockWriteDrillHole(  GmineInfo       * const gmineInfo);
-static Gb       _BlockWriteGeometry(   GmineInfo       * const gmineInfo);
-static Gb       _BlockWriteItem(       GmineInfo       * const gmineInfo);
-static Gb       _BlockWriteModel(      GmineInfo       * const gmineInfo);
+static Gb       _BlockWrite(              GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteData(          GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteDrillHoleList( GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteGeometryList(  GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteImageList(     GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteItemList(      GmineInfo       * const gmineInfo);
+static Gb       _BlockWriteModelList(     GmineInfo       * const gmineInfo);
+static Gb       _BlockWritePropertyList(  GmineInfo       * const gmineInfo);
 
-static Gb       _GetBuffer(            void * const dataRepo, Gcount const byteCount, Gn1       * const byteData);
+static Gb       _GetBuffer(               void * const dataRepo, Gcount const byteCount, Gn1       * const byteData);
 
-static void    *_MemCloc(              Gcount const memByteCount);
-static void     _MemDloc(              void * const mem);
+static void    *_MemCloc(                 Gcount const memByteCount);
+static void     _MemDloc(                 void * const mem);
 
-static Gb       _ReadMiJson(           void);
-static Gb       _ReadMiMiff(           void);
+static Gb       _ReadMiJson(              void);
+static Gb       _ReadMiMiff(              void);
 
-static Gb       _SetBuffer(            void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData);
+static Gb       _SetBuffer(               void * const dataRepo, Gcount const byteCount, Gn1 const * const byteData);
 
-static Gb       _WriteMiJson(          void);
-static Gb       _WriteMiMiff(          void);
+static Gb       _WriteMiJson(             void);
+static Gb       _WriteMiMiff(             void);
 
 /**************************************************************************************************
 global:
@@ -135,21 +137,29 @@ static Gb _BlockWrite(GmineInfo * const gmineInfo)
       {
          breakIf(!_BlockWriteData(gmineInfo));
       }
-      else if (block == gmineInfoBlockTypeITEM)
+      else if (block == gmineInfoBlockTypePROPERTY_LIST)
       {
-         breakIf(!_BlockWriteItem(gmineInfo));
+         breakIf(!_BlockWritePropertyList(gmineInfo));
       }
-      else if (block == gmineInfoBlockTypeGEOMETRY)
+      else if (block == gmineInfoBlockTypeIMAGE_LIST)
       {
-         breakIf(!_BlockWriteGeometry(gmineInfo));
+         breakIf(!_BlockWriteImageList(gmineInfo));
       }
-      else if (block == gmineInfoBlockTypeDRILL_HOLE)
+      else if (block == gmineInfoBlockTypeITEM_LIST)
       {
-         breakIf(!_BlockWriteDrillHole(gmineInfo));
+         breakIf(!_BlockWriteItemList(gmineInfo));
       }
-      else if (block == gmineInfoBlockTypeMODEL)
+      else if (block == gmineInfoBlockTypeGEOMETRY_LIST)
       {
-         breakIf(!_BlockWriteModel(gmineInfo));
+         breakIf(!_BlockWriteGeometryList(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeDRILL_HOLE_LIST)
+      {
+         breakIf(!_BlockWriteDrillHoleList(gmineInfo));
+      }
+      else if (block == gmineInfoBlockTypeMODEL_LIST)
+      {
+         breakIf(!_BlockWriteModelList(gmineInfo));
       }
    }
 
@@ -167,47 +177,82 @@ static Gb _BlockWriteData(GmineInfo * const gmineInfo)
                   max = {2500, 3500, 3100};
 
    data = gmineInfoDataCloc();
+   returnFalseIf(!data);
 
-   gmineInfoDataSetAuthorName(   data, "Robbert de Groot");
-   gmineInfoDataSetCompanyName(  data, "Zekaric");
-   gmineInfoDataSetCopyright(    data, "2025 (c) Robbert de Groot");
-   gmineInfoDataSetProjectMax(   data, &max);
-   gmineInfoDataSetProjectMin(   data, &min);
-   gmineInfoDataSetProjectName(  data, "Mines Of Moria");
-   gmineInfoDataSetProjectSystem(data, gmineInfoPROJECT_SYSTEM_LOCAL);
-   gmineInfoDataAddKeyValue(     data, "project lead",  "Ghimli");
-   gmineInfoDataAddKeyValue(     data, "project sme",   "Gandalf The Grey");
-   gmineInfoDataAddKeyValue(     data, "project theif", "Bilbo Baggins");
-   gmineInfoDataAddKeyValue(     data, "risk 1",        "Gollum");
-   gmineInfoDataAddKeyValue(     data, "risk 2",        "The Balrog");
+   returnFalseIf(!gmineInfoDataSetAuthorName(    data, "Robbert de Groot"));
+   returnFalseIf(!gmineInfoDataSetCompanyName(   data, "Zekaric"));
+   returnFalseIf(!gmineInfoDataSetCopyright(     data, "2025 (c) Robbert de Groot"));
+   returnFalseIf(!gmineInfoDataSetProjectMax(    data, &max));
+   returnFalseIf(!gmineInfoDataSetProjectMin(    data, &min));
+   returnFalseIf(!gmineInfoDataSetProjectName(   data, "Mines Of Moria"));
+   returnFalseIf(!gmineInfoDataSetProjectSystem( data, gmineInfoPROJECT_SYSTEM_LOCAL));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(data, "project lead",  "Ghimli"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(data, "project sme",   "Gandalf The Grey"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(data, "project theif", "Bilbo Baggins"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(data, "risk 1",        "Gollum"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(data, "risk 2",        "The Balrog"));
 
-   gmineInfoSetData(gmineInfo, data);
+   returnFalseIf(!gmineInfoSetData(gmineInfo, data));
 
    return gmineInfoWriteDataBlock(gmineInfo);
 }
 
 /**************************************************************************************************
-func: _BlockWriteDrillHole
+func: _BlockWriteDrillHoleList
 **************************************************************************************************/
-static Gb _BlockWriteDrillHole(GmineInfo * const gmineInfo)
+static Gb _BlockWriteDrillHoleList(GmineInfo * const gmineInfo)
 {
    gmineInfo;
    returnTrue;
 }
 
 /**************************************************************************************************
-func: _BlockWriteGeometry
+func: _BlockWriteGeometryList
 **************************************************************************************************/
-static Gb _BlockWriteGeometry(GmineInfo * const gmineInfo)
+static Gb _BlockWriteGeometryList(GmineInfo * const gmineInfo)
 {
    gmineInfo;
    returnTrue;
 }
 
 /**************************************************************************************************
-func: _BlockWriteItem
+func: _BlockWriteImageList
 **************************************************************************************************/
-static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
+static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
+{
+   GmineInfoImage *image;
+
+   // Adding an image in the mine info file directly.
+   image = gmineInfoImageCloc();
+   returnFalseIf(!image);
+
+   returnFalseIf(!gmineInfoImageSetKey(         image, "Bingham"));
+   returnFalseIf(!gmineInfoImageSetName(        image, "Biggest Mine In The World"));
+   returnFalseIf(!gmineInfoImageSetFileName(    image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoImageSetIsInline(    image, gbTRUE));
+
+   returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
+
+
+   // Adding an image as an external link.
+   image = gmineInfoImageCloc();
+   returnFalseIf(!image);
+
+   returnFalseIf(!gmineInfoImageSetKey(         image, "Bingham2"));
+   returnFalseIf(!gmineInfoImageSetName(        image, "Biggest Mine In The World"));
+   returnFalseIf(!gmineInfoImageSetFileName(    image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
+
+   returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
+
+   return gmineInfoWriteImageBlock(gmineInfo);
+}
+
+/**************************************************************************************************
+func: _BlockWriteItemList
+**************************************************************************************************/
+static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
 {
    GmineInfoItem *item;
 
@@ -215,11 +260,11 @@ static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
    item = gmineInfoItemCloc();
    returnFalseIf(!item);
 
-   returnFalseIf(!gmineInfoItemSetName(    item, "copper"));
-   returnFalseIf(!gmineInfoItemSetKey(     item, "CU"));
-   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeR));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "Comment", "Cold Copper Tears."));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "unit",    "ppm"));
+   returnFalseIf(!gmineInfoItemSetName(          item, "copper"));
+   returnFalseIf(!gmineInfoItemSetKey(           item, "CU"));
+   returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypeR));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "Comment", "Cold Copper Tears."));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "unit",    "ppm"));
    // No default set, then default value is "missing".
    // No min or max set, then min and max are full range of reals.
 
@@ -229,14 +274,14 @@ static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
    item = gmineInfoItemCloc();
    returnFalseIf(!item);
 
-   returnFalseIf(!gmineInfoItemSetName(    item, "gold"));
-   returnFalseIf(!gmineInfoItemSetKey(     item, "AU"));
-   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeR));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "Saying",  "All that glitters is not gold."));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "unit",    "ppm"));
-   returnFalseIf(!gmineInfoItemSetDefaultR(item, 0.0));
-   returnFalseIf(!gmineInfoItemSetMinR(    item, 0.0));
-   returnFalseIf(!gmineInfoItemSetMaxR(    item, 5.0));
+   returnFalseIf(!gmineInfoItemSetName(          item, "gold"));
+   returnFalseIf(!gmineInfoItemSetKey(           item, "AU"));
+   returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypeR));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "Saying",  "All that glitters is not gold."));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "unit",    "ppm"));
+   returnFalseIf(!gmineInfoItemSetDefaultR(      item, 0.0));
+   returnFalseIf(!gmineInfoItemSetMinR(          item, 0.0));
+   returnFalseIf(!gmineInfoItemSetMaxR(          item, 5.0));
 
    returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
 
@@ -244,11 +289,11 @@ static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
    item = gmineInfoItemCloc();
    returnFalseIf(!item);
 
-   returnFalseIf(!gmineInfoItemSetName(    item, "topography percent"));
-   returnFalseIf(!gmineInfoItemSetKey(     item, "topo%"));
-   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypePERCENT));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "Saying",  "Top o' da' world baby!"));
-   returnFalseIf(!gmineInfoItemSetDefaultR(item, 100.0));
+   returnFalseIf(!gmineInfoItemSetName(          item, "topography percent"));
+   returnFalseIf(!gmineInfoItemSetKey(           item, "topo%"));
+   returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypePERCENT));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "Saying",  "Top o' da' world baby!"));
+   returnFalseIf(!gmineInfoItemSetDefaultR(      item, 100.0));
 
    returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
 
@@ -256,20 +301,30 @@ static Gb _BlockWriteItem(GmineInfo * const gmineInfo)
    item = gmineInfoItemCloc();
    returnFalseIf(!item);
 
-   returnFalseIf(!gmineInfoItemSetName(    item, "rock type"));
-   returnFalseIf(!gmineInfoItemSetKey(     item, "rtype"));
-   returnFalseIf(!gmineInfoItemSetType(    item, gmineInfoItemTypeN));
-   returnFalseIf(!gmineInfoItemSetOther(   item, "ship",    "It go pew pew!"));
+   returnFalseIf(!gmineInfoItemSetName(          item, "rock type"));
+   returnFalseIf(!gmineInfoItemSetKey(           item, "rtype"));
+   returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypeN));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "ship",    "It go pew pew!"));
 
    returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
 
+   //return gmineInfoWriteItemBlock(gmineInfo);
    returnTrue;
 }
 
 /**************************************************************************************************
-func: _BlockWriteModel
+func: _BlockWriteModelList
 **************************************************************************************************/
-static Gb _BlockWriteModel(GmineInfo * const gmineInfo)
+static Gb _BlockWriteModelList(GmineInfo * const gmineInfo)
+{
+   gmineInfo;
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _BlockWritePropertyList
+**************************************************************************************************/
+static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
 {
    gmineInfo;
    returnTrue;

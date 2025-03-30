@@ -77,9 +77,22 @@ constant:
 #define KEY_BLOCK_DATA_SOFTWARE_NAME      "software name"
 #define KEY_BLOCK_DATA_SOFTWARE_VERSION   "software version"
 
+#define KEY_BLOCK_PROPERTY_LIST           "property list"
+#define KEY_BLOCK_PROPERTY                "property"
+
+#define KEY_BLOCK_IMAGE_LIST              "image list"
+#define KEY_BLOCK_IMAGE                   "image"
+
+#define KEY_BLOCK_ITEM_LIST               "item list"
 #define KEY_BLOCK_ITEM                    "item"
+
+#define KEY_BLOCK_GEOMETRY_LIST           "geometry list"
 #define KEY_BLOCK_GEOMETRY                "geometry"
-#define KEY_BLOCK_DRILL_HOLE              "drillhole"
+
+#define KEY_BLOCK_DRILL_HOLE_LIST         "drill hole list"
+#define KEY_BLOCK_DRILL_HOLE              "drill hole"
+
+#define KEY_BLOCK_MODEL_LIST              "model list"
 #define KEY_BLOCK_MODEL                   "model"
 
 /**************************************************************************************************

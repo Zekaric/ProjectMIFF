@@ -24,7 +24,22 @@
     <ClCompile Include="GmineInfo_io.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GmineInfo_array.c">
+    <ClCompile Include="GmineInfoArray.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoData.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoKeyValue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoItem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoProperty.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GmineInfoPropertyItem.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

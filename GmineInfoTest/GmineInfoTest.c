@@ -161,23 +161,29 @@ func: _BlockWriteData
 **************************************************************************************************/
 static Gb _BlockWriteData(GmineInfo * const gmineInfo)
 {
+   GmineInfoData *data;
+
    GmineInfoPoint min = {1000, 2000, 3000},
                   max = {2500, 3500, 3100};
 
-   gmineInfoSetDataAuthorName(   gmineInfo, "Robbert de Groot");
-   gmineInfoSetDataCompanyName(  gmineInfo, "Zekaric");
-   gmineInfoSetDataCopyright(    gmineInfo, "2025 (c) Robbert de Groot");
-   gmineInfoSetDataProjectMax(   gmineInfo, &max);
-   gmineInfoSetDataProjectMin(   gmineInfo, &min);
-   gmineInfoSetDataProjectName(  gmineInfo, "Mines Of Moria");
-   gmineInfoSetDataProjectSystem(gmineInfo, gmineInfoPROJECT_SYSTEM_LOCAL);
-   gmineInfoSetDataOther(        gmineInfo, "project lead",  "Ghimli");
-   gmineInfoSetDataOther(        gmineInfo, "project sme",   "Gandalf The Grey");
-   gmineInfoSetDataOther(        gmineInfo, "project theif", "Bilbo Baggins");
-   gmineInfoSetDataOther(        gmineInfo, "risk 1",        "Gollum");
-   gmineInfoSetDataOther(        gmineInfo, "risk 2",        "The Balrog");
+   data = gmineInfoDataCloc();
 
-   return gmineInfoWriteData(gmineInfo);
+   gmineInfoDataSetAuthorName(   data, "Robbert de Groot");
+   gmineInfoDataSetCompanyName(  data, "Zekaric");
+   gmineInfoDataSetCopyright(    data, "2025 (c) Robbert de Groot");
+   gmineInfoDataSetProjectMax(   data, &max);
+   gmineInfoDataSetProjectMin(   data, &min);
+   gmineInfoDataSetProjectName(  data, "Mines Of Moria");
+   gmineInfoDataSetProjectSystem(data, gmineInfoPROJECT_SYSTEM_LOCAL);
+   gmineInfoDataAddKeyValue(     data, "project lead",  "Ghimli");
+   gmineInfoDataAddKeyValue(     data, "project sme",   "Gandalf The Grey");
+   gmineInfoDataAddKeyValue(     data, "project theif", "Bilbo Baggins");
+   gmineInfoDataAddKeyValue(     data, "risk 1",        "Gollum");
+   gmineInfoDataAddKeyValue(     data, "risk 2",        "The Balrog");
+
+   gmineInfoSetData(gmineInfo, data);
+
+   return gmineInfoWriteDataBlock(gmineInfo);
 }
 
 /**************************************************************************************************

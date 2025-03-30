@@ -84,20 +84,70 @@ void _MiMemStop(void)
 }
 
 /**************************************************************************************************
+func: _MiStrIsEmpty
+**************************************************************************************************/
+Gb _MiStrIsEmpty(Gstr const * const value)
+{
+   Gcount count;
+   Gindex index;
+
+   // Null means true.
+   returnTrueIf(!value);
+
+   // The string value is 0 length, means true.
+   count = _MiStrGetCount(value, Gn4MAX);
+   returnTrueIf(count == 0);
+
+   // Hunt for a non space.
+   forCount(index, count)
+   {
+      continueIf(isspace(value[index]));
+   }
+
+   // If index is not count then there is a non space character in the string.
+   return (index != count);
+}
+
+/**************************************************************************************************
 func: _MiStrClone
 **************************************************************************************************/
 Gstr *_MiStrClone(Gstr const * const value)
 {
-   Gcount byteCount;
+   Gcount count;
+   Gindex index,
+          indexStr;
    Gstr  *str;
 
    returnNullIf(!value);
 
-   byteCount = _MiStrGetCount(value, Gn4MAX);
-   str       = _MiMemClocTypeArray(byteCount + 1, Gstr);
+   count = _MiStrGetCount(value, Gn4MAX);
+
+   // Skip over leading space.
+   forCount(index, count)
+   {
+      continueIf(isspace(value[index]));
+   }
+   returnNullIf(index == count);
+
+   str = _MiMemClocTypeArray(count + 1, Gstr);
    returnNullIf(!str);
 
-   _MiMemCopyTypeArray(str, byteCount, Gstr, value);
+   // Copy over the string.
+   indexStr = 0;
+   for (; index < count; index++)
+   {
+      str[indexStr++] = value[index];
+   }
+   str[indexStr++] = 0;
+
+   // Trim trailing space.
+   forCountDown(index, indexStr)
+   {
+      if (isspace(str[index]))
+      {
+         str[index] = 0;
+      }
+   }
 
    return str;
 }

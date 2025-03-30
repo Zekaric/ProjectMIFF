@@ -50,7 +50,6 @@ type:
 variable:
 **************************************************************************************************/
 static Gb    _isStarted = gbFALSE;
-static Gn4   _itemId    = 1;
 
 /**************************************************************************************************
 prototype:
@@ -171,6 +170,8 @@ Gb gmineInfoClocReaderContent(GmineInfo * const gmineInfo, GmineInfoFileType con
    gmineInfo->dataRepo  = dataRepo;
    gmineInfo->getBuffer = getBufferFunc;
 
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->itemArray));
+
    // Start reading the file header.
    return _MiIoClocReader(gmineInfo);
 }
@@ -212,6 +213,8 @@ Gb gmineInfoClocWriterContent(GmineInfo * const gmineInfo, GmineInfoFileType con
    gmineInfo->dataRepo  = dataRepo;
    gmineInfo->setBuffer = setBufferFunc;
 
+   returnFalseIf(!gmineInfoArrayClocContent(&gmineInfo->itemArray));
+
    // Start by writing out the header for the file.
    return _MiIoClocWriter(gmineInfo);
 }
@@ -239,161 +242,35 @@ void gmineInfoDlocContent(GmineInfo * const gmineInfo)
       !_isStarted ||
       !gmineInfo);
 
+   gmineInfoDataDloc(gmineInfo->data);
+
+   gmineInfoArrayForEach(    &gmineInfo->itemArray, gmineInfoItemDloc);
+   gmineInfoArrayDlocContent(&gmineInfo->itemArray);
+
    _MiIoDloc(gmineInfo);
 
    _MiMemClearType(gmineInfo, GmineInfo);
 }
 
 /**************************************************************************************************
-func: gmineInfoSetDataAuthorName
+func: gmineInfoIsStarted
 **************************************************************************************************/
-Gb gmineInfoSetDataAuthorName(GmineInfo * const gmineInfo, Gstr const * const value)
+Gb gmineInfoIsStarted(void)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value      ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   gmineInfo->data.authorName      = _MiStrClone(value);
-   gmineInfo->data.isSetAuthorName = (gmineInfo->data.authorName != NULL);
-
-   returnTrue;
+   return _isStarted;
 }
 
 /**************************************************************************************************
-func: gmineInfoSetDataCompanyName
+func: gmineInfoSetData
 **************************************************************************************************/
-Gb gmineInfoSetDataCompanyName(GmineInfo * const gmineInfo, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value      ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   gmineInfo->data.companyName      = _MiStrClone(value);
-   gmineInfo->data.isSetCompanyName = (gmineInfo->data.companyName != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataCopyright
-**************************************************************************************************/
-Gb gmineInfoSetDataCopyright(GmineInfo * const gmineInfo, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value      ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   gmineInfo->data.copyright      = _MiStrClone(value);
-   gmineInfo->data.isSetCopyright = (gmineInfo->data.copyright != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataProjectMax
-**************************************************************************************************/
-Gb gmineInfoSetDataProjectMax(GmineInfo * const gmineInfo, GmineInfoPoint const * const value)
+Gb gmineInfoSetData(GmineInfo * const gmineInfo, GmineInfoData * const value)
 {
    returnFalseIf(
       !_isStarted ||
       !gmineInfo  ||
       !value);
 
-   gmineInfo->data.projectMax      = *value;
-   gmineInfo->data.isSetProjectMax = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataProjectMin
-**************************************************************************************************/
-Gb gmineInfoSetDataProjectMin(GmineInfo * const gmineInfo, GmineInfoPoint const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value);
-
-   gmineInfo->data.projectMin      = *value;
-   gmineInfo->data.isSetProjectMin = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataProjectName
-**************************************************************************************************/
-Gb gmineInfoSetDataProjectName(GmineInfo * const gmineInfo, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value      ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   gmineInfo->data.projectName      = _MiStrClone(value);
-   gmineInfo->data.isSetProjectName = (gmineInfo->data.projectName != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataProjectSystem
-**************************************************************************************************/
-Gb gmineInfoSetDataProjectSystem(GmineInfo * const gmineInfo, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfo  ||
-      !value      ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   gmineInfo->data.projectSystem      = _MiStrClone(value);
-   gmineInfo->data.isSetProjectSystem = (gmineInfo->data.projectSystem != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoSetDataOther
-**************************************************************************************************/
-Gb gmineInfoSetDataOther(GmineInfo * const gmineInfo, Gstr const * const key, Gstr const * const value)
-{
-   GmineInfoKeyValue *keyValue;
-
-   returnFalseIf(
-      !_isStarted                    ||
-      !gmineInfo                     ||
-      !key                           ||
-      !_MiStrGetCount(key,   Gn4MAX) ||
-      !value                         ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   keyValue = _MiMemClocType(GmineInfoKeyValue);
-   returnFalseIf(!keyValue);
-
-   keyValue->key   = _MiStrClone(key);
-   keyValue->value = _MiStrClone(value);
-
-   if (!gmineInfo->data.otherListHead)
-   {
-      // Start the list.
-      gmineInfo->data.otherListHead    =
-         gmineInfo->data.otherListTail = keyValue;
-   }
-   else
-   {
-      // Append to the list.
-      gmineInfo->data.otherListTail->next = keyValue;
-      gmineInfo->data.otherListTail       = keyValue;
-   }
+   gmineInfo->data = value;
 
    returnTrue;
 }
@@ -408,64 +285,56 @@ Gb gmineInfoSetItemAppend(GmineInfo * const gmineInfo, GmineInfoItem * const gmi
       !gmineInfo  ||
       !gmineInfoItem);
 
-   if (!gmineInfo->itemHead)
-   {
-      gmineInfo->itemHead    =
-         gmineInfo->itemTail = gmineInfoItem;
-   }
-   else
-   {
-      gmineInfo->itemTail->next = gmineInfoItem;
-      gmineInfo->itemTail       = gmineInfoItem;
-   }
-
-   returnTrue;
+   return gmineInfoArrayAddLast(&gmineInfo->itemArray, gmineInfoItem);
 }
 
 /**************************************************************************************************
-func: gmineInfoWriteData
+func: gmineInfoWriteDataBlock
 **************************************************************************************************/
-Gb gmineInfoWriteData(GmineInfo * const gmineInfo)
+Gb gmineInfoWriteDataBlock(GmineInfo * const gmineInfo)
 {
-   GmineInfoKeyValue *keyValue;
+   Gcount             count;
+   Gindex             index;
+   GmineInfoKeyValue *kv;
 
-   if (gmineInfo->data.isSetAuthorName)
+   // Ensure writing in order.
+   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
+
+   if (gmineInfo->data->isSetAuthorName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,     gmineInfo->data.companyName);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,     gmineInfo->data->companyName);
    }
-   if (gmineInfo->data.isSetCopyright)
+   if (gmineInfo->data->isSetCopyright)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,        gmineInfo->data.copyright);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,        gmineInfo->data->copyright);
    }
-   if (gmineInfo->data.isSetProjectName)
+   if (gmineInfo->data->isSetProjectName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,     gmineInfo->data.projectName);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,     gmineInfo->data->projectName);
    }
-   if (gmineInfo->data.isSetProjectSystem)
+   if (gmineInfo->data->isSetProjectSystem)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM,   gmineInfo->data.projectSystem);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM,   gmineInfo->data->projectSystem);
    }
-   if (gmineInfo->data.isSetProjectMin)
+   if (gmineInfo->data->isSetProjectMin)
    {
-      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,     &gmineInfo->data.projectMin);
+      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,     &gmineInfo->data->projectMin);
    }
-   if (gmineInfo->data.isSetProjectMax)
+   if (gmineInfo->data->isSetProjectMax)
    {
-      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,     &gmineInfo->data.projectMax);
+      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,     &gmineInfo->data->projectMax);
    }
-   if (gmineInfo->data.isSetAuthorName)
+   if (gmineInfo->data->isSetAuthorName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,      gmineInfo->data.authorName);
+      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,      gmineInfo->data->authorName);
    }
 
-   keyValue = gmineInfo->data.otherListHead;
-   loop
+   // Write out the user key values.
+   count = gmineInfoArrayGetCount(&gmineInfo->data->keyValueArray);
+   forCount(index, count);
    {
-      breakIf(!keyValue);
-
-      _MiIoWriteString(gmineInfo, keyValue->key, keyValue->value);
-
-      keyValue = keyValue->next;
+      kv = gmineInfoArrayGetAt(&gmineInfo->data->keyValueArray, index);
+      _MiIoWriteString(gmineInfo, kv->key, kv->value);
    }
 
    returnTrue;
@@ -502,461 +371,4 @@ void gmineInfoStop(void)
    returnVoidIf(!_isStarted);
 
    _isStarted = gbFALSE;
-}
-
-/**************************************************************************************************
-GmineInfoItem:
-function:
-**************************************************************************************************/
-/**************************************************************************************************
-func: gmineInfoItemCloc
-**************************************************************************************************/
-GmineInfoItem *gmineInfoItemCloc(void)
-{
-   GmineInfoItem *gmineInfoItem;
-
-   returnNullIf(!_isStarted);
-
-   gmineInfoItem = _MiMemClocType(GmineInfoItem);
-   returnNullIf(!gmineInfoItem);
-
-   if (!gmineInfoItemClocContent(gmineInfoItem))
-   {
-      _MiMemDloc(gmineInfoItem);
-      return NULL;
-   }
-
-   return gmineInfoItem;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemClocContent
-**************************************************************************************************/
-Gb gmineInfoItemClocContent(GmineInfoItem * const gmineInfoItem)
-{
-   returnFalseIf(!_isStarted);
-
-   _MiMemClearType(gmineInfoItem, GmineInfoItem);
-
-   gmineInfoItem->id = _itemId++;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemDloc
-**************************************************************************************************/
-void gmineInfoItemDloc(GmineInfoItem * const gmineInfoItem)
-{
-   returnVoidIf(
-      !_isStarted ||
-      !gmineInfoItem);
-
-   gmineInfoItemDlocContent(gmineInfoItem);
-
-   _MiMemDloc(gmineInfoItem);
-}
-
-/**************************************************************************************************
-func: gmineInfoItemDlocContent
-**************************************************************************************************/
-void gmineInfoItemDlocContent(GmineInfoItem * const gmineInfoItem)
-{
-   GmineInfoKeyValue *curr,
-                     *next;
-
-   returnVoidIf(
-      !_isStarted ||
-      !gmineInfoItem);
-
-   // Clean up the strings.
-   if (gmineInfoItem->type == gmineInfoItemTypeDATE     ||
-       gmineInfoItem->type == gmineInfoItemTypeDATETIME ||
-       gmineInfoItem->type == gmineInfoItemTypeFORMULA  ||
-       gmineInfoItem->type == gmineInfoItemTypeSTR      ||
-       gmineInfoItem->type == gmineInfoItemTypeTIME)
-   {
-      _MiMemDloc(gmineInfoItem->defaultValue.value.str);
-   }
-   _MiMemDloc(gmineInfoItem->key);
-   _MiMemDloc(gmineInfoItem->name);
-
-   // Clean up the other list.
-   next = gmineInfoItem->otherListHead;
-   loop
-   {
-      breakIf(!next);
-
-      curr = next;
-      next = curr->next;
-
-      _MiMemDloc(curr->key);
-      _MiMemDloc(curr->value);
-      _MiMemDloc(curr);
-   }
-
-   // Clear out the memory.
-   _MiMemClearType(gmineInfoItem, GmineInfoItem);
-
-   return;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultDate
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultDate(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value         ||
-      gmineInfoItem->type != gmineInfoItemTypeDATE);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultDateTime
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultDateTime(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value         ||
-      gmineInfoItem->type != gmineInfoItemTypeDATETIME);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultI
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeI);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.i    = value;
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultN
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultN(GmineInfoItem * const gmineInfoItem, Gn8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeN);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.n    = value;
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultR
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultR(GmineInfoItem * const gmineInfoItem, Gr8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.r    = value;
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultStr
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultStr(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value         ||
-      gmineInfoItem->type != gmineInfoItemTypeSTR);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultTime
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultTime(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value         ||
-      gmineInfoItem->type != gmineInfoItemTypeTIME);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultPercent
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultPercent(GmineInfoItem * const gmineInfoItem, Gr8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.r    = value;
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetDefaultFormula
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultFormula(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value         ||
-      gmineInfoItem->type != gmineInfoItemTypeFORMULA);
-
-   gmineInfoItem->defaultValue.isSet      = gbTRUE;
-   gmineInfoItem->defaultValue.value.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault            = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetKey
-**************************************************************************************************/
-Gb gmineInfoItemSetKey(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value);
-
-   gmineInfoItem->key      = _MiStrClone(value);
-   gmineInfoItem->isSetUid = (gmineInfoItem->key != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMaxI
-**************************************************************************************************/
-Gb gmineInfoItemSetMaxI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeI);
-
-   gmineInfoItem->max.isSet   = gbTRUE;
-   gmineInfoItem->max.value.i = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMaxN
-**************************************************************************************************/
-Gb gmineInfoItemSetMaxN(GmineInfoItem * const gmineInfoItem, Gn8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeN);
-
-   gmineInfoItem->max.isSet   = gbTRUE;
-   gmineInfoItem->max.value.n = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMaxR
-**************************************************************************************************/
-Gb gmineInfoItemSetMaxR(GmineInfoItem * const gmineInfoItem, Gr8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
-
-   gmineInfoItem->max.isSet   = gbTRUE;
-   gmineInfoItem->max.value.r = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMinI
-**************************************************************************************************/
-Gb gmineInfoItemSetMinI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeI);
-
-   gmineInfoItem->min.isSet   = gbTRUE;
-   gmineInfoItem->min.value.i = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMinN
-**************************************************************************************************/
-Gb gmineInfoItemSetMinN(GmineInfoItem * const gmineInfoItem, Gn8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeN);
-
-   gmineInfoItem->min.isSet   = gbTRUE;
-   gmineInfoItem->min.value.n = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetMinR
-**************************************************************************************************/
-Gb gmineInfoItemSetMinR(GmineInfoItem * const gmineInfoItem, Gr8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
-
-   gmineInfoItem->min.isSet   = gbTRUE;
-   gmineInfoItem->min.value.r = value;
-   gmineInfoItem->isSetMax    = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetName
-**************************************************************************************************/
-Gb gmineInfoItemSetName(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      !value);
-
-   gmineInfoItem->name      = _MiStrClone(value);
-   gmineInfoItem->isSetName = (gmineInfoItem->name != NULL);
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetOther
-**************************************************************************************************/
-Gb gmineInfoItemSetOther(GmineInfoItem * const gmineInfoItem, Gstr const * const key, Gstr const * const value)
-{
-   GmineInfoKeyValue *keyValue;
-
-   returnFalseIf(
-      !_isStarted                    ||
-      !gmineInfoItem                 ||
-      !key                           ||
-      !_MiStrGetCount(key,   Gn4MAX) ||
-      !value                         ||
-      !_MiStrGetCount(value, Gn4MAX));
-
-   keyValue = _MiMemClocType(GmineInfoKeyValue);
-   returnFalseIf(!keyValue);
-
-   keyValue->key   = _MiStrClone(key);
-   keyValue->value = _MiStrClone(value);
-
-   if (!gmineInfoItem->otherListHead)
-   {
-      // Start the list.
-      gmineInfoItem->otherListHead    =
-         gmineInfoItem->otherListTail = keyValue;
-   }
-   else
-   {
-      // Append to the list.
-      gmineInfoItem->otherListTail->next = keyValue;
-      gmineInfoItem->otherListTail       = keyValue;
-   }
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetPrecision
-**************************************************************************************************/
-Gb gmineInfoItemSetPrecision(GmineInfoItem * const gmineInfoItem, Gr8 const value)
-{
-   returnFalseIf(
-      !_isStarted    ||
-      !gmineInfoItem ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
-
-   gmineInfoItem->precision      = value;
-   gmineInfoItem->isSetPrecision = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoItemSetType
-**************************************************************************************************/
-Gb gmineInfoItemSetType(GmineInfoItem * const gmineInfoItem, GmineInfoItemType const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !gmineInfoItem);
-
-   gmineInfoItem->type      = value;
-   gmineInfoItem->isSetType = (value != gmineInfoItemTypeNONE);
-
-   returnTrue;
 }

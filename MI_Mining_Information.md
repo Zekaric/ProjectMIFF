@@ -1,41 +1,41 @@
-# M.I. File: Mine Information File
+# M.I. File: Mine Information File <!-- omit in toc -->
 
 ```
 Author:             Robbert de Groot
 Date:               2019-05-15
 Copyright:          2019, Robbert de Groot
 License (Library):  MIT License.
-License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://creativecommons.org/licenses/by-nd:4.0
+License (Document): Creative Commons Attribution-NoDerivs.
+                    CC BY-ND
+                    https://creativecommons.org/licenses/by-nd:4.0
 ```
 
-## Table Of Contents:
+## Table Of Contents: <!-- omit in toc -->
 
-- [M.I. File: Mine Information File](#mi-file-mine-information-file)
-  - [Table Of Contents:](#table-of-contents)
-- [1 - M.I.](#1---mi)
-  - [1.1 - Discussion](#11---discussion)
-  - [1.2 - Goals](#12---goals)
-  - [1.3 - Disclosure](#13---disclosure)
-- [2 - MI Format](#2---mi-format)
-  - [2.1 - Header](#21---header)
-- [3 - Mine Information Blocks](#3---mine-information-blocks)
-  - [3.1 - Data Block](#31---data-block)
-  - [3.2 - Property Block](#32---property-block)
-  - [3.3 - Item Block](#33---item-block)
-  - [3.4 - Image Block](#34---image-block)
-  - [3.5 - Drillhole Block](#35---drillhole-block)
-  - [3.6 - Geometry Block](#36---geometry-block)
-  - [3.7 - Model Data](#37---model-data)
-    - [3.7.1 - Model Block](#371---model-block)
-  - [3.8 - Model Block:](#38---model-block)
-    - [3.8.1 - SubBlock: Fixed](#381---subblock-fixed)
-    - [3.8.2 - SubBlock: Semi](#382---subblock-semi)
-    - [3.8.3 - SubBlock: Octree](#383---subblock-octree)
-    - [3.8.4 - SubBlock: Free](#384---subblock-free)
+- [1. M.I.](#1-mi)
+  - [1.1. Discussion](#11-discussion)
+  - [1.2. Goals](#12-goals)
+  - [1.3. Disclosure](#13-disclosure)
+- [2. MI Format](#2-mi-format)
+  - [2.1. Header](#21-header)
+- [3. Mine Information Blocks](#3-mine-information-blocks)
+  - [3.1. Data Block](#31-data-block)
+  - [3.2. Property Block](#32-property-block)
+  - [3.3. Item Block](#33-item-block)
+  - [3.4. Image Block](#34-image-block)
+  - [3.5. Drillhole Block](#35-drillhole-block)
+  - [3.6. Geometry Block](#36-geometry-block)
+  - [3.7. Model Data](#37-model-data)
+    - [3.7.1. Model Block](#371-model-block)
+  - [3.8. Model Block:](#38-model-block)
+    - [3.8.1. SubBlock: Fixed](#381-subblock-fixed)
+    - [3.8.2. SubBlock: Semi](#382-subblock-semi)
+    - [3.8.3. SubBlock: Octree](#383-subblock-octree)
+    - [3.8.4. SubBlock: Free](#384-subblock-free)
 
-# 1 - M.I.
+# 1. M.I.
 
-## 1.1 - Discussion
+## 1.1. Discussion
 
 **What is the purpose of M.I. (MI)?**
 
@@ -45,7 +45,7 @@ I would imagine users of software packages are annoyed at the lack of interopera
 
 A lot of the client's time is lost with all this work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with an information format is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard part of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.
 
-## 1.2 - Goals
+## 1.2. Goals
 
 The main goal of this format is to be specifically a data passing format.  It is not intended to be a native format for any software package.  The focus is to make it easy for the developers from any software package to export their data to this format and, without too much difficulty, to import into another vendor's software.
 
@@ -57,7 +57,7 @@ For the users of the software packages, the process of moving data from package 
 * **Brief**, The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.
 * **Flexible**, The format needs to be able to accomodate change or account for vendor specific data.  A few software vendors started life in the 70's with time shared machines.  Over the years the amount of data and the types of data the clients want to maintain has changed and grown.  A format needs to try its best to keep up without importers and exporters to be completely remade.
 
-## 1.3 - Disclosure
+## 1.3. Disclosure
 
 As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of survey equipment and related material; as well as other mine related hardware and software products.
 
@@ -69,7 +69,7 @@ If anyone is interested in educating me on some features they would like to see 
 
 zekaric@gmail.com
 
-# 2 - MI Format
+# 2. MI Format
 
 MI is not restricted to any particular format.  Here I will specify two, MIFF and JSON.  See the MIFF_Mixed_Information_File_Format document for the discussion of the MIFF file format.  Refer to JSON.org for information about JSON.  This document will cover specifics related to using MI but it will not be restricted to any particular underlying format.
 
@@ -128,7 +128,7 @@ File extsion for the file is either...
 | &#42;.MIMIFF | For a MineInfo file using MIFF format |
 | &#42;.MIJSON | For a MineInfo file using JSON format |
 
-## 2.1 - Header
+## 2.1. Header
 
 MIFF has fields for a Sub-Format Name and Version.  For an MI file this will be set to...
 
@@ -149,7 +149,7 @@ For a JSON file, since it doesn't have a header, create base object for all the 
 }
 ```
 
-# 3 - Mine Information Blocks
+# 3. Mine Information Blocks
 
 An MI file can only have information for just one mining project or project area.  Use multiple files for different mines, sites, projects, or however you separate the information.
 
@@ -163,7 +163,7 @@ Every MI file contains a few specified blocks.  Order of these blocks are import
 * **Drillhole list block** to hold drillhole information.  Depends on item, image, and property blocks.
 * **Model list block** to hold model information.  Depends on item, image, and property blocks.
 
-## 3.1 - Data Block
+## 3.1. Data Block
 
 **Block Name**: data
 
@@ -173,39 +173,87 @@ This information block should be before other blocks.
 
 Inside the information block we have the following possible key values.  Not all are required.
 
-| Name | Description |
-| --- | --- |
-| company | The name of the company related to the mine. |
-| copyright | Copyright information |
-| author | Author or person who prepared this data. |
-| software | The software that was used to prepare this data. |
-| softwareVersion | The version of the above software. |
-| comment | Any comments provided by the author or software about the data.  This comment should hold no information that needs to be parsed by an importer of the data. |
-| projectSystem | Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  Use **local** to indicate that the project coordinates are in a local flat earth space. |
-| projectName | The name of the project. |
-| projectMin | Array of 3 real values in the given project system. |
-| projectMax | Array of 3 real values in the given project system. |
-| other | A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values. |
+| Name            | Description |
+| ---             | --- |
+| company         | A string for the name of the company. |
+| copyright       | A string for the copyright information. |
+| author          | A string for the author or person who prepared this data. |
+| project system  | A string for the coordinates system for all coordinate data. |
+| project name    | The name of the project. |
+| project min     | A point for project min value in the given project system. |
+| project max     | A point for project max value in the given project system. |
+| *               | Other client software key values which may be relavant for the software. |
+
+**project system** must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  Use **local** to indicate that the project coordinates are in a local flat earth space.
 
 **projectMin** and **projectMax** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by **projectSystem**.
 
-## 3.2 - Property Block
+## 3.2. Property Block
 
 **Block Name**: prop
 
 This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.
 
-| Name | Description |
-| --- | --- |
-| key | A unique string key for the property. |
-| name | A nice name for the property.  Optional. |
-| value | If this property block is in an item block's prop list then a value will be present.  The value will match the value type of the item.  Depending on the type the value will be an exact match or, if it is a number value, it will be the minimum value that an attribute needs to be in order to use the properties. |
-| vis, point vis, line vis, face vis, drill vis, model vis | boolean values for a global visibility, point visibility, line visibility, face visibility, drillhole geometry vis, and model geometry vis to be used when rendering the geometry.  Global trumps the rest of the visibilities.  Default visibilities will be used if these are missing. |
-| color, point color, line color, face color, face style color, drill color, model color | An rgba value for a point color, line color, face color, drillhole color, and model color to be used when rendering the geometry.  Default color will be used if these are missing. |
-| point style, line style, face style | A string representing the point style (symbol), line style (pattern), and face style (pattern) to be used when rendering the geometry.  Default styles as dictated by the software reading the MI will be used if these are missing. |
-| other | A string key and value pair array of any information that the software feels necessary for the property. |
+| Name                          | Item Only | Description |
+| ---                           | ---       | ---         |
+| key                           |   | A unique string key for the property. |
+| name                          |   | A nice name for the property.  Optional. |
+| value                         | X | A value for this property.  The type should match the item the property is associated with. |
+| is visible                    |   | A boolean for global visibility |
+| is visible data label         |   | A boolean for line label visibility (polyline and surface data.) |
+| is visible face               |   | A boolean for face visibility (closed polyline and surface faces.) |
+| is visible line               |   | A boolean for line visibility (polyline and surface lines.) |
+| is visible line label         |   | A boolean for line label visibility (polyline and surface lines.) |
+| is visible node               |   | A boolean for node visibility (polyline and surface nodes.) |
+| is visible node label         |   | A boolean for node label visibility (point and polyline nodes.) |
+| is visible drill hole         | X | A boolean for global visibility |
+| is visible drill hole node    | X | A boolean for node visibility |
+| is visible drill hole line    | X | A boolean for line visibility |
+| is visible drill hole face    | X | A boolean for face visibility |
+| is visible geometry           | X | A boolean for global visibility |
+| is visible geometry node      | X | A boolean for node visibility |
+| is visible geometry line      | X | A boolean for line visibility |
+| is visible geometry face      | X | A boolean for face visibility |
+| is visible model              | X | A boolean for global visibility |
+| is visible model node         | X | A boolean for node visibility |
+| is visible model line         | X | A boolean for line visibility |
+| is visible model face         | X | A boolean for face visibility |
+| color point                   |   | An rgb for point color. |
+| color node                    |   | An rgb for node color (polyline and surface nodes.) |
+| color line                    |   | An rgb for line color (polyline and surface lines.) |
+| color face                    |   | An rgb for face color (closed polyline and surface faces.) |
+| color face pattern            |   | An rgb for face pattern color. |
+| color text                    |   | An rgb for text color. |
+| color drill hole              | X | An rgb for drill hole color. |
+| color drill hole node         | X | An rgb for drill hole node color. |
+| color drill hole line         | X | An rgb for drill hole line color. |
+| color drill hole face         | X | An rgb for drill hole face color. |
+| color drill hole face pattern | X | An rgb for drill hole face pattern color. |
+| color geometry                | X | An rgb for geometry color. |
+| color geometry node           | X | An rgb for geometry node color. |
+| color geometry line           | X | An rgb for geometry line color. |
+| color geometry face           | X | An rgb for geometry face color. |
+| color geometry face pattern   | X | An rgb for geometry face pattern color. |
+| color model                   | X | An rgb for model color. |
+| color model node              | X | An rgb for model node color. |
+| color model line              | X | An rgb for model line color. |
+| color model face              | X | An rgb for model face color. |
+| color model face pattern      | X | An rgb for model face pattern color. |
+| pattern node                  |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
+| pattern line                  |   | A string for the line pattern (polyline and surface lines.) |
+| pattern face                  |   | A string for the face pattern (closed polyline and surface faces.) |
+| transparency                  |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
+| font                          |   | A string for the font name. |
+| font size                     |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
+| font size is relative         |   | A boolean if the font size is a percent to paper size or screen size. |
+| font is bold                  |   | A boolean if the font is bold.  Default is false. |
+| font is italic                |   | A boolean if the font is italic.  Default is false. |
+| font is underline             |   | A boolean if the font is underlined.  Default is false. |
+| font is strikeout             |   | A boolean if the font is striked out.  Default if false. |
+| *                             |   | Other client software key values which may be relavant for the software. |
 
-## 3.3 - Item Block
+
+## 3.3. Item Block
 
 **Block Name**: item
 
@@ -213,62 +261,72 @@ Item will describe a value that will be stored in the various places where the i
 
 Items need to be defined before they are used elsewhere in the MI file.
 
-| Name | Description |
-| --- | --- |
-| key | A unique key for the item.  This is stored as a string even if it is a number by the software that sets it.  This key needs to be unique so that no two items have the same key value. |
-| name | The name of the item.  A UTF8 string limited to 255 bytes.  Not necessarily unique but generally, it would be a good idea. |
-| type | The type of the item.  See lower down. |
-| max, min | If a number type, the maximum and minimum value for the item. |
-| value | If the item has limited number of values, list the array of values here. |
-| precision | If a real type, how many decimal places is this values accurrate to. |
-| default | The default value for something that did not have a value assigned. |
-| formula | The formula used to calculate the value of this item.  In other words, this item has no stored value.  The value will be calculated when needed. |
-| prop list | An array of properties for rendering purposes in a view.  See Display block for what this might mean.  First property in this array will define the properties for something that does not match any other prop block's values.  The prop blocks in this array should be in order of increasing value if the item type is a number value. |
-| other | A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values. |
+| Name          | Description |
+| ---           | --- |
+| key           | A string for a unique key value for the item. |
+| name          | A string for the name of the item.  Not necessarily unique. |
+| type          | A string for the type of the item.  See lower down. |
+| max           | A number for the maximum value. |
+| min           | A number for the minimum value. |
+| precision     | A real for the precision of the values for this item. |
+| value list    | An array of values representing the complete set of possible values. |
+| default       | A value for the default value.  If missing, then default value is 'missing value'. |
+| formula       | A string for the formula used to calculate the value of this item. |
+| property list | An array of properties for rendering purposes in a view. |
+| *             | Other client software key values which may be relavant for the software. |
 
 Each item will be given an index value starting at 0 and incrementing with every new item added to the MI file.
 
-**type** will define the value being stored for this item.  Type is one of string, real, real4, natural, integer, date, time, dateTime, or formula (formula meaning the item's value is calculated.)
+**type** will define the value being stored for this item.  Type is one of...
+
+| Name     | Description |
+| ---      | ---         |
+| boolean  | A boolean value, True/1, False/0, or missing. |
+| integer  | An integer value, -large number to + large number, or missing. |
+| natural  | A natural value, 0 to large number, or missing. |
+| real     | A real value or missing. |
+| string   | A string value or missing. |
+| percent  | A real value (0 - 1), or missing. |
+| date     | A data or missing. |
+| time     | A time or missing. |
+| dateTime | A data and time or missing. |
+| formula  | A string for a formula. |
 
 **max, min** defines the limits for an item.  Only applicable if item type is a real, natural, or integer.  If these are missing then the range is the full range as defined by the type.
 
+**precision** is the accuracy of the number.  Only applicable if item type is a real.
+
 **valueList** defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.
 
-**precision** is the accuracy of the number.  Only applicable if item type is a real and real4.
+**default** will define the default value for this item if block is skipped.  If this value is not provided then the default value is "missing".
 
-**default** will define the default value for this item if block is skipped.  If this value is not set then the default value is 'unset'.
+**formula** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Export software dictates what the formula looks like for now.  Import software will need to figure out how to convert this formula to their needs.
 
-**formula** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use "@[item key]@" in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.
+**prop list** is a list of bins with some display cues.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.
 
-When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'unset value' as well.  If this is all the values that need to be recorded, then we do not really need to use a full real or real4 value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recover the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.
+When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store in index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.
 
-```
-Calculation example:
-(@ore%@ &#42; @cu@) - @i_am_making_something_up@
-```
 
-## 3.4 - Image Block
+## 3.4. Image Block
 
 **Block Name**: image
 
 Defining an image.  Images are mainly used for texture mapping in geometry blocks.
 
-| Name | Description |
-| --- | --- |
-| key | Unique identifier for the image. |
-| name | A nice name for the image. |
-| rgb | The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgb values, no compression.] |
-| rgba | The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgba values, not compression.] |
-| file | A hex dump of the image file. |
-| filePath | A relative path to an image file.  The file should be relative to the MI file and should be in the same folder or in a sub folder of this folder.  The file should be an image file. |
+| Name     | Description |
+| ---      | --- |
+| key      | A stirng for the unique identifier for the image. |
+| name     | A string for the name for the image. |
+| filename | A string for the name of the file with extension. |
+| file     | A binary array of the image file. |
 
-An image will only have one of the following 4 items (rgb, rgba, file, filePath) and never more than one.
+**file** can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.
 
-## 3.5 - Drillhole Block
+## 3.5. Drillhole Block
 
 Drillhole data holds information about drillholes.
 
-## 3.6 - Geometry Block
+## 3.6. Geometry Block
 
 **Block Name**: geom
 
@@ -302,7 +360,7 @@ attrList, pointAttrList, and lineAttrList can change between geom blocks and the
 
 In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.
 
-## 3.7 - Model Data
+## 3.7. Model Data
 
 Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.
 
@@ -324,7 +382,7 @@ There are 3 basic model formats that are in use as Hexagon.
 
 Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.
 
-### 3.7.1 - Model Block
+### 3.7.1. Model Block
 
 After the general information block the next block will be the Model Information block.
 
@@ -433,7 +491,7 @@ Depending on what is set for **[subblock type]** there will be one of 3 **[subbl
 
 **levList** - A list of level heights starting from first level.  Only required if isLevVariable is true.
 
-## 3.8 - Model Block:
+## 3.8. Model Block:
 
 This is where the model data is placed.  Due to the size of the data, the keys are made very small.
 
@@ -501,12 +559,12 @@ B2R2C2v1 2 3cc.\n
 
 Note, if you can removed a separator without losing then that should be done.
 
-### 3.8.1 - SubBlock: Fixed
+### 3.8.1. SubBlock: Fixed
 
 
 In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.
 
-### 3.8.2 - SubBlock: Semi
+### 3.8.2. SubBlock: Semi
 
 
 In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...
@@ -523,14 +581,14 @@ If H or h follows an H or h then the previous block will be holding default valu
 
 If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.
 
-### 3.8.3 - SubBlock: Octree
+### 3.8.3. SubBlock: Octree
 
 
 In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.
 
 The 's' key need to preceed the v record.
 
-### 3.8.4 - SubBlock: Free
+### 3.8.4. SubBlock: Free
 
 
 In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.
@@ -539,4 +597,3 @@ In the free block case, an 's' key will indicate the parent block is subblocked.
 | --- | --- |
 | c | 6 x r4 values follow.  First 3 r4 values are percents for the min point and the second 3 r4 values are percents for the max point of the subblock. |
 | . | Indicates we are done with the subblocking and to process to the next parent block. |
-

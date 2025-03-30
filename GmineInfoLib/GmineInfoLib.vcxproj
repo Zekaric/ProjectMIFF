@@ -160,8 +160,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GmineInfoData.c" />
+    <ClCompile Include="GmineInfoItem.c" />
+    <ClCompile Include="GmineInfoKeyValue.c" />
     <ClCompile Include="GmineInfoLib.c" />
-    <ClCompile Include="GmineInfo_array.c" />
+    <ClCompile Include="GmineInfoArray.c" />
+    <ClCompile Include="GmineInfoProperty.c" />
+    <ClCompile Include="GmineInfoPropertyItem.c" />
     <ClCompile Include="GmineInfo_io.c" />
     <ClCompile Include="GmineInfo_mem.c" />
   </ItemGroup>

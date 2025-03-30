@@ -34,6 +34,41 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
+func: gmineInfoArrayAddLast
+**************************************************************************************************/
+Gb gmineInfoArrayAddLast(GmineInfoArray * const gmineInfoArray, void * const value)
+{
+   void **buffer;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoArray);
+
+   // Need to increase the buffer size.
+   if (gmineInfoArray->count >= gmineInfoArray->countMax)
+   {
+      // Allocate a new buffer.
+      gmineInfoArray->countMax *= 2;
+      buffer = _MiMemClocTypeArray(gmineInfoArray->countMax, void *);
+      returnFalseIf(!buffer);
+
+      // Copy the over buffer over.
+      _MiMemCopyTypeArray(buffer, gmineInfoArray->count, void *, gmineInfoArray->buffer);
+
+      // Clean up the old buffer.
+      _MiMemDloc(gmineInfoArray->buffer);
+
+      // Set the new buffer as the array.
+      gmineInfoArray->buffer = buffer;
+   }
+
+   // Add the value to the end of the array.
+   gmineInfoArray->buffer[gmineInfoArray->count++] = value;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
 func: gmineInfoArrayCloc
 **************************************************************************************************/
 GmineInfoArray *gmineInfoArrayCloc(void)
@@ -59,15 +94,16 @@ func: gmineInfoArrayClocContent
 **************************************************************************************************/
 Gb gmineInfoArrayClocContent(GmineInfoArray * const gmineInfoArray)
 {
-   returnFalseIf(!gmineInfoIsStarted());
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoArray);
 
    _MiMemClearType(gmineInfoArray, GmineInfoArray);
 
-   gmineInfoArray->countBuffer = 8;
-   gmineInfoArray->buffer      = _MiMemClocTypeArray(gmineInfoArray->countBuffer, void *);
-   returnFalseIF(!gmineInfoArray->buffer);
+   gmineInfoArray->countMax = 8;
+   gmineInfoArray->buffer   = _MiMemClocTypeArray(gmineInfoArray->countMax, void *);
 
-   returnTrue;
+   return (gmineInfoArray->buffer) ? gbTRUE : gbFALSE;
 }
 
 /**************************************************************************************************
@@ -99,48 +135,41 @@ void gmineInfoArrayDlocContent(GmineInfoArray * const gmineInfoArray)
 }
 
 /**************************************************************************************************
+func: gmineInfoArrayForEach
+**************************************************************************************************/
+void gmineInfoArrayForEach(GmineInfoArray * const gmineInfoArray, void (*func)(void *))
+{
+   Gcount count;
+   Gindex index;
+
+   count = gmineInfoArray->count;
+   forCount(index, count)
+   {
+      func(gmineInfoArray->buffer[index]);
+   }
+}
+
+/**************************************************************************************************
+func: gmineInfoArrayGetAt
+**************************************************************************************************/
+void *gmineInfoArrayGetAt(GmineInfoArray const * const gmineInfoArray, Gindex const index)
+{
+   returnNullIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoArray       ||
+      index < 0 || gmineInfoArray->count <= index);
+
+   return gmineInfoArray->buffer[index];
+}
+
+/**************************************************************************************************
 func: gmineInfoArrayGetCount
 **************************************************************************************************/
 Gcount gmineInfoArrayGetCount(GmineInfoArray const * const gmineInfoArray)
 {
-   greturn0If(
+   return0If(
       !gmineInfoIsStarted() ||
       !gmineInfoArray);
 
    return gmineInfoArray->count;
-}
-
-/**************************************************************************************************
-func: gmineInfoArrayAddLast
-**************************************************************************************************/
-Gb gmineInfoArrayAddLast(GmineInfoArray * const gmineInfoArray, void * const value)
-{
-   void **buffer;
-
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoArray);
-
-   // Need to increase the buffer size.
-   if (gmineInfoArray->count >= gmineInfoArray->countBuffer)
-   {
-      // Allocate a new buffer.
-      gmineInfoArray->countBuffer *= 2;
-      buffer = _MiMemClocTypeArray(gmineInfoArray->countBuffer, void *);
-      returnFalseIf(!buffer);
-
-      // Copy the over buffer over.
-      _MiMemCopyTypeArray(buffer, gmineInfoArray->count, void *, gmineInforArray->buffer);
-
-      // Clean up the old buffer.
-      _MiMemDloc(gmineInfoArray->buffer);
-
-      // Set the new buffer as the array.
-      gmineInfoArray->buffer = buffer;
-   }
-
-   // Add the value to the end of the array.
-   gmineInfoArray->buffer[gmineInfoArray->count++] = value;
-
-   returnTrue;
 }

@@ -42,6 +42,7 @@ constant:
 /**************************************************************************************************
 type:
 **************************************************************************************************/
+// Enumerations ///////////////////////////////////////////////////////////////////////////////////
 typedef enum
 {
    gmineInfoFileTypeNONE,
@@ -74,197 +75,310 @@ typedef enum
 {
    gmineInfoItemTypeNONE,
 
+   // Basic types.
+   gmineInfoItemTypeB,
    gmineInfoItemTypeI,
    gmineInfoItemTypeN,
    gmineInfoItemTypeR,
    gmineInfoItemTypeSTR,
+
+   // Time types.
    gmineInfoItemTypeDATE,
    gmineInfoItemTypeTIME,
    gmineInfoItemTypeDATETIME,
+
+   // Precent type.
    gmineInfoItemTypePERCENT,
 
+   // Formula type.
    gmineInfoItemTypeFORMULA,
 
    gmineInfoItemTypeCOUNT
 } GmineInfoItemType;
 
+// Basic types ////////////////////////////////////////////////////////////////////////////////////
 typedef union
 {
-   Gn8                n;
-   Gi8                i;
-   Gr8                r;
-   Gstr              *str;
-} GmineInfoValue;
+   Gb                    b;
+   Gi8                   i;
+   Gn8                   n;
+   Gr8                   r;
+   Gstr                 *str;
+} GmineInfoValueBase;
 
 typedef struct
 {
-   Gcount             count,
-                      countMax;
-   void             **buffer;
+   Gcount                count,
+                         countMax;
+   void                **buffer;
 } GmineInfoArray;
 
 typedef struct
 {
-   Gb                 isSet;
-   GmineInfoValue     value;
-} GmineInfoValuable;
+   Gb                    isSet;
+   GmineInfoValueBase    value;
+} GmineInfoValue;
 
 typedef struct
 {
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
-   double             x, // Easting, longitude
-                      y, // Northing, latitude,
-                      z; // Elevation
+   double                x, // Easting, longitude
+                         y, // Northing, latitude,
+                         z; // Elevation
 } GmineInfoPoint;
 
 typedef struct
 {
-   float              r,
-                      g,
-                      b,
-                      a;
-} GmineInfoRGBA;
+   float                 r,
+                         g,
+                         b;
+} GmineInfoColor;
+
+typedef struct
+{
+   float                 r,
+                         g,
+                         b,
+                         a;
+} GmineInfoColorA;
 
 typedef struct
 {
    // Using x, y, z because these can be interpreted differently depending on coordinate system used
-   double             x, // Easting, longitude
-                      y, // Northing, latitude,
-                      z; // Elevation
+   double                x, // Easting, longitude
+                         y, // Northing, latitude,
+                         z; // Elevation
 } GmineInfoVector;
 
 typedef struct
 {
-   Gstr              *key,
-                     *value;
+   Gstr                 *key,
+                        *value;
 } GmineInfoKeyValue;
+
+// GmineInfo Types ////////////////////////////////////////////////////////////////////////////////
+typedef struct
+{
+   Gb                    isSetAuthorName,
+                         isSetCompanyName,
+                         isSetCopyright,
+                         isSetProjectMax,
+                         isSetProjectMin,
+                         isSetProjectName,
+                         isSetProjectSystem;
+
+   Gstr                 *authorName,
+                        *companyName,
+                        *copyright;
+   GmineInfoPoint        projectMax,
+                         projectMin;
+   Gstr                 *projectName,
+                        *projectSystem;
+
+   GmineInfoArray        keyValueArray;
+} GmineInfoData;
 
 typedef struct
 {
-   Gb                 isVisibleDrillHole,
-                      isVisibleModel,
-                      isVisibleGeometry,
-                      isVisibleNode,
-                      isVisibleLine,
-                      isVisibleFace,
-                      isVisibleText;
+   Gb                    isSetIsArrowSizeRelative,
+                         isSetIsFontBold,
+                         isSetIsFontItalic,
+                         isSetIsFontSizeRelative,
+                         isSetIsFontStrikeOut,
+                         isSetIsFontUnderline,
+                         isSetIsVisible,
+                         isSetIsVisibleArrow,
+                         isSetIsVisibleDataLabel[10],
+                         isSetIsVisibleFace,
+                         isSetIsVisibleLine,
+                         isSetIsVisibleLineLabel[10],
+                         isSetIsVisibleNode,
+                         isSetIsVisibleNodeLabel[20],
+                         isSetIsVisibleText,
+                         isSetArrowPosition,
+                         isSetArrowSize,
+                         isSetColor,
+                         isSetColorFace,
+                         isSetColorFacePattern,
+                         isSetColorLine,
+                         isSetColorNode,
+                         isSetColorText,
+                         isSetFaceTransparency,
+                         isSetFontName,
+                         isSetFontSize,
+                         isSetKey,
+                         isSetLabelData[10],
+                         isSetLabelLine[10],
+                         isSetLabelNode[10],
+                         isSetName,
+                         isSetPatternArrow,
+                         isSetPatternFace,
+                         isSetPatternLine,
+                         isSetPatternNode,
 
-   GmineInfoRGBA      colorDrillHole,
-                      colorModel,
-                      colorGeometry,
-                      colorNode,
-                      colorLine,
-                      colorFace,
-                      colorFacePattern,
-                      colorText;
+                         isArrowSizeRelative,
+                         isFontBold,
+                         isFontItalic,
+                         isFontSizeRelative,
+                         isFontStrikeOut,
+                         isFontUnderline,
+                         isVisible,
+                         isVisibleArrow,
+                         isVisibleDataLabel[10],
+                         isVisibleFace,
+                         isVisibleLine,
+                         isVisibleLineLabel[10],
+                         isVisibleNode,
+                         isVisibleNodeLabel[20],
+                         isVisibleText;
 
-   Gstr              *patternNode,
-                     *patternLine,
-                     *patternFace;
+   Gi4                   arrowPosition;
+   Gr4                   arrowSize;
 
-   Gr4                faceTransparency;
+   GmineInfoColor        color,
+                         colorFace,
+                         colorFacePattern,
+                         colorLine,
+                         colorNode,
+                         colorText;
 
-   Gstr              *font;
-   Gr4                fontSize;
-   Gb                 fontIsBold,
-                      fontIsItalic,
-                      fontIsUnderline,
-                      fontIsStrikeout;
+   Gr4                   faceTransparency;
+
+   Gstr                 *fontName;
+   Gr4                   fontSize;
+
+   Gstr                 *key;
+
+   Gstr                 *labelData[10],
+                        *labelLine[10],
+                        *labelNode[20];
+
+   Gstr                 *name;
+
+   Gstr                 *patternArrow,
+                        *patternFace,
+                        *patternLine,
+                        *patternNode;
+
+   GmineInfoArray        keyValueArray;
 } GmineInfoProperty;
 
 typedef struct
 {
-   GmineInfoValuable  value;
-   GmineInfoProperty  property;
-};
+   Gb                    isSetIsVisibleDrillHole,
+                         isSetIsVisibleDrillHoleFace,
+                         isSetIsVisibleDrillHoleLine,
+                         isSetIsVisibleDrillHoleNode,
+                         isSetIsVisibleGeometry,
+                         isSetIsVisibleGeometryFace,
+                         isSetIsVisibleGeometryLine,
+                         isSetIsVisibleGeometryNode,
+                         isSetIsVisibleModel,
+                         isSetIsVisibleModelFace,
+                         isSetIsVisibleModelLine,
+                         isSetIsVisibleModelNode,
+                         isSetColorDrillHole,
+                         isSetColorDrillHoleFace,
+                         isSetColorDrillHoleLine,
+                         isSetColorDrillHoleNode,
+                         isSetColorGeometry,
+                         isSetColorGeometryFace,
+                         isSetColorGeometryLine,
+                         isSetColorGeometryNode,
+                         isSetColorModel,
+                         isSetColorModelFace,
+                         isSetColorModelLine,
+                         isSetColorModelNode,
+                         isSetValue,
+
+                         isVisibleDrillHole,
+                         isVisibleDrillHoleFace,
+                         isVisibleDrillHoleLine,
+                         isVisibleDrillHoleNode,
+                         isVisibleGeometry,
+                         isVisibleGeometryFace,
+                         isVisibleGeometryLine,
+                         isVisibleGeometryNode,
+                         isVisibleModel,
+                         isVisibleModelFace,
+                         isVisibleModelLine,
+                         isVisibleModelNode;
+
+   GmineInfoColor        colorDrillHole,
+                         colorDrillHoleFace,
+                         colorDrillHoleLine,
+                         colorDrillHoleNode,
+                         colorGeometry,
+                         colorGeometryFace,
+                         colorGeometryLine,
+                         colorGeometryNode,
+                         colorModel,
+                         colorModelFace,
+                         colorModelLine,
+                         colorModelNode;
+
+   GmineInfoProperty     property;
+
+   GmineInfoValueBase    value;
+} GmineInfoPropertyItem;
 
 typedef struct
 {
-   Gbit               isSetAuthorName     : 1,
-                      isSetCompanyName    : 1,
-                      isSetCopyright      : 1,
-                      isSetProjectName    : 1,
-                      isSetProjectSystem  : 1,
-                      isSetProjectMax     : 1,
-                      isSetProjectMin     : 1;
+   Gb                    isSetDefault,
+                         isSetKey,
+                         isSetMax,
+                         isSetMin,
+                         isSetName,
+                         isSetPrecision,
+                         isSetType;
 
-   Gstr              *authorName,
-                     *companyName,
-                     *copyright,
-                     *projectName,
-                     *projectSystem;
-   GmineInfoPoint     projectMax,
-                      projectMin;
+   GmineInfoValueBase    defaultValue;
+   Gstr                 *key;
+   GmineInfoValueBase    max;
+   GmineInfoValueBase    min;
+   Gstr                 *name;
+   Gr8                   precision;
+   GmineInfoItemType     type;
 
-   GmineInfoArray     keyValueArray;
-} GmineInfoData;
-
-typedef struct GmineInfoItem GmineInfoItem;
-struct GmineInfoItem
-{
-   Gbit               isSetDefault        : 1,
-                      isSetMax            : 1,
-                      isSetMin            : 1,
-                      isSetName           : 1,
-                      isSetPrecision      : 1,
-                      isSetType           : 1,
-                      isSetUid            : 1;
-
-   // Unique id for this item, library provided.
-   Gn4                id;
-
-   // User provided
-   GmineInfoValuable  defaultValue;
-   Gstr              *key;
-   GmineInfoValuable  max;
-   GmineInfoValuable  min;
-   Gstr              *name;
-   Gr8                precision;
-   GmineInfoItemType  type;
-
-   GmineInfoArray     keyValueArray;
-   GmineInfoArray     valueArray;
-   GmineInfoArray     binArray;
-
-   GmineInfoItem     *next;
-};
+   GmineInfoArray        keyValueArray;
+   GmineInfoArray        valueArray;
+   GmineInfoArray        propertyItemArray;
+} GmineInfoItem;
 
 typedef struct
 {
-   Gstr              *id;
+   Gstr                 *id;
 } GmineInfoGeometry;
 
 typedef struct
 {
-   Gstr              *id;
+   Gstr                 *id;
 } GmineInfoDrillHole;
 
 typedef struct
 {
-   Gstr              *id;
+   Gstr                 *id;
 } GmineInfoModel;
 
 typedef struct
 {
-   Gb                 isWriting;
-   Gb                 isByteSwapping;
-   GgetBuffer         getBuffer;
-   GsetBuffer         setBuffer;
+   Gb                    isWriting;
+   Gb                    isByteSwapping;
+   GgetBuffer            getBuffer;
+   GsetBuffer            setBuffer;
 
-   void              *dataRepo;
+   void                 *dataRepo;
 
-   GmineInfoFileType  fileType;
-   GmineInfoBlockType currentBlockType;
+   GmineInfoFileType     fileType;
+   GmineInfoBlockType    currentBlockType;
 
-   Gmiff             *miffFile;
-   Gjson             *jsonFile;
+   Gmiff                *miffFile;
+   Gjson                *jsonFile;
 
-   GmineInfoData      data;
-   GmineInfoItem     *itemHead,
-                     *itemTail;
-   GmineInfoGeometry  geometry;
-   GmineInfoDrillHole drillhole;
-   GmineInfoModel     model;
+   GmineInfoData        *data;
+   GmineInfoArray        imageArray;
+   GmineInfoArray        itemArray;
+   GmineInfoArray        propertyArray;
 } GmineInfo;
 
 /**************************************************************************************************

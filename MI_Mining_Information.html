@@ -138,63 +138,60 @@
         
         </head>
         <body class="vscode-body vscode-light">
-            <h1 id="mi-file-mine-information-file">M.I. File: Mine Information File</h1>
+            <h1 id="mi-file-mine-information-file-">M.I. File: Mine Information File <!-- omit in toc --></h1>
 <pre><code>Author:             Robbert de Groot
 Date:               2019-05-15
 Copyright:          2019, Robbert de Groot
 License (Library):  MIT License.
-License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://creativecommons.org/licenses/by-nd:4.0
+License (Document): Creative Commons Attribution-NoDerivs.
+                    CC BY-ND
+                    https://creativecommons.org/licenses/by-nd:4.0
 </code></pre>
-<h2 id="table-of-contents">Table Of Contents:</h2>
+<h2 id="table-of-contents-">Table Of Contents: <!-- omit in toc --></h2>
 <ul>
-<li><a href="#mi-file-mine-information-file">M.I. File: Mine Information File</a>
+<li><a href="#1-mi">1. M.I.</a>
 <ul>
-<li><a href="#table-of-contents">Table Of Contents:</a></li>
+<li><a href="#11-discussion">1.1. Discussion</a></li>
+<li><a href="#12-goals">1.2. Goals</a></li>
+<li><a href="#13-disclosure">1.3. Disclosure</a></li>
 </ul>
 </li>
-<li><a href="#1---mi">1 - M.I.</a>
+<li><a href="#2-mi-format">2. MI Format</a>
 <ul>
-<li><a href="#11---discussion">1.1 - Discussion</a></li>
-<li><a href="#12---goals">1.2 - Goals</a></li>
-<li><a href="#13---disclosure">1.3 - Disclosure</a></li>
+<li><a href="#21-header">2.1. Header</a></li>
 </ul>
 </li>
-<li><a href="#2---mi-format">2 - MI Format</a>
+<li><a href="#3-mine-information-blocks">3. Mine Information Blocks</a>
 <ul>
-<li><a href="#21---header">2.1 - Header</a></li>
+<li><a href="#31-data-block">3.1. Data Block</a></li>
+<li><a href="#32-property-block">3.2. Property Block</a></li>
+<li><a href="#33-item-block">3.3. Item Block</a></li>
+<li><a href="#34-image-block">3.4. Image Block</a></li>
+<li><a href="#35-drillhole-block">3.5. Drillhole Block</a></li>
+<li><a href="#36-geometry-block">3.6. Geometry Block</a></li>
+<li><a href="#37-model-data">3.7. Model Data</a>
+<ul>
+<li><a href="#371-model-block">3.7.1. Model Block</a></li>
 </ul>
 </li>
-<li><a href="#3---mine-information-blocks">3 - Mine Information Blocks</a>
+<li><a href="#38-model-block">3.8. Model Block:</a>
 <ul>
-<li><a href="#31---data-block">3.1 - Data Block</a></li>
-<li><a href="#32---property-block">3.2 - Property Block</a></li>
-<li><a href="#33---item-block">3.3 - Item Block</a></li>
-<li><a href="#34---image-block">3.4 - Image Block</a></li>
-<li><a href="#35---drillhole-block">3.5 - Drillhole Block</a></li>
-<li><a href="#36---geometry-block">3.6 - Geometry Block</a></li>
-<li><a href="#37---model-data">3.7 - Model Data</a>
-<ul>
-<li><a href="#371---model-block">3.7.1 - Model Block</a></li>
-</ul>
-</li>
-<li><a href="#38---model-block">3.8 - Model Block:</a>
-<ul>
-<li><a href="#381---subblock-fixed">3.8.1 - SubBlock: Fixed</a></li>
-<li><a href="#382---subblock-semi">3.8.2 - SubBlock: Semi</a></li>
-<li><a href="#383---subblock-octree">3.8.3 - SubBlock: Octree</a></li>
-<li><a href="#384---subblock-free">3.8.4 - SubBlock: Free</a></li>
+<li><a href="#381-subblock-fixed">3.8.1. SubBlock: Fixed</a></li>
+<li><a href="#382-subblock-semi">3.8.2. SubBlock: Semi</a></li>
+<li><a href="#383-subblock-octree">3.8.3. SubBlock: Octree</a></li>
+<li><a href="#384-subblock-free">3.8.4. SubBlock: Free</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<h1 id="1---mi">1 - M.I.</h1>
-<h2 id="11---discussion">1.1 - Discussion</h2>
+<h1 id="1-mi">1. M.I.</h1>
+<h2 id="11-discussion">1.1. Discussion</h2>
 <p><strong>What is the purpose of M.I. (MI)?</strong></p>
 <p>MI is intended to be a file format for exporting and importing data from one mining software package to another software package.</p>
 <p>I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently some software packages attempt to do their best at supporting competitor file formats (read only) but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, like DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.</p>
 <p>A lot of the client's time is lost with all this work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with an information format is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard part of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.</p>
-<h2 id="12---goals">1.2 - Goals</h2>
+<h2 id="12-goals">1.2. Goals</h2>
 <p>The main goal of this format is to be specifically a data passing format.  It is not intended to be a native format for any software package.  The focus is to make it easy for the developers from any software package to export their data to this format and, without too much difficulty, to import into another vendor's software.</p>
 <p>For the users of the software packages, the process of moving data from package to package will be much easier, less time consuming, less error prone, and less data loss as they will only have to export and import to just one type of file instead of various file formats and requiring more intimate knowledge of the data transfer process specific to their software packages.</p>
 <ul>
@@ -203,13 +200,13 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <li><strong>Brief</strong>, The format should not produce unnecessary waste.  The data in some cases will be quite large so it should not bloat the data too much.  Meaning, file sizes should not become overly large.  However, because of point 1 there will always be some bloat.</li>
 <li><strong>Flexible</strong>, The format needs to be able to accomodate change or account for vendor specific data.  A few software vendors started life in the 70's with time shared machines.  Over the years the amount of data and the types of data the clients want to maintain has changed and grown.  A format needs to try its best to keep up without importers and exporters to be completely remade.</li>
 </ul>
-<h2 id="13---disclosure">1.3 - Disclosure</h2>
+<h2 id="13-disclosure">1.3. Disclosure</h2>
 <p>As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of survey equipment and related material; as well as other mine related hardware and software products.</p>
 <p>This format is currently not sanctioned by any software vendor, including Hexagon.  This was something I am doing as an experiment to satisfy my curiosity.  It was brought about by recent efforts being made by Global Mining Guidelines (GMG), with their Open Mining Format (OMF), which seems to have the backing of some big players in the industry.  My issue with OMF, for now, is that they only have a Python library that implements the format available publically.  The format is strictly binary, which is not entirely a bad idea considering the data that needs to be passed around, but binary formats can be very fussy.  The format is also based on a ZIP archive.  The good thing about ZIP is that it will have excellent compression.  The bad thing is that ZIP archives are, in my opinion, not a great file format.</p>
 <p>So, I thought I would try my hand at defining a format that I think would be good as an information format.  I am trying to write MI independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.</p>
 <p>If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at the following email address.</p>
 <p><a href="mailto:zekaric@gmail.com">zekaric@gmail.com</a></p>
-<h1 id="2---mi-format">2 - MI Format</h1>
+<h1 id="2-mi-format">2. MI Format</h1>
 <p>MI is not restricted to any particular format.  Here I will specify two, MIFF and JSON.  See the MIFF_Mixed_Information_File_Format document for the discussion of the MIFF file format.  Refer to <a href="http://JSON.org">JSON.org</a> for information about JSON.  This document will cover specifics related to using MI but it will not be restricted to any particular underlying format.</p>
 <p>The library connect to this document will read and write to either MIFF or JSON.  XML could be an option but I would not suggest it.</p>
 <p>The data mining companies need to keep track of and transfer around.</p>
@@ -274,7 +271,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 </tr>
 </tbody>
 </table>
-<h2 id="21---header">2.1 - Header</h2>
+<h2 id="21-header">2.1. Header</h2>
 <p>MIFF has fields for a Sub-Format Name and Version.  For an MI file this will be set to...</p>
 <table>
 <thead>
@@ -303,7 +300,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
    ...
 }
 </code></pre>
-<h1 id="3---mine-information-blocks">3 - Mine Information Blocks</h1>
+<h1 id="3-mine-information-blocks">3. Mine Information Blocks</h1>
 <p>An MI file can only have information for just one mining project or project area.  Use multiple files for different mines, sites, projects, or however you separate the information.</p>
 <p>Every MI file contains a few specified blocks.  Order of these blocks are important for being able to read the file in one pass.  This means that types, limits or information that is required for other data in the file needs to be defined before it is used.</p>
 <ul>
@@ -315,7 +312,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <li><strong>Drillhole list block</strong> to hold drillhole information.  Depends on item, image, and property blocks.</li>
 <li><strong>Model list block</strong> to hold model information.  Depends on item, image, and property blocks.</li>
 </ul>
-<h2 id="31---data-block">3.1 - Data Block</h2>
+<h2 id="31-data-block">3.1. Data Block</h2>
 <p><strong>Block Name</strong>: data</p>
 <p>Common to all MI files for any of the types above, there will be an information block providing general, project wide information.</p>
 <p>This information block should be before other blocks.</p>
@@ -330,93 +327,330 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <tbody>
 <tr>
 <td>company</td>
-<td>The name of the company related to the mine.</td>
+<td>A string for the name of the company.</td>
 </tr>
 <tr>
 <td>copyright</td>
-<td>Copyright information</td>
+<td>A string for the copyright information.</td>
 </tr>
 <tr>
 <td>author</td>
-<td>Author or person who prepared this data.</td>
+<td>A string for the author or person who prepared this data.</td>
 </tr>
 <tr>
-<td>software</td>
-<td>The software that was used to prepare this data.</td>
+<td>project system</td>
+<td>A string for the coordinates system for all coordinate data.</td>
 </tr>
 <tr>
-<td>softwareVersion</td>
-<td>The version of the above software.</td>
-</tr>
-<tr>
-<td>comment</td>
-<td>Any comments provided by the author or software about the data.  This comment should hold no information that needs to be parsed by an importer of the data.</td>
-</tr>
-<tr>
-<td>projectSystem</td>
-<td>Indicates what coordinates system the all coordinate data should be considered to be in.  It will be a string as defined in a package like GDAL which can translate from one coordinate system to another.  Like <strong>WGS84</strong> or <strong>NAD27</strong>.  Use <strong>local</strong> to indicate that the project coordinates are in a local flat earth space.</td>
-</tr>
-<tr>
-<td>projectName</td>
+<td>project name</td>
 <td>The name of the project.</td>
 </tr>
 <tr>
-<td>projectMin</td>
-<td>Array of 3 real values in the given project system.</td>
+<td>project min</td>
+<td>A point for project min value in the given project system.</td>
 </tr>
 <tr>
-<td>projectMax</td>
-<td>Array of 3 real values in the given project system.</td>
+<td>project max</td>
+<td>A point for project max value in the given project system.</td>
 </tr>
 <tr>
-<td>other</td>
-<td>A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values.</td>
+<td>*</td>
+<td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
 </table>
+<p><strong>project system</strong> must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like <strong>WGS84</strong> or <strong>NAD27</strong>.  Use <strong>local</strong> to indicate that the project coordinates are in a local flat earth space.</p>
 <p><strong>projectMin</strong> and <strong>projectMax</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by <strong>projectSystem</strong>.</p>
-<h2 id="32---property-block">3.2 - Property Block</h2>
+<h2 id="32-property-block">3.2. Property Block</h2>
 <p><strong>Block Name</strong>: prop</p>
 <p>This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.</p>
 <table>
 <thead>
 <tr>
 <th>Name</th>
+<th>Item Only</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
+<td></td>
 <td>A unique string key for the property.</td>
 </tr>
 <tr>
 <td>name</td>
+<td></td>
 <td>A nice name for the property.  Optional.</td>
 </tr>
 <tr>
 <td>value</td>
-<td>If this property block is in an item block's prop list then a value will be present.  The value will match the value type of the item.  Depending on the type the value will be an exact match or, if it is a number value, it will be the minimum value that an attribute needs to be in order to use the properties.</td>
+<td>X</td>
+<td>A value for this property.  The type should match the item the property is associated with.</td>
 </tr>
 <tr>
-<td>vis, point vis, line vis, face vis, drill vis, model vis</td>
-<td>boolean values for a global visibility, point visibility, line visibility, face visibility, drillhole geometry vis, and model geometry vis to be used when rendering the geometry.  Global trumps the rest of the visibilities.  Default visibilities will be used if these are missing.</td>
+<td>is visible</td>
+<td></td>
+<td>A boolean for global visibility</td>
 </tr>
 <tr>
-<td>color, point color, line color, face color, face style color, drill color, model color</td>
-<td>An rgba value for a point color, line color, face color, drillhole color, and model color to be used when rendering the geometry.  Default color will be used if these are missing.</td>
+<td>is visible data label</td>
+<td></td>
+<td>A boolean for line label visibility (polyline and surface data.)</td>
 </tr>
 <tr>
-<td>point style, line style, face style</td>
-<td>A string representing the point style (symbol), line style (pattern), and face style (pattern) to be used when rendering the geometry.  Default styles as dictated by the software reading the MI will be used if these are missing.</td>
+<td>is visible face</td>
+<td></td>
+<td>A boolean for face visibility (closed polyline and surface faces.)</td>
 </tr>
 <tr>
-<td>other</td>
-<td>A string key and value pair array of any information that the software feels necessary for the property.</td>
+<td>is visible line</td>
+<td></td>
+<td>A boolean for line visibility (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>is visible line label</td>
+<td></td>
+<td>A boolean for line label visibility (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>is visible node</td>
+<td></td>
+<td>A boolean for node visibility (polyline and surface nodes.)</td>
+</tr>
+<tr>
+<td>is visible node label</td>
+<td></td>
+<td>A boolean for node label visibility (point and polyline nodes.)</td>
+</tr>
+<tr>
+<td>is visible drill hole</td>
+<td>X</td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole node</td>
+<td>X</td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole line</td>
+<td>X</td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole face</td>
+<td>X</td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>is visible geometry</td>
+<td>X</td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible geometry node</td>
+<td>X</td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible geometry line</td>
+<td>X</td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible geometry face</td>
+<td>X</td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>is visible model</td>
+<td>X</td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible model node</td>
+<td>X</td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible model line</td>
+<td>X</td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible model face</td>
+<td>X</td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>color point</td>
+<td></td>
+<td>An rgb for point color.</td>
+</tr>
+<tr>
+<td>color node</td>
+<td></td>
+<td>An rgb for node color (polyline and surface nodes.)</td>
+</tr>
+<tr>
+<td>color line</td>
+<td></td>
+<td>An rgb for line color (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>color face</td>
+<td></td>
+<td>An rgb for face color (closed polyline and surface faces.)</td>
+</tr>
+<tr>
+<td>color face pattern</td>
+<td></td>
+<td>An rgb for face pattern color.</td>
+</tr>
+<tr>
+<td>color text</td>
+<td></td>
+<td>An rgb for text color.</td>
+</tr>
+<tr>
+<td>color drill hole</td>
+<td>X</td>
+<td>An rgb for drill hole color.</td>
+</tr>
+<tr>
+<td>color drill hole node</td>
+<td>X</td>
+<td>An rgb for drill hole node color.</td>
+</tr>
+<tr>
+<td>color drill hole line</td>
+<td>X</td>
+<td>An rgb for drill hole line color.</td>
+</tr>
+<tr>
+<td>color drill hole face</td>
+<td>X</td>
+<td>An rgb for drill hole face color.</td>
+</tr>
+<tr>
+<td>color drill hole face pattern</td>
+<td>X</td>
+<td>An rgb for drill hole face pattern color.</td>
+</tr>
+<tr>
+<td>color geometry</td>
+<td>X</td>
+<td>An rgb for geometry color.</td>
+</tr>
+<tr>
+<td>color geometry node</td>
+<td>X</td>
+<td>An rgb for geometry node color.</td>
+</tr>
+<tr>
+<td>color geometry line</td>
+<td>X</td>
+<td>An rgb for geometry line color.</td>
+</tr>
+<tr>
+<td>color geometry face</td>
+<td>X</td>
+<td>An rgb for geometry face color.</td>
+</tr>
+<tr>
+<td>color geometry face pattern</td>
+<td>X</td>
+<td>An rgb for geometry face pattern color.</td>
+</tr>
+<tr>
+<td>color model</td>
+<td>X</td>
+<td>An rgb for model color.</td>
+</tr>
+<tr>
+<td>color model node</td>
+<td>X</td>
+<td>An rgb for model node color.</td>
+</tr>
+<tr>
+<td>color model line</td>
+<td>X</td>
+<td>An rgb for model line color.</td>
+</tr>
+<tr>
+<td>color model face</td>
+<td>X</td>
+<td>An rgb for model face color.</td>
+</tr>
+<tr>
+<td>color model face pattern</td>
+<td>X</td>
+<td>An rgb for model face pattern color.</td>
+</tr>
+<tr>
+<td>pattern node</td>
+<td></td>
+<td>A string for the node pattern (points, polyline nodes, and surface nodes.)</td>
+</tr>
+<tr>
+<td>pattern line</td>
+<td></td>
+<td>A string for the line pattern (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>pattern face</td>
+<td></td>
+<td>A string for the face pattern (closed polyline and surface faces.)</td>
+</tr>
+<tr>
+<td>transparency</td>
+<td></td>
+<td>A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque.</td>
+</tr>
+<tr>
+<td>font</td>
+<td></td>
+<td>A string for the font name.</td>
+</tr>
+<tr>
+<td>font size</td>
+<td></td>
+<td>A real for the size of the font in project units or percent (0-1) &quot;font size if relative&quot; is true.</td>
+</tr>
+<tr>
+<td>font size is relative</td>
+<td></td>
+<td>A boolean if the font size is a percent to paper size or screen size.</td>
+</tr>
+<tr>
+<td>font is bold</td>
+<td></td>
+<td>A boolean if the font is bold.  Default is false.</td>
+</tr>
+<tr>
+<td>font is italic</td>
+<td></td>
+<td>A boolean if the font is italic.  Default is false.</td>
+</tr>
+<tr>
+<td>font is underline</td>
+<td></td>
+<td>A boolean if the font is underlined.  Default is false.</td>
+</tr>
+<tr>
+<td>font is strikeout</td>
+<td></td>
+<td>A boolean if the font is striked out.  Default if false.</td>
+</tr>
+<tr>
+<td>*</td>
+<td></td>
+<td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="33---item-block">3.3 - Item Block</h2>
+<h2 id="33-item-block">3.3. Item Block</h2>
 <p><strong>Block Name</strong>: item</p>
 <p>Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drillhole assay value, a block model item value, a geometry element value, a geometry point value, etc.</p>
 <p>Items need to be defined before they are used elsewhere in the MI file.</p>
@@ -430,58 +664,110 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <tbody>
 <tr>
 <td>key</td>
-<td>A unique key for the item.  This is stored as a string even if it is a number by the software that sets it.  This key needs to be unique so that no two items have the same key value.</td>
+<td>A string for a unique key value for the item.</td>
 </tr>
 <tr>
 <td>name</td>
-<td>The name of the item.  A UTF8 string limited to 255 bytes.  Not necessarily unique but generally, it would be a good idea.</td>
+<td>A string for the name of the item.  Not necessarily unique.</td>
 </tr>
 <tr>
 <td>type</td>
-<td>The type of the item.  See lower down.</td>
+<td>A string for the type of the item.  See lower down.</td>
 </tr>
 <tr>
-<td>max, min</td>
-<td>If a number type, the maximum and minimum value for the item.</td>
+<td>max</td>
+<td>A number for the maximum value.</td>
 </tr>
 <tr>
-<td>value</td>
-<td>If the item has limited number of values, list the array of values here.</td>
+<td>min</td>
+<td>A number for the minimum value.</td>
 </tr>
 <tr>
 <td>precision</td>
-<td>If a real type, how many decimal places is this values accurrate to.</td>
+<td>A real for the precision of the values for this item.</td>
+</tr>
+<tr>
+<td>value list</td>
+<td>An array of values representing the complete set of possible values.</td>
 </tr>
 <tr>
 <td>default</td>
-<td>The default value for something that did not have a value assigned.</td>
+<td>A value for the default value.  If missing, then default value is 'missing value'.</td>
 </tr>
 <tr>
 <td>formula</td>
-<td>The formula used to calculate the value of this item.  In other words, this item has no stored value.  The value will be calculated when needed.</td>
+<td>A string for the formula used to calculate the value of this item.</td>
 </tr>
 <tr>
-<td>prop list</td>
-<td>An array of properties for rendering purposes in a view.  See Display block for what this might mean.  First property in this array will define the properties for something that does not match any other prop block's values.  The prop blocks in this array should be in order of increasing value if the item type is a number value.</td>
+<td>property list</td>
+<td>An array of properties for rendering purposes in a view.</td>
 </tr>
 <tr>
-<td>other</td>
-<td>A place to put other information that is not accounted for by the MI format but will be useful by the original software that wrote the file.  This will be an array of string values.</td>
+<td>*</td>
+<td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
 </table>
 <p>Each item will be given an index value starting at 0 and incrementing with every new item added to the MI file.</p>
-<p><strong>type</strong> will define the value being stored for this item.  Type is one of string, real, real4, natural, integer, date, time, dateTime, or formula (formula meaning the item's value is calculated.)</p>
+<p><strong>type</strong> will define the value being stored for this item.  Type is one of...</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>boolean</td>
+<td>A boolean value, True/1, False/0, or missing.</td>
+</tr>
+<tr>
+<td>integer</td>
+<td>An integer value, -large number to + large number, or missing.</td>
+</tr>
+<tr>
+<td>natural</td>
+<td>A natural value, 0 to large number, or missing.</td>
+</tr>
+<tr>
+<td>real</td>
+<td>A real value or missing.</td>
+</tr>
+<tr>
+<td>string</td>
+<td>A string value or missing.</td>
+</tr>
+<tr>
+<td>percent</td>
+<td>A real value (0 - 1), or missing.</td>
+</tr>
+<tr>
+<td>date</td>
+<td>A data or missing.</td>
+</tr>
+<tr>
+<td>time</td>
+<td>A time or missing.</td>
+</tr>
+<tr>
+<td>dateTime</td>
+<td>A data and time or missing.</td>
+</tr>
+<tr>
+<td>formula</td>
+<td>A string for a formula.</td>
+</tr>
+</tbody>
+</table>
 <p><strong>max, min</strong> defines the limits for an item.  Only applicable if item type is a real, natural, or integer.  If these are missing then the range is the full range as defined by the type.</p>
+<p><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a real.</p>
 <p><strong>valueList</strong> defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.</p>
-<p><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a real and real4.</p>
-<p><strong>default</strong> will define the default value for this item if block is skipped.  If this value is not set then the default value is 'unset'.</p>
-<p><strong>formula</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Use &quot;@[item key]@&quot; in the formula to refer to another item value in the current context.  Full discussion about the formula composition will be discussed elsewhere.</p>
-<p>When precision is used, it will change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 101 unique values. 0.0, 0.1, ..., 9.9, 10.0.  102 unique values when we include 'unset value' as well.  If this is all the values that need to be recorded, then we do not really need to use a full real or real4 value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recover the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.</p>
-<pre><code>Calculation example:
-(@ore%@ &amp;#42; @cu@) - @i_am_making_something_up@
-</code></pre>
-<h2 id="34---image-block">3.4 - Image Block</h2>
+<p><strong>default</strong> will define the default value for this item if block is skipped.  If this value is not provided then the default value is &quot;missing&quot;.</p>
+<p><strong>formula</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Export software dictates what the formula looks like for now.  Import software will need to figure out how to convert this formula to their needs.</p>
+<p><strong>prop list</strong> is a list of bins with some display cues.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.</p>
+<p>When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store in index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.</p>
+<h2 id="34-image-block">3.4. Image Block</h2>
 <p><strong>Block Name</strong>: image</p>
 <p>Defining an image.  Images are mainly used for texture mapping in geometry blocks.</p>
 <table>
@@ -494,34 +780,26 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <tbody>
 <tr>
 <td>key</td>
-<td>Unique identifier for the image.</td>
+<td>A stirng for the unique identifier for the image.</td>
 </tr>
 <tr>
 <td>name</td>
-<td>A nice name for the image.</td>
+<td>A string for the name for the image.</td>
 </tr>
 <tr>
-<td>rgb</td>
-<td>The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgb values, no compression.]</td>
-</tr>
-<tr>
-<td>rgba</td>
-<td>The pixels as a raw image.<br />[width int][tb][height int][tb][hex dump of image pixels in 8 bit rgba values, not compression.]</td>
+<td>filename</td>
+<td>A string for the name of the file with extension.</td>
 </tr>
 <tr>
 <td>file</td>
-<td>A hex dump of the image file.</td>
-</tr>
-<tr>
-<td>filePath</td>
-<td>A relative path to an image file.  The file should be relative to the MI file and should be in the same folder or in a sub folder of this folder.  The file should be an image file.</td>
+<td>A binary array of the image file.</td>
 </tr>
 </tbody>
 </table>
-<p>An image will only have one of the following 4 items (rgb, rgba, file, filePath) and never more than one.</p>
-<h2 id="35---drillhole-block">3.5 - Drillhole Block</h2>
+<p><strong>file</strong> can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.</p>
+<h2 id="35-drillhole-block">3.5. Drillhole Block</h2>
 <p>Drillhole data holds information about drillholes.</p>
-<h2 id="36---geometry-block">3.6 - Geometry Block</h2>
+<h2 id="36-geometry-block">3.6. Geometry Block</h2>
 <p><strong>Block Name</strong>: geom</p>
 <p>Defining a piece of geometry.  There can be multiple geometry blocks within an MI file.</p>
 <table>
@@ -602,7 +880,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <p>Each piece of polyline geometry can have point and line attributes.  Like geometry attributes above, the user type will be dynamically created by the library based off of the items listed and in that order.</p>
 <p>attrList, pointAttrList, and lineAttrList can change between geom blocks and they need to be defined before the geom blocks which will use them.</p>
 <p>In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.</p>
-<h2 id="37---model-data">3.7 - Model Data</h2>
+<h2 id="37-model-data">3.7. Model Data</h2>
 <p>Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.</p>
 <p><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">LINK</a> Block Model Knowledge For Mining Engineers - An Introduction</p>
 <p>There are 3 basic model formats that are in use as Hexagon.</p>
@@ -621,7 +899,7 @@ License (Document): Creative Commons Attribution-NoDerivs. CC BY-ND https://crea
 <p><strong>Seam Model</strong> is a bit fancier Block Model.  This model is subdivided uniformly in the row and column directions of the model but instead of levels, seams are described.  Each block in a seam will have an elevation top and bottom to indicate the seam's limits, as well as any other values that are found within that seam block just like a normal block model.</p>
 <p><strong>Surface Model</strong> is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.</p>
 <p>Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
-<h3 id="371---model-block">3.7.1 - Model Block</h3>
+<h3 id="371-model-block">3.7.1. Model Block</h3>
 <p>After the general information block the next block will be the Model Information block.</p>
 <pre><code>{	model
 &quot;	type	1	[model type]
@@ -724,7 +1002,7 @@ Uniform divisions in the row and column directions.
 <p><strong>blockCount</strong> - The number of column, row, and level blocks.</p>
 <p><strong>isLevVariable</strong> - Flag to indicate the level heights are not uniform.  This does not need to be present if the levels are a fixed height.</p>
 <p><strong>levList</strong> - A list of level heights starting from first level.  Only required if isLevVariable is true.</p>
-<h2 id="38---model-block">3.8 - Model Block:</h2>
+<h2 id="38-model-block">3.8. Model Block:</h2>
 <p>This is where the model data is placed.  Due to the size of the data, the keys are made very small.</p>
 <pre><code>{	model
 </code></pre>
@@ -833,9 +1111,9 @@ B2R2C2v1 2 3cc.\n
 }
 </code></pre>
 <p>Note, if you can removed a separator without losing then that should be done.</p>
-<h3 id="381---subblock-fixed">3.8.1 - SubBlock: Fixed</h3>
+<h3 id="381-subblock-fixed">3.8.1. SubBlock: Fixed</h3>
 <p>In the fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section. Use B, b, R, r, C, c, and . in the same way as for the parent blocks.</p>
-<h3 id="382---subblock-semi">3.8.2 - SubBlock: Semi</h3>
+<h3 id="382-subblock-semi">3.8.2. SubBlock: Semi</h3>
 <p>In the semi fixed case of subblocking, as soon as an 's' key is hit, that block is divided into the subblocks as defined in the infoModel section.  One difference...</p>
 <p>In this scheme of subblocking, there is an infinite variability in the z direction for each subblock.  This is defined by an 'H' key for the first level of blocks of the subblocks.  The number of level subblocks will depend on how many times H is used for the same column.</p>
 <table>
@@ -858,10 +1136,10 @@ B2R2C2v1 2 3cc.\n
 </table>
 <p>If H or h follows an H or h then the previous block will be holding default values, and the current block will be incremented to the next subblock.  The following H or h will determin the height of the new current block.</p>
 <p>If a subblock cell has already defined the entire height of the block then these will be skipped over when jumping to the next subblock.  This means that some subblock cells could have a different number of levels that others.</p>
-<h3 id="383---subblock-octree">3.8.3 - SubBlock: Octree</h3>
+<h3 id="383-subblock-octree">3.8.3. SubBlock: Octree</h3>
 <p>In the octree case, an 's' key will split the block or subblock in to 8 uniform pieces.  If we are already at a subblock then that subblock will be split into small 8 uniform pieces.  This should not exceed the subblock option count defined in the model information block.</p>
 <p>The 's' key need to preceed the v record.</p>
-<h3 id="384---subblock-free">3.8.4 - SubBlock: Free</h3>
+<h3 id="384-subblock-free">3.8.4. SubBlock: Free</h3>
 <p>In the free block case, an 's' key will indicate the parent block is subblocked.  However after that you will need to define the blocks manually.</p>
 <table>
 <thead>

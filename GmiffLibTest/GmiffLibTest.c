@@ -2503,9 +2503,11 @@ func: _MiffTestWrite
 **************************************************************************************************/
 static Gb _MiffTestWrite(Gstr const * const fileName)
 {
-   FILE     *file;
-   Gmiff     *miff;
-   Gb  result;
+   FILE  *file;
+   Gmiff *miff;
+   Gb     result;
+   Gindex index;
+   Gcount count;
 
    file   = NULL;
    miff   = NULL;
@@ -2527,8 +2529,8 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
       gmiffSetRecordNull(           miff, "Null");
 
-      gmiffSetRecordBool(           miff, "True",     gbTRUE);
-      gmiffSetRecordBool(           miff, "False",    gbFALSE);
+      gmiffSetRecordB(              miff, "True",     gbTRUE);
+      gmiffSetRecordB(              miff, "False",    gbFALSE);
 
       gmiffSetRecordI(              miff, "I 0",      0);
       gmiffSetRecordI(              miff, "I 1",      1);
@@ -2562,12 +2564,32 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordR4(             miff, "R4 -INF", -Gr4INF);
       gmiffSetRecordR4(             miff, "R4 NAN",  GrNAN);
 
-      gmiffSetRecordStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      //gmiffSetRecordStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+
+      // Usually for larger than memory or stream writing.
+      count = (Gcount) strlen("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      gmiffSetRecordStrStart(       miff, "String", count);
+      forCount(index, count)
+      {
+         gmiffSetValue_StrData(
+            miff,
+            "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"[index]);
+      }
+      gmiffSetRecordStrStop(        miff);
+
 #if defined(INCLUDE_BIN)
-      gmiffSetRecordBinBuffer(      miff, "Binary",  256 * 3, _binary);
+      //gmiffSetRecordBinBuffer(      miff, "Binary",  256 * 3, _binary);
+
+      // Usually for larger than memory or stream writing.
+      gmiffSetRecordBinBufferStart( miff, "Binary", 256 * 3);
+      forCount(index, 256 * 3)
+      {
+         gmiffSetValue_BinData(miff, _binary[index]);
+      }
+      gmiffSetRecordBinBufferStop(  miff);
 #endif
 
-      gmiffSetRecordBoolArray(      miff, "Bool Array",   100,  _bools);
+      gmiffSetRecordBArray(         miff, "Bool Array",   100,  _bools);
 
       gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
       gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
@@ -2578,39 +2600,56 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
-      gmiffSetRecordStartBinArray(  miff, "Binary Array", 3);
+      gmiffSetRecordArrayStart(  miff, "Binary Array", 3);
       gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
       gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-      gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-      gmiffSetRecordStop(           miff);
+      //gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
+
+      // Usually for larger than memory or stream writing.
+      gmiffSetValue_BinBufferStart(miff, 3 * 256);
+      forCount(index, 256 * 3)
+      {
+         gmiffSetValue_BinData(miff, _binary[index]);
+      }
+      gmiffSetValue_BinBufferStop( miff);
+      gmiffSetRecordArrayStop(      miff);
 #endif
 
-      gmiffSetRecordStartValue(     miff, "User Type IntStrReal");
-      gmiffSetRecordValueI(         miff, 42);
-      gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-      gmiffSetRecordValueR(         miff, 3.1415926535897932);
-      gmiffSetRecordStop(           miff);
+      gmiffSetRecordValueStart(     miff, "User Type IntStrReal");
+      gmiffSetValue_I(         miff, 42);
+      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetRecordValueStop(      miff);
 
-      gmiffSetRecordStartValueArray(miff, "User Type IntStrReal Array", 3);
-      gmiffSetRecordValueI(         miff, 42);
-      gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-      gmiffSetRecordValueR(         miff, 3.1415926535897932);
+      gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3);
+      gmiffSetValue_I(         miff, 42);
+      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+      gmiffSetValue_R(         miff, 3.1415926535897932);
 
-      gmiffSetRecordValueI(         miff, 42);
-      gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-      gmiffSetRecordValueR(         miff, 3.1415926535897932);
+      gmiffSetValue_I(         miff, 42);
+      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+      gmiffSetValue_R(         miff, 3.1415926535897932);
 
-      gmiffSetRecordValueI(         miff, 42);
-      gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-      gmiffSetRecordValueR(         miff, 3.1415926535897932);
-      gmiffSetRecordStop(           miff);
+      gmiffSetValue_I(         miff, 42);
+      //gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+
+      // Usually for larger than memory or stream writing.
+      count = (Gcount) strlen("Yes, but what is the question?");
+      gmiffSetValue_StrStart(  miff, count);
+      forCount(index, count)
+      {
+         gmiffSetValue_StrData(      miff, "Yes, but what is the question?"[index]);
+      }
+      gmiffSetValue_StrStop(   miff);
+      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetRecordValueArrayStop( miff);
 
       gmiffSetRecordBlockStart(     miff, "Block");
       {
          gmiffSetRecordNull(           miff, "Null");
 
-         gmiffSetRecordBool(           miff, "True",     gbTRUE);
-         gmiffSetRecordBool(           miff, "False",    gbFALSE);
+         gmiffSetRecordB(              miff, "True",     gbTRUE);
+         gmiffSetRecordB(              miff, "False",    gbFALSE);
 
          gmiffSetRecordI(              miff, "I 0",      0);
          gmiffSetRecordI(              miff, "I 1",      1);
@@ -2649,7 +2688,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordBinBuffer(      miff, "Binary",   256 * 3, _binary);
 #endif
 
-         gmiffSetRecordBoolArray(      miff, "Bool Array",   100,  _bools);
+         gmiffSetRecordBArray(         miff, "Bool Array",   100,  _bools);
 
          gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
          gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
@@ -2660,32 +2699,32 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
-         gmiffSetRecordStartBinArray(  miff, "Binary Array", 3);
+         gmiffSetRecordArrayStart(     miff, "Binary Array", 3);
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-         gmiffSetRecordStop(           miff);
+         gmiffSetRecordArrayStop(      miff);
 #endif
 
-         gmiffSetRecordStartValue(     miff, "User Type IntStrReal");
-         gmiffSetRecordValueI(         miff, 42);
-         gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-         gmiffSetRecordValueR(         miff, 3.1415926535897932);
-         gmiffSetRecordStop(           miff);
+         gmiffSetRecordValueStart(     miff, "User Type IntStrReal");
+         gmiffSetValue_I(         miff, 42);
+         gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+         gmiffSetValue_R(         miff, 3.1415926535897932);
+         gmiffSetRecordValueStop(      miff);
 
-         gmiffSetRecordStartValueArray(miff, "User Type IntStrReal Array", 3);
-         gmiffSetRecordValueI(         miff, 42);
-         gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-         gmiffSetRecordValueR(         miff, 3.1415926535897932);
+         gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3);
+         gmiffSetValue_I(         miff, 42);
+         gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+         gmiffSetValue_R(         miff, 3.1415926535897932);
 
-         gmiffSetRecordValueI(         miff, 42);
-         gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-         gmiffSetRecordValueR(         miff, 3.1415926535897932);
+         gmiffSetValue_I(         miff, 42);
+         gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+         gmiffSetValue_R(         miff, 3.1415926535897932);
 
-         gmiffSetRecordValueI(         miff, 42);
-         gmiffSetRecordValueStr(       miff, "Yes, but what is the question?");
-         gmiffSetRecordValueR(         miff, 3.1415926535897932);
-         gmiffSetRecordStop(           miff);
+         gmiffSetValue_I(         miff, 42);
+         gmiffSetValue_Str(       miff, "Yes, but what is the question?");
+         gmiffSetValue_R(         miff, 3.1415926535897932);
+         gmiffSetRecordValueArrayStop( miff);
       }
       gmiffSetRecordBlockStop(miff);
 

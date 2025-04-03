@@ -183,6 +183,54 @@ void _MiIoDloc(GmineInfo * const gmineInfo)
 }
 
 /**************************************************************************************************
+func: _MiIoWriteBinBuffer
+**************************************************************************************************/
+Gb _MiIoWriteBinBuffer(GmineInfo * const gmineInfo, Gcount const count, Gn1 const * const buffer)
+{
+   // MIFF
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
+   {
+      return gmiffSetValue_BinBuffer(gmineInfo->miffFile, count, buffer);
+   }
+   // JSON
+   return gjsonSetArrayValueBin(gmineInfo->jsonFile, count, buffer);
+}
+
+/**************************************************************************************************
+func: _MiIoWriteBinStart
+**************************************************************************************************/
+Gb _MiIoWriteBinStart(GmineInfo * const gmineInfo, Gstr const * const key, size_t const fileSize)
+{
+   returnFalseIf(fileSize >= (size_t) GcountMAX);
+
+   // MIFF
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
+   {
+      return !gmiffSetRecordBinBufferStart(gmineInfo->miffFile, key, (Gcount) fileSize);
+   }
+   // JSON
+   return gjsonSetObjectValueArrayStart(gmineInfo->jsonFile, key);
+}
+
+/**************************************************************************************************
+func: _MiIoWriteBinStop
+**************************************************************************************************/
+Gb _MiIoWriteBinStop(GmineInfo * const gmineInfo)
+{
+   // MIFF
+   if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
+   {
+      return gmiffSetValueStop( gmineInfo->miffFile);
+      return gmiffSetRecordStop(gmineInfo->miffFile);
+   }
+   // JSON
+   else
+   {
+      return gjsonSetObjectValueArrayStop(gmineInfo->jsonFile);
+   }
+}
+
+/**************************************************************************************************
 func: _MiIoWriteBlockStart
 **************************************************************************************************/
 Gb _MiIoWriteBlockStart(GmineInfo * const gmineInfo, Gstr * const key)
@@ -221,14 +269,14 @@ Gb _MiIoWritePoint(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetRecordStartValue(gmineInfo->miffFile, key));
+      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key));
       {
-         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->x));
-         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->y));
-         returnFalseIf(!gmiffSetRecordValueR( gmineInfo->miffFile, value->z));
+         returnFalseIf(!gmiffSetValue_R( gmineInfo->miffFile, value->x));
+         returnFalseIf(!gmiffSetValue_R( gmineInfo->miffFile, value->y));
+         returnFalseIf(!gmiffSetValue_R( gmineInfo->miffFile, value->z));
       }
 
-      return gmiffSetRecordStop(      gmineInfo->miffFile);
+      return gmiffSetRecordValueStop(         gmineInfo->miffFile);
    }
 
    // JSON
@@ -239,7 +287,7 @@ Gb _MiIoWritePoint(GmineInfo * const gmineInfo, Gstr const * const key,
       returnFalseIf(!gjsonSetArrayValueR(       gmineInfo->jsonFile, value->z));
    }
 
-   return gjsonSetObjectValueArrayStop( gmineInfo->jsonFile);
+   return gjsonSetObjectValueArrayStop(         gmineInfo->jsonFile);
 }
 
 /**************************************************************************************************

@@ -40,6 +40,7 @@ include:
 #include <assert.h>
 #include <memory.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <ctype.h>
@@ -82,6 +83,10 @@ constant:
 
 #define KEY_BLOCK_IMAGE_LIST              "image list"
 #define KEY_BLOCK_IMAGE                   "image"
+#define KEY_BLOCK_IMAGE_FILE              "file"
+#define KEY_BLOCK_IMAGE_FILE_PATH         "file path"
+#define KEY_BLOCK_IMAGE_KEY               "key"
+#define KEY_BLOCK_IMAGE_NAME              "name"
 
 #define KEY_BLOCK_ITEM_LIST               "item list"
 #define KEY_BLOCK_ITEM                    "item"
@@ -94,6 +99,8 @@ constant:
 
 #define KEY_BLOCK_MODEL_LIST              "model list"
 #define KEY_BLOCK_MODEL                   "model"
+
+#define SIZE_1MB                          (1 << 20)
 
 /**************************************************************************************************
 type:
@@ -116,6 +123,9 @@ Gb                 _MiIoClocWriter(       GmineInfo       * const mineInfo);
 
 void               _MiIoDloc(             GmineInfo       * const mineInfo);
 
+Gb                 _MiIoWriteBinBuffer(   GmineInfo       * const gmineInfo, Gcount const count, Gn1 const * const buffer);
+Gb                 _MiIoWriteBinStart(    GmineInfo       * const gmineInfo, Gstr const * const key, size_t const fileSize);
+Gb                 _MiIoWriteBinStop(     GmineInfo       * const gmineInfo);
 Gb                 _MiIoWriteBlockStart(  GmineInfo       * const gmineInfo, Gstr       * const key);
 Gb                 _MiIoWriteBlockStop(   GmineInfo       * const gmineInfo);
 Gb                 _MiIoWritePoint(       GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);

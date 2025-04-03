@@ -362,7 +362,6 @@ Gb gmineInfoWriteImageBlock(GmineInfo * const gmineInfo)
    Gcount          count;
    Gindex          index;
    GmineInfoImage *image;
-   FILE           *file;
 
    // Ensure writing in order
    returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeIMAGE_LIST);
@@ -375,18 +374,77 @@ Gb gmineInfoWriteImageBlock(GmineInfo * const gmineInfo)
       // File path is mandatory.  An image without an image is not an image.
       returnFalseIf(!gmineInfoImageGetFilePath(image));
 
-      // Check if the image should be inlined.
-      if (gmineInfoImageIsInline(image))
+      returnFalseIf(!_MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE));
+      returnFalseIf(!_MiIoWriteString(    gmineInfo, KEY_BLOCK_IMAGE_KEY,  image->key));
+      returnFalseIf(!_MiIoWriteString(    gmineInfo, KEY_BLOCK_IMAGE_NAME, image->name));
+      if (image->isInline)
       {
-         // If it does, then see if we can open the file.
-         returnFalseIf(!fopen_s(&file, gmineInfoImageGetFilePath(image), "rb"));
+         size_t readCount,
+                fileSize;
+         Gcount bufferSize;
+         Gn1   *buffer;
+         Gn1    bufferSmall[1024];
+         FILE  *file;
+         Gb     isWritten;
+
+         isWritten  = gbFALSE;
+         file       = NULL;
+
+         bufferSize = SIZE_1MB;
+         buffer     = _MiMemClocTypeArray(count, Gn1);
+         if (!buffer)
+         {
+            bufferSize = 1024;
+            buffer     = bufferSmall;
+         }
+
+         breakScope
+         {
+            // Open the file to read.
+            returnFalseIf(!fopen_s(&file, gmineInfoImageGetFilePath(image), "rb"));
+
+            // Get the raw file size.
+            fileSize = 0;
+            _fseeki64_nolock(file, 0, SEEK_END);
+            fileSize = _ftelli64(file);
+
+            // Start the binary buffer.
+            returnFalseIf(!_MiIoWriteBinStart(gmineInfo, KEY_BLOCK_IMAGE_FILE, fileSize));
+
+            // Return to the start of the file.
+            _fseeki64_nolock(file, 0, SEEK_SET);
+
+            // Copy the contents to the MI file.
+            loop
+            {
+               readCount = fread_s(buffer, bufferSize, 1, bufferSize, file);
+               breakIf(_MiIoWriteBinBuffer(gmineInfo, (Gcount) readCount, buffer));
+
+               // Read everything there is for the file.
+               breakIf(readCount != bufferSize);
+            }
+
+            breakIf(_MiIoWriteBinStop(gmineInfo));
+
+            isWritten = gbTRUE;
+         }
+
+         // Close the file.
+         fclose(file);
+
+         if (count == SIZE_1MB)
+         {
+            _MiMemDloc(buffer);
+         }
+
+         returnFalseIf(!isWritten);
+      }
+      else
+      {
+         returnFalseIf(_MiIoWriteString(gmineInfo, KEY_BLOCK_IMAGE_FILE_PATH, image->filePath));
       }
 
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE);
-
-
-
-      _MiIoWriteBlockStop(gmineInfo);
+      returnFalseIf(!_MiIoWriteBlockStop(gmineInfo));
    }
 }
 

@@ -640,7 +640,7 @@ Binary data may only just have the header set.  In which case ou need to call
 This sequence.
 
 gmiffSetValueStart()
-miffsetValueBinData() or gmiffSetValueStrData() called multiple times.
+miffsetValueBinData() or gmiffSetValue_StrData() called multiple times.
 gmiffSetValueStop()
 **************************************************************************************************/
 Gb gmiffSetValue(Gmiff * const miff, GmiffValue const value)
@@ -664,25 +664,9 @@ Gb gmiffSetValue(Gmiff * const miff, GmiffValue const value)
 }
 
 /**************************************************************************************************
-func: gmiffSetValueStart
+func: gmiffSetValue_BinData
 **************************************************************************************************/
-Gb gmiffSetValueStart(Gmiff * const miff, GmiffValue const value)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   miff->value = value;
-
-   gmiffSetSeparator(miff);
-
-   return _MiffSetValueHeader(miff, value);
-}
-
-/**************************************************************************************************
-func: gmiffSetValueBinData
-**************************************************************************************************/
-Gb gmiffSetValueBinData(Gmiff * const miff, Gn1 const binByte)
+Gb gmiffSetValue_BinData(Gmiff * const miff, Gn1 const binByte)
 {
    returnFalseIf(
       !_isStarted ||
@@ -696,9 +680,9 @@ Gb gmiffSetValueBinData(Gmiff * const miff, Gn1 const binByte)
 }
 
 /**************************************************************************************************
-func: gmiffSetValueStrData
+func: gmiffSetValue_StrData
 **************************************************************************************************/
-Gb gmiffSetValueStrData(Gmiff * const miff, Gstr const strLetter)
+Gb gmiffSetValue_StrData(Gmiff * const miff, Gstr const strLetter)
 {
    returnFalseIf(
       !_isStarted ||
@@ -712,6 +696,22 @@ Gb gmiffSetValueStrData(Gmiff * const miff, Gstr const strLetter)
       miff->valueIndex >= miff->value.bufferCount);
 
    return _MiffSetStr(miff, 1, &strLetter);
+}
+
+/**************************************************************************************************
+func: gmiffSetValueStart
+**************************************************************************************************/
+Gb gmiffSetValueStart(Gmiff * const miff, GmiffValue const value)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   miff->value = value;
+
+   gmiffSetSeparator(miff);
+
+   return _MiffSetValueHeader(miff, value);
 }
 
 /**************************************************************************************************
@@ -916,7 +916,7 @@ GmiffValue gmiffValueSetB(Gb const ivalue)
 /**************************************************************************************************
 func: gmiffValueSetBinBuffer
 **************************************************************************************************/
-GmiffValue gmiffValueSetBinBuffer(Gcount const binCount, Gn1 * const binBuffer)
+GmiffValue gmiffValueSetBinBuffer(Gcount const binCount, Gn1 const * const binBuffer)
 {
    GmiffValue value;
 
@@ -924,7 +924,7 @@ GmiffValue gmiffValueSetBinBuffer(Gcount const binCount, Gn1 * const binBuffer)
 
    value.type           = gmiffValueTypeBIN;
    value.bufferCount    = binCount;
-   value.bufferData.bin = binBuffer;
+   value.bufferData.bin = (Gn1 *) binBuffer;
 
    return value;
 }
@@ -1024,7 +1024,7 @@ GmiffValue gmiffValueSetR4(Gr4 const ivalue)
 /**************************************************************************************************
 func: gmiffValueSetStrBuffer
 **************************************************************************************************/
-GmiffValue gmiffValueSetStrBuffer(Gcount const strCount, Gstr * const strBuffer)
+GmiffValue gmiffValueSetStrBuffer(Gcount const strCount, Gstr const * const strBuffer)
 {
    GmiffValue value;
 
@@ -1032,7 +1032,7 @@ GmiffValue gmiffValueSetStrBuffer(Gcount const strCount, Gstr * const strBuffer)
 
    value.type           = gmiffValueTypeSTR;
    value.bufferCount    = strCount;
-   value.bufferData.str = strBuffer;
+   value.bufferData.str = (Gstr *) strBuffer;
 
    return value;
 }

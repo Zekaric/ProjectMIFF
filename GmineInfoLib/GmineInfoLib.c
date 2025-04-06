@@ -290,9 +290,9 @@ Gb gmineInfoSetData(GmineInfo * const gmineInfo, GmineInfoData * const value)
 }
 
 /**************************************************************************************************
-func: gmineInfoSetItemAppend
+func: gmineInfoSetItemListAppend
 **************************************************************************************************/
-Gb gmineInfoSetItemAppend(GmineInfo * const gmineInfo, GmineInfoItem * const gmineInfoItem)
+Gb gmineInfoSetItemListAppend(GmineInfo * const gmineInfo, GmineInfoItem * const gmineInfoItem)
 {
    returnFalseIf(
       !_isStarted ||
@@ -300,6 +300,32 @@ Gb gmineInfoSetItemAppend(GmineInfo * const gmineInfo, GmineInfoItem * const gmi
       !gmineInfoItem);
 
    return gmineInfoArrayAddLast(&gmineInfo->itemArray, gmineInfoItem);
+}
+
+/**************************************************************************************************
+func: gmineInfoSetImageListAppend
+**************************************************************************************************/
+Gb gmineInfoSetImageListAppend(GmineInfo * const gmineInfo, GmineInfoImage * const gmineInfoImage)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !gmineInfo  ||
+      !gmineInfoImage);
+
+   return gmineInfoArrayAddLast(&gmineInfo->imageArray, gmineInfoImage);
+}
+
+/**************************************************************************************************
+func: gmineInfoSetPropertyListAppend
+**************************************************************************************************/
+Gb gmineInfoSetPropertyListAppend(GmineInfo * const gmineInfo, GmineInfoProperty * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !gmineInfo  ||
+      !gmineInfoProperty);
+
+   return gmineInfoArrayAddLast(&gmineInfo->propertyArray, gmineInfoProperty);
 }
 
 /**************************************************************************************************
@@ -355,9 +381,32 @@ Gb gmineInfoWriteDataBlock(GmineInfo * const gmineInfo)
 }
 
 /**************************************************************************************************
-func: gmineInfoWriteImageBlock
+func: gmineInfoWriteItemListBlock
 **************************************************************************************************/
-Gb gmineInfoWriteImageBlock(GmineInfo * const gmineInfo)
+Gb gmineInfoWriteItemListBlock(GmineInfo * const gmineInfo)
+{
+   Gcount         count;
+   Gindex         index;
+   GmineInfoItem *item;
+
+   // Ensure writing is in order.
+   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeITEM_LIST);
+
+   count = gmineInfoArrayGetCount(&gmineInfo->itemArray);
+   forCount(index, count)
+   {
+      item = (GmineInfoItem *) gmineInfoArrayGetAt(&gmineInfo->itemArray, index);
+
+
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteImageListBlock
+**************************************************************************************************/
+Gb gmineInfoWriteImageListBlock(GmineInfo * const gmineInfo)
 {
    Gcount          count;
    Gindex          index;
@@ -446,6 +495,31 @@ Gb gmineInfoWriteImageBlock(GmineInfo * const gmineInfo)
 
       returnFalseIf(!_MiIoWriteBlockStop(gmineInfo));
    }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoWritePropertyListBlock
+**************************************************************************************************/
+Gb gmineInfoWritePropertyListBlock(GmineInfo * const gmineInfo)
+{
+   Gcount             count;
+   Gindex             index;
+   GmineInfoProperty *prop;
+
+   // Ensure writing is in order.
+   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeITEM_LIST);
+
+   count = gmineInfoArrayGetCount(&gmineInfo->propertyArray);
+   forCount(index, count)
+   {
+      prop = (GmineInfoProperty *) gmineInfoArrayGetAt(&gmineInfo->propertyArray, index);
+
+
+   }
+
+   returnTrue;
 }
 
 /**************************************************************************************************

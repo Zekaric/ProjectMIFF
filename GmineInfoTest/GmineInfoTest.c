@@ -246,7 +246,7 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
 
-   return gmineInfoWriteImageBlock(gmineInfo);
+   return gmineInfoWriteImageListBlock(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -268,7 +268,7 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    // No default set, then default value is "missing".
    // No min or max set, then min and max are full range of reals.
 
-   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+   returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
 
    item = gmineInfoItemCloc();
@@ -283,7 +283,7 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoItemSetMinR(          item, 0.0));
    returnFalseIf(!gmineInfoItemSetMaxR(          item, 5.0));
 
-   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+   returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
 
    item = gmineInfoItemCloc();
@@ -295,7 +295,7 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "Saying",  "Top o' da' world baby!"));
    returnFalseIf(!gmineInfoItemSetDefaultR(      item, 100.0));
 
-   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+   returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
 
    item = gmineInfoItemCloc();
@@ -306,10 +306,9 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypeN));
    returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "ship",    "It go pew pew!"));
 
-   returnFalseIf(!gmineInfoSetItemAppend(gmineInfo, item));
+   returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
-   //return gmineInfoWriteItemBlock(gmineInfo);
-   returnTrue;
+   return gmineInfoWriteItemListBlock(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -326,8 +325,86 @@ func: _BlockWritePropertyList
 **************************************************************************************************/
 static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
 {
-   gmineInfo;
-   returnTrue;
+   Gindex             index;
+   GmineInfoProperty *prop;
+   GmineInfoColor     colorWhite = { 255, 255, 255 };
+   GmineInfoColor     colorRed   = { 255,   0,   0 };
+   GmineInfoColor     colorGreen = {   0, 255,   0 };
+   GmineInfoColor     colorBlue  = {   0,   0, 255 };
+
+   prop = gmineInfoPropertyCloc();
+   returnFalseIf(!prop);
+
+   returnFalseIf(!gmineInfoPropertySetKey(         prop, "default"));
+   returnFalseIf(!gmineInfoPropertySetName(        prop, "default"));
+   returnFalseIf(!gmineInfoPropertySetColor(       prop, &colorWhite));
+   returnFalseIf(!gmineInfoPropertySetIsClippable( prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsSelectable(prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisible(   prop, gbTRUE));
+   // Everything else will be defaults.
+
+   returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
+
+   prop = gmineInfoPropertyCloc();
+   returnFalseIf(!prop);
+
+   // Set everything.
+   returnFalseIf(!gmineInfoPropertySetArrowPosition(           prop, -1));
+   returnFalseIf(!gmineInfoPropertySetArrowSize(               prop, 10));
+   returnFalseIf(!gmineInfoPropertySetColor(                   prop, &colorRed));
+   returnFalseIf(!gmineInfoPropertySetColorPoint(              prop, &colorGreen));
+   returnFalseIf(!gmineInfoPropertySetColorPolylineFace(       prop, &colorBlue));
+   returnFalseIf(!gmineInfoPropertySetColorPolylineFacePattern(prop, &colorBlue));
+   returnFalseIf(!gmineInfoPropertySetColorPolylineLine(       prop, &colorBlue));
+   returnFalseIf(!gmineInfoPropertySetColorPolylineNode(       prop, &colorBlue));
+   returnFalseIf(!gmineInfoPropertySetColorSurfaceFace(        prop, &colorWhite));
+   returnFalseIf(!gmineInfoPropertySetColorSurfaceFacePattern( prop, &colorWhite));
+   returnFalseIf(!gmineInfoPropertySetColorSurfaceLine(        prop, &colorWhite));
+   returnFalseIf(!gmineInfoPropertySetColorSurfaceNode(        prop, &colorWhite));
+   returnFalseIf(!gmineInfoPropertySetColorText(               prop, &colorRed));
+   returnFalseIf(!gmineInfoPropertySetIsArrowSizeRelative(     prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsClippable(             prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsFontBold(              prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsFontItalic(            prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsFontSizeRelative(      prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsFontStrikeOut(         prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsFontUnderline(         prop, gbFALSE));
+   returnFalseIf(!gmineInfoPropertySetIsSelectable(            prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisible(               prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePoint(          prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineArrow(  prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineFace(   prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineLine(   prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineNode(   prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceFace(    prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceLine(    prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceNode(    prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisibleText(           prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetFaceTransparency(        prop, 50));
+   returnFalseIf(!gmineInfoPropertySetFontName(                prop, "Times New Roman"));
+   returnFalseIf(!gmineInfoPropertySetFontSize(                prop, 10));
+   returnFalseIf(!gmineInfoPropertySetKey(                     prop, "All"));
+   forCount(index, 10)
+   {
+      returnFalseIf(!gmineInfoPropertySetIsVisibleDataLabel(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetIsVisibleLineLabel(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetLabelData(            prop, index, "easting"));
+      returnFalseIf(!gmineInfoPropertySetLabelLine(            prop, index, "northing"));
+   }
+   forCount(index, 20)
+   {
+      returnFalseIf(!gmineInfoPropertySetIsVisibleNodeLabel(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetLabelNode(            prop, index, "elevation"));
+   }
+   returnFalseIf(!gmineInfoPropertySetName(                    prop, "Everything"));
+   returnFalseIf(!gmineInfoPropertySetPatternArrow(            prop, "dot"));
+   returnFalseIf(!gmineInfoPropertySetPatternFace(             prop, "hatch"));
+   returnFalseIf(!gmineInfoPropertySetPatternLine(             prop, "dot"));
+   returnFalseIf(!gmineInfoPropertySetPatternNode(             prop, "diamond dot"));
+
+   returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
+
+   return gmineInfoWritePropertyListBlock(gmineInfo);
 }
 
 /**************************************************************************************************

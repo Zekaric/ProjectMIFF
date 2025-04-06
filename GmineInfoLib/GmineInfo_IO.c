@@ -220,7 +220,8 @@ Gb _MiIoWriteBinStop(GmineInfo * const gmineInfo)
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetValueStop( gmineInfo->miffFile);
+      returnFalseIf(!gmiffSetValueStop( gmineInfo->miffFile));
+
       return gmiffSetRecordStop(gmineInfo->miffFile);
    }
    // JSON

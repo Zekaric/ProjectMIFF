@@ -412,6 +412,9 @@ typedef struct
 
    GmineInfoFileType     fileType;
    GmineInfoBlockType    currentBlockType;
+   Gb                    isBlockStarted;
+   Gb                    isBlockStopped;
+   Gb                    isBlockDataWritten;
 
    Gmiff                *miffFile;
    Gjson                *jsonFile;

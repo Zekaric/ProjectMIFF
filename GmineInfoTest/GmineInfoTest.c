@@ -176,6 +176,8 @@ static Gb _BlockWriteData(GmineInfo * const gmineInfo)
    GmineInfoPoint min = {1000, 2000, 3000},
                   max = {2500, 3500, 3100};
 
+   returnFalseIf(!gmineInfoWriteBlockStartData(gmineInfo));
+
    data = gmineInfoDataCloc();
    returnFalseIf(!data);
 
@@ -194,7 +196,9 @@ static Gb _BlockWriteData(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoSetData(gmineInfo, data));
 
-   return gmineInfoWriteDataBlock(gmineInfo);
+   returnFalseIf(!gmineInfoWriteBlockContentData(gmineInfo));
+
+   return gmineInfoWriteBlockStop(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -222,6 +226,8 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
 {
    GmineInfoImage *image;
 
+   returnFalseIf(!gmineInfoWriteBlockStartImageList(gmineInfo));
+
    // Adding an image in the mine info file directly.
    image = gmineInfoImageCloc();
    returnFalseIf(!image);
@@ -246,7 +252,9 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
 
-   return gmineInfoWriteImageListBlock(gmineInfo);
+   returnFalseIf(!gmineInfoWriteBlockContentImageList(gmineInfo));
+
+   return gmineInfoWriteBlockStop(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -255,6 +263,8 @@ func: _BlockWriteItemList
 static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
 {
    GmineInfoItem *item;
+
+   returnFalseIf(!gmineInfoWriteBlockStartItemList(gmineInfo));
 
    // Create the list of items.
    item = gmineInfoItemCloc();
@@ -308,7 +318,9 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
-   return gmineInfoWriteItemListBlock(gmineInfo);
+   returnFalseIf(!gmineInfoWriteBlockContentItemList(gmineInfo));
+
+   return gmineInfoWriteBlockStop(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -331,6 +343,8 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    GmineInfoColor     colorRed   = { 255,   0,   0 };
    GmineInfoColor     colorGreen = {   0, 255,   0 };
    GmineInfoColor     colorBlue  = {   0,   0, 255 };
+
+   returnFalseIf(!gmineInfoWriteBlockStartPropertyList(gmineInfo));
 
    prop = gmineInfoPropertyCloc();
    returnFalseIf(!prop);
@@ -404,7 +418,9 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
 
-   return gmineInfoWritePropertyListBlock(gmineInfo);
+   returnFalseIf(!gmineInfoWriteBlockContentPropertyList(gmineInfo));
+
+   return gmineInfoWriteBlockStop(gmineInfo);
 }
 
 /**************************************************************************************************

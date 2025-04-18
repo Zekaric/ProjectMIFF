@@ -321,40 +321,49 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <thead>
 <tr>
 <th>Name</th>
+<th style="text-align:center">Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>company</td>
+<td style="text-align:center"></td>
 <td>A string for the name of the company.</td>
 </tr>
 <tr>
 <td>copyright</td>
+<td style="text-align:center"></td>
 <td>A string for the copyright information.</td>
 </tr>
 <tr>
 <td>author</td>
+<td style="text-align:center"></td>
 <td>A string for the author or person who prepared this data.</td>
 </tr>
 <tr>
 <td>project system</td>
+<td style="text-align:center">X</td>
 <td>A string for the coordinates system for all coordinate data.</td>
 </tr>
 <tr>
 <td>project name</td>
+<td style="text-align:center"></td>
 <td>The name of the project.</td>
 </tr>
 <tr>
 <td>project min</td>
+<td style="text-align:center"></td>
 <td>A point for project min value in the given project system.</td>
 </tr>
 <tr>
 <td>project max</td>
+<td style="text-align:center"></td>
 <td>A point for project max value in the given project system.</td>
 </tr>
 <tr>
 <td>*</td>
+<td style="text-align:center"></td>
 <td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
@@ -368,284 +377,431 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <thead>
 <tr>
 <th>Name</th>
-<th>Item Only</th>
+<th style="text-align:center">Required</th>
+<th style="text-align:center">Item Only</th>
+<th style="text-align:center">Item Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
-<td></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A unique string key for the property.</td>
 </tr>
 <tr>
 <td>name</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A nice name for the property.  Optional.</td>
 </tr>
 <tr>
 <td>value</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center">X</td>
 <td>A value for this property.  The type should match the item the property is associated with.</td>
 </tr>
 <tr>
 <td>is visible</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean for global visibility</td>
 </tr>
 <tr>
-<td>is visible data label</td>
-<td></td>
+<td>is visible data label</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean for line label visibility (polyline and surface data.)</td>
 </tr>
 <tr>
-<td>is visible face</td>
-<td></td>
-<td>A boolean for face visibility (closed polyline and surface faces.)</td>
-</tr>
-<tr>
-<td>is visible line</td>
-<td></td>
-<td>A boolean for line visibility (polyline and surface lines.)</td>
-</tr>
-<tr>
-<td>is visible line label</td>
-<td></td>
+<td>is visible line label</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean for line label visibility (polyline and surface lines.)</td>
 </tr>
 <tr>
-<td>is visible node</td>
-<td></td>
-<td>A boolean for node visibility (polyline and surface nodes.)</td>
-</tr>
-<tr>
-<td>is visible node label</td>
-<td></td>
+<td>is visible node label</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean for node label visibility (point and polyline nodes.)</td>
 </tr>
 <tr>
+<td>is visible point</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for point visibility</td>
+</tr>
+<tr>
+<td>is visible polyline face</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline face visibility</td>
+</tr>
+<tr>
+<td>is visible polyline line</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline line visibility</td>
+</tr>
+<tr>
+<td>is visible polyline node</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline node visibility</td>
+</tr>
+<tr>
+<td>is visible surface face</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for surface face visibility</td>
+</tr>
+<tr>
+<td>is visible surface line</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for surface line visibility</td>
+</tr>
+<tr>
+<td>is visible surface node</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>A boolean for surface node visibility</td>
+</tr>
+<tr>
 <td>is visible drill hole</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for global visibility</td>
 </tr>
 <tr>
 <td>is visible drill hole node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for node visibility</td>
 </tr>
 <tr>
 <td>is visible drill hole line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for line visibility</td>
 </tr>
 <tr>
 <td>is visible drill hole face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for face visibility</td>
 </tr>
 <tr>
 <td>is visible geometry</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for global visibility</td>
 </tr>
 <tr>
 <td>is visible geometry node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for node visibility</td>
 </tr>
 <tr>
 <td>is visible geometry line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for line visibility</td>
 </tr>
 <tr>
 <td>is visible geometry face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for face visibility</td>
 </tr>
 <tr>
 <td>is visible model</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for global visibility</td>
 </tr>
 <tr>
 <td>is visible model node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for node visibility</td>
 </tr>
 <tr>
 <td>is visible model line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for line visibility</td>
 </tr>
 <tr>
 <td>is visible model face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A boolean for face visibility</td>
 </tr>
 <tr>
+<td>color</td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td>An rgb for point color.</td>
+</tr>
+<tr>
 <td>color point</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for point color.</td>
 </tr>
 <tr>
 <td>color node</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for node color (polyline and surface nodes.)</td>
 </tr>
 <tr>
 <td>color line</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for line color (polyline and surface lines.)</td>
 </tr>
 <tr>
 <td>color face</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for face color (closed polyline and surface faces.)</td>
 </tr>
 <tr>
 <td>color face pattern</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for face pattern color.</td>
 </tr>
 <tr>
 <td>color text</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>An rgb for text color.</td>
 </tr>
 <tr>
 <td>color drill hole</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for drill hole color.</td>
 </tr>
 <tr>
 <td>color drill hole node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for drill hole node color.</td>
 </tr>
 <tr>
 <td>color drill hole line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for drill hole line color.</td>
 </tr>
 <tr>
 <td>color drill hole face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for drill hole face color.</td>
 </tr>
 <tr>
 <td>color drill hole face pattern</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for drill hole face pattern color.</td>
 </tr>
 <tr>
 <td>color geometry</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for geometry color.</td>
 </tr>
 <tr>
 <td>color geometry node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for geometry node color.</td>
 </tr>
 <tr>
 <td>color geometry line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for geometry line color.</td>
 </tr>
 <tr>
 <td>color geometry face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for geometry face color.</td>
 </tr>
 <tr>
 <td>color geometry face pattern</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for geometry face pattern color.</td>
 </tr>
 <tr>
 <td>color model</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for model color.</td>
 </tr>
 <tr>
 <td>color model node</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for model node color.</td>
 </tr>
 <tr>
 <td>color model line</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for model line color.</td>
 </tr>
 <tr>
 <td>color model face</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for model face color.</td>
 </tr>
 <tr>
 <td>color model face pattern</td>
-<td>X</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>An rgb for model face pattern color.</td>
 </tr>
 <tr>
 <td>pattern node</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A string for the node pattern (points, polyline nodes, and surface nodes.)</td>
 </tr>
 <tr>
 <td>pattern line</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A string for the line pattern (polyline and surface lines.)</td>
 </tr>
 <tr>
 <td>pattern face</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A string for the face pattern (closed polyline and surface faces.)</td>
 </tr>
 <tr>
 <td>transparency</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque.</td>
 </tr>
 <tr>
 <td>font</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A string for the font name.</td>
 </tr>
 <tr>
 <td>font size</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A real for the size of the font in project units or percent (0-1) &quot;font size if relative&quot; is true.</td>
 </tr>
 <tr>
 <td>font size is relative</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean if the font size is a percent to paper size or screen size.</td>
 </tr>
 <tr>
 <td>font is bold</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean if the font is bold.  Default is false.</td>
 </tr>
 <tr>
 <td>font is italic</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean if the font is italic.  Default is false.</td>
 </tr>
 <tr>
 <td>font is underline</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean if the font is underlined.  Default is false.</td>
 </tr>
 <tr>
 <td>font is strikeout</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>A boolean if the font is striked out.  Default if false.</td>
 </tr>
 <tr>
 <td>*</td>
-<td></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
+<td style="text-align:center"></td>
 <td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
@@ -658,52 +814,64 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <thead>
 <tr>
 <th>Name</th>
+<th style="text-align:center">Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
+<td style="text-align:center">X</td>
 <td>A string for a unique key value for the item.</td>
 </tr>
 <tr>
 <td>name</td>
+<td style="text-align:center"></td>
 <td>A string for the name of the item.  Not necessarily unique.</td>
 </tr>
 <tr>
 <td>type</td>
+<td style="text-align:center">X</td>
 <td>A string for the type of the item.  See lower down.</td>
 </tr>
 <tr>
 <td>max</td>
+<td style="text-align:center"></td>
 <td>A number for the maximum value.</td>
 </tr>
 <tr>
 <td>min</td>
+<td style="text-align:center"></td>
 <td>A number for the minimum value.</td>
 </tr>
 <tr>
 <td>precision</td>
+<td style="text-align:center"></td>
 <td>A real for the precision of the values for this item.</td>
 </tr>
 <tr>
 <td>value list</td>
+<td style="text-align:center"></td>
 <td>An array of values representing the complete set of possible values.</td>
 </tr>
 <tr>
 <td>default</td>
+<td style="text-align:center">*</td>
 <td>A value for the default value.  If missing, then default value is 'missing value'.</td>
 </tr>
 <tr>
 <td>formula</td>
+<td style="text-align:center"></td>
 <td>A string for the formula used to calculate the value of this item.</td>
 </tr>
 <tr>
 <td>property list</td>
+<td style="text-align:center"></td>
 <td>An array of properties for rendering purposes in a view.</td>
 </tr>
 <tr>
 <td>*</td>
+<td style="text-align:center"></td>
 <td>Other client software key values which may be relavant for the software.</td>
 </tr>
 </tbody>
@@ -774,29 +942,34 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <thead>
 <tr>
 <th>Name</th>
+<th style="text-align:center">Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
+<td style="text-align:center">X</td>
 <td>A stirng for the unique identifier for the image.</td>
 </tr>
 <tr>
 <td>name</td>
+<td style="text-align:center"></td>
 <td>A string for the name for the image.</td>
 </tr>
 <tr>
 <td>filename</td>
+<td style="text-align:center">x</td>
 <td>A string for the name of the file with extension.</td>
 </tr>
 <tr>
 <td>file</td>
+<td style="text-align:center">x</td>
 <td>A binary array of the image file.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>file</strong> can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.</p>
+<p><strong>file</strong> can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.  <strong>file</strong> or <strong>filename</strong> needs to be set.  Not both.</p>
 <h2 id="35-drillhole-block">3.5. Drillhole Block</h2>
 <p>Drillhole data holds information about drillholes.</p>
 <h2 id="36-geometry-block">3.6. Geometry Block</h2>
@@ -806,73 +979,95 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <thead>
 <tr>
 <th>Name</th>
+<th style="text-align:center">Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
+<td style="text-align:center">X</td>
 <td>A string that is a unique identifier for the geometry item.</td>
 </tr>
 <tr>
 <td>name</td>
+<td style="text-align:center"></td>
 <td>A nice name for the geometry if any.</td>
 </tr>
 <tr>
 <td>image</td>
+<td style="text-align:center"></td>
 <td>key to the image being used for texturing.</td>
 </tr>
 <tr>
 <td>prop</td>
+<td style="text-align:center"></td>
 <td>Key to the property block to use to render the geometry.</td>
 </tr>
 <tr>
 <td>attr item list geom</td>
+<td style="text-align:center"></td>
 <td>An array of item keys that are defined for the geometry as a whole.</td>
 </tr>
 <tr>
 <td>attr item list point</td>
+<td style="text-align:center"></td>
 <td>An array of item keys that are defined for the geometry points.  Only used for Polyline geometry and is optional.</td>
 </tr>
 <tr>
 <td>attr item list line</td>
+<td style="text-align:center"></td>
 <td>An array of item keys that are defined for the geometry segments.  A segment is the connection between two points.  Only used for Polyline geometry and is optional.</td>
 </tr>
 <tr>
 <td>type</td>
+<td style="text-align:center">X</td>
 <td>The type of the geometry.  One of &quot;label&quot;, &quot;point&quot;, &quot;polyline&quot;, &quot;surface&quot;, &quot;mesh&quot;, &quot;grid&quot;</td>
 </tr>
 <tr>
 <td>point list</td>
+<td style="text-align:center">X</td>
 <td>The point list for the geometry.  This will depend on the type above.</td>
 </tr>
 <tr>
 <td>face list</td>
+<td style="text-align:center"></td>
 <td>If the type is a surface there will be a face connectivity list.  Each face will be a triangle and be composed of 3 indicies into the point list.</td>
 </tr>
 <tr>
 <td>uv list</td>
+<td style="text-align:center"></td>
 <td>If the type is a surface or mesh, there could be a uv texture list.  One for every point in the point list.</td>
 </tr>
 <tr>
 <td>color list point</td>
+<td style="text-align:center"></td>
 <td>If the type is polyline, surface, or mesh then the geometry could be colored at the point level.  The blending over the face or line segment will be smooth from one color to the next.</td>
 </tr>
 <tr>
 <td>color list face</td>
+<td style="text-align:center"></td>
 <td>If the type is surface, or mesh then the geometry could be colored at the face level.  The face will be a solid color.</td>
 </tr>
 <tr>
 <td>attr list geom</td>
+<td style="text-align:center"></td>
 <td>The geometry level attribute values.  One value per item in the attr item list geom.</td>
 </tr>
 <tr>
 <td>attr list point</td>
+<td style="text-align:center"></td>
 <td>The point level attribute values.  One per point in the point list.  One value per item in the attr item list point.</td>
 </tr>
 <tr>
 <td>attr list line</td>
+<td style="text-align:center"></td>
 <td>The line level attribute values.  One per line segment in the point list.  One value per item in the attr item list line.</td>
+</tr>
+<tr>
+<td>text</td>
+<td style="text-align:center"></td>
+<td>The text for the label.</td>
 </tr>
 </tbody>
 </table>
@@ -882,23 +1077,17 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <p>In binary the type number for the attr, pointAttr, and lineAttr will be all 1's (4095) as we will know what type to use based off of this format.</p>
 <h2 id="37-model-data">3.7. Model Data</h2>
 <p>Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.</p>
-<p><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">LINK</a> Block Model Knowledge For Mining Engineers - An Introduction</p>
-<p>There are 3 basic model formats that are in use as Hexagon.</p>
+<p><a href="https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf">LINK</a> Block Model Knowledge For Mining Engineers - An Introduction (Thank you Julian Poniewierski for writing this.)</p>
+<p>There are 3 basic model formats that are in use at Hexagon.</p>
 <ul>
-<li>
-<p>Block Model</p>
-</li>
-<li>
-<p>Seam Model</p>
-</li>
-<li>
-<p>Surface Model</p>
-</li>
+<li>Block Model</li>
+<li>Seam Model</li>
+<li>Surface Model</li>
 </ul>
 <p><strong>Block Model</strong> is a regular collection of, usually, uniform blocks.  Each block will have values for items that are being tracked by the client.</p>
 <p><strong>Seam Model</strong> is a bit fancier Block Model.  This model is subdivided uniformly in the row and column directions of the model but instead of levels, seams are described.  Each block in a seam will have an elevation top and bottom to indicate the seam's limits, as well as any other values that are found within that seam block just like a normal block model.</p>
 <p><strong>Surface Model</strong> is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.</p>
-<p>Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.</p>
+<p>Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach.</p>
 <h3 id="371-model-block">3.7.1. Model Block</h3>
 <p>After the general information block the next block will be the Model Information block.</p>
 <pre><code>{	model

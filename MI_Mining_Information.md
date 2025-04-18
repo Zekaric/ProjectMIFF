@@ -173,16 +173,16 @@ This information block should be before other blocks.
 
 Inside the information block we have the following possible key values.  Not all are required.
 
-| Name            | Description |
-| ---             | --- |
-| company         | A string for the name of the company. |
-| copyright       | A string for the copyright information. |
-| author          | A string for the author or person who prepared this data. |
-| project system  | A string for the coordinates system for all coordinate data. |
-| project name    | The name of the project. |
-| project min     | A point for project min value in the given project system. |
-| project max     | A point for project max value in the given project system. |
-| *               | Other client software key values which may be relavant for the software. |
+| Name            | Required | Description |
+| ---             | :---:    | ---         |
+| company         |   |A string for the name of the company. |
+| copyright       |   |A string for the copyright information. |
+| author          |   |A string for the author or person who prepared this data. |
+| project system  | X |A string for the coordinates system for all coordinate data. |
+| project name    |   |The name of the project. |
+| project min     |   |A point for project min value in the given project system. |
+| project max     |   |A point for project max value in the given project system. |
+| *               |   |Other client software key values which may be relavant for the software. |
 
 **project system** must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  Use **local** to indicate that the project coordinates are in a local flat earth space.
 
@@ -194,63 +194,68 @@ Inside the information block we have the following possible key values.  Not all
 
 This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.
 
-| Name                          | Item Only | Description |
-| ---                           | ---       | ---         |
-| key                           |   | A unique string key for the property. |
-| name                          |   | A nice name for the property.  Optional. |
-| value                         | X | A value for this property.  The type should match the item the property is associated with. |
-| is visible                    |   | A boolean for global visibility |
-| is visible data label         |   | A boolean for line label visibility (polyline and surface data.) |
-| is visible face               |   | A boolean for face visibility (closed polyline and surface faces.) |
-| is visible line               |   | A boolean for line visibility (polyline and surface lines.) |
-| is visible line label         |   | A boolean for line label visibility (polyline and surface lines.) |
-| is visible node               |   | A boolean for node visibility (polyline and surface nodes.) |
-| is visible node label         |   | A boolean for node label visibility (point and polyline nodes.) |
-| is visible drill hole         | X | A boolean for global visibility |
-| is visible drill hole node    | X | A boolean for node visibility |
-| is visible drill hole line    | X | A boolean for line visibility |
-| is visible drill hole face    | X | A boolean for face visibility |
-| is visible geometry           | X | A boolean for global visibility |
-| is visible geometry node      | X | A boolean for node visibility |
-| is visible geometry line      | X | A boolean for line visibility |
-| is visible geometry face      | X | A boolean for face visibility |
-| is visible model              | X | A boolean for global visibility |
-| is visible model node         | X | A boolean for node visibility |
-| is visible model line         | X | A boolean for line visibility |
-| is visible model face         | X | A boolean for face visibility |
-| color point                   |   | An rgb for point color. |
-| color node                    |   | An rgb for node color (polyline and surface nodes.) |
-| color line                    |   | An rgb for line color (polyline and surface lines.) |
-| color face                    |   | An rgb for face color (closed polyline and surface faces.) |
-| color face pattern            |   | An rgb for face pattern color. |
-| color text                    |   | An rgb for text color. |
-| color drill hole              | X | An rgb for drill hole color. |
-| color drill hole node         | X | An rgb for drill hole node color. |
-| color drill hole line         | X | An rgb for drill hole line color. |
-| color drill hole face         | X | An rgb for drill hole face color. |
-| color drill hole face pattern | X | An rgb for drill hole face pattern color. |
-| color geometry                | X | An rgb for geometry color. |
-| color geometry node           | X | An rgb for geometry node color. |
-| color geometry line           | X | An rgb for geometry line color. |
-| color geometry face           | X | An rgb for geometry face color. |
-| color geometry face pattern   | X | An rgb for geometry face pattern color. |
-| color model                   | X | An rgb for model color. |
-| color model node              | X | An rgb for model node color. |
-| color model line              | X | An rgb for model line color. |
-| color model face              | X | An rgb for model face color. |
-| color model face pattern      | X | An rgb for model face pattern color. |
-| pattern node                  |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
-| pattern line                  |   | A string for the line pattern (polyline and surface lines.) |
-| pattern face                  |   | A string for the face pattern (closed polyline and surface faces.) |
-| transparency                  |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
-| font                          |   | A string for the font name. |
-| font size                     |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
-| font size is relative         |   | A boolean if the font size is a percent to paper size or screen size. |
-| font is bold                  |   | A boolean if the font is bold.  Default is false. |
-| font is italic                |   | A boolean if the font is italic.  Default is false. |
-| font is underline             |   | A boolean if the font is underlined.  Default is false. |
-| font is strikeout             |   | A boolean if the font is striked out.  Default if false. |
-| *                             |   | Other client software key values which may be relavant for the software. |
+| Name                          | Required | Item Only | Item Required | Description |
+| ---                           | :---:    | :---:     | :---:         | ---         |
+| key                           | X |   |   | A unique string key for the property. |
+| name                          |   |   |   | A nice name for the property.  Optional. |
+| value                         |   | X | X | A value for this property.  The type should match the item the property is associated with. |
+| is visible                    |   |   |   | A boolean for global visibility |
+| is visible data label         |   |   |   | A boolean for line label visibility (polyline and surface data.) |
+| is visible line label         |   |   |   | A boolean for line label visibility (polyline and surface lines.) |
+| is visible node label         |   |   |   | A boolean for node label visibility (point and polyline nodes.) |
+| is visible point              |   |   |   | A boolean for point visibility |
+| is visible polyline face      |   |   |   | A boolean for polyline face visibility |
+| is visible polyline line      |   |   |   | A boolean for polyline line visibility |
+| is visible polyline node      |   |   |   | A boolean for polyline node visibility |
+| is visible surface face       |   |   |   | A boolean for surface face visibility |
+| is visible surface line       |   |   |   | A boolean for surface line visibility |
+| is visible surface node       |   |   |   | A boolean for surface node visibility |
+| is visible drill hole         |   | X |   | A boolean for global visibility |
+| is visible drill hole node    |   | X |   | A boolean for node visibility |
+| is visible drill hole line    |   | X |   | A boolean for line visibility |
+| is visible drill hole face    |   | X |   | A boolean for face visibility |
+| is visible geometry           |   | X |   | A boolean for global visibility |
+| is visible geometry node      |   | X |   | A boolean for node visibility |
+| is visible geometry line      |   | X |   | A boolean for line visibility |
+| is visible geometry face      |   | X |   | A boolean for face visibility |
+| is visible model              |   | X |   | A boolean for global visibility |
+| is visible model node         |   | X |   | A boolean for node visibility |
+| is visible model line         |   | X |   | A boolean for line visibility |
+| is visible model face         |   | X |   | A boolean for face visibility |
+| color                         |   |   |   | An rgb for point color. |
+| color point                   |   |   |   | An rgb for point color. |
+| color node                    |   |   |   | An rgb for node color (polyline and surface nodes.) |
+| color line                    |   |   |   | An rgb for line color (polyline and surface lines.) |
+| color face                    |   |   |   | An rgb for face color (closed polyline and surface faces.) |
+| color face pattern            |   |   |   | An rgb for face pattern color. |
+| color text                    |   |   |   | An rgb for text color. |
+| color drill hole              |   | X |   | An rgb for drill hole color. |
+| color drill hole node         |   | X |   | An rgb for drill hole node color. |
+| color drill hole line         |   | X |   | An rgb for drill hole line color. |
+| color drill hole face         |   | X |   | An rgb for drill hole face color. |
+| color drill hole face pattern |   | X |   | An rgb for drill hole face pattern color. |
+| color geometry                |   | X |   | An rgb for geometry color. |
+| color geometry node           |   | X |   | An rgb for geometry node color. |
+| color geometry line           |   | X |   | An rgb for geometry line color. |
+| color geometry face           |   | X |   | An rgb for geometry face color. |
+| color geometry face pattern   |   | X |   | An rgb for geometry face pattern color. |
+| color model                   |   | X |   | An rgb for model color. |
+| color model node              |   | X |   | An rgb for model node color. |
+| color model line              |   | X |   | An rgb for model line color. |
+| color model face              |   | X |   | An rgb for model face color. |
+| color model face pattern      |   | X |   | An rgb for model face pattern color. |
+| pattern node                  |   |   |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
+| pattern line                  |   |   |   | A string for the line pattern (polyline and surface lines.) |
+| pattern face                  |   |   |   | A string for the face pattern (closed polyline and surface faces.) |
+| transparency                  |   |   |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
+| font                          |   |   |   | A string for the font name. |
+| font size                     |   |   |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
+| font size is relative         |   |   |   | A boolean if the font size is a percent to paper size or screen size. |
+| font is bold                  |   |   |   | A boolean if the font is bold.  Default is false. |
+| font is italic                |   |   |   | A boolean if the font is italic.  Default is false. |
+| font is underline             |   |   |   | A boolean if the font is underlined.  Default is false. |
+| font is strikeout             |   |   |   | A boolean if the font is striked out.  Default if false. |
+| *                             |   |   |   | Other client software key values which may be relavant for the software. |
 
 
 ## 3.3. Item Block
@@ -261,19 +266,19 @@ Item will describe a value that will be stored in the various places where the i
 
 Items need to be defined before they are used elsewhere in the MI file.
 
-| Name          | Description |
-| ---           | --- |
-| key           | A string for a unique key value for the item. |
-| name          | A string for the name of the item.  Not necessarily unique. |
-| type          | A string for the type of the item.  See lower down. |
-| max           | A number for the maximum value. |
-| min           | A number for the minimum value. |
-| precision     | A real for the precision of the values for this item. |
-| value list    | An array of values representing the complete set of possible values. |
-| default       | A value for the default value.  If missing, then default value is 'missing value'. |
-| formula       | A string for the formula used to calculate the value of this item. |
-| property list | An array of properties for rendering purposes in a view. |
-| *             | Other client software key values which may be relavant for the software. |
+| Name          | Required | Description |
+| ---           | :---:    | --- |
+| key           | X | A string for a unique key value for the item. |
+| name          |   | A string for the name of the item.  Not necessarily unique. |
+| type          | X | A string for the type of the item.  See lower down. |
+| max           |   | A number for the maximum value. |
+| min           |   | A number for the minimum value. |
+| precision     |   | A real for the precision of the values for this item. |
+| value list    |   | An array of values representing the complete set of possible values. |
+| default       | * | A value for the default value.  If missing, then default value is 'missing value'. |
+| formula       |   | A string for the formula used to calculate the value of this item. |
+| property list |   | An array of properties for rendering purposes in a view. |
+| *             |   | Other client software key values which may be relavant for the software. |
 
 Each item will be given an index value starting at 0 and incrementing with every new item added to the MI file.
 
@@ -313,14 +318,14 @@ When precision is used, it may change how the values are stored.  Say we have a 
 
 Defining an image.  Images are mainly used for texture mapping in geometry blocks.
 
-| Name     | Description |
-| ---      | --- |
-| key      | A stirng for the unique identifier for the image. |
-| name     | A string for the name for the image. |
-| filename | A string for the name of the file with extension. |
-| file     | A binary array of the image file. |
+| Name     | Required | Description |
+| ---      | :---:    | --- |
+| key      | X | A stirng for the unique identifier for the image. |
+| name     |   | A string for the name for the image. |
+| filename | x | A string for the name of the file with extension. |
+| file     | x | A binary array of the image file. |
 
-**file** can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.
+**file** can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.  **file** or **filename** needs to be set.  Not both.
 
 ## 3.5. Drillhole Block
 
@@ -332,25 +337,25 @@ Drillhole data holds information about drillholes.
 
 Defining a piece of geometry.  There can be multiple geometry blocks within an MI file.
 
-| Name | Description |
-| --- | --- |
-| key | A string that is a unique identifier for the geometry item. |
-| name | A nice name for the geometry if any. |
-| image | key to the image being used for texturing. |
-| prop | Key to the property block to use to render the geometry. |
-| attr item list geom | An array of item keys that are defined for the geometry as a whole. |
-| attr item list point | An array of item keys that are defined for the geometry points.  Only used for Polyline geometry and is optional. |
-| attr item list line | An array of item keys that are defined for the geometry segments.  A segment is the connection between two points.  Only used for Polyline geometry and is optional. |
-| type | The type of the geometry.  One of "label", "point", "polyline", "surface", "mesh", "grid" |
-| point list | The point list for the geometry.  This will depend on the type above. |
-| face list | If the type is a surface there will be a face connectivity list.  Each face will be a triangle and be composed of 3 indicies into the point list. |
-| uv list | If the type is a surface or mesh, there could be a uv texture list.  One for every point in the point list. |
-| color list point | If the type is polyline, surface, or mesh then the geometry could be colored at the point level.  The blending over the face or line segment will be smooth from one color to the next. |
-| color list face | If the type is surface, or mesh then the geometry could be colored at the face level.  The face will be a solid color. |
-| attr list geom | The geometry level attribute values.  One value per item in the attr item list geom. |
-| attr list point | The point level attribute values.  One per point in the point list.  One value per item in the attr item list point. |
-| attr list line | The line level attribute values.  One per line segment in the point list.  One value per item in the attr item list line. |
-
+| Name                 | Required | Description |
+| ---                  | :---:    | --- |
+| key                  | X | A string that is a unique identifier for the geometry item. |
+| name                 |   | A nice name for the geometry if any. |
+| image                |   | key to the image being used for texturing. |
+| prop                 |   | Key to the property block to use to render the geometry. |
+| attr item list geom  |   | An array of item keys that are defined for the geometry as a whole. |
+| attr item list point |   | An array of item keys that are defined for the geometry points.  Only used for Polyline geometry and is optional. |
+| attr item list line  |   | An array of item keys that are defined for the geometry segments.  A segment is the connection between two points.  Only used for Polyline geometry and is optional. |
+| type                 | X | The type of the geometry.  One of "label", "point", "polyline", "surface", "mesh", "grid" |
+| point list           | X | The point list for the geometry.  This will depend on the type above. |
+| face list            |   | If the type is a surface there will be a face connectivity list.  Each face will be a triangle and be composed of 3 indicies into the point list. |
+| uv list              |   | If the type is a surface or mesh, there could be a uv texture list.  One for every point in the point list. |
+| color list point     |   | If the type is polyline, surface, or mesh then the geometry could be colored at the point level.  The blending over the face or line segment will be smooth from one color to the next. |
+| color list face      |   | If the type is surface, or mesh then the geometry could be colored at the face level.  The face will be a solid color. |
+| attr list geom       |   | The geometry level attribute values.  One value per item in the attr item list geom. |
+| attr list point      |   | The point level attribute values.  One per point in the point list.  One value per item in the attr item list point. |
+| attr list line       |   | The line level attribute values.  One per line segment in the point list.  One value per item in the attr item list line. |
+| text                 |   | The text for the label. |
 
 Each piece of geometry can have some attributes.  The attributes need to be an item in the item list and the list of attributes is defined by attrList array.  When this array is read in, a user type is create by using the item list items' definition to build it up.  The values in the user type will be in the order listed.
 
@@ -364,14 +369,12 @@ In binary the type number for the attr, pointAttr, and lineAttr will be all 1's 
 
 Some of the information found here is based off of the block model formats that are used at Hexagon, where I work, but also from information found freely on the internet.
 
-[LINK](https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf) Block Model Knowledge For Mining Engineers - An Introduction
+[LINK](https://www.deswik.com/wp-content/uploads/2019/01/Block-model-knowledge-for-mining-engineers-An-introduction-1.pdf) Block Model Knowledge For Mining Engineers - An Introduction (Thank you Julian Poniewierski for writing this.)
 
-There are 3 basic model formats that are in use as Hexagon.
+There are 3 basic model formats that are in use at Hexagon.
 
 * Block Model
-
 * Seam Model
-
 * Surface Model
 
 **Block Model** is a regular collection of, usually, uniform blocks.  Each block will have values for items that are being tracked by the client.
@@ -380,7 +383,7 @@ There are 3 basic model formats that are in use as Hexagon.
 
 **Surface Model** is much more limited than the other two as it just holds a stack of surfaces instead of defining any volume.  This model is subdivided uniformly in the row and column directions of the model but instead of seams you will have a surface.  Each 'block', or really the contact point, for a surface will have an elevation value as well as other values that are being tracked by the client at that surface point.
 
-Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach in my opinion.
+Even though only Block Models are sub-blocked, MI does not limit you to only allowing sub-blocks for Block Models.  The logic could be applied to the other two types of models.  As far as I know, no software vendors sub-block for Seam or Surface Models.  In general, if you are sub-blocking for these other two cases, you are just going to define a model at the resolution of the sub-block size instead of this two layered approach.
 
 ### 3.7.1. Model Block
 

@@ -117,23 +117,27 @@ Gb                       gmineInfoSetData(                                 Gmine
 Gb                       gmineInfoSetImageListAppend(                      GmineInfo       * const gmineInfo, GmineInfoImage * const gmineInfoImage);
 Gb                       gmineInfoSetItemListAppend(                       GmineInfo       * const gmineInfo, GmineInfoItem * const gmineInfoItem);
 Gb                       gmineInfoSetPropertyListAppend(                   GmineInfo       * const gmineInfo, GmineInfoProperty * const gmineInfoProperty);
+Gb                       gmineInfoStart(                                   GmemCloc memClocFunc, GmemDloc memDlocFunc);
+void                     gmineInfoStop(                                    void);
 
-Gb                       gmineInfoWriteDataBlock(                          GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockContentData(                   GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockContentImageList(              GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockContentItemList(               GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockContentPropertyList(           GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStartData(                     GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStartImageList(                GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStartItemList(                 GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStartPropertyList(             GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStop(                          GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteDrillHoleBlockStart(                GmineInfo       * const gmineInfo, GmineInfoDrillHole * const gmineInfoDrillHole);
 //Gb                       gmineInfoWriteDrillHoleBlockData(                 GmineInfo       * const gmineInfo, ...);
 //Gb                       gmineInfoWriteDrillHoleBlockStop(                 GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteGeometryListBlockStart(             GmineInfo       * const gmineInfo, GmineInfoGeometry * const gmineInfoGeometry);
 //Gb                       gmineInfoWriteGeometryListBlockData(              GmineInfo       * const gmineInfo, ...);
 //Gb                       gmineInfoWriteGeometryListBlockStop(              GmineInfo       * const gmineInfo);
-Gb                       gmineInfoWriteImageListBlock(                     GmineInfo       * const gmineInfo);
-Gb                       gmineInfoWriteItemListBlock(                      GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteModelListBlockStart(                GmineInfo       * const gmineInfo, GmineInfoModel * const gmineInfoModel);
 //Gb                       gmineInfoWriteModelListBlockData(                 GmineInfo       * const gmineInfo, ...);
 //Gb                       gmineInfoWriteModelListBlockStop(                 GmineInfo       * const gmineInfo);
-Gb                       gmineInfoWritePropertyListBlock(                  GmineInfo       * const gmineInfo);
-
-Gb                       gmineInfoStart(                                   GmemCloc memClocFunc, GmemDloc memDlocFunc);
-void                     gmineInfoStop(                                    void);
 
 // GmineInfoData functions
 GmineInfoData           *gmineInfoDataCloc(                                void);

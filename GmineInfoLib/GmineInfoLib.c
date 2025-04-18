@@ -76,64 +76,37 @@ This function is only necessary for writing.  Reading will a MineInfo file works
 **************************************************************************************************/
 GmineInfoBlockType gmineInfoBlockTypeNext(GmineInfo * const gmineInfo)
 {
+   // Bad input
    returnIf(
          !_isStarted ||
-         !gmineInfo  ||
+         !gmineInfo,
+      gmineInfoBlockType_END);
+
+   // No more blocks.
+   returnIf(
          gmineInfo->currentBlockType == gmineInfoBlockType_END,
       gmineInfoBlockType_END);
 
-   // If writing...
-   if (gmineInfo->isWriting)
-   {
-      // Close up the previous block
-      switch (gmineInfo->currentBlockType)
-      {
-      case gmineInfoBlockTypeDATA:
-      case gmineInfoBlockTypePROPERTY_LIST:
-      case gmineInfoBlockTypeIMAGE_LIST:
-      case gmineInfoBlockTypeITEM_LIST:
-      case gmineInfoBlockTypeGEOMETRY_LIST:
-      case gmineInfoBlockTypeDRILL_HOLE_LIST:
-      case gmineInfoBlockTypeMODEL_LIST:
-         _MiIoWriteBlockStop(    gmineInfo);
-         break;
-      }
-   }
+   // Something needs to be written to the data block.
+   returnIf(
+         gmineInfo->isWriting                                  &&
+         gmineInfo->currentBlockType == gmineInfoBlockTypeDATA &&
+         !gmineInfo->isBlockDataWritten,
+      gmineInfoBlockType_END);
+
+   // If we started a block but not stopped it then the user is doing something wrong.
+   returnIf(
+         gmineInfo->isWriting      &&
+         gmineInfo->isBlockStarted &&
+         !gmineInfo->isBlockStopped,
+      gmineInfoBlockType_END);
 
    // Move to the next block
    gmineInfo->currentBlockType++;
 
-   // Clear the memory for the next block.
-   switch (gmineInfo->currentBlockType)
-   {
-   case gmineInfoBlockTypeDATA:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DATA);
-      break;
-
-   case gmineInfoBlockTypePROPERTY_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_PROPERTY_LIST);
-      break;
-
-   case gmineInfoBlockTypeIMAGE_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE_LIST);
-      break;
-
-   case gmineInfoBlockTypeITEM_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM_LIST);
-      break;
-
-   case gmineInfoBlockTypeGEOMETRY_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_GEOMETRY_LIST);
-      break;
-
-   case gmineInfoBlockTypeDRILL_HOLE_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DRILL_HOLE_LIST);
-      break;
-
-   case gmineInfoBlockTypeMODEL_LIST:
-      _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_MODEL_LIST);
-      break;
-   }
+   // Reset.
+   gmineInfo->isBlockStarted    =
+      gmineInfo->isBlockStopped = gbFALSE;
 
    return gmineInfo->currentBlockType;
 }
@@ -329,44 +302,101 @@ Gb gmineInfoSetPropertyListAppend(GmineInfo * const gmineInfo, GmineInfoProperty
 }
 
 /**************************************************************************************************
-func: gmineInfoWriteDataBlock
+func: gmineInfoStart
 **************************************************************************************************/
-Gb gmineInfoWriteDataBlock(GmineInfo * const gmineInfo)
+Gb gmineInfoStart(GmemCloc memClocFunc, GmemDloc memDlocFunc)
+{
+   returnTrueIf(_isStarted);
+
+   returnFalseIf(
+      !memClocFunc ||
+      !memDlocFunc)
+
+   // Start support libraries.
+   returnFalseIf(
+      !gjsonStart(memClocFunc, memDlocFunc) ||
+      !gmiffStart(memClocFunc, memDlocFunc));
+
+   _isStarted = gbTRUE;
+
+   _MiMemStart(memClocFunc, memDlocFunc);
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoStop
+**************************************************************************************************/
+void gmineInfoStop(void)
+{
+   returnVoidIf(!_isStarted);
+
+   _isStarted = gbFALSE;
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteBlockStop
+**************************************************************************************************/
+Gb gmineInfoWriteBlockStop(GmineInfo * const gmineInfo)
+{
+   returnFalseIf(
+      !_isStarted ||
+      gmineInfo->currentBlockType != gmineInfoBlockTypeDATA ||
+      !gmineInfo->isBlockStarted);
+
+   gmineInfo->isBlockStopped = gbFALSE;
+
+   return _MiIoWriteBlockStop(gmineInfo);
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteBlockContentData
+**************************************************************************************************/
+Gb gmineInfoWriteBlockContentData(GmineInfo * const gmineInfo)
 {
    Gcount             count;
    Gindex             index;
    GmineInfoKeyValue *kv;
 
    // Ensure writing in order.
-   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
+   returnFalseIf(
+      !_isStarted ||
+      !gmineInfo->isBlockStarted);
 
    if (gmineInfo->data->isSetAuthorName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,     gmineInfo->data->companyName);
+      returnFalseIf(
+         !_MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,     gmineInfo->data->companyName));
    }
    if (gmineInfo->data->isSetCopyright)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,        gmineInfo->data->copyright);
+      returnFalseIf(
+         !_MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,        gmineInfo->data->copyright));
    }
    if (gmineInfo->data->isSetProjectName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,     gmineInfo->data->projectName);
+      returnFalseIf(
+         !_MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,     gmineInfo->data->projectName));
    }
    if (gmineInfo->data->isSetProjectSystem)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM,   gmineInfo->data->projectSystem);
+      returnFalseIf(
+         !_MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM,   gmineInfo->data->projectSystem));
    }
    if (gmineInfo->data->isSetProjectMin)
    {
-      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,     &gmineInfo->data->projectMin);
+      returnFalseIf(
+         !_MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,     &gmineInfo->data->projectMin));
    }
    if (gmineInfo->data->isSetProjectMax)
    {
-      _MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,     &gmineInfo->data->projectMax);
+      returnFalseIf(
+         !_MiIoWritePoint( gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,      &gmineInfo->data->projectMax));
    }
    if (gmineInfo->data->isSetAuthorName)
    {
-      _MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,      gmineInfo->data->authorName);
+      returnFalseIf(
+         !_MiIoWriteString(gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,      gmineInfo->data->authorName));
    }
 
    // Write out the user key values.
@@ -374,39 +404,18 @@ Gb gmineInfoWriteDataBlock(GmineInfo * const gmineInfo)
    forCount(index, count);
    {
       kv = (GmineInfoKeyValue *) gmineInfoArrayGetAt(&gmineInfo->data->keyValueArray, index);
-      _MiIoWriteString(gmineInfo, kv->key, kv->value);
+      returnFalseIf(!_MiIoWriteString(gmineInfo, kv->key, kv->value));
    }
+
+   gmineInfo->isBlockDataWritten = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoWriteItemListBlock
+func: gmineInfoWriteBlockContentImageList
 **************************************************************************************************/
-Gb gmineInfoWriteItemListBlock(GmineInfo * const gmineInfo)
-{
-   Gcount         count;
-   Gindex         index;
-   GmineInfoItem *item;
-
-   // Ensure writing is in order.
-   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeITEM_LIST);
-
-   count = gmineInfoArrayGetCount(&gmineInfo->itemArray);
-   forCount(index, count)
-   {
-      item = (GmineInfoItem *) gmineInfoArrayGetAt(&gmineInfo->itemArray, index);
-
-
-   }
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmineInfoWriteImageListBlock
-**************************************************************************************************/
-Gb gmineInfoWriteImageListBlock(GmineInfo * const gmineInfo)
+Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
 {
    Gcount          count;
    Gindex          index;
@@ -500,9 +509,32 @@ Gb gmineInfoWriteImageListBlock(GmineInfo * const gmineInfo)
 }
 
 /**************************************************************************************************
-func: gmineInfoWritePropertyListBlock
+func: gmineInfoWriteBlockContentItemList
 **************************************************************************************************/
-Gb gmineInfoWritePropertyListBlock(GmineInfo * const gmineInfo)
+Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
+{
+   Gcount         count;
+   Gindex         index;
+   GmineInfoItem *item;
+
+   // Ensure writing is in order.
+   returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeITEM_LIST);
+
+   count = gmineInfoArrayGetCount(&gmineInfo->itemArray);
+   forCount(index, count)
+   {
+      item = (GmineInfoItem *) gmineInfoArrayGetAt(&gmineInfo->itemArray, index);
+
+
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteBlockContentPropertyList
+**************************************************************************************************/
+Gb gmineInfoWriteBlockContentPropertyList(GmineInfo * const gmineInfo)
 {
    Gcount             count;
    Gindex             index;
@@ -523,34 +555,57 @@ Gb gmineInfoWritePropertyListBlock(GmineInfo * const gmineInfo)
 }
 
 /**************************************************************************************************
-func: gmineInfoStart
+func: gmineInfoWriteBlockStartData
 **************************************************************************************************/
-Gb gmineInfoStart(GmemCloc memClocFunc, GmemDloc memDlocFunc)
+Gb gmineInfoWriteBlockStartData(GmineInfo * const gmineInfo)
 {
-   returnTrueIf(_isStarted);
-
    returnFalseIf(
-      !memClocFunc ||
-      !memDlocFunc)
+      !_isStarted ||
+      gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
 
-   // Start support libraries.
-   returnFalseIf(
-      !gjsonStart(memClocFunc, memDlocFunc) ||
-      !gmiffStart(memClocFunc, memDlocFunc));
+   gmineInfo->isBlockStarted = gbTRUE;
 
-   _isStarted = gbTRUE;
-
-   _MiMemStart(memClocFunc, memDlocFunc);
-
-   returnTrue;
+   return _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_DATA);
 }
 
 /**************************************************************************************************
-func: gmineInfoStop
+func: gmineInfoWriteBlockStartImageList
 **************************************************************************************************/
-void gmineInfoStop(void)
+Gb gmineInfoWriteBlockStartImageList(GmineInfo * const gmineInfo)
 {
-   returnVoidIf(!_isStarted);
+   returnFalseIf(
+      !_isStarted ||
+      gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
 
-   _isStarted = gbFALSE;
+   gmineInfo->isBlockStarted = gbTRUE;
+
+   return _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE_LIST);
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteBlockStartItemList
+**************************************************************************************************/
+Gb gmineInfoWriteBlockStartItemList(GmineInfo * const gmineInfo)
+{
+   returnFalseIf(
+      !_isStarted ||
+      gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
+
+   gmineInfo->isBlockStarted = gbTRUE;
+
+   return _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM_LIST);
+}
+
+/**************************************************************************************************
+func: gmineInfoWriteBlockStartPropertyList
+**************************************************************************************************/
+Gb gmineInfoWriteBlockStartPropertyList(GmineInfo * const gmineInfo)
+{
+   returnFalseIf(
+      !_isStarted ||
+      gmineInfo->currentBlockType != gmineInfoBlockTypeDATA);
+
+   gmineInfo->isBlockStarted = gbTRUE;
+
+   return _MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_PROPERTY_LIST);
 }

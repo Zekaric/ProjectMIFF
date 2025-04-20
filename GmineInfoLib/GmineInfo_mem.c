@@ -125,7 +125,7 @@ Gstr *_MiStrClone(Gstr const * const value)
    // Skip over leading space.
    forCount(index, count)
    {
-      continueIf(isspace(value[index]));
+      breakIf(!isspace(value[index]));
    }
    returnNullIf(index == count);
 
@@ -143,10 +143,9 @@ Gstr *_MiStrClone(Gstr const * const value)
    // Trim trailing space.
    forCountDown(index, indexStr)
    {
-      if (isspace(str[index]))
-      {
-         str[index] = 0;
-      }
+      breakIf(!isspace(str[index]))
+
+      str[index] = 0;
    }
 
    return str;

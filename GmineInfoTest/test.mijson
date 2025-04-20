@@ -8,8 +8,6 @@
 		"copyright":"2025 (c) Robbert de Groot",
 		"project name":"Mines Of Moria",
 		"project system":"local",
-		"project min":[1000,2000,3000],
-		"project max":[2500,3500,3100],
 		"author name":"Robbert de Groot",
 		"project lead":"Ghimli",
 		"project sme":"Gandalf The Grey",
@@ -17,16 +15,5 @@
 		"risk 1":"Gollum",
 		"risk 2":"The Balrog"
 	},
-	"item":{
+	"property list":{
 		
-	},
-	"geometry":{
-		
-	},
-	"drillhole":{
-		
-	},
-	"model":{
-		
-	}
-}

@@ -166,6 +166,30 @@ GmineInfoColor const *gmineInfoPropertyGetColorPoint(GmineInfoProperty const * c
 }
 
 /**************************************************************************************************
+func: gmineInfoPropertyGetColorPolyline
+**************************************************************************************************/
+GmineInfoColor const *gmineInfoPropertyGetColorPolyline(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnNullIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return &gmineInfoProperty->colorPolyline;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyGetColorPolylineArrow
+**************************************************************************************************/
+GmineInfoColor const *gmineInfoPropertyGetColorPolylineArrow(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnNullIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return &gmineInfoProperty->colorPolylineArrow;
+}
+
+/**************************************************************************************************
 func: gmineInfoPropertyGetColorPolylineFace
 **************************************************************************************************/
 GmineInfoColor const *gmineInfoPropertyGetColorPolylineFace(GmineInfoProperty const * const gmineInfoProperty)
@@ -211,6 +235,18 @@ GmineInfoColor const *gmineInfoPropertyGetColorPolylineNode(GmineInfoProperty co
       !gmineInfoProperty);
 
    return &gmineInfoProperty->colorPolylineNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyGetColorSurface
+**************************************************************************************************/
+GmineInfoColor const *gmineInfoPropertyGetColorSurface(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnNullIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return &gmineInfoProperty->colorSurface;
 }
 
 /**************************************************************************************************
@@ -532,9 +568,9 @@ Gb gmineInfoPropertyIsSetIsVisible(GmineInfoProperty const * const gmineInfoProp
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsSetIsVisibleDataLabel
+func: gmineInfoPropertyIsSetIsVisibleLabelData
 **************************************************************************************************/
-Gb gmineInfoPropertyIsSetIsVisibleDataLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsSetIsVisibleLabelData(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -542,13 +578,13 @@ Gb gmineInfoPropertyIsSetIsVisibleDataLabel(GmineInfoProperty const * const gmin
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   return gmineInfoProperty->isSetIsVisibleDataLabel[index];
+   return gmineInfoProperty->isSetIsVisibleLabelData[index];
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsSetIsVisibleLineLabel
+func: gmineInfoPropertyIsSetIsVisibleLabelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyIsSetIsVisibleLineLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsSetIsVisibleLabelLine(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -556,13 +592,13 @@ Gb gmineInfoPropertyIsSetIsVisibleLineLabel(GmineInfoProperty const * const gmin
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   return gmineInfoProperty->isSetIsVisibleLineLabel[index];
+   return gmineInfoProperty->isSetIsVisibleLabelLine[index];
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsSetIsVisibleNodeLabel
+func: gmineInfoPropertyIsSetIsVisibleLabelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyIsSetIsVisibleNodeLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsSetIsVisibleLabelNode(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -570,7 +606,7 @@ Gb gmineInfoPropertyIsSetIsVisibleNodeLabel(GmineInfoProperty const * const gmin
       !gmineInfoProperty    ||
       index < 0 || 20 <= index);
 
-   return gmineInfoProperty->isSetIsVisibleNodeLabel[index];
+   return gmineInfoProperty->isSetIsVisibleLabelNode[index];
 }
 
 /**************************************************************************************************
@@ -583,6 +619,18 @@ Gb gmineInfoPropertyIsSetIsVisiblePoint(GmineInfoProperty const * const gmineInf
       !gmineInfoProperty);
 
    return gmineInfoProperty->isSetIsVisiblePoint;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyIsSetIsVisiblePolyline
+**************************************************************************************************/
+Gb gmineInfoPropertyIsSetIsVisiblePolyline(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isSetIsVisiblePolyline;
 }
 
 /**************************************************************************************************
@@ -730,6 +778,18 @@ Gb gmineInfoPropertyIsSetColorPoint(GmineInfoProperty const * const gmineInfoPro
 }
 
 /**************************************************************************************************
+func: gmineInfoPropertyIsSetColorPolyline
+**************************************************************************************************/
+Gb gmineInfoPropertyIsSetColorPolyline(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isSetColorPolyline;
+}
+
+/**************************************************************************************************
 func: gmineInfoPropertyIsSetColorPolylineFace
 **************************************************************************************************/
 Gb gmineInfoPropertyIsSetColorPolylineFace(GmineInfoProperty const * const gmineInfoProperty)
@@ -775,6 +835,18 @@ Gb gmineInfoPropertyIsSetColorPolylineNode(GmineInfoProperty const * const gmine
       !gmineInfoProperty);
 
    return gmineInfoProperty->isSetColorPolylineNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyIsSetColorSurface
+**************************************************************************************************/
+Gb gmineInfoPropertyIsSetColorSurface(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isSetColorSurface;
 }
 
 /**************************************************************************************************
@@ -1096,9 +1168,9 @@ Gb gmineInfoPropertyIsVisible(GmineInfoProperty const * const gmineInfoProperty)
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsVisibleDataLabel
+func: gmineInfoPropertyIsVisibleLabelData
 **************************************************************************************************/
-Gb gmineInfoPropertyIsVisibleDataLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsVisibleLabelData(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -1106,13 +1178,13 @@ Gb gmineInfoPropertyIsVisibleDataLabel(GmineInfoProperty const * const gmineInfo
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   return gmineInfoProperty->isVisibleDataLabel[index];
+   return gmineInfoProperty->isVisibleLabelData[index];
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsVisibleLineLabel
+func: gmineInfoPropertyIsVisibleLabelLine
 **************************************************************************************************/
-Gb gmineInfoPropertyIsVisibleLineLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsVisibleLabelLine(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -1120,13 +1192,13 @@ Gb gmineInfoPropertyIsVisibleLineLabel(GmineInfoProperty const * const gmineInfo
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   return gmineInfoProperty->isVisibleLineLabel[index];
+   return gmineInfoProperty->isVisibleLabelLine[index];
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsVisibleNodeLabel
+func: gmineInfoPropertyIsVisibleLabelNode
 **************************************************************************************************/
-Gb gmineInfoPropertyIsVisibleNodeLabel(GmineInfoProperty const * const gmineInfoProperty,
+Gb gmineInfoPropertyIsVisibleLabelNode(GmineInfoProperty const * const gmineInfoProperty,
    Gindex const index)
 {
    returnFalseIf(
@@ -1134,7 +1206,7 @@ Gb gmineInfoPropertyIsVisibleNodeLabel(GmineInfoProperty const * const gmineInfo
       !gmineInfoProperty    ||
       index < 0 || 20 <= index);
 
-   return gmineInfoProperty->isVisibleNodeLabel[index];
+   return gmineInfoProperty->isVisibleLabelNode[index];
 }
 
 /**************************************************************************************************
@@ -1147,6 +1219,18 @@ Gb gmineInfoPropertyIsVisiblePoint(GmineInfoProperty const * const gmineInfoProp
       !gmineInfoProperty);
 
    return gmineInfoProperty->isVisiblePoint;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyIsVisiblePolyline
+**************************************************************************************************/
+Gb gmineInfoPropertyIsVisiblePolyline(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isVisiblePolyline;
 }
 
 /**************************************************************************************************
@@ -1195,6 +1279,18 @@ Gb gmineInfoPropertyIsVisiblePolylineNode(GmineInfoProperty const * const gmineI
       !gmineInfoProperty);
 
    return gmineInfoProperty->isVisiblePolylineNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyIsVisibleSurface
+**************************************************************************************************/
+Gb gmineInfoPropertyIsVisibleSurface(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isVisibleSurface;
 }
 
 /**************************************************************************************************
@@ -1306,6 +1402,36 @@ Gb gmineInfoPropertySetColorPoint(GmineInfoProperty * const gmineInfoProperty, G
 }
 
 /**************************************************************************************************
+func: gmineInfoPropertySetColorPolyline
+**************************************************************************************************/
+Gb gmineInfoPropertySetColorPolyline(GmineInfoProperty * const gmineInfoProperty, GmineInfoColor const * const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->colorPolyline      = *value;
+   gmineInfoProperty->isSetColorPolyline = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertySetColorPolylineArrow
+**************************************************************************************************/
+Gb gmineInfoPropertySetColorPolylineArrow(GmineInfoProperty * const gmineInfoProperty, GmineInfoColor const * const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->colorPolylineArrow      = *value;
+   gmineInfoProperty->isSetColorPolylineArrow = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
 func: gmineInfoPropertySetColorPolylineFace
 **************************************************************************************************/
 Gb gmineInfoPropertySetColorPolylineFace(GmineInfoProperty * const gmineInfoProperty, GmineInfoColor const * const value)
@@ -1361,6 +1487,21 @@ Gb gmineInfoPropertySetColorPolylineNode(GmineInfoProperty * const gmineInfoProp
 
    gmineInfoProperty->colorPolylineNode      = *value;
    gmineInfoProperty->isSetColorPolylineNode = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertySetColorSurface
+**************************************************************************************************/
+Gb gmineInfoPropertySetColorSurface(GmineInfoProperty * const gmineInfoProperty, GmineInfoColor const * const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->colorSurface      = *value;
+   gmineInfoProperty->isSetColorSurface = gbTRUE;
 
    returnTrue;
 }
@@ -1576,9 +1717,9 @@ Gb gmineInfoPropertySetIsVisible(GmineInfoProperty * const gmineInfoProperty, Gb
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertySetIsVisibleDataLabel
+func: gmineInfoPropertySetIsVisibleLabelData
 **************************************************************************************************/
-Gb gmineInfoPropertySetIsVisibleDataLabel(GmineInfoProperty * const gmineInfoProperty,
+Gb gmineInfoPropertySetIsVisibleLabelData(GmineInfoProperty * const gmineInfoProperty,
    Gindex const index, Gb const value)
 {
    returnFalseIf(
@@ -1586,16 +1727,16 @@ Gb gmineInfoPropertySetIsVisibleDataLabel(GmineInfoProperty * const gmineInfoPro
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   gmineInfoProperty->isVisibleDataLabel[index]      = value;
-   gmineInfoProperty->isSetIsVisibleDataLabel[index] = gbTRUE;
+   gmineInfoProperty->isVisibleLabelData[index]      = value;
+   gmineInfoProperty->isSetIsVisibleLabelData[index] = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertySetIsVisibleLineLabel
+func: gmineInfoPropertySetIsVisibleLabelLine
 **************************************************************************************************/
-Gb gmineInfoPropertySetIsVisibleLineLabel(GmineInfoProperty * const gmineInfoProperty,
+Gb gmineInfoPropertySetIsVisibleLabelLine(GmineInfoProperty * const gmineInfoProperty,
    Gindex const index, Gb const value)
 {
    returnFalseIf(
@@ -1603,16 +1744,16 @@ Gb gmineInfoPropertySetIsVisibleLineLabel(GmineInfoProperty * const gmineInfoPro
       !gmineInfoProperty    ||
       index < 0 || 10 <= index);
 
-   gmineInfoProperty->isVisibleLineLabel[index]      = value;
-   gmineInfoProperty->isSetIsVisibleLineLabel[index] = gbTRUE;
+   gmineInfoProperty->isVisibleLabelLine[index]      = value;
+   gmineInfoProperty->isSetIsVisibleLabelLine[index] = gbTRUE;
 
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertySetIsVisibleNodeLabel
+func: gmineInfoPropertySetIsVisibleLabelNode
 **************************************************************************************************/
-Gb gmineInfoPropertySetIsVisibleNodeLabel(GmineInfoProperty * const gmineInfoProperty,
+Gb gmineInfoPropertySetIsVisibleLabelNode(GmineInfoProperty * const gmineInfoProperty,
    Gindex const index, Gb const value)
 {
    returnFalseIf(
@@ -1620,8 +1761,8 @@ Gb gmineInfoPropertySetIsVisibleNodeLabel(GmineInfoProperty * const gmineInfoPro
       !gmineInfoProperty    ||
       index < 0 || 20 <= index);
 
-   gmineInfoProperty->isVisibleNodeLabel[index]      = value;
-   gmineInfoProperty->isSetIsVisibleNodeLabel[index] = gbTRUE;
+   gmineInfoProperty->isVisibleLabelNode[index]      = value;
+   gmineInfoProperty->isSetIsVisibleLabelNode[index] = gbTRUE;
 
    returnTrue;
 }
@@ -1637,6 +1778,21 @@ Gb gmineInfoPropertySetIsVisiblePoint(GmineInfoProperty * const gmineInfoPropert
 
    gmineInfoProperty->isVisiblePoint      = value;
    gmineInfoProperty->isSetIsVisiblePoint = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertySetIsVisiblePolyline
+**************************************************************************************************/
+Gb gmineInfoPropertySetIsVisiblePolyline(GmineInfoProperty * const gmineInfoProperty, Gb const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->isVisiblePolyline      = value;
+   gmineInfoProperty->isSetIsVisiblePolyline = gbTRUE;
 
    returnTrue;
 }
@@ -1697,6 +1853,21 @@ Gb gmineInfoPropertySetIsVisiblePolylineNode(GmineInfoProperty * const gmineInfo
 
    gmineInfoProperty->isVisiblePolylineNode      = value;
    gmineInfoProperty->isSetIsVisiblePolylineNode = gbTRUE;
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertySetIsVisibleSurface
+**************************************************************************************************/
+Gb gmineInfoPropertySetIsVisibleSurface(GmineInfoProperty * const gmineInfoProperty, Gb const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->isVisibleSurface      = value;
+   gmineInfoProperty->isSetIsVisibleSurface = gbTRUE;
 
    returnTrue;
 }

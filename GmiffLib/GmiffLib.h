@@ -186,7 +186,7 @@ Gb              gmiffSetRecordR(             Gmiff       * const miff, Gstr cons
 Gb              gmiffSetRecordRArray(        Gmiff       * const miff, Gstr const * const name, Gcount const count, Gr8 const * const array);
 Gb              gmiffSetRecordR4(            Gmiff       * const miff, Gstr const * const name, Gr4 const value);
 Gb              gmiffSetRecordR4Array(       Gmiff       * const miff, Gstr const * const name, Gcount const count, Gr4 const * const array);
-Gb              gmiffSetRecordStr(           Gmiff       * const miff, Gstr const * const name, Gstr * const value);
+Gb              gmiffSetRecordStr(           Gmiff       * const miff, Gstr const * const name, Gstr const * const value);
 Gb              gmiffSetRecordStrArray(      Gmiff       * const miff, Gstr const * const name, Gcount const count, Gstr ** const array);
 Gb              gmiffSetRecordStrStart(      Gmiff       * const miff, Gstr const * const name, Gcount const count);
 Gb              gmiffSetRecordStrStop(       Gmiff       * const miff);

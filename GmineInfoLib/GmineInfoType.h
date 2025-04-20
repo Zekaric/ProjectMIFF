@@ -84,8 +84,8 @@ typedef enum
 
    // Time types.
    gmineInfoItemTypeDATE,
-   gmineInfoItemTypeTIME,
    gmineInfoItemTypeDATETIME,
+   gmineInfoItemTypeTIME,
 
    // Precent type.
    gmineInfoItemTypePERCENT,
@@ -206,15 +206,16 @@ typedef struct
                          isSetIsFontUnderline,
                          isSetIsSelectable,
                          isSetIsVisible,
+                         isSetIsVisibleLabelData[10],
+                         isSetIsVisibleLabelLine[10],
+                         isSetIsVisibleLabelNode[20],
                          isSetIsVisiblePoint,
+                         isSetIsVisiblePolyline,
                          isSetIsVisiblePolylineArrow,
                          isSetIsVisiblePolylineFace,
                          isSetIsVisiblePolylineLine,
                          isSetIsVisiblePolylineNode,
-                         isSetIsVisibleArrow,
-                         isSetIsVisibleDataLabel[10],
-                         isSetIsVisibleLineLabel[10],
-                         isSetIsVisibleNodeLabel[20],
+                         isSetIsVisibleSurface,
                          isSetIsVisibleSurfaceFace,
                          isSetIsVisibleSurfaceLine,
                          isSetIsVisibleSurfaceNode,
@@ -223,11 +224,13 @@ typedef struct
                          isSetArrowSize,
                          isSetColor,
                          isSetColorPoint,
+                         isSetColorPolyline,
                          isSetColorPolylineArrow,
                          isSetColorPolylineFace,
                          isSetColorPolylineFacePattern,
                          isSetColorPolylineLine,
                          isSetColorPolylineNode,
+                         isSetColorSurface,
                          isSetColorSurfaceFace,
                          isSetColorSurfaceFacePattern,
                          isSetColorSurfaceLine,
@@ -255,14 +258,16 @@ typedef struct
                          isFontUnderline,
                          isSelectable,
                          isVisible,
+                         isVisibleLabelData[10],
+                         isVisibleLabelLine[10],
+                         isVisibleLabelNode[20],
                          isVisiblePoint,
+                         isVisiblePolyline,
+                         isVisiblePolylineArrow,
                          isVisiblePolylineFace,
                          isVisiblePolylineLine,
                          isVisiblePolylineNode,
-                         isVisiblePolylineArrow,
-                         isVisibleDataLabel[10],
-                         isVisibleLineLabel[10],
-                         isVisibleNodeLabel[20],
+                         isVisibleSurface,
                          isVisibleSurfaceFace,
                          isVisibleSurfaceLine,
                          isVisibleSurfaceNode,
@@ -273,10 +278,13 @@ typedef struct
 
    GmineInfoColor        color,
                          colorPoint,
+                         colorPolyline,
+                         colorPolylineArrow,
                          colorPolylineFace,
                          colorPolylineFacePattern,
                          colorPolylineLine,
                          colorPolylineNode,
+                         colorSurface,
                          colorSurfaceFace,
                          colorSurfaceFacePattern,
                          colorSurfaceLine,
@@ -366,6 +374,7 @@ typedef struct
 typedef struct
 {
    Gb                    isSetDefault,
+                         isSetFormula,
                          isSetKey,
                          isSetMax,
                          isSetMin,
@@ -374,6 +383,7 @@ typedef struct
                          isSetType;
 
    GmineInfoValueBase    defaultValue;
+   Gstr                 *formula;
    Gstr                 *key;
    GmineInfoValueBase    max;
    GmineInfoValueBase    min;
@@ -381,7 +391,7 @@ typedef struct
    Gr8                   precision;
    GmineInfoItemType     type;
 
-   GmineInfoArray        BinArray;
+   GmineInfoArray        binArray;
    GmineInfoArray        keyValueArray;
    GmineInfoArray        valueArray;
 } GmineInfoItem;

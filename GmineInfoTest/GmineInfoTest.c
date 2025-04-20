@@ -367,10 +367,12 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetArrowSize(               prop, 10));
    returnFalseIf(!gmineInfoPropertySetColor(                   prop, &colorRed));
    returnFalseIf(!gmineInfoPropertySetColorPoint(              prop, &colorGreen));
+   returnFalseIf(!gmineInfoPropertySetColorPolyline(           prop, &colorBlue));
    returnFalseIf(!gmineInfoPropertySetColorPolylineFace(       prop, &colorBlue));
    returnFalseIf(!gmineInfoPropertySetColorPolylineFacePattern(prop, &colorBlue));
    returnFalseIf(!gmineInfoPropertySetColorPolylineLine(       prop, &colorBlue));
    returnFalseIf(!gmineInfoPropertySetColorPolylineNode(       prop, &colorBlue));
+   returnFalseIf(!gmineInfoPropertySetColorSurface(            prop, &colorWhite));
    returnFalseIf(!gmineInfoPropertySetColorSurfaceFace(        prop, &colorWhite));
    returnFalseIf(!gmineInfoPropertySetColorSurfaceFacePattern( prop, &colorWhite));
    returnFalseIf(!gmineInfoPropertySetColorSurfaceLine(        prop, &colorWhite));
@@ -386,10 +388,12 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetIsSelectable(            prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisible(               prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisiblePoint(          prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisiblePolyline(       prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineArrow(  prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineFace(   prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineLine(   prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisiblePolylineNode(   prop, gbTRUE));
+   returnFalseIf(!gmineInfoPropertySetIsVisibleSurface(        prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceFace(    prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceLine(    prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceNode(    prop, gbTRUE));
@@ -400,14 +404,14 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetKey(                     prop, "All"));
    forCount(index, 10)
    {
-      returnFalseIf(!gmineInfoPropertySetIsVisibleDataLabel(   prop, index, gbTRUE));
-      returnFalseIf(!gmineInfoPropertySetIsVisibleLineLabel(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetIsVisibleLabelData(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetIsVisibleLabelLine(   prop, index, gbTRUE));
       returnFalseIf(!gmineInfoPropertySetLabelData(            prop, index, "easting"));
       returnFalseIf(!gmineInfoPropertySetLabelLine(            prop, index, "northing"));
    }
    forCount(index, 20)
    {
-      returnFalseIf(!gmineInfoPropertySetIsVisibleNodeLabel(   prop, index, gbTRUE));
+      returnFalseIf(!gmineInfoPropertySetIsVisibleLabelNode(   prop, index, gbTRUE));
       returnFalseIf(!gmineInfoPropertySetLabelNode(            prop, index, "elevation"));
    }
    returnFalseIf(!gmineInfoPropertySetName(                    prop, "Everything"));

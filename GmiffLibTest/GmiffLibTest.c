@@ -1562,8 +1562,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
       {
          gjsonSetObjectValueNull(   json, "Null");
 
-         gjsonSetObjectValueBool(   json, "True",      gbTRUE);
-         gjsonSetObjectValueBool(   json, "False",     gbFALSE);
+         gjsonSetObjectValueB(      json, "True",      gbTRUE);
+         gjsonSetObjectValueB(      json, "False",     gbFALSE);
 
          gjsonSetObjectValueI(      json, "I 0",       0);
          gjsonSetObjectValueI(      json, "I 1",       1);
@@ -1606,7 +1606,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          gjsonSetObjectValueArrayStart(json, "Bool Array");
          forCount(index, 100)
          {
-            gjsonSetArrayValueBool(    json, _bools[index]);
+            gjsonSetArrayValueB(       json, _bools[index]);
          }
          gjsonSetObjectValueArrayStop( json);
 
@@ -1695,8 +1695,8 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
          {
             gjsonSetObjectValueNull(   json, "Null");
 
-            gjsonSetObjectValueBool(   json, "True",      gbTRUE);
-            gjsonSetObjectValueBool(   json, "False",     gbFALSE);
+            gjsonSetObjectValueB(      json, "True",      gbTRUE);
+            gjsonSetObjectValueB(      json, "False",     gbFALSE);
 
             gjsonSetObjectValueI(      json, "I 0",       0);
             gjsonSetObjectValueI(      json, "I 1",       1);
@@ -1739,7 +1739,7 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
             gjsonSetObjectValueArrayStart(json, "Bool Array");
             forCount(index, 100)
             {
-               gjsonSetArrayValueBool(    json, _bools[index]);
+               gjsonSetArrayValueB(       json, _bools[index]);
             }
             gjsonSetObjectValueArrayStop( json);
 
@@ -1986,7 +1986,7 @@ static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
    returnTrue;
 }
 
-static Gb _MiffTestGetBool(Gmiff *miff, char const *key, Gb const value)
+static Gb _MiffTestGetB(Gmiff *miff, char const *key, Gb const value)
 {
    GmiffRecType   recType;
    Gcount         arrayCount;
@@ -2099,10 +2099,10 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       breakIf(!_MiffTestGetNull(miff, msg));
 
       msg = "True";
-      breakIf(!_MiffTestGetBool(miff, msg, gbTRUE));
+      breakIf(!_MiffTestGetB(miff, msg, gbTRUE));
 
       msg = "False";
-      breakIf(!_MiffTestGetBool(miff, msg, gbFALSE));
+      breakIf(!_MiffTestGetB(miff, msg, gbFALSE));
 
       msg = "I 0";
       breakIf(!_MiffTestGetI(miff, msg, 0));
@@ -2294,10 +2294,10 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          breakIf(!_MiffTestGetNull(miff, msg));
 
          msg = "True";
-         breakIf(!_MiffTestGetBool(miff, msg, gbTRUE));
+         breakIf(!_MiffTestGetB(miff, msg, gbTRUE));
 
          msg = "False";
-         breakIf(!_MiffTestGetBool(miff, msg, gbFALSE));
+         breakIf(!_MiffTestGetB(miff, msg, gbFALSE));
 
          msg = "I 0";
          breakIf(!_MiffTestGetI(miff, msg, 0));

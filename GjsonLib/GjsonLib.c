@@ -1130,9 +1130,9 @@ Gb gjsonSetValueBinStop(Gjson * const json)
 }
 
 /**************************************************************************************************
-func: gjsonSetValueBool
+func: gjsonSetValueB
 **************************************************************************************************/
-Gb gjsonSetValueBool(Gjson * const json, Gb const value)
+Gb gjsonSetValueB(Gjson * const json, Gb const value)
 {
    returnFalseIf(
       !_isStarted ||

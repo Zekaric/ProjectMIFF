@@ -317,7 +317,7 @@ Gb gmiffSetRecordR4Array(Gmiff * const miff, Gstr const * const name, Gcount con
 /**************************************************************************************************
 func: gmiffSetRecordStr
 **************************************************************************************************/
-Gb gmiffSetRecordStr(Gmiff * const miff, Gstr const * const name, Gstr * const value)
+Gb gmiffSetRecordStr(Gmiff * const miff, Gstr const * const name, Gstr const * const value)
 {
    returnFalseIf(
       !miff ||

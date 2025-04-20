@@ -179,19 +179,6 @@ Gstr const * gmineInfoItemGetDefaultValueDateTime(GmineInfoItem const * const gm
 }
 
 /**************************************************************************************************
-func: gmineInfoItemGetDefaultValueFormula
-**************************************************************************************************/
-Gstr const * gmineInfoItemGetDefaultValueFormula(GmineInfoItem const * const gmineInfoItem)
-{
-   returnNullIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoItem        ||
-      gmineInfoItem->type != gmineInfoItemTypeFORMULA);
-
-   return gmineInfoItem->defaultValue.str;
-}
-
-/**************************************************************************************************
 func: gmineInfoItemGetDefaultValueI
 **************************************************************************************************/
 Gi8 gmineInfoItemGetDefaultValueI(GmineInfoItem const * const gmineInfoItem)
@@ -267,6 +254,19 @@ Gstr const * gmineInfoItemGetDefaultValueTime(GmineInfoItem const * const gmineI
       gmineInfoItem->type != gmineInfoItemTypeTIME);
 
    return gmineInfoItem->defaultValue.str;
+}
+
+/**************************************************************************************************
+func: gmineInfoItemGetFormula
+**************************************************************************************************/
+Gstr const *gmineInfoItemGetFormula(GmineInfoItem const * const gmineInfoItem)
+{
+   returnNullIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      gmineInfoItem->type != gmineInfoItemTypeFORMULA);
+
+   return gmineInfoItem->formula;
 }
 
 /**************************************************************************************************
@@ -409,6 +409,18 @@ Gb gmineInfoItemIsSetDefault(GmineInfoItem const * const gmineInfoItem)
 }
 
 /**************************************************************************************************
+func: gmineInfoItemIsSetFormula
+**************************************************************************************************/
+Gb gmineInfoItemIsSetFormula(GmineInfoItem const * const gmineInfoItem)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem);
+
+   return gmineInfoItem->isSetFormula;
+}
+
+/**************************************************************************************************
 func: gmineInfoItemIsSetKey
 **************************************************************************************************/
 Gb gmineInfoItemIsSetKey(GmineInfoItem const * const gmineInfoItem)
@@ -531,23 +543,6 @@ Gb gmineInfoItemSetDefaultDateTime(GmineInfoItem * const gmineInfoItem, Gstr con
 }
 
 /**************************************************************************************************
-func: gmineInfoItemSetDefaultFormula
-**************************************************************************************************/
-Gb gmineInfoItemSetDefaultFormula(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
-{
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoItem        ||
-      !value                ||
-      gmineInfoItem->type != gmineInfoItemTypeFORMULA);
-
-   gmineInfoItem->defaultValue.str  = _MiStrClone(value);
-   gmineInfoItem->isSetDefault      = (gmineInfoItem->defaultValue.str) ? gbTRUE : gbFALSE;
-
-   return gmineInfoItem->isSetDefault;
-}
-
-/**************************************************************************************************
 func: gmineInfoItemSetDefaultI
 **************************************************************************************************/
 Gb gmineInfoItemSetDefaultI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
@@ -643,6 +638,23 @@ Gb gmineInfoItemSetDefaultTime(GmineInfoItem * const gmineInfoItem, Gstr const *
    gmineInfoItem->isSetDefault      = (gmineInfoItem->defaultValue.str) ? gbTRUE : gbFALSE;
 
    return gmineInfoItem->isSetDefault;
+}
+
+/**************************************************************************************************
+func: gmineInfoItemSetFormula
+**************************************************************************************************/
+Gb gmineInfoItemSetFormula(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      !value                ||
+      gmineInfoItem->type != gmineInfoItemTypeFORMULA);
+
+   gmineInfoItem->formula      = _MiStrClone(value);
+   gmineInfoItem->isSetFormula = (gmineInfoItem->defaultValue.str) ? gbTRUE : gbFALSE;
+
+   return gmineInfoItem->isSetFormula;
 }
 
 /**************************************************************************************************

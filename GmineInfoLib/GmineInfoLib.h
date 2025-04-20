@@ -277,7 +277,6 @@ GmineInfoColor const    *gmineInfoPropertyGetColorSurfaceFacePattern(      Gmine
 GmineInfoColor const    *gmineInfoPropertyGetColorSurfaceLine(             GmineInfoProperty const * const gmineInfoProperty);
 GmineInfoColor const    *gmineInfoPropertyGetColorSurfaceNode(             GmineInfoProperty const * const gmineInfoProperty);
 GmineInfoColor const    *gmineInfoPropertyGetColorText(                    GmineInfoProperty const * const gmineInfoProperty);
-Gr4                      gmineInfoPropertyGetFaceTransparency(             GmineInfoProperty const * const gmineInfoProperty);
 Gstr const              *gmineInfoPropertyGetFontName(                     GmineInfoProperty const * const gmineInfoProperty);
 Gr4                      gmineInfoPropertyGetFontSize(                     GmineInfoProperty const * const gmineInfoProperty);
 Gstr const              *gmineInfoPropertyGetKey(                          GmineInfoProperty const * const gmineInfoProperty);
@@ -289,6 +288,7 @@ Gstr const              *gmineInfoPropertyGetPatternArrow(                 Gmine
 Gstr const              *gmineInfoPropertyGetPatternFace(                  GmineInfoProperty const * const gmineInfoProperty);
 Gstr const              *gmineInfoPropertyGetPatternLine(                  GmineInfoProperty const * const gmineInfoProperty);
 Gstr const              *gmineInfoPropertyGetPatternNode(                  GmineInfoProperty const * const gmineInfoProperty);
+Gr4                      gmineInfoPropertyGetTransparency(                 GmineInfoProperty const * const gmineInfoProperty);
 
 Gb                       gmineInfoPropertyIsSetIsArrowSizeRelative(        GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetIsClippable(                GmineInfoProperty const * const gmineInfoProperty);
@@ -328,7 +328,6 @@ Gb                       gmineInfoPropertyIsSetColorSurfaceFacePattern(    Gmine
 Gb                       gmineInfoPropertyIsSetColorSurfaceLine(           GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetColorSurfaceNode(           GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetColorText(                  GmineInfoProperty const * const gmineInfoProperty);
-Gb                       gmineInfoPropertyIsSetFaceTransparency(           GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetFontName(                   GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetFontSize(                   GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetKey(                        GmineInfoProperty const * const gmineInfoProperty);
@@ -340,6 +339,7 @@ Gb                       gmineInfoPropertyIsSetPatternArrow(               Gmine
 Gb                       gmineInfoPropertyIsSetPatternFace(                GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetPatternLine(                GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsSetPatternNode(                GmineInfoProperty const * const gmineInfoProperty);
+Gb                       gmineInfoPropertyIsSetTransparency(               GmineInfoProperty const * const gmineInfoProperty);
 
 Gb                       gmineInfoPropertyIsArrowSizeRelative(             GmineInfoProperty const * const gmineInfoProperty);
 Gb                       gmineInfoPropertyIsClippable(                     GmineInfoProperty const * const gmineInfoProperty);
@@ -403,7 +403,6 @@ Gb                       gmineInfoPropertySetIsVisibleSurfaceFace(         Gmine
 Gb                       gmineInfoPropertySetIsVisibleSurfaceLine(         GmineInfoProperty       * const gmineInfoProperty, Gb const value);
 Gb                       gmineInfoPropertySetIsVisibleSurfaceNode(         GmineInfoProperty       * const gmineInfoProperty, Gb const value);
 Gb                       gmineInfoPropertySetIsVisibleText(                GmineInfoProperty       * const gmineInfoProperty, Gb const value);
-Gb                       gmineInfoPropertySetFaceTransparency(             GmineInfoProperty       * const gmineInfoProperty, Gr4 const value);
 Gb                       gmineInfoPropertySetFontName(                     GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
 Gb                       gmineInfoPropertySetFontSize(                     GmineInfoProperty       * const gmineInfoProperty, Gr4 const value);
 Gb                       gmineInfoPropertySetKey(                          GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
@@ -415,6 +414,7 @@ Gb                       gmineInfoPropertySetPatternArrow(                 Gmine
 Gb                       gmineInfoPropertySetPatternFace(                  GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
 Gb                       gmineInfoPropertySetPatternLine(                  GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
 Gb                       gmineInfoPropertySetPatternNode(                  GmineInfoProperty       * const gmineInfoProperty, Gstr const * const value);
+Gb                       gmineInfoPropertySetTransparency(                 GmineInfoProperty       * const gmineInfoProperty, Gr4 const value);
 
 // GmineInfoItemBin
 GmineInfoItemBin        *gmineInfoItemBinCloc(                             void);

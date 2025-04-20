@@ -202,13 +202,24 @@ func: _MiIoWriteBinBuffer
 **************************************************************************************************/
 Gb _MiIoWriteBinBuffer(GmineInfo * const gmineInfo, Gcount const count, Gn1 const * const buffer)
 {
+   int index;
+
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetValue_BinBuffer(gmineInfo->miffFile, count, buffer);
+      forCount(index, count)
+      {
+         returnFalseIf(!gmiffSetValue_BinData(gmineInfo->miffFile, buffer[index]));
+      }
+      returnTrue;
    }
+
    // JSON
-   return gjsonSetArrayValueBin(gmineInfo->jsonFile, count, buffer);
+   forCount(index, count)
+   {
+      gjsonSetObjectValueBinByte(gmineInfo->jsonFile, buffer[index]);
+   }
+   returnTrue;
 }
 
 /**************************************************************************************************
@@ -221,10 +232,11 @@ Gb _MiIoWriteBinStart(GmineInfo * const gmineInfo, Gstr const * const key, size_
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return !gmiffSetRecordBinBufferStart(gmineInfo->miffFile, key, (Gcount) fileSize);
+      return gmiffSetRecordBinBufferStart(gmineInfo->miffFile, key, (Gcount) fileSize);
    }
+
    // JSON
-   return gjsonSetObjectValueArrayStart(gmineInfo->jsonFile, key);
+   return gjsonSetObjectValueBinStart(gmineInfo->jsonFile, key);
 }
 
 /**************************************************************************************************
@@ -235,15 +247,11 @@ Gb _MiIoWriteBinStop(GmineInfo * const gmineInfo)
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetValueStop( gmineInfo->miffFile));
+      return gmiffSetRecordBinBufferStop(gmineInfo->miffFile);
+   }
 
-      return gmiffSetRecordStop(gmineInfo->miffFile);
-   }
    // JSON
-   else
-   {
-      return gjsonSetObjectValueArrayStop(gmineInfo->jsonFile);
-   }
+   return gjsonSetObjectValueBinStop(gmineInfo->jsonFile);
 }
 
 /**************************************************************************************************

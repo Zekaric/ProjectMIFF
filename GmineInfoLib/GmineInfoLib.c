@@ -70,19 +70,21 @@ prototype:
 **************************************************************************************************/
 static Gstr const *_StrFromItemType(GmineInfoItemType const type);
 
+static Gb          _WriteB(         GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, Gb const value);
+static Gb          _WriteColor(     GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, GmineInfoColor const * const value);
+static Gb          _WriteI(         GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, Gi8 const value);
+static Gb          _WriteItemType(  GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, GmineInfoItemType const value);
+static Gb          _WriteN(         GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, Gn8 const value);
+
 static Gb          _WriteProperty(  GmineInfo       * const gmineInfo, GmineInfoProperty const * const prop);
+
+static Gb          _WritePoint(     GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, GmineInfoPoint const * const value);
+static Gb          _WriteR(         GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, Gr8 const value);
+static Gb          _WriteStr(       GmineInfo       * const gmineInfo, char const * const key, Gb const isSet, Gstr const * const value);
 
 /**************************************************************************************************
 macro:
 **************************************************************************************************/
-#define WRITE_B(        MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteB(    (MI), (KEY),  (VAR)->VALUE)); }
-#define WRITE_I(        MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteI(    (MI), (KEY),  (VAR)->VALUE)); }
-#define WRITE_R(        MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteR(    (MI), (KEY),  (VAR)->VALUE)); }
-#define WRITE_N(        MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteN(    (MI), (KEY),  (VAR)->VALUE)); }
-#define WRITE_STR(      MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteStr(  (MI), (KEY),  (VAR)->VALUE)); }
-#define WRITE_COLOR(    MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteColor((MI), (KEY), &(VAR)->VALUE)); }
-#define WRITE_POINT(    MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWritePoint((MI), (KEY), &(VAR)->VALUE)); }
-#define WRITE_ITEM_TYPE(MI, VAR, KEY, ISSET, VALUE) if (!(VAR)->ISSET) { returnFalseIf(!_MiIoWriteStr(  (MI), (KEY), _itemTypeStr[(VAR)->VALUE])); }
 
 /**************************************************************************************************
 global:
@@ -378,19 +380,21 @@ Gb gmineInfoWriteBlockContentData(GmineInfo * const gmineInfo)
    Gcount             count;
    Gindex             index;
    GmineInfoKeyValue *kv;
+   GmineInfoData     *data;
 
    // Ensure writing in order.
    returnFalseIf(
       !_isStarted ||
       !gmineInfo->isBlockStarted);
 
-   WRITE_STR(  gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_COMPANY_NAME,   isSetAuthorName,    companyName);
-   WRITE_STR(  gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_COPYRIGHT,      isSetCopyright,     copyright);
-   WRITE_STR(  gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_PROJECT_NAME,   isSetProjectName,   projectName);
-   WRITE_STR(  gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_PROJECT_SYSTEM, isSetProjectSystem, projectSystem);
-   WRITE_POINT(gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_PROJECT_MIN,    isSetProjectMin,    projectMin);
-   WRITE_POINT(gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_PROJECT_MAX,    isSetProjectMax,    projectMax);
-   WRITE_STR(  gmineInfo, gmineInfo->data, KEY_BLOCK_DATA_AUTHOR_NAME,      isSetAuthorName,    authorName);
+   data = gmineInfo->data;
+   _WriteStr(  gmineInfo, KEY_BLOCK_DATA_COMPANY_NAME,   data->isSetCompanyName,    data->companyName);
+   _WriteStr(  gmineInfo, KEY_BLOCK_DATA_COPYRIGHT,      data->isSetCopyright,      data->copyright);
+   _WriteStr(  gmineInfo, KEY_BLOCK_DATA_PROJECT_NAME,   data->isSetProjectName,    data->projectName);
+   _WriteStr(  gmineInfo, KEY_BLOCK_DATA_PROJECT_SYSTEM, data->isSetProjectSystem,  data->projectSystem);
+   _WritePoint(gmineInfo, KEY_BLOCK_DATA_PROJECT_MIN,    data->isSetProjectMin,    &data->projectMin);
+   _WritePoint(gmineInfo, KEY_BLOCK_DATA_PROJECT_MAX,    data->isSetProjectMax,    &data->projectMax);
+   _WriteStr(  gmineInfo, KEY_BLOCK_DATA_AUTHOR_NAME,    data->isSetAuthorName,     data->authorName);
 
    // Write out the user key values.
    count = gmineInfoArrayGetCount(&gmineInfo->data->keyValueArray);
@@ -413,6 +417,14 @@ Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
    Gcount          count;
    Gindex          index;
    GmineInfoImage *image;
+   size_t          readCount;
+   size_t          fileSize;
+   Gcount          bufferSize;
+   Gn1            *buffer;
+   Gn1             bufferSmall[1024];
+   FILE           *file;
+   Gb              isWritten;
+   int             result;
 
    // Ensure writing in order
    returnFalseIf(gmineInfo->currentBlockType != gmineInfoBlockTypeIMAGE_LIST);
@@ -423,29 +435,21 @@ Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
       image = (GmineInfoImage *) gmineInfoArrayGetAt(&gmineInfo->imageArray, index);
 
       // File path is mandatory.  An image without an image is not an image.
-      returnFalseIf(!gmineInfoImageGetFilePath(image));
+      returnFalseIf(!gmineInfoImageGetFileName(image));
 
       returnFalseIf(!_MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_IMAGE));
 
-      WRITE_STR(gmineInfo, image, KEY_BLOCK_IMAGE_KEY,       isSetKey,      key);
-      WRITE_STR(gmineInfo, image, KEY_BLOCK_IMAGE_NAME,      isSetName,     name);
-      WRITE_STR(gmineInfo, image, KEY_BLOCK_IMAGE_FILE_PATH, isSetFilePath, filePath);
+      _WriteStr(gmineInfo, KEY_BLOCK_IMAGE_KEY,       image->isSetKey,      image->key);
+      _WriteStr(gmineInfo, KEY_BLOCK_IMAGE_NAME,      image->isSetName,     image->name);
+      _WriteStr(gmineInfo, KEY_BLOCK_IMAGE_FILE_NAME, image->isSetFileName, image->fileName);
 
       if (image->isInline)
       {
-         size_t readCount,
-                fileSize;
-         Gcount bufferSize;
-         Gn1   *buffer;
-         Gn1    bufferSmall[1024];
-         FILE  *file;
-         Gb     isWritten;
-
          isWritten  = gbFALSE;
          file       = NULL;
 
-         bufferSize = SIZE_1MB;
-         buffer     = _MiMemClocTypeArray(count, Gn1);
+         bufferSize = READ_BLOCK_SIZE;
+         buffer     = _MiMemClocTypeArray(bufferSize, Gn1);
          if (!buffer)
          {
             bufferSize = 1024;
@@ -455,30 +459,30 @@ Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
          breakScope
          {
             // Open the file to read.
-            returnFalseIf(!fopen_s(&file, gmineInfoImageGetFilePath(image), "rb"));
+            file = fopen(gmineInfoImageGetFilePath(image), "rb");
+            returnFalseIf(!file);
 
             // Get the raw file size.
             fileSize = 0;
-            _fseeki64_nolock(file, 0, SEEK_END);
+            result   = _fseeki64(file, 0, SEEK_END);
             fileSize = _ftelli64(file);
+            result   = _fseeki64(file, 0, SEEK_SET);
 
             // Start the binary buffer.
             returnFalseIf(!_MiIoWriteBinStart(gmineInfo, KEY_BLOCK_IMAGE_FILE, fileSize));
 
-            // Return to the start of the file.
-            _fseeki64_nolock(file, 0, SEEK_SET);
-
             // Copy the contents to the MI file.
             loop
             {
-               readCount = fread_s(buffer, bufferSize, 1, bufferSize, file);
-               breakIf(_MiIoWriteBinBuffer(gmineInfo, (Gcount) readCount, buffer));
+               readCount = fread(buffer, 1, bufferSize, file);
+               breakIf(!readCount);
+               breakIf(!_MiIoWriteBinBuffer(gmineInfo, (Gcount) readCount, buffer));
 
                // Read everything there is for the file.
                breakIf(readCount != bufferSize);
             }
 
-            breakIf(_MiIoWriteBinStop(gmineInfo));
+            breakIf(!_MiIoWriteBinStop(gmineInfo));
 
             isWritten = gbTRUE;
          }
@@ -486,7 +490,7 @@ Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
          // Close the file.
          fclose(file);
 
-         if (count == SIZE_1MB)
+         if (bufferSize == READ_BLOCK_SIZE)
          {
             _MiMemDloc(buffer);
          }
@@ -522,84 +526,84 @@ Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
 
       returnFalseIf(!_MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_ITEM));
 
-      WRITE_STR(      gmineInfo, item, KEY_BLOCK_ITEM_KEY,  isSetKey,  key);
-      WRITE_STR(      gmineInfo, item, KEY_BLOCK_ITEM_NAME, isSetName, name);
-      WRITE_ITEM_TYPE(gmineInfo, item, KEY_BLOCK_ITEM_TYPE, isSetType, type);
+      _WriteStr(     gmineInfo, KEY_BLOCK_ITEM_KEY,  item->isSetKey,  item->key);
+      _WriteStr(     gmineInfo, KEY_BLOCK_ITEM_NAME, item->isSetName, item->name);
+      _WriteItemType(gmineInfo, KEY_BLOCK_ITEM_TYPE, item->isSetType, item->type);
 
       switch (item->type)
       {
       case gmineInfoItemTypeB:
-         WRITE_B(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMin, max.b);
+         _WriteB(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMin, item->max.b);
          break;
 
       case gmineInfoItemTypeI:
-         WRITE_I(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMin, max.i);
+         _WriteI(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMin, item->max.i);
          break;
 
       case gmineInfoItemTypeN:
-         WRITE_N(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMin, max.n);
+         _WriteN(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMin, item->max.n);
          break;
 
       case gmineInfoItemTypeR:
       case gmineInfoItemTypePERCENT:
-         WRITE_R(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMin, max.r);
+         _WriteR(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMin, item->max.r);
          break;
       }
 
       switch (item->type)
       {
       case gmineInfoItemTypeB:
-         WRITE_B(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMax, max.b);
+         _WriteB(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMax, item->max.b);
          break;
 
       case gmineInfoItemTypeI:
-         WRITE_I(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMax, max.i);
+         _WriteI(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMax, item->max.i);
          break;
 
       case gmineInfoItemTypeN:
-         WRITE_N(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMax, max.n);
+         _WriteN(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMax, item->max.n);
          break;
 
       case gmineInfoItemTypeR:
       case gmineInfoItemTypePERCENT:
-         WRITE_R(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetMax, max.r);
+         _WriteR(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetMax, item->max.r);
          break;
       }
 
       if (item->type == gmineInfoItemTypeR ||
-            item->type == gmineInfoItemTypePERCENT)
+          item->type == gmineInfoItemTypePERCENT)
       {
-         WRITE_R(gmineInfo, item, KEY_BLOCK_ITEM_PRECISION, isSetPrecision, precision);
+         _WriteR(gmineInfo, KEY_BLOCK_ITEM_PRECISION, item->isSetPrecision, item->precision);
       }
 
       switch (item->type)
       {
       case gmineInfoItemTypeB:
-         WRITE_B(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetDefault, defaultValue.b);
+         _WriteB(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetDefault, item->defaultValue.b);
          break;
 
       case gmineInfoItemTypeDATE:
       case gmineInfoItemTypeDATETIME:
       case gmineInfoItemTypeTIME:
       case gmineInfoItemTypeSTR:
-         WRITE_STR(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetDefault, defaultValue.str);
+         _WriteStr(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetDefault, item->defaultValue.str);
          break;
 
       case gmineInfoItemTypeI:
-         WRITE_I(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetDefault, defaultValue.i);
+         _WriteI(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetDefault, item->defaultValue.i);
          break;
 
       case gmineInfoItemTypeN:
-         WRITE_N(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetDefault, defaultValue.n);
+         _WriteN(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetDefault, item->defaultValue.n);
          break;
 
       case gmineInfoItemTypeR:
       case gmineInfoItemTypePERCENT:
-         WRITE_R(gmineInfo, item, KEY_BLOCK_ITEM_DEFAULT, isSetDefault, defaultValue.r);
+         _WriteR(gmineInfo, KEY_BLOCK_ITEM_DEFAULT, item->isSetDefault, item->defaultValue.r);
          break;
       }
 
-      WRITE_STR(gmineInfo, item, KEY_BLOCK_ITEM_FORMULA, isSetFormula, formula);
+      _WriteStr(gmineInfo, KEY_BLOCK_ITEM_FORMULA, item->isSetFormula, item->formula);
 
       countBin = gmineInfoArrayGetCount(&item->binArray);
       if (countBin)
@@ -615,7 +619,7 @@ Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
             switch (item->type)
             {
             case gmineInfoItemTypeB:
-               WRITE_B(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_VALUE, isSetValue, value.b);
+               _WriteB(gmineInfo, KEY_BLOCK_ITEM_BIN_VALUE, bin->isSetValue, bin->value.b);
                break;
 
             case gmineInfoItemTypeDATE:
@@ -623,47 +627,47 @@ Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
             case gmineInfoItemTypeTIME:
             case gmineInfoItemTypeSTR:
             case gmineInfoItemTypeFORMULA:
-               WRITE_STR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_VALUE, isSetValue, value.str);
+               _WriteStr(gmineInfo, KEY_BLOCK_ITEM_BIN_VALUE, bin->isSetValue, bin->value.str);
                break;
 
             case gmineInfoItemTypeI:
-               WRITE_I(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_VALUE, isSetValue, value.i);
+               _WriteI(gmineInfo, KEY_BLOCK_ITEM_BIN_VALUE, bin->isSetValue, bin->value.i);
                break;
 
             case gmineInfoItemTypeN:
-               WRITE_N(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_VALUE, isSetValue, value.n);
+               _WriteN(gmineInfo, KEY_BLOCK_ITEM_BIN_VALUE, bin->isSetValue, bin->value.n);
                break;
 
             case gmineInfoItemTypeR:
             case gmineInfoItemTypePERCENT:
-               WRITE_R(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_VALUE, isSetValue, value.r);
+               _WriteR(gmineInfo, KEY_BLOCK_ITEM_BIN_VALUE, bin->isSetValue, bin->value.r);
                break;
             }
 
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE,      isSetIsVisibleDrillHole,     isVisibleDrillHole);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_FACE, isSetIsVisibleDrillHoleFace, isVisibleDrillHoleFace);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_LINE, isSetIsVisibleDrillHoleLine, isVisibleDrillHoleLine);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_NODE, isSetIsVisibleDrillHoleNode, isVisibleDrillHoleNode);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY,       isSetIsVisibleGeometry,      isVisibleGeometry);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_FACE,  isSetIsVisibleGeometryFace,  isVisibleGeometryFace);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_LINE,  isSetIsVisibleGeometryLine,  isVisibleGeometryLine);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_NODE,  isSetIsVisibleGeometryNode,  isVisibleGeometryNode);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL,          isSetIsVisibleModel,         isVisibleModel);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_FACE,     isSetIsVisibleModelFace,     isVisibleModelFace);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_LINE,     isSetIsVisibleModelLine,     isVisibleModelLine);
-            WRITE_B(    gmineInfo, bin, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_NODE,     isSetIsVisibleModelNode,     isVisibleModelNode);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE,           isSetColorDrillHole,         colorDrillHole);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_FACE,      isSetColorDrillHoleFace,     colorDrillHoleFace);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_LINE,      isSetColorDrillHoleLine,     colorDrillHoleLine);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_NODE,      isSetColorDrillHoleNode,     colorDrillHoleNode);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY,            isSetColorGeometry,          colorGeometry);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_FACE,       isSetColorGeometryFace,      colorGeometryFace);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_LINE,       isSetColorGeometryLine,      colorGeometryLine);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_NODE,       isSetColorGeometryNode,      colorGeometryNode);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_MODEL,               isSetColorModel,             colorModel);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_FACE,          isSetColorModelFace,         colorModelFace);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_LINE,          isSetColorModelLine,         colorModelLine);
-            WRITE_COLOR(gmineInfo, bin, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_NODE,          isSetColorModelNode,         colorModelNode);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE,      bin->isSetIsVisibleDrillHole,      bin->isVisibleDrillHole);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_FACE, bin->isSetIsVisibleDrillHoleFace,  bin->isVisibleDrillHoleFace);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_LINE, bin->isSetIsVisibleDrillHoleLine,  bin->isVisibleDrillHoleLine);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_DRILLHOLE_NODE, bin->isSetIsVisibleDrillHoleNode,  bin->isVisibleDrillHoleNode);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY,       bin->isSetIsVisibleGeometry,       bin->isVisibleGeometry);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_FACE,  bin->isSetIsVisibleGeometryFace,   bin->isVisibleGeometryFace);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_LINE,  bin->isSetIsVisibleGeometryLine,   bin->isVisibleGeometryLine);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_GEOMETRY_NODE,  bin->isSetIsVisibleGeometryNode,   bin->isVisibleGeometryNode);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL,          bin->isSetIsVisibleModel,          bin->isVisibleModel);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_FACE,     bin->isSetIsVisibleModelFace,      bin->isVisibleModelFace);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_LINE,     bin->isSetIsVisibleModelLine,      bin->isVisibleModelLine);
+            _WriteB(    gmineInfo, KEY_BLOCK_ITEM_BIN_IS_VISIBLE_MODEL_NODE,     bin->isSetIsVisibleModelNode,      bin->isVisibleModelNode);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE,           bin->isSetColorDrillHole,         &bin->colorDrillHole);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_FACE,      bin->isSetColorDrillHoleFace,     &bin->colorDrillHoleFace);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_LINE,      bin->isSetColorDrillHoleLine,     &bin->colorDrillHoleLine);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_DRILLHOLE_NODE,      bin->isSetColorDrillHoleNode,     &bin->colorDrillHoleNode);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY,            bin->isSetColorGeometry,          &bin->colorGeometry);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_FACE,       bin->isSetColorGeometryFace,      &bin->colorGeometryFace);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_LINE,       bin->isSetColorGeometryLine,      &bin->colorGeometryLine);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_GEOMETRY_NODE,       bin->isSetColorGeometryNode,      &bin->colorGeometryNode);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_MODEL,               bin->isSetColorModel,             &bin->colorModel);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_FACE,          bin->isSetColorModelFace,         &bin->colorModelFace);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_LINE,          bin->isSetColorModelLine,         &bin->colorModelLine);
+            _WriteColor(gmineInfo, KEY_BLOCK_ITEM_BIN_COLOR_MODEL_NODE,          bin->isSetColorModelNode,         &bin->colorModelNode);
 
             returnFalseIf(!_WriteProperty(gmineInfo, &bin->property));
 
@@ -698,8 +702,8 @@ Gb gmineInfoWriteBlockContentPropertyList(GmineInfo * const gmineInfo)
 
       returnFalseIf(!_MiIoWriteBlockStart(gmineInfo, KEY_BLOCK_PROPERTY));
 
-      WRITE_STR(gmineInfo, prop, KEY_BLOCK_PROPERTY_KEY,  isSetKey,  key);
-      WRITE_STR(gmineInfo, prop, KEY_BLOCK_PROPERTY_NAME, isSetName, name);
+      _WriteStr(gmineInfo, KEY_BLOCK_PROPERTY_KEY,  prop->isSetKey,  prop->key);
+      _WriteStr(gmineInfo, KEY_BLOCK_PROPERTY_NAME, prop->isSetName, prop->name);
 
       returnFalseIf(!_WriteProperty(gmineInfo, prop));
 
@@ -811,134 +815,236 @@ static Gstr const *_StrFromItemType(GmineInfoItemType const type)
 }
 
 /**************************************************************************************************
+func: _WriteB
+**************************************************************************************************/
+static Gb _WriteB(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, Gb const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteB(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteColor
+**************************************************************************************************/
+static Gb _WriteColor(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, GmineInfoColor const * const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteColor(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteI
+**************************************************************************************************/
+static Gb _WriteI(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, Gi8 const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteI(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteItemType
+**************************************************************************************************/
+static Gb _WriteItemType(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, GmineInfoItemType const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteStr(gmineInfo, key, _itemTypeStr[value]));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteN
+**************************************************************************************************/
+static Gb _WriteN(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, Gn8 const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteN(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
 func: _WriteProperty
 **************************************************************************************************/
-static Gb _WriteProperty(GmineInfo *gmineInfo, GmineInfoProperty const * const prop)
+static Gb _WriteProperty(GmineInfo * const gmineInfo, GmineInfoProperty const * const prop)
 {
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_ARROW_SIZE_RELATIVE,      isSetIsArrowSizeRelative,      isArrowSizeRelative);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_CLIPPABLE,                isSetIsClippable,              isClippable);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_FONT_BOLD,                isSetIsFontBold,               isFontBold);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_FONT_ITALIC,              isSetIsFontItalic,             isFontItalic);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_FONT_SIZE_RELATIVE,       isSetIsFontSizeRelative,       isFontSizeRelative);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_FONT_STRIKE_OUT,          isSetIsFontStrikeOut,          isFontStrikeOut);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_FONT_UNDERLINE,           isSetIsFontUnderline,          isFontUnderline);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_SELECTABLE,               isSetIsSelectable,             isSelectable);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE,                  isSetIsVisible,                isVisible);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POINT,            isSetIsVisiblePoint,           isVisiblePoint);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE,         isSetIsVisiblePolyline,        isVisiblePolyline);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_ARROW,   isSetIsVisiblePolylineArrow,   isVisiblePolylineArrow);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_FACE,    isSetIsVisiblePolylineFace,    isVisiblePolylineFace);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_LINE,    isSetIsVisiblePolylineLine,    isVisiblePolylineLine);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_NODE,    isSetIsVisiblePolylineNode,    isVisiblePolylineNode);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE,          isSetIsVisibleSurface,         isVisibleSurface);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_FACE,     isSetIsVisibleSurfaceFace,     isVisibleSurfaceFace);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_LINE,     isSetIsVisibleSurfaceLine,     isVisibleSurfaceLine);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_NODE,     isSetIsVisibleSurfaceNode,     isVisibleSurfaceNode);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_TEXT,             isSetIsVisibleText,            isVisibleText);
-   WRITE_I(    gmineInfo, prop, KEY_BLOCK_PROPERTY_ARROW_POSITION,              isSetArrowPosition,            arrowPosition);
-   WRITE_R(    gmineInfo, prop, KEY_BLOCK_PROPERTY_ARROW_SIZE,                  isSetArrowSize,                arrowSize);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR,                       isSetColor,                    color);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POINT,                 isSetColorPoint,               colorPoint);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE,              isSetColorPolyline,            colorPolyline);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_ARROW,        isSetColorPolylineArrow,       colorPolylineArrow);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_FACE,         isSetColorPolylineFace,        colorPolylineFace);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_FACE_PATTERN, isSetColorPolylineFacePattern, colorPolylineFacePattern);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_LINE,         isSetColorPolylineLine,        colorPolylineLine);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_NODE,         isSetColorPolylineNode,        colorPolylineNode);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_SURFACE_FACE,          isSetColorSurfaceFace,         colorSurfaceFace);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_SURFACE_FACE_PATTERN,  isSetColorSurfaceFacePattern,  colorSurfaceFacePattern);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_SURFACE_LINE,          isSetColorSurfaceLine,         colorSurfaceLine);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_SURFACE_NODE,          isSetColorSurfaceNode,         colorSurfaceNode);
-   WRITE_COLOR(gmineInfo, prop, KEY_BLOCK_PROPERTY_COLOR_TEXT,                  isSetColorText,                colorText);
-   WRITE_R(    gmineInfo, prop, KEY_BLOCK_PROPERTY_FACE_TRANSPARENCY,           isSetFaceTransparency,         faceTransparency);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_FONT_NAME,                   isSetFontName,                 fontName);
-   WRITE_R(    gmineInfo, prop, KEY_BLOCK_PROPERTY_FONT_SIZE,                   isSetFontSize,                 fontSize);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_PATTERN_ARROW,               isSetPatternArrow,             patternArrow);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_PATTERN_FACE,                isSetPatternFace,              patternFace);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_PATTERN_LINE,                isSetPatternLine,              patternLine);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_PATTERN_NODE,                isSetPatternNode,              patternNode);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_ARROW_SIZE_RELATIVE,      prop->isSetIsArrowSizeRelative,       prop->isArrowSizeRelative);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_CLIPPABLE,                prop->isSetIsClippable,               prop->isClippable);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_FONT_BOLD,                prop->isSetIsFontBold,                prop->isFontBold);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_FONT_ITALIC,              prop->isSetIsFontItalic,              prop->isFontItalic);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_FONT_SIZE_RELATIVE,       prop->isSetIsFontSizeRelative,        prop->isFontSizeRelative);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_FONT_STRIKE_OUT,          prop->isSetIsFontStrikeOut,           prop->isFontStrikeOut);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_FONT_UNDERLINE,           prop->isSetIsFontUnderline,           prop->isFontUnderline);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_SELECTABLE,               prop->isSetIsSelectable,              prop->isSelectable);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE,                  prop->isSetIsVisible,                 prop->isVisible);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POINT,            prop->isSetIsVisiblePoint,            prop->isVisiblePoint);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE,         prop->isSetIsVisiblePolyline,         prop->isVisiblePolyline);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_ARROW,   prop->isSetIsVisiblePolylineArrow,    prop->isVisiblePolylineArrow);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_FACE,    prop->isSetIsVisiblePolylineFace,     prop->isVisiblePolylineFace);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_LINE,    prop->isSetIsVisiblePolylineLine,     prop->isVisiblePolylineLine);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_POLYLINE_NODE,    prop->isSetIsVisiblePolylineNode,     prop->isVisiblePolylineNode);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE,          prop->isSetIsVisibleSurface,          prop->isVisibleSurface);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_FACE,     prop->isSetIsVisibleSurfaceFace,      prop->isVisibleSurfaceFace);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_LINE,     prop->isSetIsVisibleSurfaceLine,      prop->isVisibleSurfaceLine);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_SURFACE_NODE,     prop->isSetIsVisibleSurfaceNode,      prop->isVisibleSurfaceNode);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_TEXT,             prop->isSetIsVisibleText,             prop->isVisibleText);
+   _WriteI(    gmineInfo, KEY_BLOCK_PROPERTY_ARROW_POSITION,              prop->isSetArrowPosition,             prop->arrowPosition);
+   _WriteR(    gmineInfo, KEY_BLOCK_PROPERTY_ARROW_SIZE,                  prop->isSetArrowSize,                 prop->arrowSize);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR,                       prop->isSetColor,                    &prop->color);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POINT,                 prop->isSetColorPoint,               &prop->colorPoint);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE,              prop->isSetColorPolyline,            &prop->colorPolyline);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_ARROW,        prop->isSetColorPolylineArrow,       &prop->colorPolylineArrow);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_FACE,         prop->isSetColorPolylineFace,        &prop->colorPolylineFace);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_FACE_PATTERN, prop->isSetColorPolylineFacePattern, &prop->colorPolylineFacePattern);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_LINE,         prop->isSetColorPolylineLine,        &prop->colorPolylineLine);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_POLYLINE_NODE,         prop->isSetColorPolylineNode,        &prop->colorPolylineNode);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_SURFACE_FACE,          prop->isSetColorSurfaceFace,         &prop->colorSurfaceFace);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_SURFACE_FACE_PATTERN,  prop->isSetColorSurfaceFacePattern,  &prop->colorSurfaceFacePattern);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_SURFACE_LINE,          prop->isSetColorSurfaceLine,         &prop->colorSurfaceLine);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_SURFACE_NODE,          prop->isSetColorSurfaceNode,         &prop->colorSurfaceNode);
+   _WriteColor(gmineInfo, KEY_BLOCK_PROPERTY_COLOR_TEXT,                  prop->isSetColorText,                &prop->colorText);
+   _WriteR(    gmineInfo, KEY_BLOCK_PROPERTY_FACE_TRANSPARENCY,           prop->isSetFaceTransparency,          prop->faceTransparency);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_FONT_NAME,                   prop->isSetFontName,                  prop->fontName);
+   _WriteR(    gmineInfo, KEY_BLOCK_PROPERTY_FONT_SIZE,                   prop->isSetFontSize,                  prop->fontSize);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_PATTERN_ARROW,               prop->isSetPatternArrow,              prop->patternArrow);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_PATTERN_FACE,                prop->isSetPatternFace,               prop->patternFace);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_PATTERN_LINE,                prop->isSetPatternLine,               prop->patternLine);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_PATTERN_NODE,                prop->isSetPatternNode,               prop->patternNode);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_01,    prop->isSetIsVisibleLabelData[ 0],    prop->isVisibleLabelData[ 0]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_02,    prop->isSetIsVisibleLabelData[ 1],    prop->isVisibleLabelData[ 1]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_03,    prop->isSetIsVisibleLabelData[ 2],    prop->isVisibleLabelData[ 2]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_04,    prop->isSetIsVisibleLabelData[ 3],    prop->isVisibleLabelData[ 3]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_05,    prop->isSetIsVisibleLabelData[ 4],    prop->isVisibleLabelData[ 4]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_06,    prop->isSetIsVisibleLabelData[ 5],    prop->isVisibleLabelData[ 5]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_07,    prop->isSetIsVisibleLabelData[ 6],    prop->isVisibleLabelData[ 6]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_08,    prop->isSetIsVisibleLabelData[ 7],    prop->isVisibleLabelData[ 7]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_09,    prop->isSetIsVisibleLabelData[ 8],    prop->isVisibleLabelData[ 8]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_10,    prop->isSetIsVisibleLabelData[ 9],    prop->isVisibleLabelData[ 9]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_01,    prop->isSetIsVisibleLabelLine[ 0],    prop->isVisibleLabelLine[ 0]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_02,    prop->isSetIsVisibleLabelLine[ 1],    prop->isVisibleLabelLine[ 1]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_03,    prop->isSetIsVisibleLabelLine[ 2],    prop->isVisibleLabelLine[ 2]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_04,    prop->isSetIsVisibleLabelLine[ 3],    prop->isVisibleLabelLine[ 3]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_05,    prop->isSetIsVisibleLabelLine[ 4],    prop->isVisibleLabelLine[ 4]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_06,    prop->isSetIsVisibleLabelLine[ 5],    prop->isVisibleLabelLine[ 5]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_07,    prop->isSetIsVisibleLabelLine[ 6],    prop->isVisibleLabelLine[ 6]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_08,    prop->isSetIsVisibleLabelLine[ 7],    prop->isVisibleLabelLine[ 7]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_09,    prop->isSetIsVisibleLabelLine[ 8],    prop->isVisibleLabelLine[ 8]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_10,    prop->isSetIsVisibleLabelLine[ 9],    prop->isVisibleLabelLine[ 9]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_01,    prop->isSetIsVisibleLabelNode[ 0],    prop->isVisibleLabelNode[ 0]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_02,    prop->isSetIsVisibleLabelNode[ 1],    prop->isVisibleLabelNode[ 1]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_03,    prop->isSetIsVisibleLabelNode[ 2],    prop->isVisibleLabelNode[ 2]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_04,    prop->isSetIsVisibleLabelNode[ 3],    prop->isVisibleLabelNode[ 3]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_05,    prop->isSetIsVisibleLabelNode[ 4],    prop->isVisibleLabelNode[ 4]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_06,    prop->isSetIsVisibleLabelNode[ 5],    prop->isVisibleLabelNode[ 5]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_07,    prop->isSetIsVisibleLabelNode[ 6],    prop->isVisibleLabelNode[ 6]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_08,    prop->isSetIsVisibleLabelNode[ 7],    prop->isVisibleLabelNode[ 7]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_09,    prop->isSetIsVisibleLabelNode[ 8],    prop->isVisibleLabelNode[ 8]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_10,    prop->isSetIsVisibleLabelNode[ 9],    prop->isVisibleLabelNode[ 9]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_11,    prop->isSetIsVisibleLabelNode[10],    prop->isVisibleLabelNode[10]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_12,    prop->isSetIsVisibleLabelNode[11],    prop->isVisibleLabelNode[11]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_13,    prop->isSetIsVisibleLabelNode[12],    prop->isVisibleLabelNode[12]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_14,    prop->isSetIsVisibleLabelNode[13],    prop->isVisibleLabelNode[13]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_15,    prop->isSetIsVisibleLabelNode[14],    prop->isVisibleLabelNode[14]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_16,    prop->isSetIsVisibleLabelNode[15],    prop->isVisibleLabelNode[15]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_17,    prop->isSetIsVisibleLabelNode[16],    prop->isVisibleLabelNode[16]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_18,    prop->isSetIsVisibleLabelNode[17],    prop->isVisibleLabelNode[17]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_19,    prop->isSetIsVisibleLabelNode[18],    prop->isVisibleLabelNode[18]);
+   _WriteB(    gmineInfo, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_20,    prop->isSetIsVisibleLabelNode[19],    prop->isVisibleLabelNode[19]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_01,               prop->isSetLabelData[ 0],             prop->labelData[ 0]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_02,               prop->isSetLabelData[ 1],             prop->labelData[ 1]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_03,               prop->isSetLabelData[ 2],             prop->labelData[ 2]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_04,               prop->isSetLabelData[ 3],             prop->labelData[ 3]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_05,               prop->isSetLabelData[ 4],             prop->labelData[ 4]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_06,               prop->isSetLabelData[ 5],             prop->labelData[ 5]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_07,               prop->isSetLabelData[ 6],             prop->labelData[ 6]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_08,               prop->isSetLabelData[ 7],             prop->labelData[ 7]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_09,               prop->isSetLabelData[ 8],             prop->labelData[ 8]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_DATA_LABEL_10,               prop->isSetLabelData[ 9],             prop->labelData[ 9]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_01,               prop->isSetLabelLine[ 0],             prop->labelLine[ 0]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_02,               prop->isSetLabelLine[ 1],             prop->labelLine[ 1]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_03,               prop->isSetLabelLine[ 2],             prop->labelLine[ 2]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_04,               prop->isSetLabelLine[ 3],             prop->labelLine[ 3]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_05,               prop->isSetLabelLine[ 4],             prop->labelLine[ 4]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_06,               prop->isSetLabelLine[ 5],             prop->labelLine[ 5]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_07,               prop->isSetLabelLine[ 6],             prop->labelLine[ 6]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_08,               prop->isSetLabelLine[ 7],             prop->labelLine[ 7]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_09,               prop->isSetLabelLine[ 8],             prop->labelLine[ 8]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_LINE_LABEL_10,               prop->isSetLabelLine[ 9],             prop->labelLine[ 9]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_01,               prop->isSetLabelNode[ 0],             prop->labelNode[ 0]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_02,               prop->isSetLabelNode[ 1],             prop->labelNode[ 1]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_03,               prop->isSetLabelNode[ 2],             prop->labelNode[ 2]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_04,               prop->isSetLabelNode[ 3],             prop->labelNode[ 3]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_05,               prop->isSetLabelNode[ 4],             prop->labelNode[ 4]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_06,               prop->isSetLabelNode[ 5],             prop->labelNode[ 5]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_07,               prop->isSetLabelNode[ 6],             prop->labelNode[ 6]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_08,               prop->isSetLabelNode[ 7],             prop->labelNode[ 7]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_09,               prop->isSetLabelNode[ 8],             prop->labelNode[ 8]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_10,               prop->isSetLabelNode[ 9],             prop->labelNode[ 9]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_11,               prop->isSetLabelNode[10],             prop->labelNode[10]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_12,               prop->isSetLabelNode[11],             prop->labelNode[11]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_13,               prop->isSetLabelNode[12],             prop->labelNode[12]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_14,               prop->isSetLabelNode[13],             prop->labelNode[13]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_15,               prop->isSetLabelNode[14],             prop->labelNode[14]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_16,               prop->isSetLabelNode[15],             prop->labelNode[15]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_17,               prop->isSetLabelNode[16],             prop->labelNode[16]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_18,               prop->isSetLabelNode[17],             prop->labelNode[17]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_19,               prop->isSetLabelNode[18],             prop->labelNode[18]);
+   _WriteStr(  gmineInfo, KEY_BLOCK_PROPERTY_NODE_LABEL_20,               prop->isSetLabelNode[19],             prop->labelNode[19]);
 
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_01,    isSetIsVisibleLabelData[ 0],   isVisibleLabelData[ 0]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_02,    isSetIsVisibleLabelData[ 1],   isVisibleLabelData[ 1]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_03,    isSetIsVisibleLabelData[ 2],   isVisibleLabelData[ 2]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_04,    isSetIsVisibleLabelData[ 3],   isVisibleLabelData[ 3]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_05,    isSetIsVisibleLabelData[ 4],   isVisibleLabelData[ 4]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_06,    isSetIsVisibleLabelData[ 5],   isVisibleLabelData[ 5]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_07,    isSetIsVisibleLabelData[ 6],   isVisibleLabelData[ 6]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_08,    isSetIsVisibleLabelData[ 7],   isVisibleLabelData[ 7]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_09,    isSetIsVisibleLabelData[ 8],   isVisibleLabelData[ 8]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_DATA_LABEL_10,    isSetIsVisibleLabelData[ 9],   isVisibleLabelData[ 9]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_01,    isSetIsVisibleLabelLine[ 0],   isVisibleLabelLine[ 0]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_02,    isSetIsVisibleLabelLine[ 1],   isVisibleLabelLine[ 1]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_03,    isSetIsVisibleLabelLine[ 2],   isVisibleLabelLine[ 2]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_04,    isSetIsVisibleLabelLine[ 3],   isVisibleLabelLine[ 3]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_05,    isSetIsVisibleLabelLine[ 4],   isVisibleLabelLine[ 4]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_06,    isSetIsVisibleLabelLine[ 5],   isVisibleLabelLine[ 5]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_07,    isSetIsVisibleLabelLine[ 6],   isVisibleLabelLine[ 6]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_08,    isSetIsVisibleLabelLine[ 7],   isVisibleLabelLine[ 7]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_09,    isSetIsVisibleLabelLine[ 8],   isVisibleLabelLine[ 8]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_LINE_LABEL_10,    isSetIsVisibleLabelLine[ 9],   isVisibleLabelLine[ 9]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_01,    isSetIsVisibleLabelNode[ 0],   isVisibleLabelNode[ 0]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_02,    isSetIsVisibleLabelNode[ 1],   isVisibleLabelNode[ 1]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_03,    isSetIsVisibleLabelNode[ 2],   isVisibleLabelNode[ 2]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_04,    isSetIsVisibleLabelNode[ 3],   isVisibleLabelNode[ 3]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_05,    isSetIsVisibleLabelNode[ 4],   isVisibleLabelNode[ 4]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_06,    isSetIsVisibleLabelNode[ 5],   isVisibleLabelNode[ 5]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_07,    isSetIsVisibleLabelNode[ 6],   isVisibleLabelNode[ 6]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_08,    isSetIsVisibleLabelNode[ 7],   isVisibleLabelNode[ 7]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_09,    isSetIsVisibleLabelNode[ 8],   isVisibleLabelNode[ 8]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_10,    isSetIsVisibleLabelNode[ 9],   isVisibleLabelNode[ 9]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_11,    isSetIsVisibleLabelNode[10],   isVisibleLabelNode[10]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_12,    isSetIsVisibleLabelNode[11],   isVisibleLabelNode[11]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_13,    isSetIsVisibleLabelNode[12],   isVisibleLabelNode[12]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_14,    isSetIsVisibleLabelNode[13],   isVisibleLabelNode[13]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_15,    isSetIsVisibleLabelNode[14],   isVisibleLabelNode[14]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_16,    isSetIsVisibleLabelNode[15],   isVisibleLabelNode[15]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_17,    isSetIsVisibleLabelNode[16],   isVisibleLabelNode[16]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_18,    isSetIsVisibleLabelNode[17],   isVisibleLabelNode[17]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_19,    isSetIsVisibleLabelNode[18],   isVisibleLabelNode[18]);
-   WRITE_B(    gmineInfo, prop, KEY_BLOCK_PROPERTY_IS_VISIBLE_NODE_LABEL_20,    isSetIsVisibleLabelNode[19],   isVisibleLabelNode[19]);
+   returnTrue;
+}
 
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_01,               isSetLabelData[ 0],            labelData[ 0]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_02,               isSetLabelData[ 1],            labelData[ 1]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_03,               isSetLabelData[ 2],            labelData[ 2]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_04,               isSetLabelData[ 3],            labelData[ 3]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_05,               isSetLabelData[ 4],            labelData[ 4]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_06,               isSetLabelData[ 5],            labelData[ 5]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_07,               isSetLabelData[ 6],            labelData[ 6]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_08,               isSetLabelData[ 7],            labelData[ 7]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_09,               isSetLabelData[ 8],            labelData[ 8]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_DATA_LABEL_10,               isSetLabelData[ 9],            labelData[ 9]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_01,               isSetLabelLine[ 0],            labelLine[ 0]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_02,               isSetLabelLine[ 1],            labelLine[ 1]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_03,               isSetLabelLine[ 2],            labelLine[ 2]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_04,               isSetLabelLine[ 3],            labelLine[ 3]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_05,               isSetLabelLine[ 4],            labelLine[ 4]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_06,               isSetLabelLine[ 5],            labelLine[ 5]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_07,               isSetLabelLine[ 6],            labelLine[ 6]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_08,               isSetLabelLine[ 7],            labelLine[ 7]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_09,               isSetLabelLine[ 8],            labelLine[ 8]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_LINE_LABEL_10,               isSetLabelLine[ 9],            labelLine[ 9]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_01,               isSetLabelNode[ 0],            labelNode[ 0]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_02,               isSetLabelNode[ 1],            labelNode[ 1]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_03,               isSetLabelNode[ 2],            labelNode[ 2]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_04,               isSetLabelNode[ 3],            labelNode[ 3]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_05,               isSetLabelNode[ 4],            labelNode[ 4]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_06,               isSetLabelNode[ 5],            labelNode[ 5]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_07,               isSetLabelNode[ 6],            labelNode[ 6]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_08,               isSetLabelNode[ 7],            labelNode[ 7]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_09,               isSetLabelNode[ 8],            labelNode[ 8]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_10,               isSetLabelNode[ 9],            labelNode[ 9]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_11,               isSetLabelNode[10],            labelNode[10]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_12,               isSetLabelNode[11],            labelNode[11]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_13,               isSetLabelNode[12],            labelNode[12]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_14,               isSetLabelNode[13],            labelNode[13]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_15,               isSetLabelNode[14],            labelNode[14]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_16,               isSetLabelNode[15],            labelNode[15]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_17,               isSetLabelNode[16],            labelNode[16]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_18,               isSetLabelNode[17],            labelNode[17]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_19,               isSetLabelNode[18],            labelNode[18]);
-   WRITE_STR(  gmineInfo, prop, KEY_BLOCK_PROPERTY_NODE_LABEL_20,               isSetLabelNode[19],            labelNode[19]);
+/**************************************************************************************************
+func: _WritePoint
+**************************************************************************************************/
+static Gb _WritePoint(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, GmineInfoPoint const * const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWritePoint(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteR
+**************************************************************************************************/
+static Gb _WriteR(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, Gr8 const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteR(gmineInfo, key, value));
+   }
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: _WriteStr
+**************************************************************************************************/
+static Gb _WriteStr(GmineInfo * const gmineInfo, char const * const key, Gb const isSet, Gstr const * const value)
+{
+   if (isSet)
+   {
+      returnFalseIf(!_MiIoWriteStr(gmineInfo, key, value));
+   }
 
    returnTrue;
 }

@@ -44,6 +44,8 @@ include:
 #include <stdlib.h>
 #include <locale.h>
 #include <ctype.h>
+#include <io.h>
+#include <fcntl.h>
 
 #include "GmineInfoLib.h"
 
@@ -51,12 +53,13 @@ include:
 local:
 constant:
 **************************************************************************************************/
-#define STRINGIFY(x)                                     #x
+#define STRIFY(X)                                        #X
+#define STRINGIFY(X)                                     STRIFY(X)
 
 #define HEADER_TYPE_STR                                  "Mining Information"
 #define HEADER_TYPE_LEN                                  18
 #define HEADER_VERSION_NUM                               1
-#define HEADER_VERSION_STR                               STRINGIFY(HEADER_VERSION_NUMBER)
+#define HEADER_VERSION_STR                               STRINGIFY(HEADER_VERSION_NUM)
 #define HEADER_VERSION_LEN                               1
 
 #define KEY_FORMAT_STR                                   "format"
@@ -209,7 +212,7 @@ constant:
 #define KEY_BLOCK_IMAGE_LIST                             "image list"
 #define KEY_BLOCK_IMAGE                                  "image"
 #define KEY_BLOCK_IMAGE_FILE                             "file"
-#define KEY_BLOCK_IMAGE_FILE_PATH                        "file path"
+#define KEY_BLOCK_IMAGE_FILE_NAME                        "file name"
 #define KEY_BLOCK_IMAGE_KEY                              "key"
 #define KEY_BLOCK_IMAGE_NAME                             "name"
 
@@ -260,7 +263,7 @@ constant:
 #define KEY_BLOCK_MODEL_LIST                             "model list"
 #define KEY_BLOCK_MODEL                                  "model"
 
-#define SIZE_1MB                                         (1 << 20)
+#define READ_BLOCK_SIZE                                  (1 << 20)
 
 /**************************************************************************************************
 type:

@@ -243,7 +243,7 @@ void            gjsonStop(                      void);
 #define gjsonSetObjectValueB(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueB(       JSON,       VALUE))
 #define gjsonSetObjectValueBin(        JSON, KEY, SIZE, VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueBin(     JSON, SIZE, VALUE))
 #define gjsonSetObjectValueBinByte(    JSON,            VALUE) gjsonSetValueBinByte(   JSON,       VALUE)
-#define gjsonSetObjectValueBinStart(   JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetValueBinStart(JSON, SIZE, VALUE))
+#define gjsonSetObjectValueBinStart(   JSON, KEY)              (gjsonSetKey(           JSON, KEY) && gjsonSetValueBinStart(JSON))
 #define gjsonSetObjectValueBinStop(    JSON)                   gjsonSetValueBinStop(   JSON)
 #define gjsonSetObjectValueI(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueI(       JSON,       VALUE))
 #define gjsonSetObjectValueN(          JSON, KEY,       VALUE) (gjsonSetKey(           JSON, KEY) && gjsonSetValueN(       JSON,       VALUE))

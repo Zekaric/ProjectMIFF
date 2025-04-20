@@ -242,7 +242,7 @@ typedef struct
                          isSetKey,
                          isSetLabelData[10],
                          isSetLabelLine[10],
-                         isSetLabelNode[10],
+                         isSetLabelNode[20],
                          isSetName,
                          isSetPatternArrow,
                          isSetPatternFace,

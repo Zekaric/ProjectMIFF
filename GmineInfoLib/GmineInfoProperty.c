@@ -310,18 +310,6 @@ GmineInfoColor const *gmineInfoPropertyGetColorText(GmineInfoProperty const * co
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyGetFaceTransparency
-**************************************************************************************************/
-Gr4 gmineInfoPropertyGetFaceTransparency(GmineInfoProperty const * const gmineInfoProperty)
-{
-   return0If(
-      !gmineInfoIsStarted() ||
-      !gmineInfoProperty);
-
-   return gmineInfoProperty->faceTransparency;
-}
-
-/**************************************************************************************************
 func: gmineInfoPropertyGetFontName
 **************************************************************************************************/
 Gstr const *gmineInfoPropertyGetFontName(GmineInfoProperty const * const gmineInfoProperty)
@@ -457,6 +445,18 @@ Gstr const *gmineInfoPropertyGetPatternNode(GmineInfoProperty const * const gmin
       !gmineInfoProperty);
 
    return gmineInfoProperty->patternNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyGetTransparency
+**************************************************************************************************/
+Gr4 gmineInfoPropertyGetTransparency(GmineInfoProperty const * const gmineInfoProperty)
+{
+   return0If(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->faceTransparency;
 }
 
 /**************************************************************************************************
@@ -910,18 +910,6 @@ Gb gmineInfoPropertyIsSetColorText(GmineInfoProperty const * const gmineInfoProp
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertyIsSetFaceTransparency
-**************************************************************************************************/
-Gb gmineInfoPropertyIsSetFaceTransparency(GmineInfoProperty const * const gmineInfoProperty)
-{
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoProperty);
-
-   return gmineInfoProperty->isSetFaceTransparency;
-}
-
-/**************************************************************************************************
 func: gmineInfoPropertyIsSetFontName
 **************************************************************************************************/
 Gb gmineInfoPropertyIsSetFontName(GmineInfoProperty const * const gmineInfoProperty)
@@ -1057,6 +1045,18 @@ Gb gmineInfoPropertyIsSetPatternNode(GmineInfoProperty const * const gmineInfoPr
       !gmineInfoProperty);
 
    return gmineInfoProperty->isSetPatternNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertyIsSetTransparency
+**************************************************************************************************/
+Gb gmineInfoPropertyIsSetTransparency(GmineInfoProperty const * const gmineInfoProperty)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   return gmineInfoProperty->isSetFaceTransparency;
 }
 
 /**************************************************************************************************
@@ -1933,21 +1933,6 @@ Gb gmineInfoPropertySetIsVisibleText(GmineInfoProperty * const gmineInfoProperty
 }
 
 /**************************************************************************************************
-func: gmineInfoPropertySetFaceTransparency
-**************************************************************************************************/
-Gb gmineInfoPropertySetFaceTransparency(GmineInfoProperty * const gmineInfoProperty, Gr4 const value)
-{
-   returnFalseIf(
-      !gmineInfoIsStarted() ||
-      !gmineInfoProperty);
-
-   gmineInfoProperty->faceTransparency      = value;
-   gmineInfoProperty->isSetFaceTransparency = gbTRUE;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
 func: gmineInfoPropertySetFontName
 **************************************************************************************************/
 Gb gmineInfoPropertySetFontName(GmineInfoProperty * const gmineInfoProperty, Gstr const * const value)
@@ -2070,7 +2055,7 @@ Gb gmineInfoPropertySetPatternArrow(GmineInfoProperty * const gmineInfoProperty,
    gmineInfoProperty->patternArrow      = _MiStrClone(value);
    gmineInfoProperty->isSetPatternArrow = (gmineInfoProperty->patternArrow) ? gbTRUE : gbFALSE;
 
-   return gmineInfoProperty->isSetPatternFace;
+   return gmineInfoProperty->isSetPatternArrow;
 }
 
 /**************************************************************************************************
@@ -2116,4 +2101,19 @@ Gb gmineInfoPropertySetPatternNode(GmineInfoProperty * const gmineInfoProperty, 
    gmineInfoProperty->isSetPatternNode = (gmineInfoProperty->patternNode) ? gbTRUE : gbFALSE;
 
    return gmineInfoProperty->isSetPatternNode;
+}
+
+/**************************************************************************************************
+func: gmineInfoPropertySetTransparency
+**************************************************************************************************/
+Gb gmineInfoPropertySetTransparency(GmineInfoProperty * const gmineInfoProperty, Gr4 const value)
+{
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoProperty);
+
+   gmineInfoProperty->faceTransparency      = value;
+   gmineInfoProperty->isSetFaceTransparency = gbTRUE;
+
+   returnTrue;
 }

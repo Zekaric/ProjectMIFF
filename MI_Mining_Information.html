@@ -164,10 +164,12 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <li><a href="#3-mine-information-blocks">3. Mine Information Blocks</a>
 <ul>
 <li><a href="#31-data-block">3.1. Data Block</a></li>
-<li><a href="#32-property-block">3.2. Property Block</a></li>
+<li><a href="#32-property-list-block">3.2. Property List Block</a></li>
+<li><a href="#property-block">Property Block</a></li>
 <li><a href="#33-item-block">3.3. Item Block</a></li>
+<li><a href="#bin-block">Bin Block</a></li>
 <li><a href="#34-image-block">3.4. Image Block</a></li>
-<li><a href="#35-drillhole-block">3.5. Drillhole Block</a></li>
+<li><a href="#35-drill-hole-block">3.5. Drill Hole Block</a></li>
 <li><a href="#36-geometry-block">3.6. Geometry Block</a></li>
 <li><a href="#37-model-data">3.7. Model Data</a>
 <ul>
@@ -234,10 +236,10 @@ License (Document): Creative Commons Attribution-NoDerivs.
     - Symbol
   - Survey
     - Points, Polylines but using angles instead of coordinates.
-- Drillhole
-  - Drillhole survery information.
-  - Drillhole assay information.
-  - Drillhole composite information.
+- Drill hole
+  - Drill hole survery information.
+  - Drill hole assay information.
+  - Drill hole composite information.
   - Blast hole shot information.
   - Chip assay information.
   - Design vs Actual information.
@@ -307,14 +309,14 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <li><strong>Information block</strong> to hold general information about the project.  This must be the first block.</li>
 <li><strong>Image list block</strong> to hold the images.  Images can be used for texturing, symbols, etc.</li>
 <li><strong>Property list block</strong> to hold display properties for geometry or data.</li>
-<li><strong>Item list block</strong> to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
+<li><strong>Item list block</strong> to hold the item definitions.  Items being the values that are stored in the drill hole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.</li>
 <li><strong>Geometry list block</strong> to hold geometry information.  Depends on item, image, and property blocks.</li>
-<li><strong>Drillhole list block</strong> to hold drillhole information.  Depends on item, image, and property blocks.</li>
+<li><strong>Drill hole list block</strong> to hold drill hole information.  Depends on item, image, and property blocks.</li>
 <li><strong>Model list block</strong> to hold model information.  Depends on item, image, and property blocks.</li>
 </ul>
 <h2 id="31-data-block">3.1. Data Block</h2>
 <p><strong>Block Name</strong>: data</p>
-<p>Common to all MI files for any of the types above, there will be an information block providing general, project wide information.</p>
+<p>Common to all MI files for any of the types above, there can be an information block providing general, project wide information.  Generally good practice to fill something in here but nothing is strictly necessary.</p>
 <p>This information block should be before other blocks.</p>
 <p>Inside the information block we have the following possible key values.  Not all are required.</p>
 <table>
@@ -343,7 +345,7 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </tr>
 <tr>
 <td>project system</td>
-<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A string for the coordinates system for all coordinate data.</td>
 </tr>
 <tr>
@@ -368,439 +370,245 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </tr>
 </tbody>
 </table>
-<p><strong>project system</strong> must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like <strong>WGS84</strong> or <strong>NAD27</strong>.  Use <strong>local</strong> to indicate that the project coordinates are in a local flat earth space.</p>
+<p><strong>project system</strong> must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like <strong>WGS84</strong> or <strong>NAD27</strong>.  It can be set to <strong>local</strong> to indicate that the project coordinates are in a local flat earth space.  If it is missing then <strong>local</strong> is assumed.</p>
 <p><strong>projectMin</strong> and <strong>projectMax</strong> should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by <strong>projectSystem</strong>.</p>
-<h2 id="32-property-block">3.2. Property Block</h2>
-<p><strong>Block Name</strong>: prop</p>
-<p>This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.</p>
+<h2 id="32-property-list-block">3.2. Property List Block</h2>
+<p><strong>Block Name</strong>: property list</p>
+<p>A property list block will hold a list of property blocks.  These property blocks will be referred to by geometry.</p>
+<h2 id="property-block">Property Block</h2>
+<p><strong>Block Name</strong>: property</p>
+<p>This will be found on its own inside a property list.  Item Bin blocks will also have these values and the ones specifica to that bin.  What is found in a property block is information about how something is presented to the user.  Not all values need to be set.  Software will set what it will consider it uses.</p>
 <table>
 <thead>
 <tr>
 <th>Name</th>
 <th style="text-align:center">Required</th>
-<th style="text-align:center">Item Only</th>
-<th style="text-align:center">Item Required</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>key</td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td>A unique string key for the property.</td>
 </tr>
 <tr>
 <td>name</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A nice name for the property.  Optional.</td>
 </tr>
 <tr>
-<td>value</td>
+<td>is font bold</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center">X</td>
-<td>A value for this property.  The type should match the item the property is associated with.</td>
+<td>A boolean if the font is bold.  Default is false.</td>
+</tr>
+<tr>
+<td>is font italic</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is italic.  Default is false.</td>
+</tr>
+<tr>
+<td>is font underline</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is underlined.  Default is false.</td>
+</tr>
+<tr>
+<td>is font size relative</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font size is a percent to paper size or screen size.</td>
+</tr>
+<tr>
+<td>is font strikeout</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is striked out.  Default if false.</td>
 </tr>
 <tr>
 <td>is visible</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for global visibility</td>
 </tr>
 <tr>
-<td>is visible data label</td>
+<td>is visible label data 01-10</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean for line label visibility (polyline and surface data.)</td>
+<td>A boolean for data label visibility 1-10 (polyline and surface data.)</td>
 </tr>
 <tr>
-<td>is visible line label</td>
+<td>is visible label line 01-10</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean for line label visibility (polyline and surface lines.)</td>
+<td>A boolean for line label visibility 1-10 (polyline and surface lines.)</td>
 </tr>
 <tr>
-<td>is visible node label</td>
+<td>is visible label node 01-20</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean for node label visibility (point and polyline nodes.)</td>
+<td>A boolean for node label visibility 1-20 (point and polyline nodes.)</td>
 </tr>
 <tr>
 <td>is visible point</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for point visibility</td>
 </tr>
 <tr>
+<td>is visible polyline</td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline visibility (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
 <td>is visible polyline face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td>A boolean for polyline face visibility</td>
 </tr>
 <tr>
 <td>is visible polyline line</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for polyline line visibility</td>
 </tr>
 <tr>
 <td>is visible polyline node</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for polyline node visibility</td>
 </tr>
 <tr>
+<td>is visible surface</td>
+<td style="text-align:center"></td>
+<td>A boolean for surface visibility (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
 <td>is visible surface face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td>A boolean for surface face visibility</td>
 </tr>
 <tr>
 <td>is visible surface line</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for surface line visibility</td>
 </tr>
 <tr>
 <td>is visible surface node</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A boolean for surface node visibility</td>
 </tr>
 <tr>
-<td>is visible drill hole</td>
+<td>arrow position</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for global visibility</td>
+<td>An integer for where the arrow heads are placed along the polyline</td>
 </tr>
 <tr>
-<td>is visible drill hole node</td>
+<td>arrow size</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for node visibility</td>
-</tr>
-<tr>
-<td>is visible drill hole line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for line visibility</td>
-</tr>
-<tr>
-<td>is visible drill hole face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for face visibility</td>
-</tr>
-<tr>
-<td>is visible geometry</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for global visibility</td>
-</tr>
-<tr>
-<td>is visible geometry node</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for node visibility</td>
-</tr>
-<tr>
-<td>is visible geometry line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for line visibility</td>
-</tr>
-<tr>
-<td>is visible geometry face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for face visibility</td>
-</tr>
-<tr>
-<td>is visible model</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for global visibility</td>
-</tr>
-<tr>
-<td>is visible model node</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for node visibility</td>
-</tr>
-<tr>
-<td>is visible model line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for line visibility</td>
-</tr>
-<tr>
-<td>is visible model face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>A boolean for face visibility</td>
+<td>An real for the size of the arrow heads</td>
 </tr>
 <tr>
 <td>color</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for point color.</td>
+<td>An rgb for point color</td>
 </tr>
 <tr>
 <td>color point</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for point color.</td>
+<td>An rgb for point color</td>
 </tr>
 <tr>
-<td>color node</td>
+<td>color polyline</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for node color (polyline and surface nodes.)</td>
+<td>An rgb for polyline color (if face, line, and node values are not needed)</td>
 </tr>
 <tr>
-<td>color line</td>
+<td>color polyline face</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for line color (polyline and surface lines.)</td>
+<td>An rgb for polyline face color</td>
 </tr>
 <tr>
-<td>color face</td>
+<td>color polyline face pattern</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for face color (closed polyline and surface faces.)</td>
+<td>An rgb for polyline face pattern color</td>
 </tr>
 <tr>
-<td>color face pattern</td>
+<td>color polyline line</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for face pattern color.</td>
+<td>An rgb for polyline line color</td>
 </tr>
 <tr>
-<td>color text</td>
+<td>color polyline node</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>An rgb for text color.</td>
+<td>An rgb for polyline node color</td>
 </tr>
 <tr>
-<td>color drill hole</td>
+<td>color surface</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for drill hole color.</td>
+<td>An rgb for surface color (if face, line, and node values are not needed)</td>
 </tr>
 <tr>
-<td>color drill hole node</td>
+<td>color surface face</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for drill hole node color.</td>
+<td>An rgb for surface face color</td>
 </tr>
 <tr>
-<td>color drill hole line</td>
+<td>color surface face pattern</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for drill hole line color.</td>
+<td>An rgb for surface face pattern color</td>
 </tr>
 <tr>
-<td>color drill hole face</td>
+<td>color surface line</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for drill hole face color.</td>
+<td>An rgb for surface line color</td>
 </tr>
 <tr>
-<td>color drill hole face pattern</td>
+<td>color surface node</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for drill hole face pattern color.</td>
+<td>An rgb for surface node color</td>
 </tr>
 <tr>
-<td>color geometry</td>
+<td>color text</td>
 <td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for geometry color.</td>
-</tr>
-<tr>
-<td>color geometry node</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for geometry node color.</td>
-</tr>
-<tr>
-<td>color geometry line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for geometry line color.</td>
-</tr>
-<tr>
-<td>color geometry face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for geometry face color.</td>
-</tr>
-<tr>
-<td>color geometry face pattern</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for geometry face pattern color.</td>
-</tr>
-<tr>
-<td>color model</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for model color.</td>
-</tr>
-<tr>
-<td>color model node</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for model node color.</td>
-</tr>
-<tr>
-<td>color model line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for model line color.</td>
-</tr>
-<tr>
-<td>color model face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for model face color.</td>
-</tr>
-<tr>
-<td>color model face pattern</td>
-<td style="text-align:center"></td>
-<td style="text-align:center">X</td>
-<td style="text-align:center"></td>
-<td>An rgb for model face pattern color.</td>
-</tr>
-<tr>
-<td>pattern node</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A string for the node pattern (points, polyline nodes, and surface nodes.)</td>
-</tr>
-<tr>
-<td>pattern line</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A string for the line pattern (polyline and surface lines.)</td>
-</tr>
-<tr>
-<td>pattern face</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A string for the face pattern (closed polyline and surface faces.)</td>
-</tr>
-<tr>
-<td>transparency</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque.</td>
+<td>An rgb for text color</td>
 </tr>
 <tr>
 <td>font</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td>A string for the font name.</td>
 </tr>
 <tr>
 <td>font size</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td>A real for the size of the font in project units or percent (0-1) &quot;font size if relative&quot; is true.</td>
 </tr>
 <tr>
-<td>font size is relative</td>
+<td>label data 01-10</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean if the font size is a percent to paper size or screen size.</td>
+<td>A string for the what is displayed on the data at positions 01-10.</td>
 </tr>
 <tr>
-<td>font is bold</td>
+<td>label line 01-10</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean if the font is bold.  Default is false.</td>
+<td>A string for the what is displayed on the line segments at positions 01-10.</td>
 </tr>
 <tr>
-<td>font is italic</td>
+<td>label node 01-20</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean if the font is italic.  Default is false.</td>
+<td>A string for the what is displayed on the node segments at positions 01-20.</td>
 </tr>
 <tr>
-<td>font is underline</td>
+<td>pattern node</td>
 <td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
-<td>A boolean if the font is underlined.  Default is false.</td>
+<td>A string for the node pattern (points, polyline nodes, and surface nodes.)</td>
 </tr>
 <tr>
-<td>font is strikeout</td>
+<td>pattern line</td>
 <td style="text-align:center"></td>
+<td>A string for the line pattern (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>pattern face</td>
 <td style="text-align:center"></td>
+<td>A string for the face pattern (closed polyline and surface faces.)</td>
+</tr>
+<tr>
+<td>transparency</td>
 <td style="text-align:center"></td>
-<td>A boolean if the font is striked out.  Default if false.</td>
+<td>A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque.</td>
 </tr>
 <tr>
 <td>*</td>
-<td style="text-align:center"></td>
-<td style="text-align:center"></td>
 <td style="text-align:center"></td>
 <td>Other client software key values which may be relavant for the software.</td>
 </tr>
@@ -808,7 +616,7 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </table>
 <h2 id="33-item-block">3.3. Item Block</h2>
 <p><strong>Block Name</strong>: item</p>
-<p>Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drillhole assay value, a block model item value, a geometry element value, a geometry point value, etc.</p>
+<p>Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drill hole assay value, a block model item value, a geometry element value, a geometry point value, etc.</p>
 <p>Items need to be defined before they are used elsewhere in the MI file.</p>
 <table>
 <thead>
@@ -821,7 +629,7 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <tbody>
 <tr>
 <td>key</td>
-<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A string for a unique key value for the item.</td>
 </tr>
 <tr>
@@ -852,11 +660,11 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <tr>
 <td>value list</td>
 <td style="text-align:center"></td>
-<td>An array of values representing the complete set of possible values.</td>
+<td>A list of values representing the complete set of possible values.</td>
 </tr>
 <tr>
 <td>default</td>
-<td style="text-align:center">*</td>
+<td style="text-align:center"></td>
 <td>A value for the default value.  If missing, then default value is 'missing value'.</td>
 </tr>
 <tr>
@@ -865,9 +673,9 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <td>A string for the formula used to calculate the value of this item.</td>
 </tr>
 <tr>
-<td>property list</td>
+<td>bin list</td>
 <td style="text-align:center"></td>
-<td>An array of properties for rendering purposes in a view.</td>
+<td>A list of properties for rendering purposes in a view.</td>
 </tr>
 <tr>
 <td>*</td>
@@ -930,11 +738,380 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </table>
 <p><strong>max, min</strong> defines the limits for an item.  Only applicable if item type is a real, natural, or integer.  If these are missing then the range is the full range as defined by the type.</p>
 <p><strong>precision</strong> is the accuracy of the number.  Only applicable if item type is a real.</p>
-<p><strong>valueList</strong> defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.</p>
+<p><strong>value list</strong> defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drill hole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.</p>
 <p><strong>default</strong> will define the default value for this item if block is skipped.  If this value is not provided then the default value is &quot;missing&quot;.</p>
 <p><strong>formula</strong> is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Export software dictates what the formula looks like for now.  Import software will need to figure out how to convert this formula to their needs.</p>
-<p><strong>prop list</strong> is a list of bins with some display cues.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.</p>
-<p>When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store in index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.</p>
+<p><strong>bin list</strong> is a list of <strong>bin</strong>s.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.  The first bin will generally not have a <strong>value</strong>.</p>
+<p>When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store an index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.</p>
+<h2 id="bin-block">Bin Block</h2>
+<p><strong>Block Name</strong>: bin</p>
+<p>Very similar to a <strong>property</strong> block except there are not <strong>key</strong> and <strong>name</strong> values.  There is a <strong>value</strong> field for the bin's min (integer, natural, real), exact (boolean, string, date, datetime, time), or a regular expression (string, date, datetime, time) values.  Extra items for drill hole, geometry, and model styling are bin related and not found in property.</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th style="text-align:center">Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value</td>
+<td style="text-align:center">*</td>
+<td>A value for this property.  The type should match the item the property is associated with.  First bin in the bin list is for missing or below the next bin in the bin list and so value is not set for this bin.  It must be set for all other bins in the bin list.</td>
+</tr>
+<tr>
+<td>is font bold</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is bold.  Default is false.</td>
+</tr>
+<tr>
+<td>is font italic</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is italic.  Default is false.</td>
+</tr>
+<tr>
+<td>is font underline</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is underlined.  Default is false.</td>
+</tr>
+<tr>
+<td>is font size relative</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font size is a percent to paper size or screen size.</td>
+</tr>
+<tr>
+<td>is font strikeout</td>
+<td style="text-align:center"></td>
+<td>A boolean if the font is striked out.  Default if false.</td>
+</tr>
+<tr>
+<td>is visible</td>
+<td style="text-align:center"></td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole</td>
+<td style="text-align:center"></td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole node</td>
+<td style="text-align:center"></td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole line</td>
+<td style="text-align:center"></td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible drill hole face</td>
+<td style="text-align:center"></td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>is visible geometry</td>
+<td style="text-align:center"></td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible geometry node</td>
+<td style="text-align:center"></td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible geometry line</td>
+<td style="text-align:center"></td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible geometry face</td>
+<td style="text-align:center"></td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>is visible label data 01-10</td>
+<td style="text-align:center"></td>
+<td>A boolean for data label visibility 1-10 (polyline and surface data.)</td>
+</tr>
+<tr>
+<td>is visible label line 01-10</td>
+<td style="text-align:center"></td>
+<td>A boolean for line label visibility 1-10 (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>is visible label node 01-20</td>
+<td style="text-align:center"></td>
+<td>A boolean for node label visibility 1-20 (point and polyline nodes.)</td>
+</tr>
+<tr>
+<td>is visible model</td>
+<td style="text-align:center"></td>
+<td>A boolean for global visibility</td>
+</tr>
+<tr>
+<td>is visible model node</td>
+<td style="text-align:center"></td>
+<td>A boolean for node visibility</td>
+</tr>
+<tr>
+<td>is visible model line</td>
+<td style="text-align:center"></td>
+<td>A boolean for line visibility</td>
+</tr>
+<tr>
+<td>is visible model face</td>
+<td style="text-align:center"></td>
+<td>A boolean for face visibility</td>
+</tr>
+<tr>
+<td>is visible point</td>
+<td style="text-align:center"></td>
+<td>A boolean for point visibility</td>
+</tr>
+<tr>
+<td>is visible polyline</td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline visibility (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
+<td>is visible polyline face</td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline face visibility</td>
+</tr>
+<tr>
+<td>is visible polyline line</td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline line visibility</td>
+</tr>
+<tr>
+<td>is visible polyline node</td>
+<td style="text-align:center"></td>
+<td>A boolean for polyline node visibility</td>
+</tr>
+<tr>
+<td>is visible surface</td>
+<td style="text-align:center"></td>
+<td>A boolean for surface visibility (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
+<td>is visible surface face</td>
+<td style="text-align:center"></td>
+<td>A boolean for surface face visibility</td>
+</tr>
+<tr>
+<td>is visible surface line</td>
+<td style="text-align:center"></td>
+<td>A boolean for surface line visibility</td>
+</tr>
+<tr>
+<td>is visible surface node</td>
+<td style="text-align:center"></td>
+<td>A boolean for surface node visibility</td>
+</tr>
+<tr>
+<td>arrow position</td>
+<td style="text-align:center"></td>
+<td>An integer for where the arrow heads are placed along the polyline</td>
+</tr>
+<tr>
+<td>arrow size</td>
+<td style="text-align:center"></td>
+<td>An real for the size of the arrow heads</td>
+</tr>
+<tr>
+<td>color</td>
+<td style="text-align:center"></td>
+<td>An rgb for point color</td>
+</tr>
+<tr>
+<td>color drill hole</td>
+<td style="text-align:center"></td>
+<td>An rgb for drill hole color</td>
+</tr>
+<tr>
+<td>color drill hole node</td>
+<td style="text-align:center"></td>
+<td>An rgb for drill hole node color</td>
+</tr>
+<tr>
+<td>color drill hole line</td>
+<td style="text-align:center"></td>
+<td>An rgb for drill hole line color</td>
+</tr>
+<tr>
+<td>color drill hole face</td>
+<td style="text-align:center"></td>
+<td>An rgb for drill hole face color</td>
+</tr>
+<tr>
+<td>color drill hole face pattern</td>
+<td style="text-align:center"></td>
+<td>An rgb for drill hole face pattern color</td>
+</tr>
+<tr>
+<td>color geometry</td>
+<td style="text-align:center"></td>
+<td>An rgb for geometry color</td>
+</tr>
+<tr>
+<td>color geometry node</td>
+<td style="text-align:center"></td>
+<td>An rgb for geometry node color</td>
+</tr>
+<tr>
+<td>color geometry line</td>
+<td style="text-align:center"></td>
+<td>An rgb for geometry line color</td>
+</tr>
+<tr>
+<td>color geometry face</td>
+<td style="text-align:center"></td>
+<td>An rgb for geometry face color</td>
+</tr>
+<tr>
+<td>color geometry face pattern</td>
+<td style="text-align:center"></td>
+<td>An rgb for geometry face pattern color</td>
+</tr>
+<tr>
+<td>color model</td>
+<td style="text-align:center"></td>
+<td>An rgb for model color</td>
+</tr>
+<tr>
+<td>color model node</td>
+<td style="text-align:center"></td>
+<td>An rgb for model node color</td>
+</tr>
+<tr>
+<td>color model line</td>
+<td style="text-align:center"></td>
+<td>An rgb for model line color</td>
+</tr>
+<tr>
+<td>color model face</td>
+<td style="text-align:center"></td>
+<td>An rgb for model face color</td>
+</tr>
+<tr>
+<td>color model face pattern</td>
+<td style="text-align:center"></td>
+<td>An rgb for model face pattern color</td>
+</tr>
+<tr>
+<td>color point</td>
+<td style="text-align:center"></td>
+<td>An rgb for point color</td>
+</tr>
+<tr>
+<td>color polyline</td>
+<td style="text-align:center"></td>
+<td>An rgb for polyline color (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
+<td>color polyline face</td>
+<td style="text-align:center"></td>
+<td>An rgb for polyline face color</td>
+</tr>
+<tr>
+<td>color polyline face pattern</td>
+<td style="text-align:center"></td>
+<td>An rgb for polyline face pattern color</td>
+</tr>
+<tr>
+<td>color polyline line</td>
+<td style="text-align:center"></td>
+<td>An rgb for polyline line color</td>
+</tr>
+<tr>
+<td>color polyline node</td>
+<td style="text-align:center"></td>
+<td>An rgb for polyline node color</td>
+</tr>
+<tr>
+<td>color surface</td>
+<td style="text-align:center"></td>
+<td>An rgb for surface color (if face, line, and node values are not needed)</td>
+</tr>
+<tr>
+<td>color surface face</td>
+<td style="text-align:center"></td>
+<td>An rgb for surface face color</td>
+</tr>
+<tr>
+<td>color surface face pattern</td>
+<td style="text-align:center"></td>
+<td>An rgb for surface face pattern color</td>
+</tr>
+<tr>
+<td>color surface line</td>
+<td style="text-align:center"></td>
+<td>An rgb for surface line color</td>
+</tr>
+<tr>
+<td>color surface node</td>
+<td style="text-align:center"></td>
+<td>An rgb for surface node color</td>
+</tr>
+<tr>
+<td>color text</td>
+<td style="text-align:center"></td>
+<td>An rgb for text color</td>
+</tr>
+<tr>
+<td>font</td>
+<td style="text-align:center"></td>
+<td>A string for the font name.</td>
+</tr>
+<tr>
+<td>font size</td>
+<td style="text-align:center"></td>
+<td>A real for the size of the font in project units or percent (0-1) &quot;font size if relative&quot; is true.</td>
+</tr>
+<tr>
+<td>label data 01-10</td>
+<td style="text-align:center"></td>
+<td>A string for the what is displayed on the data at positions 01-10.</td>
+</tr>
+<tr>
+<td>label line 01-10</td>
+<td style="text-align:center"></td>
+<td>A string for the what is displayed on the line segments at positions 01-10.</td>
+</tr>
+<tr>
+<td>label node 01-20</td>
+<td style="text-align:center"></td>
+<td>A string for the what is displayed on the node segments at positions 01-20.</td>
+</tr>
+<tr>
+<td>pattern node</td>
+<td style="text-align:center"></td>
+<td>A string for the node pattern (points, polyline nodes, and surface nodes.)</td>
+</tr>
+<tr>
+<td>pattern line</td>
+<td style="text-align:center"></td>
+<td>A string for the line pattern (polyline and surface lines.)</td>
+</tr>
+<tr>
+<td>pattern face</td>
+<td style="text-align:center"></td>
+<td>A string for the face pattern (closed polyline and surface faces.)</td>
+</tr>
+<tr>
+<td>transparency</td>
+<td style="text-align:center"></td>
+<td>A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque.</td>
+</tr>
+<tr>
+<td>*</td>
+<td style="text-align:center"></td>
+<td>Other client software key values which may be relavant for the software.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="34-image-block">3.4. Image Block</h2>
 <p><strong>Block Name</strong>: image</p>
 <p>Defining an image.  Images are mainly used for texture mapping in geometry blocks.</p>
@@ -949,7 +1126,7 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <tbody>
 <tr>
 <td>key</td>
-<td style="text-align:center">X</td>
+<td style="text-align:center"></td>
 <td>A stirng for the unique identifier for the image.</td>
 </tr>
 <tr>
@@ -958,20 +1135,20 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <td>A string for the name for the image.</td>
 </tr>
 <tr>
-<td>filename</td>
+<td>file name</td>
 <td style="text-align:center">x</td>
 <td>A string for the name of the file with extension.</td>
 </tr>
 <tr>
 <td>file</td>
-<td style="text-align:center">x</td>
-<td>A binary array of the image file.</td>
+<td style="text-align:center"></td>
+<td>A binary blob of the image file.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>file</strong> can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.  <strong>file</strong> or <strong>filename</strong> needs to be set.  Not both.</p>
-<h2 id="35-drillhole-block">3.5. Drillhole Block</h2>
-<p>Drillhole data holds information about drillholes.</p>
+<p><strong>file</strong> can be any file type.  Although it would be best to limit to common types (like PNG, JPG, TIFF, etc.)  <strong>file name</strong> needs to be set.  If <strong>file</strong> is also set, then <strong>file name</strong> is the name of the file stored in <strong>file</strong>.  If only <strong>file name</strong> is set, then it is assumed that the file named <strong>file name</strong> accompanies the mine information file externally.</p>
+<h2 id="35-drill-hole-block">3.5. Drill Hole Block</h2>
+<p>Drill hole data holds information about drill holes.</p>
 <h2 id="36-geometry-block">3.6. Geometry Block</h2>
 <p><strong>Block Name</strong>: geom</p>
 <p>Defining a piece of geometry.  There can be multiple geometry blocks within an MI file.</p>

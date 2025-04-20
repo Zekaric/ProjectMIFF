@@ -232,11 +232,11 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
    image = gmineInfoImageCloc();
    returnFalseIf(!image);
 
-   returnFalseIf(!gmineInfoImageSetKey(         image, "Bingham"));
-   returnFalseIf(!gmineInfoImageSetName(        image, "Biggest Mine In The World"));
-   returnFalseIf(!gmineInfoImageSetFileName(    image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoImageSetKey(     image, "Bingham"));
+   returnFalseIf(!gmineInfoImageSetName(    image, "Biggest Mine In The World"));
+   returnFalseIf(!gmineInfoImageSetFileName(image, "BinghamCanyonCopperMine.png"));
    returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
-   returnFalseIf(!gmineInfoImageSetIsInline(    image, gbTRUE));
+   returnFalseIf(!gmineInfoImageSetIsInline(image, gbTRUE));
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
 
@@ -245,9 +245,9 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
    image = gmineInfoImageCloc();
    returnFalseIf(!image);
 
-   returnFalseIf(!gmineInfoImageSetKey(         image, "Bingham2"));
-   returnFalseIf(!gmineInfoImageSetName(        image, "Biggest Mine In The World"));
-   returnFalseIf(!gmineInfoImageSetFileName(    image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoImageSetKey(     image, "Bingham2"));
+   returnFalseIf(!gmineInfoImageSetName(    image, "Biggest Mine In The World"));
+   returnFalseIf(!gmineInfoImageSetFileName(image, "BinghamCanyonCopperMine.png"));
    returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
@@ -303,7 +303,7 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoItemSetKey(           item, "topo%"));
    returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypePERCENT));
    returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "Saying",  "Top o' da' world baby!"));
-   returnFalseIf(!gmineInfoItemSetDefaultR(      item, 100.0));
+   returnFalseIf(!gmineInfoItemSetDefaultPercent(item, 100.0));
 
    returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));
 
@@ -339,10 +339,10 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
 {
    Gindex             index;
    GmineInfoProperty *prop;
-   GmineInfoColor     colorWhite = { 255, 255, 255 };
-   GmineInfoColor     colorRed   = { 255,   0,   0 };
-   GmineInfoColor     colorGreen = {   0, 255,   0 };
-   GmineInfoColor     colorBlue  = {   0,   0, 255 };
+   GmineInfoColor     colorWhite = { 1, 1, 1 };
+   GmineInfoColor     colorRed   = { 1, 0, 0 };
+   GmineInfoColor     colorGreen = { 0, 1, 0 };
+   GmineInfoColor     colorBlue  = { 0, 0, 1 };
 
    returnFalseIf(!gmineInfoWriteBlockStartPropertyList(gmineInfo));
 
@@ -398,7 +398,6 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceLine(    prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisibleSurfaceNode(    prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisibleText(           prop, gbTRUE));
-   returnFalseIf(!gmineInfoPropertySetFaceTransparency(        prop, 50));
    returnFalseIf(!gmineInfoPropertySetFontName(                prop, "Times New Roman"));
    returnFalseIf(!gmineInfoPropertySetFontSize(                prop, 10));
    returnFalseIf(!gmineInfoPropertySetKey(                     prop, "All"));
@@ -419,6 +418,7 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetPatternFace(             prop, "hatch"));
    returnFalseIf(!gmineInfoPropertySetPatternLine(             prop, "dot"));
    returnFalseIf(!gmineInfoPropertySetPatternNode(             prop, "diamond dot"));
+   returnFalseIf(!gmineInfoPropertySetTransparency(            prop, 50));
 
    returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
 

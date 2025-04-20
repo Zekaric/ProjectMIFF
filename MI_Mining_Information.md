@@ -20,10 +20,12 @@ License (Document): Creative Commons Attribution-NoDerivs.
   - [2.1. Header](#21-header)
 - [3. Mine Information Blocks](#3-mine-information-blocks)
   - [3.1. Data Block](#31-data-block)
-  - [3.2. Property Block](#32-property-block)
+  - [3.2. Property List Block](#32-property-list-block)
+  - [Property Block](#property-block)
   - [3.3. Item Block](#33-item-block)
+  - [Bin Block](#bin-block)
   - [3.4. Image Block](#34-image-block)
-  - [3.5. Drillhole Block](#35-drillhole-block)
+  - [3.5. Drill Hole Block](#35-drill-hole-block)
   - [3.6. Geometry Block](#36-geometry-block)
   - [3.7. Model Data](#37-model-data)
     - [3.7.1. Model Block](#371-model-block)
@@ -102,10 +104,10 @@ The data mining companies need to keep track of and transfer around.
     - Symbol
   - Survey
     - Points, Polylines but using angles instead of coordinates.
-- Drillhole
-  - Drillhole survery information.
-  - Drillhole assay information.
-  - Drillhole composite information.
+- Drill hole
+  - Drill hole survery information.
+  - Drill hole assay information.
+  - Drill hole composite information.
   - Blast hole shot information.
   - Chip assay information.
   - Design vs Actual information.
@@ -158,16 +160,16 @@ Every MI file contains a few specified blocks.  Order of these blocks are import
 * **Information block** to hold general information about the project.  This must be the first block.
 * **Image list block** to hold the images.  Images can be used for texturing, symbols, etc.
 * **Property list block** to hold display properties for geometry or data.
-* **Item list block** to hold the item definitions.  Items being the values that are stored in the drillhole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
+* **Item list block** to hold the item definitions.  Items being the values that are stored in the drill hole, model, cuts, and whatever else that is being tracked.  There will only be one Item List block.
 * **Geometry list block** to hold geometry information.  Depends on item, image, and property blocks.
-* **Drillhole list block** to hold drillhole information.  Depends on item, image, and property blocks.
+* **Drill hole list block** to hold drill hole information.  Depends on item, image, and property blocks.
 * **Model list block** to hold model information.  Depends on item, image, and property blocks.
 
 ## 3.1. Data Block
 
 **Block Name**: data
 
-Common to all MI files for any of the types above, there will be an information block providing general, project wide information.
+Common to all MI files for any of the types above, there can be an information block providing general, project wide information.  Generally good practice to fill something in here but nothing is strictly necessary.
 
 This information block should be before other blocks.
 
@@ -178,107 +180,98 @@ Inside the information block we have the following possible key values.  Not all
 | company         |   |A string for the name of the company. |
 | copyright       |   |A string for the copyright information. |
 | author          |   |A string for the author or person who prepared this data. |
-| project system  | X |A string for the coordinates system for all coordinate data. |
+| project system  |   |A string for the coordinates system for all coordinate data. |
 | project name    |   |The name of the project. |
 | project min     |   |A point for project min value in the given project system. |
 | project max     |   |A point for project max value in the given project system. |
 | *               |   |Other client software key values which may be relavant for the software. |
 
-**project system** must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  Use **local** to indicate that the project coordinates are in a local flat earth space.
+**project system** must be as defined in a package like GDAL which can translate from one coordinate system to another.  Like **WGS84** or **NAD27**.  It can be set to **local** to indicate that the project coordinates are in a local flat earth space.  If it is missing then **local** is assumed.
 
 **projectMin** and **projectMax** should given an indication on the data range of the project.  This does not need to be exactly defining the outer limits of the all the data, just the rough range that the data should live inside or near.  It should be in the coordinate system defined by **projectSystem**.
 
-## 3.2. Property Block
+## 3.2. Property List Block
 
-**Block Name**: prop
+**Block Name**: property list
 
-This can be found on its own or inside a prop list of an item block below.  What is found in a property block are information about an item value range or a geometry.  It can include display/rendering cues for whatever software that reads the MI.
+A property list block will hold a list of property blocks.  These property blocks will be referred to by geometry.
 
-| Name                          | Required | Item Only | Item Required | Description |
-| ---                           | :---:    | :---:     | :---:         | ---         |
-| key                           | X |   |   | A unique string key for the property. |
-| name                          |   |   |   | A nice name for the property.  Optional. |
-| value                         |   | X | X | A value for this property.  The type should match the item the property is associated with. |
-| is visible                    |   |   |   | A boolean for global visibility |
-| is visible data label         |   |   |   | A boolean for line label visibility (polyline and surface data.) |
-| is visible line label         |   |   |   | A boolean for line label visibility (polyline and surface lines.) |
-| is visible node label         |   |   |   | A boolean for node label visibility (point and polyline nodes.) |
-| is visible point              |   |   |   | A boolean for point visibility |
-| is visible polyline face      |   |   |   | A boolean for polyline face visibility |
-| is visible polyline line      |   |   |   | A boolean for polyline line visibility |
-| is visible polyline node      |   |   |   | A boolean for polyline node visibility |
-| is visible surface face       |   |   |   | A boolean for surface face visibility |
-| is visible surface line       |   |   |   | A boolean for surface line visibility |
-| is visible surface node       |   |   |   | A boolean for surface node visibility |
-| is visible drill hole         |   | X |   | A boolean for global visibility |
-| is visible drill hole node    |   | X |   | A boolean for node visibility |
-| is visible drill hole line    |   | X |   | A boolean for line visibility |
-| is visible drill hole face    |   | X |   | A boolean for face visibility |
-| is visible geometry           |   | X |   | A boolean for global visibility |
-| is visible geometry node      |   | X |   | A boolean for node visibility |
-| is visible geometry line      |   | X |   | A boolean for line visibility |
-| is visible geometry face      |   | X |   | A boolean for face visibility |
-| is visible model              |   | X |   | A boolean for global visibility |
-| is visible model node         |   | X |   | A boolean for node visibility |
-| is visible model line         |   | X |   | A boolean for line visibility |
-| is visible model face         |   | X |   | A boolean for face visibility |
-| color                         |   |   |   | An rgb for point color. |
-| color point                   |   |   |   | An rgb for point color. |
-| color node                    |   |   |   | An rgb for node color (polyline and surface nodes.) |
-| color line                    |   |   |   | An rgb for line color (polyline and surface lines.) |
-| color face                    |   |   |   | An rgb for face color (closed polyline and surface faces.) |
-| color face pattern            |   |   |   | An rgb for face pattern color. |
-| color text                    |   |   |   | An rgb for text color. |
-| color drill hole              |   | X |   | An rgb for drill hole color. |
-| color drill hole node         |   | X |   | An rgb for drill hole node color. |
-| color drill hole line         |   | X |   | An rgb for drill hole line color. |
-| color drill hole face         |   | X |   | An rgb for drill hole face color. |
-| color drill hole face pattern |   | X |   | An rgb for drill hole face pattern color. |
-| color geometry                |   | X |   | An rgb for geometry color. |
-| color geometry node           |   | X |   | An rgb for geometry node color. |
-| color geometry line           |   | X |   | An rgb for geometry line color. |
-| color geometry face           |   | X |   | An rgb for geometry face color. |
-| color geometry face pattern   |   | X |   | An rgb for geometry face pattern color. |
-| color model                   |   | X |   | An rgb for model color. |
-| color model node              |   | X |   | An rgb for model node color. |
-| color model line              |   | X |   | An rgb for model line color. |
-| color model face              |   | X |   | An rgb for model face color. |
-| color model face pattern      |   | X |   | An rgb for model face pattern color. |
-| pattern node                  |   |   |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
-| pattern line                  |   |   |   | A string for the line pattern (polyline and surface lines.) |
-| pattern face                  |   |   |   | A string for the face pattern (closed polyline and surface faces.) |
-| transparency                  |   |   |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
-| font                          |   |   |   | A string for the font name. |
-| font size                     |   |   |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
-| font size is relative         |   |   |   | A boolean if the font size is a percent to paper size or screen size. |
-| font is bold                  |   |   |   | A boolean if the font is bold.  Default is false. |
-| font is italic                |   |   |   | A boolean if the font is italic.  Default is false. |
-| font is underline             |   |   |   | A boolean if the font is underlined.  Default is false. |
-| font is strikeout             |   |   |   | A boolean if the font is striked out.  Default if false. |
-| *                             |   |   |   | Other client software key values which may be relavant for the software. |
+## Property Block
+
+**Block Name**: property
+
+This will be found on its own inside a property list.  Item Bin blocks will also have these values and the ones specifica to that bin.  What is found in a property block is information about how something is presented to the user.  Not all values need to be set.  Software will set what it will consider it uses.
+
+| Name                          | Required | Description |
+| ---                           | :---:    | ---         |
+| key                           |   | A unique string key for the property. |
+| name                          |   | A nice name for the property.  Optional. |
+| is font bold                  |   | A boolean if the font is bold.  Default is false. |
+| is font italic                |   | A boolean if the font is italic.  Default is false. |
+| is font underline             |   | A boolean if the font is underlined.  Default is false. |
+| is font size relative         |   | A boolean if the font size is a percent to paper size or screen size. |
+| is font strikeout             |   | A boolean if the font is striked out.  Default if false. |
+| is visible                    |   | A boolean for global visibility |
+| is visible label data 01-10   |   | A boolean for data label visibility 1-10 (polyline and surface data.) |
+| is visible label line 01-10   |   | A boolean for line label visibility 1-10 (polyline and surface lines.) |
+| is visible label node 01-20   |   | A boolean for node label visibility 1-20 (point and polyline nodes.) |
+| is visible point              |   | A boolean for point visibility |
+| is visible polyline           |   | A boolean for polyline visibility (if face, line, and node values are not needed) |
+| is visible polyline face      |   | A boolean for polyline face visibility |
+| is visible polyline line      |   | A boolean for polyline line visibility |
+| is visible polyline node      |   | A boolean for polyline node visibility |
+| is visible surface            |   | A boolean for surface visibility (if face, line, and node values are not needed) |
+| is visible surface face       |   | A boolean for surface face visibility |
+| is visible surface line       |   | A boolean for surface line visibility |
+| is visible surface node       |   | A boolean for surface node visibility |
+| arrow position                |   | An integer for where the arrow heads are placed along the polyline |
+| arrow size                    |   | An real for the size of the arrow heads |
+| color                         |   | An rgb for point color |
+| color point                   |   | An rgb for point color |
+| color polyline                |   | An rgb for polyline color (if face, line, and node values are not needed) |
+| color polyline face           |   | An rgb for polyline face color |
+| color polyline face pattern   |   | An rgb for polyline face pattern color |
+| color polyline line           |   | An rgb for polyline line color |
+| color polyline node           |   | An rgb for polyline node color |
+| color surface                 |   | An rgb for surface color (if face, line, and node values are not needed) |
+| color surface face            |   | An rgb for surface face color |
+| color surface face pattern    |   | An rgb for surface face pattern color |
+| color surface line            |   | An rgb for surface line color |
+| color surface node            |   | An rgb for surface node color |
+| color text                    |   | An rgb for text color |
+| font                          |   | A string for the font name. |
+| font size                     |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
+| label data 01-10              |   | A string for the what is displayed on the data at positions 01-10. |
+| label line 01-10              |   | A string for the what is displayed on the line segments at positions 01-10. |
+| label node 01-20              |   | A string for the what is displayed on the node segments at positions 01-20. |
+| pattern node                  |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
+| pattern line                  |   | A string for the line pattern (polyline and surface lines.) |
+| pattern face                  |   | A string for the face pattern (closed polyline and surface faces.) |
+| transparency                  |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
+| *                             |   | Other client software key values which may be relavant for the software. |
 
 
 ## 3.3. Item Block
 
 **Block Name**: item
 
-Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drillhole assay value, a block model item value, a geometry element value, a geometry point value, etc.
+Item will describe a value that will be stored in the various places where the item is being tracked.  For instance, a drill hole assay value, a block model item value, a geometry element value, a geometry point value, etc.
 
 Items need to be defined before they are used elsewhere in the MI file.
 
-| Name          | Required | Description |
-| ---           | :---:    | --- |
-| key           | X | A string for a unique key value for the item. |
-| name          |   | A string for the name of the item.  Not necessarily unique. |
-| type          | X | A string for the type of the item.  See lower down. |
-| max           |   | A number for the maximum value. |
-| min           |   | A number for the minimum value. |
-| precision     |   | A real for the precision of the values for this item. |
-| value list    |   | An array of values representing the complete set of possible values. |
-| default       | * | A value for the default value.  If missing, then default value is 'missing value'. |
-| formula       |   | A string for the formula used to calculate the value of this item. |
-| property list |   | An array of properties for rendering purposes in a view. |
-| *             |   | Other client software key values which may be relavant for the software. |
+| Name       | Required | Description |
+| ---        | :---:    | --- |
+| key        |   | A string for a unique key value for the item. |
+| name       |   | A string for the name of the item.  Not necessarily unique. |
+| type       | X | A string for the type of the item.  See lower down. |
+| max        |   | A number for the maximum value. |
+| min        |   | A number for the minimum value. |
+| precision  |   | A real for the precision of the values for this item. |
+| value list |   | A list of values representing the complete set of possible values. |
+| default    |   | A value for the default value.  If missing, then default value is 'missing value'. |
+| formula    |   | A string for the formula used to calculate the value of this item. |
+| bin list   |   | A list of properties for rendering purposes in a view. |
+| *          |   | Other client software key values which may be relavant for the software. |
 
 Each item will be given an index value starting at 0 and incrementing with every new item added to the MI file.
 
@@ -301,16 +294,95 @@ Each item will be given an index value starting at 0 and incrementing with every
 
 **precision** is the accuracy of the number.  Only applicable if item type is a real.
 
-**valueList** defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drillhole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.
+**value list** defines the actual values that will ever be used for this item.  This can exist for any type.  If values are used then what is stored in the drill hole assay, block model block, or geometry attribute will be an index into this list of values.  A string type and a valueList essentially defines an enumerated value.  Do not violate this rule, if you export data with a value that isn't found in this list then the export will fail.
 
 **default** will define the default value for this item if block is skipped.  If this value is not provided then the default value is "missing".
 
 **formula** is an equation that is performed to obtain the item's value.  Only applicable if item type is formula.  Export software dictates what the formula looks like for now.  Import software will need to figure out how to convert this formula to their needs.
 
-**prop list** is a list of bins with some display cues.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.
+**bin list** is a list of **bin**s.  First bin will be the display cues for missing information or values lower than the lowest bin value.  This list should be ascending order if the item is a number item.  The first bin will generally not have a **value**.
 
-When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store in index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.
+When precision is used, it may change how the values are stored.  Say we have a min of 0 and an max of 10 and a precision of 0.1.  As a result we have a total of 102 unique values. 0.0, 0.1, ..., 9.9, 10.0 and 'unset'.  If this is all the values that need to be recorded, then we do not really need to use a full real value to store it.  We will be storing instead a natural value such that the natural value, multiplied by the precision and added to the min value will recreate the real value which is being stored.  In this case, 102 values only requires a single byte natural to encode all the values in the range.  If a valueList is also provided then that will override this behaviour.  A value list will store an index into the list so we end up with a similar space saving.  If the range is more than can be encoded into a natural then real values will be stored.
 
+## Bin Block
+
+**Block Name**: bin
+
+Very similar to a **property** block except there are not **key** and **name** values.  There is a **value** field for the bin's min (integer, natural, real), exact (boolean, string, date, datetime, time), or a regular expression (string, date, datetime, time) values.  Extra items for drill hole, geometry, and model styling are bin related and not found in property.
+
+| Name                          | Required | Description |
+| ---                           | :---:    | ---         |
+| value                         | * | A value for this property.  The type should match the item the property is associated with.  First bin in the bin list is for missing or below the next bin in the bin list and so value is not set for this bin.  It must be set for all other bins in the bin list. |
+| is font bold                  |   | A boolean if the font is bold.  Default is false. |
+| is font italic                |   | A boolean if the font is italic.  Default is false. |
+| is font underline             |   | A boolean if the font is underlined.  Default is false. |
+| is font size relative         |   | A boolean if the font size is a percent to paper size or screen size. |
+| is font strikeout             |   | A boolean if the font is striked out.  Default if false. |
+| is visible                    |   | A boolean for global visibility |
+| is visible drill hole         |   | A boolean for global visibility |
+| is visible drill hole node    |   | A boolean for node visibility |
+| is visible drill hole line    |   | A boolean for line visibility |
+| is visible drill hole face    |   | A boolean for face visibility |
+| is visible geometry           |   | A boolean for global visibility |
+| is visible geometry node      |   | A boolean for node visibility |
+| is visible geometry line      |   | A boolean for line visibility |
+| is visible geometry face      |   | A boolean for face visibility |
+| is visible label data 01-10   |   | A boolean for data label visibility 1-10 (polyline and surface data.) |
+| is visible label line 01-10   |   | A boolean for line label visibility 1-10 (polyline and surface lines.) |
+| is visible label node 01-20   |   | A boolean for node label visibility 1-20 (point and polyline nodes.) |
+| is visible model              |   | A boolean for global visibility |
+| is visible model node         |   | A boolean for node visibility |
+| is visible model line         |   | A boolean for line visibility |
+| is visible model face         |   | A boolean for face visibility |
+| is visible point              |   | A boolean for point visibility |
+| is visible polyline           |   | A boolean for polyline visibility (if face, line, and node values are not needed) |
+| is visible polyline face      |   | A boolean for polyline face visibility |
+| is visible polyline line      |   | A boolean for polyline line visibility |
+| is visible polyline node      |   | A boolean for polyline node visibility |
+| is visible surface            |   | A boolean for surface visibility (if face, line, and node values are not needed) |
+| is visible surface face       |   | A boolean for surface face visibility |
+| is visible surface line       |   | A boolean for surface line visibility |
+| is visible surface node       |   | A boolean for surface node visibility |
+| arrow position                |   | An integer for where the arrow heads are placed along the polyline |
+| arrow size                    |   | An real for the size of the arrow heads |
+| color                         |   | An rgb for point color |
+| color drill hole              |   | An rgb for drill hole color |
+| color drill hole node         |   | An rgb for drill hole node color |
+| color drill hole line         |   | An rgb for drill hole line color |
+| color drill hole face         |   | An rgb for drill hole face color |
+| color drill hole face pattern |   | An rgb for drill hole face pattern color |
+| color geometry                |   | An rgb for geometry color |
+| color geometry node           |   | An rgb for geometry node color |
+| color geometry line           |   | An rgb for geometry line color |
+| color geometry face           |   | An rgb for geometry face color |
+| color geometry face pattern   |   | An rgb for geometry face pattern color |
+| color model                   |   | An rgb for model color |
+| color model node              |   | An rgb for model node color |
+| color model line              |   | An rgb for model line color |
+| color model face              |   | An rgb for model face color |
+| color model face pattern      |   | An rgb for model face pattern color |
+| color point                   |   | An rgb for point color |
+| color polyline                |   | An rgb for polyline color (if face, line, and node values are not needed) |
+| color polyline face           |   | An rgb for polyline face color |
+| color polyline face pattern   |   | An rgb for polyline face pattern color |
+| color polyline line           |   | An rgb for polyline line color |
+| color polyline node           |   | An rgb for polyline node color |
+| color surface                 |   | An rgb for surface color (if face, line, and node values are not needed) |
+| color surface face            |   | An rgb for surface face color |
+| color surface face pattern    |   | An rgb for surface face pattern color |
+| color surface line            |   | An rgb for surface line color |
+| color surface node            |   | An rgb for surface node color |
+| color text                    |   | An rgb for text color |
+| font                          |   | A string for the font name. |
+| font size                     |   | A real for the size of the font in project units or percent (0-1) "font size if relative" is true.|
+| label data 01-10              |   | A string for the what is displayed on the data at positions 01-10. |
+| label line 01-10              |   | A string for the what is displayed on the line segments at positions 01-10. |
+| label node 01-20              |   | A string for the what is displayed on the node segments at positions 01-20. |
+| pattern node                  |   | A string for the node pattern (points, polyline nodes, and surface nodes.) |
+| pattern line                  |   | A string for the line pattern (polyline and surface lines.) |
+| pattern face                  |   | A string for the face pattern (closed polyline and surface faces.) |
+| transparency                  |   | A real for the amount a face is transparent.  0.00 - 1.00 value.  1 is default if transparency is missing.  0 is fully transparent, 1 is opaque. |
+| *                             |   | Other client software key values which may be relavant for the software. |
 
 ## 3.4. Image Block
 
@@ -318,18 +390,18 @@ When precision is used, it may change how the values are stored.  Say we have a 
 
 Defining an image.  Images are mainly used for texture mapping in geometry blocks.
 
-| Name     | Required | Description |
-| ---      | :---:    | --- |
-| key      | X | A stirng for the unique identifier for the image. |
-| name     |   | A string for the name for the image. |
-| filename | x | A string for the name of the file with extension. |
-| file     | x | A binary array of the image file. |
+| Name      | Required | Description |
+| ---       | :---:    | --- |
+| key       |   | A stirng for the unique identifier for the image. |
+| name      |   | A string for the name for the image. |
+| file name | x | A string for the name of the file with extension. |
+| file      |   | A binary blob of the image file. |
 
-**file** can be any file type.  Although it would be best to limit to common types used in industry like PNG, JPG, and TIFF.  **file** or **filename** needs to be set.  Not both.
+**file** can be any file type.  Although it would be best to limit to common types (like PNG, JPG, TIFF, etc.)  **file name** needs to be set.  If **file** is also set, then **file name** is the name of the file stored in **file**.  If only **file name** is set, then it is assumed that the file named **file name** accompanies the mine information file externally.
 
-## 3.5. Drillhole Block
+## 3.5. Drill Hole Block
 
-Drillhole data holds information about drillholes.
+Drill hole data holds information about drill holes.
 
 ## 3.6. Geometry Block
 

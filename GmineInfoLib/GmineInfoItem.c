@@ -91,6 +91,10 @@ Gb gmineInfoItemClocContent(GmineInfoItem * const gmineInfoItem)
 
    _MiMemClearType(gmineInfoItem, GmineInfoItem);
 
+   gmineInfoArrayClocContent(&gmineInfoItem->binArray);
+   gmineInfoArrayClocContent(&gmineInfoItem->keyValueArray);
+   gmineInfoArrayClocContent(&gmineInfoItem->valueArray);
+
    returnTrue;
 }
 
@@ -129,9 +133,17 @@ void gmineInfoItemDlocContent(GmineInfoItem * const gmineInfoItem)
    _MiMemDloc(gmineInfoItem->key);
    _MiMemDloc(gmineInfoItem->name);
 
+   // Clean up the bin array
+   gmineInfoArrayForEach(    &gmineInfoItem->binArray, gmineInfoItemBinDloc);
+   gmineInfoArrayDlocContent(&gmineInfoItem->binArray);
+
    // Clean up the key value array.
    gmineInfoArrayForEach(    &gmineInfoItem->keyValueArray, gmineInfoKeyValueDloc);
    gmineInfoArrayDlocContent(&gmineInfoItem->keyValueArray);
+
+   // Clean up the value array
+   gmineInfoArrayForEach(    &gmineInfoItem->valueArray, _MiMemDloc);
+   gmineInfoArrayDlocContent(&gmineInfoItem->valueArray);
 
    // Clear out the memory.
    _MiMemClearType(gmineInfoItem, GmineInfoItem);
@@ -582,7 +594,7 @@ Gb gmineInfoItemSetDefaultPercent(GmineInfoItem * const gmineInfoItem, Gr8 const
    returnFalseIf(
       !gmineInfoIsStarted() ||
       !gmineInfoItem        ||
-      gmineInfoItem->type != gmineInfoItemTypeR);
+      gmineInfoItem->type != gmineInfoItemTypePERCENT);
 
    gmineInfoItem->defaultValue.r    = value;
    gmineInfoItem->isSetDefault      = gbTRUE;

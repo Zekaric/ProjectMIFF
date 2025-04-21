@@ -95,10 +95,10 @@ func: _JsonSetN
 **************************************************************************************************/
 Gb _JsonSetN(Gjson * const json, Gn8 const value)
 {
-   int    index,
-          count,
-          digit;
-   Gn8  temp;
+   int index,
+       count,
+       digit;
+   Gn8 temp;
    Gn1 string[32];
 
    temp = value;

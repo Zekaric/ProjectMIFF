@@ -35,13 +35,11 @@ function:
 **************************************************************************************************/
 Gb _MiIoClocReader(GmineInfo * const gmineInfo)
 {
-   Gstr headerTypeStr[   GkeySIZE],
-        headerVersionStr[GkeySIZE];
-   Gn4  headerVersionNum;
+   Gstr headerTypeStr[   GkeySIZE];
+   Gn8  headerVersion;
 
-   headerVersionNum = 0;
-   _MiMemClearTypeArray(headerTypeStr,    Gstr, GkeySIZE);
-   _MiMemClearTypeArray(headerVersionStr, Gstr, GkeySIZE);
+   headerVersion = 0;
+   _MiMemClearTypeArray(headerTypeStr, Gstr, GkeySIZE);
 
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
@@ -49,12 +47,12 @@ Gb _MiIoClocReader(GmineInfo * const gmineInfo)
       gmineInfo->miffFile = gmiffClocReader(
          gmineInfo->getBuffer,
          headerTypeStr,
-         headerVersionStr,
+         &headerVersion,
          gmineInfo->dataRepo);
       returnFalseIf(
-         !gmineInfo->miffFile                                ||
+         !gmineInfo->miffFile                               ||
          !_MiStrIsEqual(headerTypeStr,    HEADER_TYPE_STR)  ||
-         !_MiStrIsEqual(headerVersionStr, HEADER_VERSION_STR));
+         headerVersion != HEADER_VERSION_NUM);
    }
    // JSON
    else
@@ -132,7 +130,7 @@ Gb _MiIoClocWriter(GmineInfo * const gmineInfo)
       gmineInfo->miffFile = gmiffClocWriter(
          gmineInfo->setBuffer,
          HEADER_TYPE_STR,
-         HEADER_VERSION_STR,
+         HEADER_VERSION_NUM,
          gmineInfo->dataRepo);
       returnFalseIf(!gmineInfo->miffFile);
    }
@@ -293,7 +291,7 @@ Gb _MiIoWriteColor(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key));
+      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key, 3));
       {
          returnFalseIf(!gmiffSetValue_R4(     gmineInfo->miffFile, value->r));
          returnFalseIf(!gmiffSetValue_R4(     gmineInfo->miffFile, value->g));
@@ -353,7 +351,7 @@ Gb _MiIoWritePoint(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key));
+      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key, 3));
       {
          returnFalseIf(!gmiffSetValue_R(      gmineInfo->miffFile, value->x));
          returnFalseIf(!gmiffSetValue_R(      gmineInfo->miffFile, value->y));

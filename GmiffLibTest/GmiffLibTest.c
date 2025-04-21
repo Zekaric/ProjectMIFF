@@ -1840,14 +1840,13 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
 /**************************************************************************************************
 func: _MiffTestRead
 **************************************************************************************************/
-static Gb _MiffTestKey(Gmiff *miff, char const * const KEY, GmiffRecType *recType,
-   Gcount *arrayCount)
+static Gb _MiffTestKey(Gmiff *miff, char const * const KEY)
 {
    Gstr key[GkeySIZE];
 
    memset(key, 0, GkeySIZE);
 
-   returnFalseIf(!gmiffGetRecordStart(miff, recType, arrayCount, key));
+   returnFalseIf(!gmiffGetRecordStart(miff, key));
    returnFalseIf(!streq(key, KEY));
 
    returnTrue;
@@ -1968,17 +1967,16 @@ static Gb _MiffTestCount(Gn8 COUNT, Gn8 arrayCount)
 
 static Gb _MiffTestNext(Gmiff *miff)
 {
-   returnFalseIf(!gmiffGetRecordEnd(miff));
+   returnFalseIf(!gmiffGetRecordStop(miff));
 
    returnTrue;
 }
 
 static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
 {
-   GmiffRecType   recType;
    Gcount         arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestNullValue(miff));
    returnFalseIf(!_MiffTestNext(miff));
@@ -1988,10 +1986,9 @@ static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
 
 static Gb _MiffTestGetB(Gmiff *miff, char const *key, Gb const value)
 {
-   GmiffRecType   recType;
    Gcount         arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestBValue(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2001,10 +1998,9 @@ static Gb _MiffTestGetB(Gmiff *miff, char const *key, Gb const value)
 
 static Gb _MiffTestGetI(Gmiff *miff, char const *key, Gi8 const value)
 {
-   GmiffRecType  recType;
    Gcount        arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestIValue(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2014,10 +2010,9 @@ static Gb _MiffTestGetI(Gmiff *miff, char const *key, Gi8 const value)
 
 static Gb _MiffTestGetN(Gmiff *miff, char const *key, Gn8 const value)
 {
-   GmiffRecType  recType;
    Gcount        arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestNValue(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2027,10 +2022,9 @@ static Gb _MiffTestGetN(Gmiff *miff, char const *key, Gn8 const value)
 
 static Gb _MiffTestGetR(Gmiff *miff, char const *key, Gr8 const value)
 {
-   GmiffRecType  recType;
    Gcount        arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestRValue(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2040,10 +2034,9 @@ static Gb _MiffTestGetR(Gmiff *miff, char const *key, Gr8 const value)
 
 static Gb _MiffTestGetR4(Gmiff *miff, char const *key, Gr4 const value)
 {
-   GmiffRecType  recType;
    Gcount        arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestR4Value(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2053,10 +2046,9 @@ static Gb _MiffTestGetR4(Gmiff *miff, char const *key, Gr4 const value)
 
 static Gb _MiffTestGetStr(Gmiff *miff, char const *key, Gstr const *value)
 {
-   GmiffRecType  recType;
    Gcount        arrayCount;
 
-   returnFalseIf(!_MiffTestKey(miff, key, &recType, &arrayCount));
+   returnFalseIf(!_MiffTestKey(miff, key));
    returnFalseIf(!_MiffTestCount(1, arrayCount));
    returnFalseIf(!_MiffTestStrValue(miff, value));
    returnFalseIf(!_MiffTestNext(miff));
@@ -2070,8 +2062,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
    Gmiff          *miff;
    Gb              result;
    Gstr            subFormatName[GkeySIZE];
-   Gstr            subFormatVersion[GkeySIZE];
-   GmiffRecType    recType;
+   Gn8             subFormatVersion;
    Gcount          arrayCount;
    Gindex          index;
    char const     *msg;
@@ -2087,7 +2078,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
 
       // Set Gmiff up for reading.
       msg = "Create reader";
-      miff = gmiffClocReader(_GetBuffer, subFormatName, subFormatVersion, (void *) file);
+      miff = gmiffClocReader(_GetBuffer, subFormatName, &subFormatVersion, (void *) file);
       if (!miff) break;
 
       // Read in the header information.
@@ -2521,7 +2512,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       }
 
       // Create a miff file.
-      miff = gmiffClocWriter(_SetBuffer, "MiffTestFile", "1", (void *) file);
+      miff = gmiffClocWriter(_SetBuffer, "MiffTestFile", 2, (void *) file);
       if (!miff)
       {
          break;
@@ -2600,7 +2591,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
-      gmiffSetRecordArrayStart(     miff, "Binary Array", 3);
+      gmiffSetRecordArrayStart(     miff, "Binary Array", 3, 0);
       gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
       gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
       //gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
@@ -2615,33 +2606,33 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordArrayStop(      miff);
 #endif
 
-      gmiffSetRecordValueStart(     miff, "User Type IntStrReal");
-      gmiffSetValue_I(         miff, 42);
-      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
-      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetRecordValueStart(     miff, "User Type IntStrReal", 3);
+      gmiffSetValue_I(              miff, 42);
+      gmiffSetValue_Str(            miff, "Yes, but what is the question?");
+      gmiffSetValue_R(              miff, 3.1415926535897932);
       gmiffSetRecordValueStop(      miff);
 
-      gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3);
-      gmiffSetValue_I(         miff, 42);
-      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
-      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3, 3);
+      gmiffSetValue_I(              miff, 42);
+      gmiffSetValue_Str(            miff, "Yes, but what is the question?");
+      gmiffSetValue_R(              miff, 3.1415926535897932);
 
-      gmiffSetValue_I(         miff, 42);
-      gmiffSetValue_Str(       miff, "Yes, but what is the question?");
-      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetValue_I(              miff, 42);
+      gmiffSetValue_Str(            miff, "Yes, but what is the question?");
+      gmiffSetValue_R(              miff, 3.1415926535897932);
 
-      gmiffSetValue_I(         miff, 42);
+      gmiffSetValue_I(              miff, 42);
       //gmiffSetValue_Str(       miff, "Yes, but what is the question?");
 
       // Usually for larger than memory or stream writing.
       count = (Gcount) strlen("Yes, but what is the question?");
-      gmiffSetValue_StrStart(  miff, count);
+      gmiffSetValue_StrStart(       miff, count);
       forCount(index, count)
       {
          gmiffSetValue_StrData(      miff, "Yes, but what is the question?"[index]);
       }
-      gmiffSetValue_StrStop(   miff);
-      gmiffSetValue_R(         miff, 3.1415926535897932);
+      gmiffSetValue_StrStop(        miff);
+      gmiffSetValue_R(              miff, 3.1415926535897932);
       gmiffSetRecordValueArrayStop( miff);
 
       gmiffSetRecordBlockStart(     miff, "Block");
@@ -2699,20 +2690,20 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
-         gmiffSetRecordArrayStart(     miff, "Binary Array", 3);
+         gmiffSetRecordArrayStart(     miff, "Binary Array", 3, 0);
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
          gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
          gmiffSetRecordArrayStop(      miff);
 #endif
 
-         gmiffSetRecordValueStart(     miff, "User Type IntStrReal");
+         gmiffSetRecordValueStart(     miff, "User Type IntStrReal", 3);
          gmiffSetValue_I(              miff, 42);
          gmiffSetValue_Str(            miff, "Yes, but what is the question?");
          gmiffSetValue_R(              miff, 3.1415926535897932);
          gmiffSetRecordValueStop(      miff);
 
-         gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3);
+         gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3, 3);
          gmiffSetValue_I(              miff, 42);
          gmiffSetValue_Str(            miff, "Yes, but what is the question?");
          gmiffSetValue_R(              miff, 3.1415926535897932);

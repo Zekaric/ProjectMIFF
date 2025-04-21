@@ -126,11 +126,11 @@ func: _JsonGetNumber
 GjsonType _JsonGetNumber(Gjson * const json)
 {
    Gb   isIntegerNumberFound,
-           isFractionalNumberFound,
-           isExponentNumberFound;
+        isFractionalNumberFound,
+        isExponentNumberFound;
    // Current doulbe maxes out a 10^+/-308, 400 characters is large enough.
    Gstr numberStr[400];
-   int     index;
+   int  index;
 
    // Reset the number string.
    forCount(index, 400)

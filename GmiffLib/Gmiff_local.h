@@ -53,10 +53,7 @@ constant:
 #define strIsEqual(COUNT, A, B)                    (strncmp((char *) A, (char *) B, COUNT) == 0)
 
 #define MIFF_HEADER_FILETYPE_STR                   "MIFF"
-#define MIFF_HEADER_FILETYPE_SIZE                  4
-
-#define MIFF_HEADER_VERSION_STR                    "1"
-#define MIFF_HEADER_VERSION_SIZE                   1
+#define MIFF_HEADER_VERSION                        1
 
 #define miffTypeBLOCK_START_STR                    "{"
 #define miffTypeBLOCK_START_STR_SIZE               1
@@ -113,8 +110,6 @@ Gb                 _MiffGetBinByte(          Gmiff       * const miff, Gn1 * con
 Gb                 _MiffGetConstant(         Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
 Gb                 _MiffGetKey(              Gmiff       * const miff);
 Gb                 _MiffGetLineSkip(         Gmiff       * const miff);
-Gb                 _MiffGetNumInt(           Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
-Gb                 _MiffGetNumReal(          Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
 Gb                 _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
 Gb                 _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
 Gb                 _MiffGetPartEnd(          Gmiff       * const miff);
@@ -123,6 +118,8 @@ Gstr               _MiffGetValueHeader(      Gmiff       * const miff);
 Gcount             _MiffGetValueBufferCount( Gmiff       * const miff);
 
 Gb                 _MiffIsByteSwapping(      void);
+
+_locale_t          _MiffLocaleGet(           void);
 
 void              *_MiffMemCloc(             Gcount const memByteCount);
 void               _MiffMemDloc(             void * const mem);

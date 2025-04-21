@@ -44,8 +44,7 @@ prototype:
 **************************************************************************************************/
 static Gb _SetBinBuffer(Gmiff       * const miff, Gcount const bufferCount, Gn1 const * const bufferData);
 static Gb _SetBinByte(  Gmiff       * const miff, Gn1    const value);
-static Gb _SetNumInt(   Gmiff       * const miff, GmiffValue const value);
-static Gb _SetNumReal(  Gmiff       * const miff, GmiffValue const valueInput);
+static Gb _SetNum(      Gmiff       * const miff, GmiffValue const value);
 
 /**************************************************************************************************
 global:
@@ -58,7 +57,7 @@ Gb _MiffSetBinByte(Gmiff * const miff, Gn1 const binByte)
 {
    returnFalseIf(!_SetBinByte(miff, binByte));
 
-   miff->valueIndex++;
+   miff->bufferIndex++;
 
    returnTrue;
 }
@@ -82,7 +81,7 @@ Gb _MiffSetNumInt(Gmiff * const miff, Gn8 const value)
    _MiffMemClearType(&vtemp, GmiffValue);
 
    vtemp.inr.n = value;
-   return _SetNumInt(miff, vtemp);
+   return _SetNum(miff, vtemp);
 }
 
 /**************************************************************************************************
@@ -145,7 +144,7 @@ Gb _MiffSetStr(Gmiff * const miff, Gcount const strLen, Gstr const * const str)
       returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) bufferData));
    }
 
-   miff->valueIndex += strLen;
+   miff->bufferIndex += strLen;
 
    returnTrue;
 }
@@ -158,26 +157,68 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
    GmiffValue vtemp;
 
    _MiffMemClearType(&vtemp, GmiffValue);
-   miff->valueIndex = 0;
+   miff->bufferIndex = 0;
 
    switch (value.type)
    {
+   case gmiffValueTypeARRAY_DEF:
+      // This needs to be set before any actual values.
+      returnFalseIf(miff->valueIndex != 0);
+
+      miff->arrayCount = value.inr.n;
+
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "["));
+      if (value.inr.n == miffCountUNKNOWN)
+      {
+         return _MiffSetBuffer(miff, 1, (Gn1 *) "*");
+      }
+      return _SetNum(miff, value);
+
+   case gmiffValueTypeBLOCK_DEF:
+      // This needs to be set before any actual values.
+      returnFalseIf(miff->valueIndex != 0);
+
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "{"));
+      miff->scopeLevel++;
+      returnTrue;
+
+   case gmiffValueTypeGROUP_DEF:
+      // This needs to be set before any actual values.
+      returnFalseIf(miff->valueIndex != 0);
+
+      miff->groupCount = value.inr.n;
+
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "("));
+      return         _SetNum(    miff, value);
+
+
    case gmiffValueTypeNULL:
-      return         _MiffSetBuffer(miff, 1, (Gn1 *) "~");
+      miff->valueIndex++;
+      return _MiffSetBuffer(miff, 1, (Gn1 *) "~");
 
    case gmiffValueTypeBIN:
+      miff->valueIndex++;
       vtemp.inr.n = value.bufferCount;
 
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
-      returnFalseIf(!_SetNumInt( miff, vtemp));
-      return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "."));
+      // Only need a number if the count is larger than 4K
+      if (value.bufferCount > 4096)
+      {
+         returnFalseIf(!_SetNum( miff, vtemp));
+      }
+      return _MiffSetBuffer(miff, 1, (Gn1 *) " ");
 
    case gmiffValueTypeSTR:
+      miff->valueIndex++;
       vtemp.inr.n = value.bufferCount;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
-      returnFalseIf(!_SetNumInt( miff, vtemp));
-      return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
+      // Only need a number if the count is larger than 4K
+      if (value.bufferCount > 4096)
+      {
+         returnFalseIf(!_SetNum( miff, vtemp));
+      }
+      return _MiffSetBuffer(miff, 1, (Gn1 *) " ");
    }
 
    returnTrue;
@@ -194,18 +235,17 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
       returnFalseIf(
          value.bufferCount == miffBufferCountUNKNOWN ||
          !value.bufferData.bin);
+
       return _SetBinBuffer(miff, value.bufferCount, value.bufferData.bin);
 
-   case gmiffValueTypeNUM_INT:
-      return _SetNumInt(miff, value);
-
-   case gmiffValueTypeNUM_REAL:
-      return _SetNumReal(miff, value);
+   case gmiffValueTypeNUM:
+      return _SetNum(miff, value);
 
    case gmiffValueTypeSTR:
       returnFalseIf(
          value.bufferCount == miffBufferCountUNKNOWN ||
          !value.bufferData.str);
+
       return _MiffSetStr(miff, value.bufferCount, value.bufferData.str);
    }
 
@@ -234,9 +274,6 @@ static Gb _SetBinBuffer(Gmiff * const miff, Gcount const bufferCount, Gn1 const 
 
 /**************************************************************************************************
 func: _SetBinByte
-
-The different between this and _SetNumInt is that this will not trim leading
-0s and works only on Bytes.
 **************************************************************************************************/
 static Gb _SetBinByte(Gmiff * const miff, Gn1 const value)
 {
@@ -250,21 +287,47 @@ static Gb _SetBinByte(Gmiff * const miff, Gn1 const value)
 }
 
 /**************************************************************************************************
-func: _SetNumInt
+func: _SetNum
 **************************************************************************************************/
-static Gb _SetNumInt(Gmiff * const miff, GmiffValue const valueInput)
+static Gb _SetNum(Gmiff * const miff, GmiffValue const valueInput)
 {
    int        index,
               count,
-              shift,
-              stringIndex,
-              ntemp;
-   Gn8        mask;
-   Gstr       string[16];
-   Gstr       letters[] = "0123456789ABCDEF";
+              digit;
+   Gn8        nval;
+   Gstr       string[80];
    GmiffValue value;
 
    value = valueInput;
+
+   if (value.isR4 ||
+       value.isR8)
+   {
+      if (value.isR4)
+      {
+         if (value.inr4.r == 0)            return _MiffSetBuffer(miff, 1, (Gn1 *) "0");
+         if (value.inr4.r == Gr4MAX)       return _MiffSetBuffer(miff, 1, (Gn1 *) "R");
+         if (value.inr4.r == -Gr4MAX)      return _MiffSetBuffer(miff, 1, (Gn1 *) "r");
+         if (value.inr4.r == HUGE_VALF)    return _MiffSetBuffer(miff, 1, (Gn1 *) "C");
+         if (value.inr4.r == -HUGE_VALF)   return _MiffSetBuffer(miff, 1, (Gn1 *) "c");
+         if (isnan(value.inr4.r))          return _MiffSetBuffer(miff, 1, (Gn1 *) "?");
+
+         _sprintf_s_l((char *) string, 80, "%.*g", _MiffLocaleGet(), FLT_DECIMAL_DIG, value.inr4.r);
+      }
+      else
+      {
+         if (value.inr.r == 0)             return _MiffSetBuffer(miff, 1, (Gn1 *) "0");
+         if (value.inr.r == Gr8MAX)        return _MiffSetBuffer(miff, 1, (Gn1 *) "R");
+         if (value.inr.r == -Gr8MAX)       return _MiffSetBuffer(miff, 1, (Gn1 *) "r");
+         if (value.inr.r == HUGE_VALF)     return _MiffSetBuffer(miff, 1, (Gn1 *) "C");
+         if (value.inr.r == -HUGE_VALF)    return _MiffSetBuffer(miff, 1, (Gn1 *) "c");
+         if (isnan(value.inr.r))           return _MiffSetBuffer(miff, 1, (Gn1 *) "?");
+
+         _sprintf_s_l((char *) string, 80, "%.*g", _MiffLocaleGet(), DBL_DECIMAL_DIG, value.inr.r);
+      }
+
+      return _MiffSetBuffer(miff, _MiffStrGetCount(string), (Gn1 *) string);
+   }
 
    // If the number is 0, it's 0.
    if (value.inr.n == 0)
@@ -276,14 +339,8 @@ static Gb _SetNumInt(Gmiff * const miff, GmiffValue const valueInput)
    if (value.isI)
    {
       // Send out a constant.
-      if      (value.inr.i == Gi8MIN)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Zi");
-      }
-      else if (value.inr.i == Gi8MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "ZI");
-      }
+      if (value.inr.i == Gi8MIN) return _MiffSetBuffer(miff, 1, (Gn1 *) "i");
+      if (value.inr.i == Gi8MAX) return _MiffSetBuffer(miff, 1, (Gn1 *) "I");
 
       // Negative number.
       if (value.inr.i < 0)
@@ -297,154 +354,25 @@ static Gb _SetNumInt(Gmiff * const miff, GmiffValue const valueInput)
    else
    {
       // Send out a constant.
-      if (value.inr.n == Gn8MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "ZN");
-      }
+      if (value.inr.n == Gn8MAX) return _MiffSetBuffer(miff, 1, (Gn1 *) "N");
    }
 
-   count       = 16;
-   shift       = 60;
-   mask        = 0xf000000000000000;
-   stringIndex = 0;
-
-   // Skip 0s
-   forCount(index, count)
+   nval = value.inr.n;
+   loopCount(index)
    {
-      if (value.inr.n & mask)
-      {
-         break;
-      }
+      digit = nval % 10;
+      nval  = nval / 10;
 
-      mask   = mask >> 4;
-      shift -= 4;
+      string[index] = (Gn1) ('0' + digit);
+
+      breakIf(nval == 0);
    }
 
-   // Fill in the buffer.
-   for (; index < count; index++)
+   count = index + 1;
+   forCountDown(index, count)
    {
-      ntemp                 = (int) ((value.inr.n & mask) >> shift);
-      string[stringIndex++] = letters[ntemp];
-
-      mask   = mask >> 4;
-      shift -= 4;
+      returnFalseIf(!miff->setBuffer(miff->dataRepo, 1, (Gn1 *) &string[index]));
    }
 
-   return _MiffSetBuffer(miff, stringIndex, (Gn1 *) string);
-}
-
-/**************************************************************************************************
-func: _SetNumReal
-**************************************************************************************************/
-static Gb _SetNumReal(Gmiff * const miff, GmiffValue const valueInput)
-{
-   int        index,
-              count,
-              shift,
-              stringIndex,
-              ntemp;
-   Gn8        mask;
-   Gstr       string[16];
-   Gstr       letters[]  = "GHIJKLMNOPQRSTUV";
-   GmiffValue value;
-
-   value = valueInput;
-
-   if (value.isR4)
-   {
-      if      (value.inr4.r == 0)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z0");
-      }
-      else if (value.inr4.r == Gr4MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "ZR");
-      }
-      else if (value.inr4.r == -Gr4MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Zr");
-      }
-      else if (value.inr4.r == HUGE_VALF)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z+");
-      }
-      else if (value.inr4.r == -HUGE_VALF)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z-");
-      }
-      else if (isnan(value.inr4.r))
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z?");
-      }
-   }
-   else
-   {
-      if      (value.inr.r == 0)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z0");
-      }
-      else if (value.inr.r == Gr8MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "ZR");
-      }
-      else if (value.inr.r == -Gr8MAX)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Zr");
-      }
-      else if (value.inr.r == HUGE_VALF)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z+");
-      }
-      else if (value.inr.r == -HUGE_VALF)
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z-");
-      }
-      else if (isnan(value.inr.r))
-      {
-         return _MiffSetBuffer(miff, 2, (Gn1 *) "Z?");
-      }
-   }
-
-   // Write out the number.  Real numbers are being written out as hex.
-   stringIndex = 0;
-
-   // We need to byte swap the value first.
-   if (value.isR4)
-   {
-      count = 8;
-      shift = 28;
-      mask  = 0xf0000000;
-
-      _MiffByteSwap4(&value.inr4);
-
-      // Fill in the buffer.
-      forCount(index, count)
-      {
-         ntemp         = (int) ((value.inr4.n & mask) >> shift);
-         string[index] = letters[ntemp];
-
-         mask   = mask >> 4;
-         shift -= 4;
-      }
-   }
-   else
-   {
-      count = 16;
-      shift = 60;
-      mask  = 0xf000000000000000;
-
-      _MiffByteSwap8(&value.inr);
-
-      // Fill in the buffer.
-      forCount(index, count)
-      {
-         ntemp         = (int) ((value.inr.n & mask) >> shift);
-         string[index] = letters[ntemp];
-
-         mask   = mask >> 4;
-         shift -= 4;
-      }
-   }
-
-   return _MiffSetBuffer(miff, count, (Gn1 *) string);
+   returnTrue;
 }

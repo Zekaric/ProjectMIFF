@@ -43,7 +43,7 @@ Gb gmiffSetRecordB(Gmiff * const miff, Gstr const * const name, Gb const value)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_B(miff, value));
 
@@ -63,7 +63,7 @@ Gb gmiffSetRecordBArray(Gmiff * const miff, Gstr const * const name, Gcount cons
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -83,7 +83,7 @@ Gb gmiffSetRecordBinBuffer(Gmiff * const miff, Gstr const * const name, Gcount c
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_BinBuffer(miff, count, value));
 
@@ -99,7 +99,7 @@ Gb gmiffSetRecordBinBufferStart(Gmiff * const miff, Gstr const * const name, Gco
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    return gmiffSetValue_BinBufferStart(miff, count);
 }
@@ -125,7 +125,7 @@ Gb gmiffSetRecordBlockStart(Gmiff * const miff, Gstr const * const name)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeBLOCK_START, 0, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeBLOCK_START, 0, 0));
 
    return gmiffSetRecordStop(miff);
 }
@@ -137,7 +137,7 @@ Gb gmiffSetRecordBlockStop(Gmiff * const miff)
 {
    returnFalseIf(!miff);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeBLOCK_STOP,  0, NULL));
+   returnFalseIf(!gmiffSetRecordStart(miff, NULL, gmiffRecTypeBLOCK_STOP,  0, 0));
 
    return gmiffSetRecordStop(miff);
 }
@@ -151,7 +151,7 @@ Gb gmiffSetRecordNull(Gmiff * const miff, Gstr const * const name)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_Null(miff));
 
@@ -167,7 +167,7 @@ Gb gmiffSetRecordI(Gmiff * const miff, Gstr const * const name, Gi8 const value)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_I(miff, value));
 
@@ -187,7 +187,7 @@ Gb gmiffSetRecordIArray(Gmiff * const miff, Gstr const * const name, Gcount cons
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -206,7 +206,7 @@ Gb gmiffSetRecordN(Gmiff * const miff, Gstr const * const name, Gn8 const value)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_N(miff, value));
 
@@ -226,7 +226,7 @@ Gb gmiffSetRecordNArray(Gmiff * const miff, Gstr const * const name, Gcount cons
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -245,7 +245,7 @@ Gb gmiffSetRecordR(Gmiff * const miff, Gstr const * const name, Gr8 const value)
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_R(miff, value));
 
@@ -265,7 +265,7 @@ Gb gmiffSetRecordRArray(Gmiff * const miff, Gstr const * const name, Gcount cons
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -284,7 +284,7 @@ Gb gmiffSetRecordR4(Gmiff * const miff, Gstr const * const name, Gr4 const value
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_R4(miff, value));
 
@@ -304,7 +304,7 @@ Gb gmiffSetRecordR4Array(Gmiff * const miff, Gstr const * const name, Gcount con
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -323,7 +323,7 @@ Gb gmiffSetRecordStr(Gmiff * const miff, Gstr const * const name, Gstr const * c
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    returnFalseIf(!gmiffSetValue_Str(miff, value));
 
@@ -343,7 +343,7 @@ Gb gmiffSetRecordStrArray(Gmiff * const miff, Gstr const * const name, Gcount co
       !name ||
       (count != 0 && !array));
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, count, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, count, 0));
 
    forCount(index, count)
    {
@@ -362,7 +362,7 @@ Gb gmiffSetRecordStrStart(Gmiff * const miff, Gstr const * const name, Gcount co
       !miff ||
       !name);
 
-   returnFalseIf(!gmiffSetRecordStart(miff, gmiffRecTypeVALUE, 1, name));
+   returnFalseIf(!gmiffSetRecordStart(miff, name, gmiffRecTypeVALUE, 0, 0));
 
    return gmiffSetValue_StrStart(miff, count);
 }

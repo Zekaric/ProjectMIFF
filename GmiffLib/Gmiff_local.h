@@ -108,14 +108,15 @@ void               _MiffByteSwap8(           Gmiff8 * const value);
 
 Gb                 _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
 Gb                 _MiffGetConstant(         Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
-Gb                 _MiffGetKey(              Gmiff       * const miff);
+Gb                 _MiffGetKey(              Gmiff       * const miff, Gstr * const key);
 Gb                 _MiffGetLineSkip(         Gmiff       * const miff);
+void               _MiffGetNum(              Gmiff       * const miff);
 Gb                 _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
 Gb                 _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
 Gb                 _MiffGetPartEnd(          Gmiff       * const miff);
 GmiffData          _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
+Gcount             _MiffGetValueCount(       Gmiff       * const miff);
 Gstr               _MiffGetValueHeader(      Gmiff       * const miff);
-Gcount             _MiffGetValueBufferCount( Gmiff       * const miff);
 
 Gb                 _MiffIsByteSwapping(      void);
 

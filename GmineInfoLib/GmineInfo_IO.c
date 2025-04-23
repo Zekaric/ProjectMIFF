@@ -188,7 +188,7 @@ Gb _MiIoWriteB(GmineInfo * const gmineInfo, Gstr const * const key, Gb const val
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordB(gmineInfo->miffFile, key, value);
+      return gmiffSetB(gmineInfo->miffFile, key, value);
    }
 
    // JSON
@@ -260,7 +260,7 @@ Gb _MiIoWriteBlockStart(GmineInfo * const gmineInfo, Gstr * const key)
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordBlockStart(gmineInfo->miffFile, key);
+      return gmiffSetBlockStart(gmineInfo->miffFile, key);
    }
 
    //JSON
@@ -275,7 +275,7 @@ Gb _MiIoWriteBlockStop(GmineInfo * const gmineInfo)
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordBlockStop(gmineInfo->miffFile);
+      return gmiffSetBlockStop(gmineInfo->miffFile);
    }
 
    // JSON
@@ -320,7 +320,7 @@ Gb _MiIoWriteI(GmineInfo * const gmineInfo, Gstr const * const key, Gi8 const va
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordI(gmineInfo->miffFile, key, value);
+      return gmiffSetI(gmineInfo->miffFile, key, value);
    }
 
    // JSON
@@ -335,7 +335,7 @@ Gb _MiIoWriteN(GmineInfo * const gmineInfo, Gstr const * const key, Gn8 const va
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordN(gmineInfo->miffFile, key, value);
+      return gmiffSetN(gmineInfo->miffFile, key, value);
    }
 
    // JSON
@@ -380,7 +380,7 @@ Gb _MiIoWriteR(GmineInfo * const gmineInfo, Gstr const * const key, Gr8 const va
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordR(gmineInfo->miffFile, key, value);
+      return gmiffSetR(gmineInfo->miffFile, key, value);
    }
 
    // JSON
@@ -395,7 +395,7 @@ Gb _MiIoWriteStr(GmineInfo * const gmineInfo, Gstr const * const key, Gstr const
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordStr(gmineInfo->miffFile, key, value);
+      return gmiffSetStr(gmineInfo->miffFile, key, value);
    }
 
    // JSON

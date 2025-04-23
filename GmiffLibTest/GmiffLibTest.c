@@ -2518,44 +2518,44 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
          break;
       }
 
-      gmiffSetRecordNull(           miff, "Null");
+      gmiffSetNull(           miff, "Null");
 
-      gmiffSetRecordB(              miff, "True",     gbTRUE);
-      gmiffSetRecordB(              miff, "False",    gbFALSE);
+      gmiffSetB(              miff, "True",     gbTRUE);
+      gmiffSetB(              miff, "False",    gbFALSE);
 
-      gmiffSetRecordI(              miff, "I 0",      0);
-      gmiffSetRecordI(              miff, "I 1",      1);
-      gmiffSetRecordI(              miff, "I -1",     -1);
-      gmiffSetRecordI(              miff, "I MAX",    Gi8MAX);
-      gmiffSetRecordI(              miff, "I MIN",    Gi8MIN);
+      gmiffSetI(              miff, "I 0",      0);
+      gmiffSetI(              miff, "I 1",      1);
+      gmiffSetI(              miff, "I -1",     -1);
+      gmiffSetI(              miff, "I MAX",    Gi8MAX);
+      gmiffSetI(              miff, "I MIN",    Gi8MIN);
 
-      gmiffSetRecordN(              miff, "N 0",      0);
-      gmiffSetRecordN(              miff, "N 1",      1);
-      gmiffSetRecordN(              miff, "N MAX",    Gn8MAX);
+      gmiffSetN(              miff, "N 0",      0);
+      gmiffSetN(              miff, "N 1",      1);
+      gmiffSetN(              miff, "N MAX",    Gn8MAX);
 
-      gmiffSetRecordR(              miff, "R 0",     0.0);
-      gmiffSetRecordR(              miff, "R 1",     1.0);
-      gmiffSetRecordR(              miff, "R -1",    -1.0);
-      gmiffSetRecordR(              miff, "R PI",    3.1415926535897932);
-      gmiffSetRecordR(              miff, "R EPS",   Gr8EPSILON);
-      gmiffSetRecordR(              miff, "R MAX",   Gr8MAX);
-      gmiffSetRecordR(              miff, "R -MAX",  -Gr8MAX);
-      gmiffSetRecordR(              miff, "R INF",   Gr8INF);
-      gmiffSetRecordR(              miff, "R -INF",  -Gr8INF);
-      gmiffSetRecordR(              miff, "R NAN",   GrNAN);
+      gmiffSetR(              miff, "R 0",     0.0);
+      gmiffSetR(              miff, "R 1",     1.0);
+      gmiffSetR(              miff, "R -1",    -1.0);
+      gmiffSetR(              miff, "R PI",    3.1415926535897932);
+      gmiffSetR(              miff, "R EPS",   Gr8EPSILON);
+      gmiffSetR(              miff, "R MAX",   Gr8MAX);
+      gmiffSetR(              miff, "R -MAX",  -Gr8MAX);
+      gmiffSetR(              miff, "R INF",   Gr8INF);
+      gmiffSetR(              miff, "R -INF",  -Gr8INF);
+      gmiffSetR(              miff, "R NAN",   GrNAN);
 
-      gmiffSetRecordR4(             miff, "R4 0",    0.0);
-      gmiffSetRecordR4(             miff, "R4 1",    1.0);
-      gmiffSetRecordR4(             miff, "R4 -1",   -1.0);
-      gmiffSetRecordR4(             miff, "R4 PI",   3.1415926535897932f);
-      gmiffSetRecordR4(             miff, "R4 EPS",  Gr4EPSILON);
-      gmiffSetRecordR4(             miff, "R4 MAX",  Gr4MAX);
-      gmiffSetRecordR4(             miff, "R4 -MAX", -Gr4MAX);
-      gmiffSetRecordR4(             miff, "R4 INF",  Gr4INF);
-      gmiffSetRecordR4(             miff, "R4 -INF", -Gr4INF);
-      gmiffSetRecordR4(             miff, "R4 NAN",  GrNAN);
+      gmiffSetR4(             miff, "R4 0",    0.0);
+      gmiffSetR4(             miff, "R4 1",    1.0);
+      gmiffSetR4(             miff, "R4 -1",   -1.0);
+      gmiffSetR4(             miff, "R4 PI",   3.1415926535897932f);
+      gmiffSetR4(             miff, "R4 EPS",  Gr4EPSILON);
+      gmiffSetR4(             miff, "R4 MAX",  Gr4MAX);
+      gmiffSetR4(             miff, "R4 -MAX", -Gr4MAX);
+      gmiffSetR4(             miff, "R4 INF",  Gr4INF);
+      gmiffSetR4(             miff, "R4 -INF", -Gr4INF);
+      gmiffSetR4(             miff, "R4 NAN",  GrNAN);
 
-      //gmiffSetRecordStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      //gmiffSetStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 
       // Usually for larger than memory or stream writing.
       count = (Gcount) strlen("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
@@ -2569,7 +2569,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordStrStop(        miff);
 
 #if defined(INCLUDE_BIN)
-      //gmiffSetRecordBinBuffer(      miff, "Binary",  256 * 3, _binary);
+      //gmiffSetBin(      miff, "Binary",  256 * 3, _binary);
 
       // Usually for larger than memory or stream writing.
       gmiffSetRecordBinBufferStart( miff, "Binary", 256 * 3);
@@ -2580,21 +2580,21 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetRecordBinBufferStop(  miff);
 #endif
 
-      gmiffSetRecordBArray(         miff, "Bool Array",   100,  _bools);
+      gmiffSetBArray(         miff, "Bool Array",   100,  _bools);
 
-      gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
-      gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
+      gmiffSetIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
+      gmiffSetNArray(         miff, "N Array",      256,  _narray);
 
-      gmiffSetRecordRArray(         miff, "R Array",      300,  _reals8);
-      gmiffSetRecordR4Array(        miff, "R4 Array",     300,  _reals4);
+      gmiffSetRArray(         miff, "R Array",      300,  _reals8);
+      gmiffSetR4Array(        miff, "R4 Array",     300,  _reals4);
 
-      gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
+      gmiffSetStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
       gmiffSetRecordArrayStart(     miff, "Binary Array", 3, 0);
-      gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-      gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-      //gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
+      gmiffSetValue(                miff, gmiffValueSetBin(3 * 256, _binary));
+      gmiffSetValue(                miff, gmiffValueSetBin(3 * 256, _binary));
+      //gmiffSetValue(                miff, gmiffValueSetBin(3 * 256, _binary));
 
       // Usually for larger than memory or stream writing.
       gmiffSetValue_BinBufferStart(miff, 3 * 256);
@@ -2635,89 +2635,93 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
       gmiffSetValue_R(              miff, 3.1415926535897932);
       gmiffSetRecordValueArrayStop( miff);
 
-      gmiffSetRecordBlockStart(     miff, "Block");
+      gmiffSetBlockStart(     miff, "Block");
       {
-         gmiffSetRecordNull(           miff, "Null");
+         gmiffSetNull(           miff, "Null");
 
-         gmiffSetRecordB(              miff, "True",     gbTRUE);
-         gmiffSetRecordB(              miff, "False",    gbFALSE);
+         gmiffSetB(              miff, "True",     gbTRUE);
+         gmiffSetB(              miff, "False",    gbFALSE);
 
-         gmiffSetRecordI(              miff, "I 0",      0);
-         gmiffSetRecordI(              miff, "I 1",      1);
-         gmiffSetRecordI(              miff, "I -1",     -1);
-         gmiffSetRecordI(              miff, "I MAX",    Gi8MAX);
-         gmiffSetRecordI(              miff, "I MIN",    Gi8MIN);
+         gmiffSetI(              miff, "I 0",      0);
+         gmiffSetI(              miff, "I 1",      1);
+         gmiffSetI(              miff, "I -1",     -1);
+         gmiffSetI(              miff, "I MAX",    Gi8MAX);
+         gmiffSetI(              miff, "I MIN",    Gi8MIN);
 
-         gmiffSetRecordN(              miff, "N 0",      0);
-         gmiffSetRecordN(              miff, "N 1",      1);
-         gmiffSetRecordN(              miff, "N MAX",    Gn8MAX);
+         gmiffSetN(              miff, "N 0",      0);
+         gmiffSetN(              miff, "N 1",      1);
+         gmiffSetN(              miff, "N MAX",    Gn8MAX);
 
-         gmiffSetRecordR(              miff, "R 0",      0.0);
-         gmiffSetRecordR(              miff, "R 1",      1.0);
-         gmiffSetRecordR(              miff, "R -1",     -1.0);
-         gmiffSetRecordR(              miff, "R PI",     3.1415926535897932);
-         gmiffSetRecordR(              miff, "R EPS",    Gr8EPSILON);
-         gmiffSetRecordR(              miff, "R MAX",    Gr8MAX);
-         gmiffSetRecordR(              miff, "R -MAX",   -Gr8MAX);
-         gmiffSetRecordR(              miff, "R INF",    Gr8INF);
-         gmiffSetRecordR(              miff, "R -INF",   -Gr8INF);
-         gmiffSetRecordR(              miff, "R NAN",    GrNAN);
+         gmiffSetR(              miff, "R 0",      0.0);
+         gmiffSetR(              miff, "R 1",      1.0);
+         gmiffSetR(              miff, "R -1",     -1.0);
+         gmiffSetR(              miff, "R PI",     3.1415926535897932);
+         gmiffSetR(              miff, "R EPS",    Gr8EPSILON);
+         gmiffSetR(              miff, "R MAX",    Gr8MAX);
+         gmiffSetR(              miff, "R -MAX",   -Gr8MAX);
+         gmiffSetR(              miff, "R INF",    Gr8INF);
+         gmiffSetR(              miff, "R -INF",   -Gr8INF);
+         gmiffSetR(              miff, "R NAN",    GrNAN);
 
-         gmiffSetRecordR4(             miff, "R4 0",     0.0);
-         gmiffSetRecordR4(             miff, "R4 1",     1.0);
-         gmiffSetRecordR4(             miff, "R4 -1",    -1.0);
-         gmiffSetRecordR4(             miff, "R4 PI",    3.1415926535897932f);
-         gmiffSetRecordR4(             miff, "R4 EPS",   Gr4EPSILON);
-         gmiffSetRecordR4(             miff, "R4 MAX",   Gr4MAX);
-         gmiffSetRecordR4(             miff, "R4 -MAX",  -Gr4MAX);
-         gmiffSetRecordR4(             miff, "R4 INF",   Gr4INF);
-         gmiffSetRecordR4(             miff, "R4 -INF",  -Gr4INF);
-         gmiffSetRecordR4(             miff, "R4 NAN",   GrNAN);
+         gmiffSetR4(             miff, "R4 0",     0.0);
+         gmiffSetR4(             miff, "R4 1",     1.0);
+         gmiffSetR4(             miff, "R4 -1",    -1.0);
+         gmiffSetR4(             miff, "R4 PI",    3.1415926535897932f);
+         gmiffSetR4(             miff, "R4 EPS",   Gr4EPSILON);
+         gmiffSetR4(             miff, "R4 MAX",   Gr4MAX);
+         gmiffSetR4(             miff, "R4 -MAX",  -Gr4MAX);
+         gmiffSetR4(             miff, "R4 INF",   Gr4INF);
+         gmiffSetR4(             miff, "R4 -INF",  -Gr4INF);
+         gmiffSetR4(             miff, "R4 NAN",   GrNAN);
 
-         gmiffSetRecordStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+         gmiffSetStr(            miff, "String",   "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
 #if defined(INCLUDE_BIN)
-         gmiffSetRecordBinBuffer(      miff, "Binary",   256 * 3, _binary);
+         gmiffSetBin(            miff, "Binary",   256 * 3, _binary);
 #endif
 
-         gmiffSetRecordBArray(         miff, "Bool Array",   100,  _bools);
+         gmiffSetBArray(         miff, "Bool Array",   100,  _bools);
 
-         gmiffSetRecordIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
-         gmiffSetRecordNArray(         miff, "N Array",      256,  _narray);
+         gmiffSetIArray(         miff, "I Array",      256,  (Gi8 *) _narray);
+         gmiffSetNArray(         miff, "N Array",      256,  _narray);
 
-         gmiffSetRecordRArray(         miff, "R Array",      300,  _reals8);
-         gmiffSetRecordR4Array(        miff, "R4 Array",     300,  _reals4);
+         gmiffSetRArray(         miff, "R Array",      300,  _reals8);
+         gmiffSetR4Array(        miff, "R4 Array",     300,  _reals4);
 
-         gmiffSetRecordStrArray(       miff, "String Array", 10,   _strings);
+         gmiffSetStrArray(       miff, "String Array", 10,   _strings);
 
 #if defined(INCLUDE_BIN)
-         gmiffSetRecordArrayStart(     miff, "Binary Array", 3, 0);
-         gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-         gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-         gmiffSetValue(                miff, gmiffValueSetBinBuffer(3 * 256, _binary));
-         gmiffSetRecordArrayStop(      miff);
+         gmiffRecordSetStart(          miff, "Binary Array");
+         gmiffRecordSetValue(          miff, gmiffValueSetArrayCount(3));
+         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffRecordSetStop(           miff);
 #endif
 
-         gmiffSetRecordValueStart(     miff, "User Type IntStrReal", 3);
-         gmiffSetValue_I(              miff, 42);
-         gmiffSetValue_Str(            miff, "Yes, but what is the question?");
-         gmiffSetValue_R(              miff, 3.1415926535897932);
-         gmiffSetRecordValueStop(      miff);
+         gmiffRecordSetStart(          miff, "User Type IntStrReal");
+         gmiffRecordSetValue(          miff, gmiffValueSetGroupCount(3));
+         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
+         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffRecordSetStop(           miff);
 
-         gmiffSetRecordValueArrayStart(miff, "User Type IntStrReal Array", 3, 3);
-         gmiffSetValue_I(              miff, 42);
-         gmiffSetValue_Str(            miff, "Yes, but what is the question?");
-         gmiffSetValue_R(              miff, 3.1415926535897932);
+         gmiffRecordSetStart(          miff, "User Type IntStrReal Array");
+         gmiffRecordSetValue(          miff, gmiffValueSetArrayCount(3));
+         gmiffRecordSetValue(          miff, gmiffValueSetGroupCount(3));
+         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
+         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
 
-         gmiffSetValue_I(              miff, 42);
-         gmiffSetValue_Str(            miff, "Yes, but what is the question?");
-         gmiffSetValue_R(              miff, 3.1415926535897932);
+         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
+         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
 
-         gmiffSetValue_I(              miff, 42);
-         gmiffSetValue_Str(            miff, "Yes, but what is the question?");
-         gmiffSetValue_R(              miff, 3.1415926535897932);
-         gmiffSetRecordValueArrayStop( miff);
+         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
+         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffRecordSetStop(           miff);
       }
-      gmiffSetRecordBlockStop(miff);
+      gmiffSetBlockStop(miff);
 
       result = gbTRUE;
    }

@@ -42,7 +42,7 @@ include:
 local:
 prototype:
 **************************************************************************************************/
-static Gb _SetBinBuffer(Gmiff       * const miff, Gcount const bufferCount, Gn1 const * const bufferData);
+static Gb _SetBinBuffer(Gmiff       * const miff, Gcount const count, Gn1 const * const data);
 static Gb _SetBinByte(  Gmiff       * const miff, Gn1    const value);
 static Gb _SetNum(      Gmiff       * const miff, GmiffValue const value);
 
@@ -91,10 +91,10 @@ Gb _MiffSetStr(Gmiff * const miff, Gcount const strLen, Gstr const * const str)
 {
    Gindex index;
    Gindex bufferIndex;
-   Gstr   bufferData[66];
+   Gstr   data[66];
 
    bufferIndex = 0;
-   _MiffMemClearTypeArray(bufferData, Gn1, 66);
+   _MiffMemClearTypeArray(data, Gn1, 66);
    forCount(index, strLen)
    {
       // Escape single character slash, tab, and newline characters.
@@ -103,45 +103,45 @@ Gb _MiffSetStr(Gmiff * const miff, Gcount const strLen, Gstr const * const str)
       case '\\':
       case '\t':
       case '\n':
-         bufferData[bufferIndex++] = '\\';
+         data[bufferIndex++] = '\\';
          switch (str[index])
          {
          case '\\':
             // Slashes become two character "\\"
-            bufferData[bufferIndex++] = '\\';
+            data[bufferIndex++] = '\\';
             break;
 
          case '\t':
             // Tabs become two character "\t"
-            bufferData[bufferIndex++] = 't';
+            data[bufferIndex++] = 't';
             break;
 
          case '\n':
             // New lines become two character "\n"
-            bufferData[bufferIndex++] = 'n';
+            data[bufferIndex++] = 'n';
             break;
          }
          break;
 
       default:
-         bufferData[bufferIndex++] = str[index];
+         data[bufferIndex++] = str[index];
          break;
       }
 
       // Filled the buffer, write out and restart.
       if (bufferIndex >= 64)
       {
-         returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) bufferData));
+         returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) data));
 
          bufferIndex = 0;
-         _MiffMemClearTypeArray(bufferData, Gn1, 66);
+         _MiffMemClearTypeArray(data, Gn1, 66);
       }
    }
 
    // Write out the remainder.
    if (bufferIndex)
    {
-      returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) bufferData));
+      returnFalseIf(!_MiffSetBuffer(miff, bufferIndex, (Gn1 *) data));
    }
 
    miff->bufferIndex += strLen;
@@ -161,35 +161,35 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
    switch (value.type)
    {
-   case gmiffValueTypeARRAY_DEF:
+   case gmiffValueTypeARRAY_COUNT:
       // This needs to be set before any actual values.
       returnFalseIf(miff->valueIndex != 0);
 
-      miff->arrayCount = value.inr.n;
-
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "["));
-      if (value.inr.n == miffCountUNKNOWN)
+      if (value.inr.i == miffCountUNKNOWN)
       {
          return _MiffSetBuffer(miff, 1, (Gn1 *) "*");
       }
+
       return _SetNum(miff, value);
 
-   case gmiffValueTypeBLOCK_DEF:
-      // This needs to be set before any actual values.
-      returnFalseIf(miff->valueIndex != 0);
-
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "{"));
+   case gmiffValueTypeBLOCK_START:
       miff->scopeLevel++;
-      returnTrue;
+      return _MiffSetBuffer(miff, 1, (Gn1 *) "{");
 
-   case gmiffValueTypeGROUP_DEF:
+   case gmiffValueTypeBLOCK_STOP:
+      miff->scopeLevel--;
+      // Called too many times.
+      returnFalseIf(miff->scopeLevel < 0);
+      return _MiffSetBuffer(miff, 1, (Gn1 *) "}");
+
+   case gmiffValueTypeGROUP_COUNT:
       // This needs to be set before any actual values.
       returnFalseIf(miff->valueIndex != 0);
-
-      miff->groupCount = value.inr.n;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "("));
-      return         _SetNum(    miff, value);
+
+      return _SetNum(miff, value);
 
 
    case gmiffValueTypeNULL:
@@ -198,11 +198,11 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
    case gmiffValueTypeBIN:
       miff->valueIndex++;
-      vtemp.inr.n = value.bufferCount;
+      vtemp.inr.n = value.count;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "."));
       // Only need a number if the count is larger than 4K
-      if (value.bufferCount > 4096)
+      if (value.count > 4096)
       {
          returnFalseIf(!_SetNum( miff, vtemp));
       }
@@ -210,11 +210,11 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
    case gmiffValueTypeSTR:
       miff->valueIndex++;
-      vtemp.inr.n = value.bufferCount;
+      vtemp.inr.n = value.count;
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
       // Only need a number if the count is larger than 4K
-      if (value.bufferCount > 4096)
+      if (value.count > 4096)
       {
          returnFalseIf(!_SetNum( miff, vtemp));
       }
@@ -233,20 +233,20 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
    {
    case gmiffValueTypeBIN:
       returnFalseIf(
-         value.bufferCount == miffBufferCountUNKNOWN ||
-         !value.bufferData.bin);
+         value.count == miffBufferCountUNKNOWN ||
+         !value.data.bin);
 
-      return _SetBinBuffer(miff, value.bufferCount, value.bufferData.bin);
+      return _SetBinBuffer(miff, value.count, value.data.bin);
 
    case gmiffValueTypeNUM:
       return _SetNum(miff, value);
 
    case gmiffValueTypeSTR:
       returnFalseIf(
-         value.bufferCount == miffBufferCountUNKNOWN ||
-         !value.bufferData.str);
+         value.count == miffBufferCountUNKNOWN ||
+         !value.data.str);
 
-      return _MiffSetStr(miff, value.bufferCount, value.bufferData.str);
+      return _MiffSetStr(miff, value.count, value.data.str);
    }
 
    returnTrue;
@@ -259,14 +259,14 @@ function:
 /**************************************************************************************************
 func: _SetBinBuffer
 **************************************************************************************************/
-static Gb _SetBinBuffer(Gmiff * const miff, Gcount const bufferCount, Gn1 const * const bufferData)
+static Gb _SetBinBuffer(Gmiff * const miff, Gcount const count, Gn1 const * const data)
 {
    Gindex index;
 
    // Testing the user way.
-   forCount(index, bufferCount)
+   forCount(index, count)
    {
-      returnFalseIf(!_MiffSetBinByte(miff, bufferData[index]));
+      returnFalseIf(!_MiffSetBinByte(miff, data[index]));
    }
 
    returnTrue;

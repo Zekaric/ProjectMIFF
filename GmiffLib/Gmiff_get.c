@@ -164,7 +164,7 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
 /**************************************************************************************************
 func: _MiffGetKey
 **************************************************************************************************/
-Gb _MiffGetKey(Gmiff * const miff)
+Gb _MiffGetKey(Gmiff * const miff, Gstr * const key)
 {
    Gindex index;
 
@@ -175,9 +175,8 @@ Gb _MiffGetKey(Gmiff * const miff)
    }
 
    // Copy the key over.
-   _MiffMemCopyTypeArray(miff->currentName, Gn1, GkeyBYTE_COUNT, &miff->readData[index]);
-
-   miff->currentNameCount = miff->readCount - index;
+   _MiffMemClearTypeArray(key, Gstr, GkeySIZE);
+   _MiffMemCopyTypeArray( key, Gn1, GkeyBYTE_COUNT, &miff->readData[index]);
 
    returnTrue;
 }
@@ -199,6 +198,14 @@ Gb _MiffGetLineSkip(Gmiff * const miff)
    }
 
    returnTrue;
+}
+
+/**************************************************************************************************
+func: _MiffGetNum
+**************************************************************************************************/
+void _MiffGetNum(Gmiff * const miff)
+{
+   _GetNum(miff, miff->value, miff->readCount, miff->readData);
 }
 
 /**************************************************************************************************
@@ -388,21 +395,9 @@ GmiffData _MiffGetStrLetter(Gmiff * const miff, Gstr * const letter)
 }
 
 /**************************************************************************************************
-func: _MiffGetValueHeader
-**************************************************************************************************/
-Gstr _MiffGetValueHeader(Gmiff * const miff)
-{
-   Gn1 byte;
-
-   return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
-
-   return (Gstr) byte;
-}
-
-/**************************************************************************************************
 func: _MiffGetValueCount
 **************************************************************************************************/
-Gcount _MiffGetValueBufferCount(Gmiff * const miff, GmiffGetCountEnder value)
+Gcount _MiffGetValueCount(Gmiff * const miff)
 {
    Gindex     index;
    Gstr       buffer[32];
@@ -426,9 +421,26 @@ Gcount _MiffGetValueBufferCount(Gmiff * const miff, GmiffGetCountEnder value)
 
    buffer[index] = 0;
 
-   _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer);
+   if (buffer[0] == '*')
+   {
+      return miffCountUNKNOWN;
+   }
+
+   _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer));
 
    return (Gcount) value.inr.n;
+}
+
+/**************************************************************************************************
+func: _MiffGetValueHeader
+**************************************************************************************************/
+Gstr _MiffGetValueHeader(Gmiff * const miff)
+{
+   Gn1 byte;
+
+   return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
+
+   return (Gstr) byte;
 }
 
 /**************************************************************************************************

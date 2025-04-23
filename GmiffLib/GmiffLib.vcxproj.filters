@@ -30,9 +30,6 @@
     <ClCompile Include="Gmiff_get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Gmiff_util.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GmiffLib.h">

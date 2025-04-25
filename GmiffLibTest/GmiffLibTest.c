@@ -2691,34 +2691,34 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
 #if defined(INCLUDE_BIN)
          gmiffRecordSetStart(          miff, "Binary Array");
-         gmiffRecordSetValue(          miff, gmiffValueSetArrayCount(3));
-         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
-         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
-         gmiffRecordSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffSetValue(          miff, gmiffValueSetArrayCount(3));
+         gmiffSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
+         gmiffSetValue(          miff, gmiffValueSetBin(3 * 256, _binary));
          gmiffRecordSetStop(           miff);
 #endif
 
          gmiffRecordSetStart(          miff, "User Type IntStrReal");
-         gmiffRecordSetValue(          miff, gmiffValueSetGroupCount(3));
-         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
-         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
-         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffSetValue(          miff, gmiffValueSetGroupCount(3));
+         gmiffSetValue(          miff, gmiffValueSetI(42));
+         gmiffSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffSetValue(          miff, gmiffValueSetR(3.1415926535897932));
          gmiffRecordSetStop(           miff);
 
          gmiffRecordSetStart(          miff, "User Type IntStrReal Array");
-         gmiffRecordSetValue(          miff, gmiffValueSetArrayCount(3));
-         gmiffRecordSetValue(          miff, gmiffValueSetGroupCount(3));
-         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
-         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
-         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffSetValue(          miff, gmiffValueSetArrayCount(3));
+         gmiffSetValue(          miff, gmiffValueSetGroupCount(3));
+         gmiffSetValue(          miff, gmiffValueSetI(42));
+         gmiffSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffSetValue(          miff, gmiffValueSetR(3.1415926535897932));
 
-         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
-         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
-         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffSetValue(          miff, gmiffValueSetI(42));
+         gmiffSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffSetValue(          miff, gmiffValueSetR(3.1415926535897932));
 
-         gmiffRecordSetValue(          miff, gmiffValueSetI(42));
-         gmiffRecordSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
-         gmiffRecordSetValue(          miff, gmiffValueSetR(3.1415926535897932));
+         gmiffSetValue(          miff, gmiffValueSetI(42));
+         gmiffSetValue(          miff, gmiffValueSetStr("Yes, but what is the question?"));
+         gmiffSetValue(          miff, gmiffValueSetR(3.1415926535897932));
          gmiffRecordSetStop(           miff);
       }
       gmiffSetBlockStop(miff);

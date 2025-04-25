@@ -22,9 +22,8 @@ License (Document): Creative Commons Attribution-NoDerivs.
 - [2 - Format](#2---format)
   - [2.1 - File Header](#21---file-header)
   - [2.2 - Content](#22---content)
-    - [2.2.2 - Key Section](#222---key-section)
-    - [Block Start, Array Count, Grouping Count section](#block-start-array-count-grouping-count-section)
-    - [2.2.3 - Value Section](#223---value-section)
+    - [2.2.2 - Key Values](#222---key-values)
+    - [2.2.3 - Values](#223---values)
   - [Examples](#examples)
 - [Notes](#notes)
   - [Comparing with JSON.](#comparing-with-json)
@@ -77,101 +76,61 @@ zekaric@gmail.com
 
 # 2 - Format
 
-A MIFF File is a UTF8 text file.
+A **MIFF File is a UTF8 text file**.
 
-Each line in the text file is a 'record' or piece of data.  A record is delimited by [tb], '\t', tab characters and is terminated by a UNIX [nl], '\n', new line character.  The contents of the file is a collection of key value pairs.
+**Each line** in the text file **is a record**.  Each record is **terminated with a** [nl], '\n' **new line character**.
 
-The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a data transfer file format between softwared packages or a general format to store data.  It could be used as a native format if desired, just like where JSON is used.
+**A record is a collection of values**.  Each value is **separated by a** [tb], '\t', **tab** character.
 
-Any data that is encode or stored as a binary byte sequence will be in big endian order.
+**A record is** generally **a key-value pair**.
+
+The intent with this format is to make only one read pass over the file.  There is no focus on making the file randomly accessable or modifiable.  This format is not intended as a substitute for native formats for any software package.  This file is meant to be a data transfer file format between software packages or a general format to store data.  It could be used as a native format if desired, just like where JSON is used, but performance will most likely not be better than something more tailor made.
+
+Any data that is encode or stored as a binary byte sequence will be defined by the subformat of the file.
 
 ## 2.1 - File Header
 
-There will always be a file header so that you can be sure the file you recieved is actually a MIFF file and not some other file.  The header is 4 lines long.
+First two records of the file are always the header lines.
 
 ```
 MIFF[tb]1[nl]
-[Sub-Format Name string][tb][Sub-Format Version integer][nl]
+[value: Sub-Format Name text string][tb][value: Sub-Format Version integer][nl]
 ```
 
-[nl] means a new line character.
+* **Line 1** - Format of the file: text string value "MIFF", tab, Version of the file: natural value "1"
+* **Line 2** - Sub-Format name: text string value, tab, Sub-Format version: natural value.
 
-* **Line 1** - Format of the file: "MIFF", tab, Version of the file: "1"
-* **Line 2** - Sub-Format name, tab, Sub-Format version integer.
+The sub-format name is not limited to any characters.  Text strings are always in UTF8 format.  The only limit to the format name is that it can not be longer than 4096 bytes and it cannot contain raw [tb]s or [nl]s.  Leading spaces are trimmed.  Trailing spaces should not exist but if they do then it is part of the format name.  Spaces internal to the format name are also allowed and are significant.
 
-If a sub-format name exists it is not limited to any characters.  A MIFF header is in UTF8 format always.  The only limit to the format name is that it can not be longer than 255 bytes in length and it cannot contain [tb]s or [nl]s.  Leading spaces are trimmed.  Trailing spaces should not exist but if they do then it is part of the format name.  Spaces internal to the format name are also allowed and are significant.
-
-I say 255 bytes instead of characters because in UTF8, one UNICODE character or codepoint can span multiple bytes.  So this name can not exceed this byte count.
+I say 4096 bytes instead of characters because in UTF8, one UNICODE letter or codepoint can span multiple bytes.  So this name can not exceed this byte count.  These header lines will be encoded like other text values found in the records.  See how a record and record values are encoded.
 
 ## 2.2 - Content
 
-Each record (a line in the file) is split into 2 to 3 sections.  The key for the line, an optional array and/or grouping count, and the value section.
+Each record (a line in the file) is a collection of values.  The first value has a particular meaning and is considered the key for the record.
 
-Each section is separated by a [tb].  The entire line ends in a [nl].
-
-```
-[key][tb][value][nl]
--or-
-[key][tb][array and/or grouping count][tb][value][nl]
-```
-
-### 2.2.2 - Key Section
-
-Keys are any string that is up to 255 bytes long.  I say bytes because in UTF8 format, UNICODE characters can take up multiple bytes.  So as long as the key is not larger than 255 bytes, the key is valid.  The key can have spaces or any special characters you like except [tb]s and [nl]s.  Leading spaces are trimmed and are not included.  Trailing spaces should not exist and will become part of the key if they do exist.  Internal spaces within the key are part of the key.
-
-Special key of **}** will indicate a closing of a block.
-
-### Block Start, Array Count, Grouping Count section
-
-Block start will look like...
+Each value is separated by a [tb].  The entire line ends in a [nl].  For example...
 
 ```
-{
+[key value][nl]
+[key value][tb][value][nl]
+[key value][tb][value][tb][value]nl]
+[key value][tb][value][tb][value][tb][value][nl]
+...
 ```
 
-...followed by a [nl].  The key is the name of the block.
+### 2.2.2 - Key Values
 
-An Array count will look like...
+Keys are generally text string values but nothing it limiting you to that.  Key values are the only values in the record where there may be leading spaces.  Any leading spaces are trimmed.  Trailing and internal spaces are not trimmed and are significant to the text string.
 
-```
-[10
-```
+However key values are generally needed for a structured file.  If all you are dumping is a very simple list of values then the first value of a record can be anything.  It all depends on what the subformat for the file dictates.
 
-It will start with a "[" and followed immediately by a natural number 0 or larger.  Why is 0 possible.  It might be significant for the reader to know that this is an array but it is deliberately empty.
+See Values next section for what a key will will look like.  Certain text strings will need a "[count] prefix if the text string starts with a certain letter.
 
-Grouping count will look like...
+### 2.2.3 - Values
 
-```
-(3
-```
+The sub-format of the file should be dictating what key values follow.  This should be defined somewhere in the documentation of the sub-format.  Like Mining Information MIFF file format.
 
-It will start with a "(" and followed immediately by a natrual number 2 or larger.  What is grouping needed for?  It is intended to convey how many items are per array item.  Lets say we have a user type like a point which has 3 double values.
-
-So if we had a point list of 52 points we could see the following...
-
-```
-[52 (3
-```
-
-If both are provided then they are separated by a space.  Array specification is always first.
-
-If the size of the array is unknown then you can provide...
-
-```
-[*
-```
-
-This will tell reader that the writer didn't know the size of the array before writing and to proceed with a potentially variable array size.
-
-Is either strictly necessary?  No.  You can still have a key value that still dictates an array and not specified beforehand.  It just helps the reader to allocate space properly for faster reading.  Sometimes grouping may not be as 'neat' as a fixed size.  Then it will need to be determined by the format of the value by the subformat of the file.  However it is generally assumed if array or grouping is missing then their respective values are 1 but it is not a strict rule.
-
-By default, if this section is missing, it is generally assumed that the array count and grouping count is 1 but that is not a strict rule.  Often, by what the key is referring to, the value could be a known type of specified values.  Set value section.
-
-### 2.2.3 - Value Section
-
-The sub-format of the file should be dictating what values follow.  This should be defined somewhere in the documentation of the sub-format.
-
-There can be 0 or more values associated with the key.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a [tb].
+There can be 0 or more values other than the key value associated with the record.  Again depending on what the sub-format documenation dictates.  Each value will be separated by a [tb].
 
 If there is a count in the line header other than 1, then there should be multiple copies of whatever type that is associated with the key.
 
@@ -187,13 +146,14 @@ The valueData will depend on the header.
 
 | Header | Default |Description |
 | --- | --- | --- |
-| ~ | | The value data is unset/null.  Nothing else follows the header. |
-| 0 1 2 3 4 5 6 7 8 9 . e -<br />I i<br />N<br />R r C c ? | 0 |A number.<br />A boolean value this will be 0 (false) or 1 (true).<br />An integer value will be a number between INT_MIN to INT_MAX.  "I" is short for INT_MAX, and "i" is short for INT_MIN.<br />A natural value will be a nbumber between 0 and UINT_MAX.  "N" is short for UINT_MAX.<br />A small real value  will be written simply.  E.G.: 0, 1.1, -1.5.  <br />A large real value will be written in scientific notation.  E.G.: 3.1415e128.  "R" is short for DBL_MAX, "r" is short for -DBL_MAX, "C" is short for infinity, "c" is short for -infinity, and "?" is short for not a number. |
-| "[count] | empty string |The value data will be a string.  There is no closing **"**.  [count] denotes the size of the string in bytes but it can be optional.  If the string is less than 4K in size this count can be omitted.  [count] can be a "*" to indicate that the length of the string is unknown and should be obtained from reading the string carefully.<br />A single space follows the [count] value and the string immediately follows up to the next [tb] or [nl] which ever is next.  All [tb], [nl], and '\' characters inside the string are escaped.  Meaning a [tb] inside the string will be '\t', a [nl] inside teh string will be a '\n', and a '\' inside the string will be a '\\'.  Nothing else is escaped and should be written as is in the file. |
-| .[count] | empty buffer |The value data is a binary buffer.  [count] denotes the size of the binary buffer in bytes but it can be optional.  If the buffer is less than 4K in size this count can be omitted.  [count] can be a "*" to indicate that the size of the buffer is unknown and should be obtained from reading the buffer carefully.<br />A single space follows the [count] value and the binary buffer in hexidecimal encoding immediately follows. |
-| [Any other letter] | | Bad format |
-
-Each key can potentially have 0 or more values.  If more than one value present for a key, then each value is separated by a [tb] character.
+| ~ | | The value is null.<br /><br />Nothing else follows the header. |
+| { | | A block start.<br /><br />Normally nothing else follows the header.  Used as the first value after a key value but may also follow array specifiers.  But could possibly be used to encode a more complicated data structure in which case a stop block will also be included.  But as the format author, keep things simple. |
+| } | | A block stop.<br /><br />This is often used without a key value.  Meaning it is often in the key value spot of a record.  A key is not necessary as it will simply close the last block that was started.  If a key value is provided, no check to see if it matches the start block key is made. |
+| [[count] | | An array specifier.<br /><br>The values following are part of an array.  [count] can be * if unknown.  Multiple array specifiers can be used to indicate nested arrays.<br /><br />The reader and writer of the format will need to validate if the item count of the values that follow are actually matching the count provided.<br /><br />(This value is not necessary if subformat is explicit about what a value for a key should be.  Can be used to make the format more obvious or allow readers to allocate space.) |
+| ([count]<br/>([type name] | | A user type.<br /><br />[count] should be a number of values in the user type or [type name] should be a simple text string for the user type.  This can follow an array specifier.<br /><br />The reader and writer of the format will need to validate if the values that follow match the user type.<br /><br />(This value is not necessary if the subformat is explicit about what the value for a key should be.  Can be used to make the format more obvious or allow readers to allocate proper space.  It is encouraged to include a record defining [type name] before its use in the file, but again, not strictly necessary as long as it is adequately documented somewhere.) |
+| 0 1 2 3 4 5 6 7 8 9 + -<br />+I -I +N +R -R +C -C ? | 0 |The value is a number.<br /><br />A boolean value this will be 0 (false) or 1 (true).<br /><br />An integer value will be a number between INT64_MIN to INT64_MAX.<br />**+I** is short for MAX value.<br />**-I** is short for MIN value.<br /><br />A natural value will be a number between 0 and UINT64_MAX.<br />**+N** is short for MAX value.<br /><br />A small real value  will be written simply.  E.G.: 0, 1.1, -1.5.  <br />A large real value will be written in scientific notation.  E.G.: 3.1415e128.<br />**+R** is short for DBL_MAX.<br />**-R** is short for -DBL_MAX.<br />**+C** is short for infinity.<br />**-C** is short for -infinity.<br />**?** is short for not a number. |
+| `[count] | empty buffer |The value is a binary buffer.<br /><br/>[count] denotes the size of the binary buffer in bytes but it can be optional.  If the buffer is less than 4K in size this count can be omitted.  If the count is unknown at write time, [count] can be a "*" to indicate that the size of the buffer is unknown and should be obtained from reading the buffer carefully.<br />A single space follows the [count] and the binary buffer data is in hexidecimal encoding immediately following that space. |
+| Any other letter than 0123456789{}\`"([+-<br />"[count] | empty string | The value is a text string.<br /><br/>If the header is a letter other than 0123456789{}\`"([+- then the header letter is part of the text and the entire text string is up to the next \t or \r.  In this case the length of the text string is limited ot 4096 bytes.<br /><br />If the string starts with 0123456789{}\`([+- then we need to use the "[count] header.  [count] gives you the size of the text string in bytes (not letters.) [count] can be omitted if the byte count of the text string is not larger than 4096.  [count] can be * to indicate that the size of the text string is unknown and should be obtained from reading the buffer carefully.<br /><br />A single space follows the [count] and the text string continues until the \t or \n.<br /><br />All [tb], [nl], and '\' characters inside the string are escaped.  Meaning a [tb] inside the string will be '\t', a [nl] inside teh string will be a '\n', and a '\' inside the string will be a '\\'.  Nothing else is escaped and should be written as is in the file. |
 
 ## Examples
 
@@ -215,10 +175,10 @@ True And False[tb][2[tb]1[tb]0[nl]
 Numbers[tb][7[tb]0[tb]1[tb]-1[tb]i[tb]0.[tb]3.14159[tb]R[tb]?[nl]
 -
 - Some strings.
-Strings[tb][3[tb]" The quick brown fox\njumped over the lazy dog.[tb]" Salut, c'est été.[tb]" 你好马[nl]
+Strings[tb][3[tb]The quick brown fox\njumped over the lazy dog.[tb]Salut, c'est été.[tb]你好马[nl]
 -
 - Some binary data.
-binary buffer[tb]. FEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEF[nl]
+binary buffer[tb]` FEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEF[nl]
 ```
 
 # Notes
@@ -231,38 +191,45 @@ File size from the test program which dumps out every data type MIFF can support
 
 | File | Size In Bytes Text | Size In Bytes Zipped |
 | --- | --- | --- |
-| JSON compressed to one line | 32,335 | 2,178 |
-| JSON Miff style formatted | 32,550 | 2,316 |
-| MIFF | 29,432 | 2,191 |
-
+| JSON formatted to one line | 32,335 | 2,178 |
+| JSON formatted for human readability | 32,550 | 2,316 |
+| MIFF | (need to redo because of format change) | (need to redo because of format change) |
 
 JSON compressed to one line removed quite a bit of formatting bytes.  When compressed this difference becomes almost negligable.
 
 ### Comments
 
-Doing an apples to apples comparison with JSON, MIFF saves quite a few bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge differences.
+Doing an apples to apples comparison with JSON, MIFF saves some bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge differences.
 
-Where MIFF saves some space.
+**Where MIFF better than JSON?**
 
 | Part                     | Comments | Size | Readable | Speed |
 | ---                      | ---      | ---  | ---      | ---   |
-| Header                   | MIFF has a header with versions<br />JSON does not have a header. | + JSON | + MIFF | - |
-| Keys                     | MIFF does not need keys to be enclosed in quotes.<br />JSON encloses keys within quotes. | + MIFF | - | - |
-| Array Count              | MIFF has an array count and grouping count.<br />JSON does not have such concept. | + JSON | + MIFF | + MIFF |
+| Header                   | Header and subformat header<br />MIFF has a header with versions<br />JSON does not have a header.  Better hope you know what you are reading. | + JSON | + MIFF | - |
+| Keys                     | MIFF does not need keys and text strings to be enclosed in quotes and most do not need the "[count] prefix.<br />JSON encloses all keys and text strings within quotes. | + MIFF | - | - |
+| Array Count              | MIFF has an array count and grouping count option.<br />JSON does not have such concept. | + JSON | + MIFF | + MIFF |
 | Record Ender             | MIFF needs just a single [nl].<br />JSON will depend on formatting. | - | - | - |
 | True, False, Null        | MIFF uses "1", "0", "~".<br />JSON uses "true", "false", "null" | + MIFF | - | + MIFF |
 | Numbers                  | MIFF and JSON writes numbers roughtly the same | - | - | - |
-| Numbers - Special Values | Infinity, -Infinity, Not a Number, Maximum and Minimum<br />MIFF has constants for these values.<br />JSON has no standard for these values.  Implementations vary. | + MIFF | + MIFF | + MIFF |
-| Array of objects         | MIFF will require you to just make duplicate key blocks<br />JSON has object definition built in. | + JSON | + JSON | - |
-| Allow for duplicate keys in a block/object | MIFF is intended to be read in sequence.  Duplicate use of keys is expected.<br />JSON doesn't forbid it but if you want a JSON to be read correctly by every importer then you should treat the data as if it is an object in memory.  So you need to make an array of objects instead.<br />Neither is better, just need to be aware either file's intended use. | - | - | - |
+| Numbers - Special Values | Infinity, -Infinity, Not a Number, Maximum, and Minimum<br />MIFF has constants for these values.<br />JSON has no standard for these values.  Implementations vary. | + MIFF | + MIFF | + MIFF |
+| Array of objects         | MIFF will require you to just make duplicate key blocks however a block can have an array specifier<br />JSON has object definition built in more elegantly. | + JSON | + JSON | - |
+| Allow for duplicate keys in a block/object | MIFF is intended to be read in sequence.  Duplicate use of keys is expected.<br />JSON doesn't forbid it but if you want a JSON to be read correctly by every importer then you should treat the data as if it is an actual object in memory.  So you need to make an array of objects instead.<br />I give JSON a slight advantage for readability here. | - | + JSON | - |
 
 **Is MIFF better?**
 
-No.  It will depend on how much value you place on readability and editability of the format.
+No.
 
-I suspect MIFF will have a slight advantage over reading and writing speed over JSON because there is less processing of numbers from the text format to binary in memory representation since the text format of the number is basically binary.
+I suspect MIFF might have a slight advantage over reading and writing speed over JSON but only slightly.  Probably the difference is not anything to write about.  However MIFF format and parsing is way simpler than JSON.
 
-The question is, how important is it to read the file and edit it manually?  Maybe for testing and debugging but in general, common everyday users are never going to.  So for the most part, whoever is actually reading the file will be a developer or similar.  Granted the real numbers will be a pain in the ass even for developers.
+The header of the file will tell you what the file contains.  JSON has no such thing other than the file name giving you some hint as to what is contained in the file.  OR you structured the JSON to has a small layer to provide a key to the overall object that the file contains.  At least will MIFF, the header tells you it is a MIFF file and what information is store in the file with the subformat header line.  To me this would be important information.  Otherwise, an importer of data may not know if it is receiving data it is expecting.
+
+JSON doesn't include any size information for arrays or strings.  This leaves it up to the importer to guess how large an array or string should be.  At least with MIFF you can allocate the size before reading.  Nicer for the importer.
+
+JSON doesn't handle numbers quite right.  But this is because JavaScript doesn't handle numbers quite right.  Encoding some special values is not standard.  You can't encode all 64 bit integers or naturals.  Often, for JSON, if a number can't be represented, it is turned into a string.  This adds complication for the importer and exporter of JSON data.  This is where MIFF, I believe, does it right.
+
+JSON does array of objects better.  I can't argue that point.  JSON is closer to a programming language in that respect so it naturally does it better.
+
+MIFF, I will say, limits how you can write out the file.  It will be fairly predictable while JSON could include a lot of space and formatting or none at all.  I'm not sure which would have the upper hand here but I like MIFF's 1 line 1 record.
 
 ## Comments on MIFF
 

@@ -156,7 +156,7 @@ void            gmiffDloc(                   Gmiff       * const miff);
 void            gmiffDlocContent(            Gmiff       * const miff);
 
 Gb              gmiffGetRecordStart(         Gmiff       * const miff, Gstr       * const key);
-Gb              gmiffGetRecordStop(           Gmiff       * const miff);
+Gb              gmiffGetRecordStop(          Gmiff       * const miff);
 GmiffValue      gmiffGetRecordValue(         Gmiff       * const miff);
 Gb              gmiffGetValueBin(            Gmiff       * const miff, Gcount const binCount, Gn1  * const binBuffer);
 GmiffData       gmiffGetValueBinData(        Gmiff       * const miff, Gn1 * const binByte);
@@ -179,6 +179,7 @@ Gb              gmiffSetR4(                  Gmiff       * const miff, Gstr cons
 Gb              gmiffSetR4Array(             Gmiff       * const miff, Gstr const * const name, Gcount const count, Gr4 const * const array);
 Gb              gmiffSetStr(                 Gmiff       * const miff, Gstr const * const name, Gstr const * const value);
 Gb              gmiffSetStrArray(            Gmiff       * const miff, Gstr const * const name, Gcount const count, Gstr ** const array);
+Gb              gmiffSetValue(               Gmiff       * const miff, GmiffValue const value);
 
 Gb              gmiffStart(                  GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
 void            gmiffStop(                   void);
@@ -193,7 +194,6 @@ call
 **************************************************************************************************/
 Gb              gmiffRecordSetStart(         Gmiff       * const miff, Gstr const * const key);
 Gb              gmiffRecordSetStop(          Gmiff       * const miff);
-Gb              gmiffRecordSetValue(         Gmiff       * const miff, GmiffValue const value);
 Gb              gmiffRecordSetValueB(        Gmiff       * const miff, Gb const value);
 Gb              gmiffRecordSetValueBin(      Gmiff       * const miff, Gcount const byteCount, Gn1 const * const binBuffer);
 Gb              gmiffRecordSetValueBinByte(  Gmiff       * const miff, Gn1 const byte);

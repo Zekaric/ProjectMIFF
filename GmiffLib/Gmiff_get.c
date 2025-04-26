@@ -40,10 +40,11 @@ include:
 local:
 prototype:
 **************************************************************************************************/
-static void  _GetNumInt(         Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
-static Gb    _GetNumIntNegative( Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
+static void  _GetNum(            Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
+static void  _GetNumInteger(     Gmiff * const miff, Gstr * const str);
+static void  _GetNumReal(        Gmiff * const miff, Gstr * const str);
 
-static Gn8   _StrToN(            Gstr const * const str);
+static Gn8   _NFromStr(          Gstr const * const str);
 
 static Gn1   _ValueFromHexInt(   Gn1 const value);
 
@@ -74,19 +75,10 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
 {
    returnFalseIf(count < 2);
 
-   if (strIsEqual(2, buffer, "Z0"))
-   {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = 0;
-      miff->value.inr4.r = 0;
-      returnTrue;
-   }
+   miff->value.type   = gmiffValueTypeNUM;
 
-   if (strIsEqual(2, buffer, "ZR"))
+   if (strIsEqual(2, buffer, "+R"))
    {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
       miff->value.isR8   = gbTRUE;
       miff->value.isR4   = gbTRUE;
       miff->value.inr.r  = Gr8MAX;
@@ -94,9 +86,8 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "Zr"))
+   if (strIsEqual(2, buffer, "-R"))
    {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
       miff->value.isR8   = gbTRUE;
       miff->value.isR4   = gbTRUE;
       miff->value.inr.r  = -Gr8MAX;
@@ -104,9 +95,8 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "Z+"))
+   if (strIsEqual(2, buffer, "+C"))
    {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
       miff->value.isR8   = gbTRUE;
       miff->value.isR4   = gbTRUE;
       miff->value.inr.r  = HUGE_VAL;
@@ -114,9 +104,8 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "Z-"))
+   if (strIsEqual(2, buffer, "-C"))
    {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
       miff->value.isR8   = gbTRUE;
       miff->value.isR4   = gbTRUE;
       miff->value.inr.r  = -HUGE_VAL;
@@ -124,9 +113,8 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "Z?"))
+   if (strIsEqual(1, buffer, "?"))
    {
-      miff->value.type   = gmiffValueTypeNUM_REAL;
       miff->value.isR8   = gbTRUE;
       miff->value.isR4   = gbTRUE;
       miff->value.inr.r  = GrNAN;
@@ -134,30 +122,29 @@ Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const bu
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "ZI"))
+   if (strIsEqual(2, buffer, "+I"))
    {
-      miff->value.type   = gmiffValueTypeNUM_INT;
       miff->value.isI    = gbTRUE;
       miff->value.inr.i  = Gi8MAX;
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "Zi"))
+   if (strIsEqual(2, buffer, "-I"))
    {
-      miff->value.type   = gmiffValueTypeNUM_INT;
       miff->value.isI    = gbTRUE;
       miff->value.inr.i  = Gi8MIN;
       returnTrue;
    }
 
-   if (strIsEqual(2, buffer, "ZN"))
+   if (strIsEqual(2, buffer, "+N"))
    {
-      miff->value.type   = gmiffValueTypeNUM_INT;
       miff->value.inr.n  = Gn8MAX;
       returnTrue;
    }
 
-   // unknown Z value
+   // unknown constant value
+   miff->value.type = gmiffValueTypeNONE;
+
    returnFalse;
 }
 
@@ -205,7 +192,7 @@ func: _MiffGetNum
 **************************************************************************************************/
 void _MiffGetNum(Gmiff * const miff)
 {
-   _GetNum(miff, miff->value, miff->readCount, miff->readData);
+   _GetNum(miff, &miff->value, miff->readCount, miff->readData);
 }
 
 /**************************************************************************************************
@@ -426,7 +413,7 @@ Gcount _MiffGetValueCount(Gmiff * const miff)
       return miffCountUNKNOWN;
    }
 
-   _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer));
+   _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer);
 
    return (Gcount) value.inr.n;
 }
@@ -447,24 +434,6 @@ Gstr _MiffGetValueHeader(Gmiff * const miff)
 local:
 function:
 **************************************************************************************************/
-/**************************************************************************************************
-func: _GetNumIntNegative
-**************************************************************************************************/
-static Gb _GetNumIntNegative(Gmiff * const miff, GmiffValue * const value, Gcount const count,
-   Gn1 const * const buffer)
-{
-   _GetNumInt(miff, value, count, buffer);
-
-   // Out of range.
-   // If positive, nTemp can't be larger than UINT64_MAX.
-   // If negative, nTemp can't be larger than UINT64_MAX + 1.  UINT64_MIN = -UINT64_MAX - 1.
-   returnFalseIf(value->inr.n > ((Gn8) Gi8MAX) + 1);
-
-   value->inr.i = -((Gi8) value->inr.n - 1) - 1;
-
-   returnTrue;
-}
-
 /**************************************************************************************************
 func: _GetNum
 **************************************************************************************************/
@@ -525,7 +494,7 @@ static void _GetNum(Gmiff * const miff, GmiffValue * const value, Gcount const c
    if (isIntegerNumberFound)
    {
       value->type = gmiffValueTypeNUM;
-      _GetNumberInteger(miff, numStr);
+      _GetNumInteger(miff, numStr);
    }
    return;
 
@@ -564,7 +533,7 @@ GET_FRACTION:
    if (isFractionalNumberFound)
    {
       value->type = gmiffValueTypeNUM;
-      _GetNumberReal(miff, numStr);
+      _GetNumReal(miff, numStr);
    }
    return;
 
@@ -604,7 +573,7 @@ GET_EXPONENT:
 
       if ('0' <= buffer[index] && buffer[index] <= '9')
       {
-         numStr[numIndex++]    = (Gstr) json->lastByte;
+         numStr[numIndex++]    = buffer[index];
          isExponentNumberFound = gbTRUE;
       }
       else
@@ -615,8 +584,89 @@ GET_EXPONENT:
 
    if (isExponentNumberFound)
    {
-      _GetNumberReal(miff, numStr);
+      _GetNumReal(miff, numStr);
    }
+}
+
+/**************************************************************************************************
+func: _GetNumInteger
+**************************************************************************************************/
+static void _GetNumInteger(Gmiff * const miff, Gstr * const str)
+{
+   // Default number type.
+   miff->value.type    = gmiffValueTypeNUM;
+   miff->value.isI     =
+      miff->value.isN  =
+      miff->value.isR8 =
+      miff->value.isR4 = gbFALSE;
+
+   // This is a negative number.  Definitely not a natural number.
+   if (str[0] == '-')
+   {
+      miff->value.inr.n = _NFromStr(&str[1]);
+      if (miff->value.inr.n == ((Gn8) Gi8MAX) + 1)
+      {
+         miff->value.isI   = gbTRUE;
+         miff->value.inr.i = Gi8MIN;
+
+         return;
+      }
+      if (miff->value.inr.n <= Gi8MAX)
+      {
+         miff->value.isI   = gbTRUE;
+         miff->value.inr.i = - ((Gi8) miff->value.inr.n);
+
+         return;
+      }
+
+      // Not all values are representable if they are too large.
+      miff->value.inr.n = 0;
+
+      return;
+   }
+
+   miff->value.isN   = gbTRUE;
+   miff->value.inr.n = _NFromStr(str);
+
+   // This unsigned integer is small enough to be a signed integer.
+   if (miff->value.inr.n <= Gi8MAX)
+   {
+      miff->value.isI   = gbTRUE;
+      miff->value.inr.i = miff->value.inr.n;
+
+      return;
+   }
+}
+
+/**************************************************************************************************
+func: _GetNumReal
+**************************************************************************************************/
+static void _GetNumReal(Gmiff * const miff, Gstr * const str)
+{
+   miff->value.inr.i  = 0;
+   miff->value.inr.n  = 0;
+   miff->value.inr.r  = _atof_l(str, _MiffLocaleGet());
+   miff->value.inr4.r = (float) miff->value.inr.r;
+   miff->value.type   = gmiffValueTypeNUM;
+}
+
+/**************************************************************************************************
+func: _NFromStr
+**************************************************************************************************/
+static Gn8 _NFromStr(Gstr const * const str)
+{
+   Gi4 index;
+   Gn8 value;
+
+   value = 0;
+   loopCount(index)
+   {
+      breakIf(str[index] == 0);
+
+      value = value * 10 + str[index] - '0';
+   }
+
+   return value;
 }
 
 /**************************************************************************************************
@@ -656,70 +706,4 @@ static Gn1 _ValueFromHexInt(Gn1 const value)
    }
 
    return 0;
-}
-
-/**************************************************************************************************
-func: _GetNumInteger
-**************************************************************************************************/
-static void _GetNumInteger(Gmiff * const miff, Gstr * const numberStr)
-{
-   miff->value.isI     =
-      miff->value.isR4 =
-      miff->value.isR8 = gbFALSE;
-
-   // This is a negative number.  Definitely not a natural number.
-   if (numberStr[0] == '-')
-   {
-      miff->value.inr.n = _StrToN(&numberStr[1]);
-      if (miff->value.inr.n == ((Gn8) Gi8MAX) + 1)
-      {
-         miff->value.isI   = gbTRUE;
-         miff->value.inr.i = Gi8MIN;
-
-         return;
-      }
-      if (miff->value.inr.n <= Gi8MAX)
-      {
-         miff->value.isI   = gbTRUE;
-         miff->value.inr.i = - (Gi8) miff->value.inr.n;
-
-         return;
-      }
-
-      // Number it not representable as an integer.
-      miff->value.n  = 0;
-
-      miff->value.isR8 = gbTRUE;
-      miff->value.r  = -((Gr8) miff->value.inr.n);
-      miff->value.r4 = -((Gr4) miff->value.inr.n);
-
-      return;
-   }
-
-   miff->value.inr.n = _StrToN(numberStr);
-   // This unsigned integer is small enough to be a signed integer.
-   if (miff->value.inr.n <= Gi8MAX)
-   {
-      miff->value.isI   = gbTRUE;
-      miff->value.inr.i = miff->value.inr.n;
-   }
-}
-
-/**************************************************************************************************
-func: _StrToN
-**************************************************************************************************/
-static Gn8 _StrToN(Gstr const * const str)
-{
-   Gi4 index;
-   Gn8 value;
-
-   value = 0;
-   loopCount(index)
-   {
-      breakIf(str[index] == 0);
-
-      value = value * 10 + str[index] - '0';
-   }
-
-   return value;
 }

@@ -1,4 +1,4 @@
-# M.I.F.F.: Mixed Information File Format
+# M.I.F.F.: Mixed Information File Format <!-- omit in toc -->
 
 ```
 Author:             Robbert de Groot
@@ -10,37 +10,34 @@ License (Document): Creative Commons Attribution-NoDerivs.
                     https://creativecommons.org/licenses/by-nd:4.0
 ```
 
-## Table Of Contents:
+## Table Of Contents: <!-- omit in toc -->
 
-- [M.I.F.F.: Mixed Information File Format](#miff-mixed-information-file-format)
-  - [Table Of Contents:](#table-of-contents)
-- [1 - M.I.F.F.](#1---miff)
-  - [1.1 - Discussion](#11---discussion)
-  - [1.2 - Goals](#12---goals)
-  - [1.3 - Design Decisions:](#13---design-decisions)
-  - [1.4 - Disclosure](#14---disclosure)
-- [2 - Format](#2---format)
-  - [2.1 - File Header](#21---file-header)
-  - [2.2 - Content](#22---content)
-    - [2.2.2 - Key Values](#222---key-values)
-    - [2.2.3 - Values](#223---values)
-  - [Examples](#examples)
-- [Notes](#notes)
-  - [Comparing with JSON.](#comparing-with-json)
-    - [File Size](#file-size)
-    - [Comments](#comments)
-  - [Comments on MIFF](#comments-on-miff)
+- [1. M.I.F.F.](#1-miff)
+  - [1.1. Discussion](#11-discussion)
+  - [1.2. Goals](#12-goals)
+  - [1.3. Design Decisions:](#13-design-decisions)
+  - [1.4. Disclosure](#14-disclosure)
+- [2. Format](#2-format)
+  - [2.1. File Header](#21-file-header)
+  - [2.2. Content](#22-content)
+    - [2.2.1. Value](#221-value)
+  - [2.3. Example](#23-example)
+- [3. Notes](#3-notes)
+  - [3.1. Comparing with JSON.](#31-comparing-with-json)
+    - [3.1.1. File Size](#311-file-size)
+    - [3.1.2. Comments](#312-comments)
+  - [3.2. Comments on MIFF](#32-comments-on-miff)
 
 
-# 1 - M.I.F.F.
+# 1. M.I.F.F.
 
-## 1.1 - Discussion
+## 1.1. Discussion
 
 **What is the purpose of M.I.F.F. (MIFF)?**
 
 MIFF is intended to be a simple file format for storing data.  Any data.  And large amounts of data without being too fat.
 
-## 1.2 - Goals
+## 1.2. Goals
 
 * **Simple**    The format should be simple for the developers to export their data and still be fairly simple to re-import that data.
 
@@ -50,7 +47,7 @@ MIFF is intended to be a simple file format for storing data.  Any data.  And la
 
 * **Accurate**  The format needs to be able to maintain accuracy of the data.  Namely floating point values.  The in memory value when exported should be reimported without any change.
 
-## 1.3 - Design Decisions:
+## 1.3. Design Decisions:
 
 **Why not XML or JSON?**
 
@@ -64,7 +61,7 @@ Both are very flexible but that can be a double edged sword.  I feel there shoul
 
 In the past my company was multi-platform, SGI IRIX, SUN OS, SUN Solaris and Windows (NT/2000/XP/etc.)  At that time the architecture on some of the other platforms was big endian and we stored the data in the native format of the machine.  However this lead to issues when users moved their data over to a machine with a different endian.  The problems that we faced were trivial to solve but were very annoying and yet anothering thing to remember.  So standardizing on one option is easier than having to support two options.  I go with simplicity, only one option to rule them all!  It keeps things simpler even if it does mean a potential performance hit for a platform.  This format is not meant to be good in performance; its main goal is to be good in getting data moved from one place to another, accurately.
 
-## 1.4 - Disclosure
+## 1.4. Disclosure
 
 I, Robbert de Groot, have been a professional Software Developer since 1995.
 
@@ -74,7 +71,7 @@ I can be reached at the following email address.
 
 zekaric@gmail.com
 
-# 2 - Format
+# 2. Format
 
 A **MIFF File is a UTF8 text file**.
 
@@ -88,7 +85,7 @@ The intent with this format is to make only one read pass over the file.  There 
 
 Any data that is encode or stored as a binary byte sequence will be defined by the subformat of the file.
 
-## 2.1 - File Header
+## 2.1. File Header
 
 First two records of the file are always the header lines.
 
@@ -104,29 +101,21 @@ The sub-format name is not limited to any characters.  Text strings are always i
 
 I say 4096 bytes instead of characters because in UTF8, one UNICODE letter or codepoint can span multiple bytes.  So this name can not exceed this byte count.  These header lines will be encoded like other text values found in the records.  See how a record and record values are encoded.
 
-## 2.2 - Content
+## 2.2. Content
 
-Each record (a line in the file) is a collection of values.  The first value has a particular meaning and is considered the key for the record.
+Each record (a line in the file) is a collection of values.  The first value can be considered a 'key value' for the record.
 
 Each value is separated by a [tb].  The entire line ends in a [nl].  For example...
 
 ```
-[key value][nl]
-[key value][tb][value][nl]
-[key value][tb][value][tb][value]nl]
-[key value][tb][value][tb][value][tb][value][nl]
+[value][nl]
+[value][tb][value][nl]
+[value][tb][value][tb][value]nl]
+[value][tb][value][tb][value][tb][value][nl]
 ...
 ```
 
-### 2.2.2 - Key Values
-
-Keys are generally text string values but nothing it limiting you to that.  Key values are the only values in the record where there may be leading spaces.  Any leading spaces are trimmed.  Trailing and internal spaces are not trimmed and are significant to the text string.
-
-However key values are generally needed for a structured file.  If all you are dumping is a very simple list of values then the first value of a record can be anything.  It all depends on what the subformat for the file dictates.
-
-See Values next section for what a key will will look like.  Certain text strings will need a "[count] prefix if the text string starts with a certain letter.
-
-### 2.2.3 - Values
+### 2.2.1. Value
 
 The sub-format of the file should be dictating what key values follow.  This should be defined somewhere in the documentation of the sub-format.  Like Mining Information MIFF file format.
 
@@ -155,7 +144,9 @@ The valueData will depend on the header.
 | `[count] | empty buffer |The value is a binary buffer.<br /><br/>[count] denotes the size of the binary buffer in bytes but it can be optional.  If the buffer is less than 4K in size this count can be omitted.  If the count is unknown at write time, [count] can be a "*" to indicate that the size of the buffer is unknown and should be obtained from reading the buffer carefully.<br />A single space follows the [count] and the binary buffer data is in hexidecimal encoding immediately following that space. |
 | Any other letter than 0123456789{}\`"([+-<br />"[count] | empty string | The value is a text string.<br /><br/>If the header is a letter other than 0123456789{}\`"([+- then the header letter is part of the text and the entire text string is up to the next \t or \r.  In this case the length of the text string is limited ot 4096 bytes.<br /><br />If the string starts with 0123456789{}\`([+- then we need to use the "[count] header.  [count] gives you the size of the text string in bytes (not letters.) [count] can be omitted if the byte count of the text string is not larger than 4096.  [count] can be * to indicate that the size of the text string is unknown and should be obtained from reading the buffer carefully.<br /><br />A single space follows the [count] and the text string continues until the \t or \n.<br /><br />All [tb], [nl], and '\' characters inside the string are escaped.  Meaning a [tb] inside the string will be '\t', a [nl] inside teh string will be a '\n', and a '\' inside the string will be a '\\'.  Nothing else is escaped and should be written as is in the file. |
 
-## Examples
+## 2.3. Example
+
+In this example, the first value of the record is a key value.  The values that follow are related to this key value.
 
 ```
 - A null value.
@@ -181,11 +172,11 @@ Strings[tb][3[tb]The quick brown fox\njumped over the lazy dog.[tb]Salut, c'est 
 binary buffer[tb]` FEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEFFEEDFACEDEADBEEF[nl]
 ```
 
-# Notes
+# 3. Notes
 
-## Comparing with JSON.
+## 3.1. Comparing with JSON.
 
-### File Size
+### 3.1.1. File Size
 
 File size from the test program which dumps out every data type MIFF can support and also dumps out the exact same data to a similar JSON file.
 
@@ -197,7 +188,7 @@ File size from the test program which dumps out every data type MIFF can support
 
 JSON compressed to one line removed quite a bit of formatting bytes.  When compressed this difference becomes almost negligable.
 
-### Comments
+### 3.1.2. Comments
 
 Doing an apples to apples comparison with JSON, MIFF saves some bytes in the file size.  Compressed, MIFF fares slightly better but not an easy win.  We aren't talking huge differences.
 
@@ -231,7 +222,7 @@ JSON does array of objects better.  I can't argue that point.  JSON is closer to
 
 MIFF, I will say, limits how you can write out the file.  It will be fairly predictable while JSON could include a lot of space and formatting or none at all.  I'm not sure which would have the upper hand here but I like MIFF's 1 line 1 record.
 
-## Comments on MIFF
+## 3.2. Comments on MIFF
 
 **Why not use Base64 for binary data?**
 

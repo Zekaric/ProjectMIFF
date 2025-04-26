@@ -48,6 +48,7 @@ static _locale_t   _locale;
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
+static Gb _RecordSetSeparator(Gmiff * const miff);
 
 /**************************************************************************************************
 global:
@@ -101,7 +102,7 @@ Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, Gstr * c
    returnFalseIf(!gmiffGetRecordStart(miff, key));
    returnFalseIf(!strIsEqual(GkeyBYTE_COUNT, key, MIFF_HEADER_FILETYPE_STR));
 
-   value = gmiffGetRecordValue(miff);
+   value = gmiffGetValue(miff);
    returnFalseIf(
       gmiffValueGetType(value) != gmiffValueTypeNUM &&
       gmiffValueGetN(   value) != MIFF_HEADER_VERSION)
@@ -111,7 +112,7 @@ Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, Gstr * c
    _MiffMemCopyTypeArray(subFormatName,       Gstr, GkeyBYTE_COUNT, key);
    _MiffMemCopyTypeArray(miff->subFormatName, Gstr, GkeyBYTE_COUNT, key);
 
-   value = gmiffGetRecordValue(miff);
+   value = gmiffGetValue(miff);
    returnFalseIf(gmiffValueGetType(value) != gmiffValueTypeNUM)
    *subFormatVersion          =
       miff->subFormatVersion  = gmiffValueGetN(value);
@@ -164,13 +165,8 @@ Gb gmiffClocWriterContent(Gmiff * const miff, GsetBuffer setBufferFunc,
    miff->setBuffer            = setBufferFunc;
 
    // Write the miff header.
-   gmiffSetValue(miff, gmiffValueSetStr(MIFF_HEADER_FILETYPE_STR));
-   gmiffSetValue(miff, gmiffValueSetN(  MIFF_HEADER_VERSION));
-   gmiffSetRecordEnd( miff);
-
-   gmiffSetValue(miff, gmiffValueSetStr(subFormatName));
-   gmiffSetValue(miff, gmiffValueSetN(  subFormatVersion));
-   gmiffSetRecordEnd( miff);
+   gmiffRecordSetN(miff, MIFF_HEADER_FILETYPE_STR, MIFF_HEADER_VERSION);
+   gmiffRecordSetN(miff, subFormatName,            subFormatVersion);
 
    returnTrue;
 }
@@ -286,9 +282,9 @@ Gb gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
 }
 
 /**************************************************************************************************
-func: gmiffGetRecordValue
+func: gmiffGetValue
 **************************************************************************************************/
-GmiffValue gmiffGetRecordValue(Gmiff * const miff)
+GmiffValue gmiffGetValue(Gmiff * const miff)
 {
    Gstr        header;
    GmiffValue  vtemp;
@@ -304,7 +300,7 @@ GmiffValue gmiffGetRecordValue(Gmiff * const miff)
    _MiffMemClearType(&miff->value, GmiffValue);
 
    miff->value.type  = gmiffValueTypeNONE;
-   miff->valueIndex  = 0;
+   miff->valueCount  = 0;
    miff->bufferIndex = 0;
 
    header = _MiffGetValueHeader(miff);
@@ -320,7 +316,7 @@ GmiffValue gmiffGetRecordValue(Gmiff * const miff)
       break;
 
    case '[':
-      miff->value.type  = gmiffValueTypeARRAY_DEF;
+      miff->value.type  = gmiffValueTypeARRAY_COUNT;
       miff->value.inr.n = _MiffGetValueCount(miff);
       break;
 
@@ -335,7 +331,7 @@ GmiffValue gmiffGetRecordValue(Gmiff * const miff)
       break;
 
    case '(':
-      miff->value.type  = gmiffValueTypeGROUP_DEF;
+      miff->value.type  = gmiffValueTypeGROUP_COUNT;
       miff->value.inr.n = _MiffGetValueCount(miff);
       break;
 
@@ -451,19 +447,19 @@ GmiffData gmiffGetValueStrData(Gmiff * const miff, Gstr * const strLetter)
 }
 
 /**************************************************************************************************
-func: gmiffSetB
+func: gmiffRecordSetB
 **************************************************************************************************/
-Gb gmiffSetB(Gmiff * const miff, Gstr const * const name, Gb const value)
+Gb gmiffRecordSetB(Gmiff * const miff, Gstr const * const name, Gb const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetB(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetB(value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetBArray
+func: gmiffRecordSetBArray
 **************************************************************************************************/
-Gb gmiffSetBArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetBArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gb const * const array)
 {
    Gindex index;
@@ -472,7 +468,7 @@ Gb gmiffSetBArray(Gmiff * const miff, Gstr const * const name, Gcount const coun
       count != 0 &&
       !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
@@ -480,54 +476,53 @@ Gb gmiffSetBArray(Gmiff * const miff, Gstr const * const name, Gcount const coun
       returnFalseIf(!gmiffSetValue(miff, gmiffValueSetB(array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetBin
+func: gmiffRecordSetBin
 **************************************************************************************************/
-Gb gmiffSetBin(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetBin(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gn1 * const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetBin(count, value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetBin(count, value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetBlockStart
+func: gmiffRecordSetBlockStart
 **************************************************************************************************/
-Gb gmiffSetBlockStart(Gmiff * const miff, Gstr const * const key)
+Gb gmiffRecordSetBlockStart(Gmiff * const miff, Gstr const * const name)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, key));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetBlockStart());
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetBlockStart()));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetBlockStop
+func: gmiffRecordSetBlockStop
 **************************************************************************************************/
-Gb gmiffSetBlockStop(Gmiff * const miff)
+Gb gmiffRecordSetBlockStop(Gmiff * const miff)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, ""));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetBlockStop()));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetBlockStop()));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetI
+func: gmiffRecordSetI
 **************************************************************************************************/
-Gb gmiffSetI(Gmiff * const miff, Gstr const * const name, Gi8 const value)
+Gb gmiffRecordSetI(Gmiff * const miff, Gstr const * const name, Gi8 const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetI(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetI(value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetIArray
+func: gmiffRecordSetIArray
 **************************************************************************************************/
-Gb gmiffSetIArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetIArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gi8 const * const array)
 {
    Gindex index;
@@ -536,31 +531,31 @@ Gb gmiffSetIArray(Gmiff * const miff, Gstr const * const name, Gcount const coun
       count != 0 &&
       !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
    {
-      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetI(array[index]));
+      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetI(array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetN
+func: gmiffRecordSetN
 **************************************************************************************************/
-Gb gmiffSetN(Gmiff * const miff, Gstr const * const name, Gn8 const value)
+Gb gmiffRecordSetN(Gmiff * const miff, Gstr const * const name, Gn8 const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetN(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(      miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(      miff, gmiffValueSetN(value)));
+   return         gmiffSetRecordStop( miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetNArray
+func: gmiffRecordSetNArray
 **************************************************************************************************/
-Gb gmiffSetNArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetNArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gn8 const * const array)
 {
    Gindex index;
@@ -569,41 +564,41 @@ Gb gmiffSetNArray(Gmiff * const miff, Gstr const * const name, Gcount const coun
       count != 0 &&
       !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
    {
-      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetN(array[index]));
+      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetN(array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetNull
+func: gmiffRecordSetNull
 **************************************************************************************************/
-Gb gmiffSetNull(Gmiff * const miff, Gstr const * const name)
+Gb gmiffRecordSetNull(Gmiff * const miff, Gstr const * const name)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetNull(miff));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetNull()));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetR
+func: gmiffRecordSetR
 **************************************************************************************************/
-Gb gmiffSetR(Gmiff * const miff, Gstr const * const name, Gr8 const value)
+Gb gmiffRecordSetR(Gmiff * const miff, Gstr const * const name, Gr8 const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetR(value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetRArray
+func: gmiffRecordSetRArray
 **************************************************************************************************/
-Gb gmiffSetRArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetRArray(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gr8 const * const array)
 {
    Gindex index;
@@ -612,31 +607,31 @@ Gb gmiffSetRArray(Gmiff * const miff, Gstr const * const name, Gcount const coun
       count != 0 &&
       !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
    {
-      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR(array[index]));
+      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR(array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetR4
+func: gmiffRecordSetR4
 **************************************************************************************************/
-Gb gmiffSetR4(Gmiff * const miff, Gstr const * const name, Gr4 const value)
+Gb gmiffRecordSetR4(Gmiff * const miff, Gstr const * const name, Gr4 const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR4(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetR4(value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetR4Array
+func: gmiffRecordSetR4Array
 **************************************************************************************************/
-Gb gmiffSetR4Array(Gmiff * const miff, Gstr const * const name, Gcount const count,
+Gb gmiffRecordSetR4Array(Gmiff * const miff, Gstr const * const name, Gcount const count,
    Gr4 const * const array)
 {
    Gindex index;
@@ -645,25 +640,25 @@ Gb gmiffSetR4Array(Gmiff * const miff, Gstr const * const name, Gcount const cou
       count != 0 &&
       !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
    {
-      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR4(array[index]));
+      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetR4(array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
-func: gmiffSetStr
+func: gmiffRecordSetStr
 **************************************************************************************************/
-Gb gmiffSetStr(Gmiff * const miff, Gstr const * const name, Gstr const * const value)
+Gb gmiffRecordSetStr(Gmiff * const miff, Gstr const * const name, Gstr const * const value)
 {
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
-   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(value));
-   return         gmiffRecordSetStop( miff);
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(name),  name)));
+   returnFalseIf(!gmiffSetValue(     miff, gmiffValueSetStr(_MiffStrGetCount(value), value)));
+   return         gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
@@ -676,17 +671,18 @@ Gb gmiffSetStrArray(Gmiff * const miff, Gstr const * const name, Gcount const co
 
    returnFalseIf(
       count != 0 &&
-      !array));
+      !array);
 
-   returnFalseIf(!gmiffRecordSetStart(miff, name));
+   returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(name), name)));
    returnFalseIf(!gmiffSetValue(miff, gmiffValueSetArrayCount(count)));
 
    forCount(index, count)
    {
-      returnFalseIf(!gmiffSetValue(miff, gmiffValueSetStr(array[index]));
+      returnFalseIf(
+         !gmiffSetValue(miff, gmiffValueSetStr(_MiffStrGetCount(array[index]), array[index])));
    }
 
-   return gmiffRecordSetStop(miff);
+   return gmiffSetRecordStop(miff);
 }
 
 /**************************************************************************************************
@@ -735,50 +731,17 @@ miffRecord
 function:
 **************************************************************************************************/
 /**************************************************************************************************
-func: gmiffRecordSetStart
+func: gmiffSetRecordStop
 **************************************************************************************************/
-Gb gmiffRecordSetStart(Gmiff * const miff, Gstr const * const key)
+Gb gmiffSetRecordStop(Gmiff * const miff)
 {
-   Gindex index;
-   Gcount count;
-
    returnFalseIf(
       !_isStarted ||
       !miff       ||
-      !key);
+      !miff->valueCount);
 
-   miff->isRecordDone   = gbFALSE;
-   miff->bufferIndex    = 0;
-
-   // Set the indent to the current scope level.
-   forCount(index, miff->scopeLevel)
-   {
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) " "));
-   }
-
-   // Write the key.
-   count = _MiffStrGetCount(key);
-   returnFalseIf(count > GkeyBYTE_COUNT);
-
-   _MiffMemClearTypeArray(key, Gstr, GkeySIZE);
-
-   returnFalseIf(!_MiffSetBuffer(miff, count, (Gn1 *) key));
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: gmiffRecordSetStop
-**************************************************************************************************/
-Gb gmiffRecordSetStop(Gmiff * const miff)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // The current type should end up being NONE.  It if isn't then the caller didn't
-   // fullfill the record requirements.
-   miff->isRecordDone = gbTRUE;
+   // Reset the value index.
+   miff->valueCount = 0;
 
    return _MiffSetBuffer(miff, 1, (Gn1 *) "\n");
 }
@@ -799,7 +762,7 @@ Gb gmiffSetValue(Gmiff * const miff, GmiffValue const value)
         value.data.str == NULL)));
 
    // Only separate after the first value key.
-   if (miff->valueIndex != 0)
+   if (miff->valueCount)
    {
       _RecordSetSeparator(miff);
    }
@@ -810,47 +773,38 @@ Gb gmiffSetValue(Gmiff * const miff, GmiffValue const value)
    // Write out the value data.
    returnFalseIf(!_MiffSetValueData(  miff, value));
 
-   // Write whatever is left to writ out and final check.
-   returnFalseIf(!gmiffSetValueStop(miff));
-
-   miff->valueIndex++;
+   miff->valueCount++;
    returnTrue;
 }
 
 /**************************************************************************************************
-func: gmiffSetRecordValueStart
+func: gmiffSetValueArrayCount
 **************************************************************************************************/
-Gb gmiffSetRecordValueStart(Gmiff * const miff, GmiffValue const value)
+Gb gmiffSetValueArrayCount(Gmiff * const miff, Gcount const count)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   miff->value = value;
-
-   // Separate from the key or previous value.
-   _RecordSetSeparator(miff);
-
-   // Write out the value header.
-   return _MiffSetValueHeader(miff, value);
+   return gmiffSetValue(miff, gmiffValueSetArrayCount(count));
 }
 
 /**************************************************************************************************
-func: gmiffSetRecordValueStop
+func: gmiffSetValueB
 **************************************************************************************************/
-Gb gmiffSetRecordValueStop(Gmiff * const miff, GmiffValue const value)
+Gb gmiffSetValueB(Gmiff * const miff, Gb const value)
 {
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   return gmiffSetValueStop(miff);
+   return gmiffSetValue(miff, gmiffValueSetB(value));
 }
 
 /**************************************************************************************************
-func: gmiffSetRecordValueDataBin
+func: gmiffSetValueBin
 **************************************************************************************************/
-Gb gmiffSetRecordValueDataBin(Gmiff * const miff, Gn1 const binByte)
+Gb gmiffSetValueBin(Gmiff * const miff, Gcount const binCount, Gn1 const * const binBuffer)
+{
+   return gmiffSetValue(miff, gmiffValueSetBin(binCount, binBuffer));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueBinData
+**************************************************************************************************/
+Gb gmiffSetValueBinData(Gmiff * const miff, Gn1 const binByte)
 {
    returnFalseIf(
       !_isStarted ||
@@ -864,9 +818,111 @@ Gb gmiffSetRecordValueDataBin(Gmiff * const miff, Gn1 const binByte)
 }
 
 /**************************************************************************************************
-func: gmiffSetRecordValueDataStr
+func: gmiffSetValueBinStart
 **************************************************************************************************/
-Gb gmiffSetRecordValueDataStr(Gmiff * const miff, Gstr const strLetter)
+Gb gmiffSetValueBinStart(Gmiff * const miff, Gcount const binCount)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   return _MiffSetValueHeader(miff, gmiffValueSetBin(binCount, NULL));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueBinStop
+**************************************************************************************************/
+Gb gmiffSetValueBinStop(Gmiff * const miff)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   // Binary or String buffer was not fully written out.
+   returnFalseIf(
+       miff->value.type != gmiffValueTypeBIN          ||
+       (miff->value.count != miffCountUNKNOWN &&
+        miff->value.count != miff->bufferIndex));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmiffSetValueBlockStart
+**************************************************************************************************/
+Gb gmiffSetValueBlockStart(Gmiff * const miff)
+{
+   return gmiffSetValue(miff, gmiffValueSetBlockStart());
+}
+
+/**************************************************************************************************
+func: gmiffSetValueBlockStop
+**************************************************************************************************/
+Gb gmiffSetValueBlockStop(Gmiff * const miff)
+{
+   return gmiffSetValue(miff, gmiffValueSetBlockStop());
+}
+
+/**************************************************************************************************
+func: gmiffSetValueGroupCount
+**************************************************************************************************/
+Gb gmiffSetValueGroupCount(Gmiff * const miff, Gcount const count)
+{
+   return gmiffSetValue(miff, gmiffValueSetGroupCount(count));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueI
+**************************************************************************************************/
+Gb gmiffSetValueI(Gmiff * const miff, Gi8 const value)
+{
+   return gmiffSetValue(miff, gmiffValueSetI(value));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueN
+**************************************************************************************************/
+Gb gmiffSetValueN(Gmiff * const miff, Gn8 const value)
+{
+   return gmiffSetValue(miff, gmiffValueSetN(value));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueNull
+**************************************************************************************************/
+Gb gmiffSetValueNull(Gmiff * const miff)
+{
+   return gmiffSetValue(miff, gmiffValueSetNull());
+}
+
+/**************************************************************************************************
+func: gmiffSetValueR
+**************************************************************************************************/
+Gb gmiffSetValueR(Gmiff * const miff, Gr8 const value)
+{
+   return gmiffSetValue(miff, gmiffValueSetR(value));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueR4
+**************************************************************************************************/
+Gb gmiffSetValueR4(Gmiff * const miff, Gr4 const value)
+{
+   return gmiffSetValue(miff, gmiffValueSetR4(value));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueStr
+**************************************************************************************************/
+Gb gmiffSetValueStr(Gmiff * const miff, Gcount const strCount, Gstr const * const strBuffer)
+{
+   return gmiffSetValue(miff, gmiffValueSetStr(strCount, strBuffer));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueStrData
+**************************************************************************************************/
+Gb gmiffSetValueStrData(Gmiff * const miff, Gstr const strLetter)
 {
    returnFalseIf(
       !_isStarted ||
@@ -883,9 +939,21 @@ Gb gmiffSetRecordValueDataStr(Gmiff * const miff, Gstr const strLetter)
 }
 
 /**************************************************************************************************
-func: gmiffSetValueStop
+func: gmiffSetValueStrStart
 **************************************************************************************************/
-Gb gmiffSetValueStop(Gmiff * const miff)
+Gb gmiffSetValueStrStart(Gmiff * const miff, Gcount const strCount)
+{
+   returnFalseIf(
+      !_isStarted ||
+      !miff);
+
+   return _MiffSetValueHeader(miff, gmiffValueSetStr(strCount, NULL));
+}
+
+/**************************************************************************************************
+func: gmiffSetValueStrStop
+**************************************************************************************************/
+Gb gmiffSetValueStrStop(Gmiff * const miff)
 {
    returnFalseIf(
       !_isStarted ||
@@ -893,10 +961,9 @@ Gb gmiffSetValueStop(Gmiff * const miff)
 
    // Binary or String buffer was not fully written out.
    returnFalseIf(
-       (miff->value.type == gmiffValueTypeBIN   ||
-        miff->value.type == gmiffValueTypeSTR)     &&
-       miff->value.count != miffBufferCountUNKNOWN &&
-       miff->value.count != miff->bufferIndex);
+       miff->value.type != gmiffValueTypeSTR          ||
+       (miff->value.count != miffCountUNKNOWN &&
+        miff->value.count != miff->bufferIndex));
 
    returnTrue;
 }
@@ -910,7 +977,7 @@ func: gmiffValueGetB
 **************************************************************************************************/
 Gb gmiffValueGetB(GmiffValue const value)
 {
-   returnFalseIf(value.type != gmiffValueTypeNUM_INT);
+   returnFalseIf(value.type != gmiffValueTypeNUM);
 
    returnTrueIf(value.inr.n > 0);
 
@@ -932,7 +999,9 @@ func: gmiffValueGetI
 **************************************************************************************************/
 Gi8 gmiffValueGetI(GmiffValue const value)
 {
-   return0If(value.type != gmiffValueTypeNUM_INT);
+   return0If(
+      value.type != gmiffValueTypeNUM ||
+      !value.isI);
 
    return value.inr.i;
 }
@@ -942,7 +1011,9 @@ func: gmiffValueGetN
 **************************************************************************************************/
 Gn8 gmiffValueGetN(GmiffValue const value)
 {
-   return0If(value.type != gmiffValueTypeNUM_INT);
+   return0If(
+      value.type != gmiffValueTypeNUM||
+      !value.isN);
 
    return value.inr.n;
 }
@@ -952,14 +1023,31 @@ func: gmiffValueGetR
 **************************************************************************************************/
 Gr8 gmiffValueGetR(GmiffValue const value)
 {
-   return0If(value.type != gmiffValueTypeNUM_REAL);
+   return0If(
+      value.type != gmiffValueTypeNUM ||
+      !(value.isR8 ||
+        value.isR4 ||
+        value.isI  ||
+        value.isN));
 
    if (value.isR8)
    {
       return value.inr.r;
    }
+   if (value.isR4)
+   {
+      return (Gr8) value.inr4.r;
+   }
+   if (value.isI)
+   {
+      return (Gr8) value.inr.i;
+   }
+   if (value.isN)
+   {
+      return (Gr8) value.inr.n;
+   }
 
-   return (Gr8) value.inr4.r;
+   return 0;
 }
 
 /**************************************************************************************************
@@ -967,14 +1055,31 @@ func: gmiffValueGetR4
 **************************************************************************************************/
 Gr4 gmiffValueGetR4(GmiffValue const value)
 {
-   return0If(value.type != gmiffValueTypeNUM_REAL);
+   return0If(
+      value.type != gmiffValueTypeNUM ||
+      !(value.isR8 ||
+        value.isR4 ||
+        value.isI  ||
+        value.isN));
 
    if (value.isR4)
    {
       return value.inr4.r;
    }
+   if (value.isR8)
+   {
+      return (Gr4) value.inr.r;
+   }
+   if (value.isI)
+   {
+      return (Gr4) value.inr.i;
+   }
+   if (value.isN)
+   {
+      return (Gr4) value.inr.n;
+   }
 
-   return (Gr4) value.inr.r;
+   return 0;
 }
 
 /**************************************************************************************************
@@ -996,6 +1101,32 @@ GmiffValueType gmiffValueGetType(GmiffValue const value)
 }
 
 /**************************************************************************************************
+func: gmiffValueIsI
+
+Return the Real value byte count.
+True if Gr4
+**************************************************************************************************/
+Gb gmiffValueIsI(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeNUM);
+
+   return value.isI;
+}
+
+/**************************************************************************************************
+func: gmiffValueIsN
+
+Return the Real value byte count.
+True if Gr4
+**************************************************************************************************/
+Gb gmiffValueIsN(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeNUM);
+
+   return value.isN;
+}
+
+/**************************************************************************************************
 func: gmiffValueIsR4
 
 Return the Real value byte count.
@@ -1003,7 +1134,7 @@ True if Gr4
 **************************************************************************************************/
 Gb gmiffValueIsR4(GmiffValue const value)
 {
-   returnFalseIf(value.type != gmiffValueTypeNUM_REAL);
+   returnFalseIf(value.type != gmiffValueTypeNUM);
 
    return value.isR4;
 }
@@ -1016,7 +1147,7 @@ True if Gr8
 **************************************************************************************************/
 Gb gmiffValueIsR8(GmiffValue const value)
 {
-   returnFalseIf(value.type != gmiffValueTypeNUM_REAL);
+   returnFalseIf(value.type != gmiffValueTypeNUM);
 
    return value.isR8;
 }
@@ -1030,7 +1161,8 @@ GmiffValue gmiffValueSetArrayCount(Gcount const count)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type = gmiffValueTypeARRAY_COUNT;
+   value.type  = gmiffValueTypeARRAY_COUNT;
+   value.count = count;
 
    return value;
 }
@@ -1119,7 +1251,8 @@ GmiffValue gmiffValueSetGroupCount(Gcount const count)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type = gmiffValueTypeGROUP_COUNT;
+   value.type  = gmiffValueTypeGROUP_COUNT;
+   value.count = count;
 
    return value;
 }
@@ -1133,9 +1266,13 @@ GmiffValue gmiffValueSetI(Gi8 const ivalue)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type  = gmiffValueTypeNUM_INT;
+   value.type  = gmiffValueTypeNUM;
    value.isI   = gbTRUE;
    value.inr.i = ivalue;
+   if (value.inr.i >= 0)
+   {
+      value.isN = gbTRUE;
+   }
 
    return value;
 }
@@ -1149,8 +1286,13 @@ GmiffValue gmiffValueSetN(Gn8 const ivalue)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type  = gmiffValueTypeNUM_INT;
+   value.type  = gmiffValueTypeNUM;
+   value.isN   = gbTRUE;
    value.inr.n = ivalue;
+   if (value.inr.n < Gi8MAX)
+   {
+      value.isI = gbTRUE;
+   }
 
    return value;
 }
@@ -1178,7 +1320,7 @@ GmiffValue gmiffValueSetR(Gr8 const ivalue)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type  = gmiffValueTypeNUM_REAL;
+   value.type  = gmiffValueTypeNUM;
    value.isR8  = gbTRUE;
    value.inr.r = ivalue;
 
@@ -1194,7 +1336,7 @@ GmiffValue gmiffValueSetR4(Gr4 const ivalue)
 
    _MiffMemClearType(&value, GmiffValue);
 
-   value.type   = gmiffValueTypeNUM_REAL;
+   value.type   = gmiffValueTypeNUM;
    value.isR4   = gbTRUE;
    value.inr4.r = ivalue;
 
@@ -1202,9 +1344,9 @@ GmiffValue gmiffValueSetR4(Gr4 const ivalue)
 }
 
 /**************************************************************************************************
-func: gmiffValueSetStrBuffer
+func: gmiffValueSetStr
 **************************************************************************************************/
-GmiffValue gmiffValueSetStrBuffer(Gcount const strCount, Gstr const * const strBuffer)
+GmiffValue gmiffValueSetStr(Gcount const strCount, Gstr const * const strBuffer)
 {
    GmiffValue value;
 
@@ -1258,7 +1400,7 @@ function:
 /**************************************************************************************************
 func: _RecordSetSeparator
 **************************************************************************************************/
-Gb _RecordSetSeparator(Gmiff * const miff)
+static Gb _RecordSetSeparator(Gmiff * const miff)
 {
    return _MiffSetBuffer(miff, 1, (Gn1 *) "\t");
 }

@@ -162,11 +162,8 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
    switch (value.type)
    {
    case gmiffValueTypeARRAY_COUNT:
-      // This needs to be set before any actual values.
-      returnFalseIf(miff->valueIndex != 0);
-
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "["));
-      if (value.inr.i == miffCountUNKNOWN)
+      if (value.count == miffCountUNKNOWN)
       {
          return _MiffSetBuffer(miff, 1, (Gn1 *) "*");
       }
@@ -184,41 +181,63 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
       return _MiffSetBuffer(miff, 1, (Gn1 *) "}");
 
    case gmiffValueTypeGROUP_COUNT:
-      // This needs to be set before any actual values.
-      returnFalseIf(miff->valueIndex != 0);
-
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "("));
 
       return _SetNum(miff, value);
 
 
    case gmiffValueTypeNULL:
-      miff->valueIndex++;
       return _MiffSetBuffer(miff, 1, (Gn1 *) "~");
 
    case gmiffValueTypeBIN:
-      miff->valueIndex++;
       vtemp.inr.n = value.count;
 
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "."));
+      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "`"));
       // Only need a number if the count is larger than 4K
-      if (value.count > 4096)
+      if      (value.count == miffCountUNKNOWN)
+      {
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
+      }
+      else if (value.count > 4096)
       {
          returnFalseIf(!_SetNum( miff, vtemp));
       }
       return _MiffSetBuffer(miff, 1, (Gn1 *) " ");
 
    case gmiffValueTypeSTR:
-      miff->valueIndex++;
       vtemp.inr.n = value.count;
 
-      returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
-      // Only need a number if the count is larger than 4K
-      if (value.count > 4096)
+      // If the start of the string is any of the headers for the other types then we need to use
+      // the string header.
+      if (value.count == miffCountUNKNOWN)
       {
-         returnFalseIf(!_SetNum( miff, vtemp));
+         return _MiffSetBuffer(miff, 3, (Gn1 *) "\"* ");
       }
-      return _MiffSetBuffer(miff, 1, (Gn1 *) " ");
+
+      if (value.count       >  4096 ||
+          value.data.str[0] == '0'  ||
+          value.data.str[0] == '1'  ||
+          value.data.str[0] == '2'  ||
+          value.data.str[0] == '3'  ||
+          value.data.str[0] == '4'  ||
+          value.data.str[0] == '5'  ||
+          value.data.str[0] == '6'  ||
+          value.data.str[0] == '7'  ||
+          value.data.str[0] == '8'  ||
+          value.data.str[0] == '9'  ||
+          value.data.str[0] == '+'  ||
+          value.data.str[0] == '-'  ||
+          value.data.str[0] == '{'  ||
+          value.data.str[0] == '}'  ||
+          value.data.str[0] == '['  ||
+          value.data.str[0] == '('  ||
+          value.data.str[0] == '`'  ||
+          value.data.str[0] == '\"')
+      {
+         returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
+         returnFalseIf(!_SetNum( miff, vtemp));
+         return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
+      }
    }
 
    returnTrue;
@@ -233,7 +252,7 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
    {
    case gmiffValueTypeBIN:
       returnFalseIf(
-         value.count == miffBufferCountUNKNOWN ||
+         value.count == miffCountUNKNOWN ||
          !value.data.bin);
 
       return _SetBinBuffer(miff, value.count, value.data.bin);
@@ -243,7 +262,7 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
 
    case gmiffValueTypeSTR:
       returnFalseIf(
-         value.count == miffBufferCountUNKNOWN ||
+         value.count == miffCountUNKNOWN ||
          !value.data.str);
 
       return _MiffSetStr(miff, value.count, value.data.str);

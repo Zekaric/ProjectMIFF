@@ -21,9 +21,6 @@
     <ClCompile Include="Gmiff_set.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Gmiff_byteSwap.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Gmiff_mem.c">
       <Filter>Source Files</Filter>
     </ClCompile>

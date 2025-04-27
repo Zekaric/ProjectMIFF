@@ -184,9 +184,9 @@ File size from the test program which dumps out every data type MIFF can support
 | --- | --- | --- |
 | JSON formatted to one line | 32,335 | 2,178 |
 | JSON formatted for human readability | 32,550 | 2,316 |
-| MIFF | (need to redo because of format change) | (need to redo because of format change) |
+| MIFF | 24,665 | 2,011 |
 
-JSON compressed to one line removed quite a bit of formatting bytes.  When compressed this difference becomes almost negligable.
+MIFF file size for simlar data does save quite a few bytes.  Even when compared to JSON and even when compared to JSON in its minimal form.  Zip compression saves over 100 bytes but since this is a made up file and not real world data I don't know if the difference will be significant in the long run.  Uncompressed, MIFF might have an argument over JSON.
 
 ### 3.1.2. Comments
 
@@ -216,11 +216,11 @@ The header of the file will tell you what the file contains.  JSON has no such t
 
 JSON doesn't include any size information for arrays or strings.  This leaves it up to the importer to guess how large an array or string should be.  At least with MIFF you can allocate the size before reading.  Nicer for the importer.
 
-JSON doesn't handle numbers quite right.  But this is because JavaScript doesn't handle numbers quite right.  Encoding some special values is not standard.  You can't encode all 64 bit integers or naturals.  Often, for JSON, if a number can't be represented, it is turned into a string.  This adds complication for the importer and exporter of JSON data.  This is where MIFF, I believe, does it right.
+JSON doesn't handle numbers quite right.  But this is because JavaScript doesn't handle numbers quite right.  Encoding some special values is not standard.  You can't encode all 64 bit integers or naturals.  Often, for JSON, if a number can't be represented, it is turned into a string.  This adds complication for the importer and exporter of JSON data.  This is where MIFF, I believe, does it right.  At least if all you need is a number that can fit into 64 bit representations (double, int64_t, uint64_t.)  Both formats have issues if you have numbers that are larger than built in 64 bit types of the C/C++/C#/and similar languages.
 
 JSON does array of objects better.  I can't argue that point.  JSON is closer to a programming language in that respect so it naturally does it better.
 
-MIFF, I will say, limits how you can write out the file.  It will be fairly predictable while JSON could include a lot of space and formatting or none at all.  I'm not sure which would have the upper hand here but I like MIFF's 1 line 1 record.
+MIFF, I will say, limits how you can write out the file.  It will be fairly predictable while JSON could include a lot of space and formatting or none at all.  I'm not sure which would have the upper hand here but I like MIFF's 1 line 1 record.  Which means, when comparing minimal forms, MIFF's readability is probably more human readable than JSON's minimal form.  But this is just an objective opinion.
 
 ## 3.2. Comments on MIFF
 

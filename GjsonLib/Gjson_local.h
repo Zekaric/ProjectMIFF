@@ -124,8 +124,6 @@ void       _JsonStrStop(          void);
 Gn1        _JsonStrToHex(         Gn1 const value);
 Gn8        _JsonStrToN(           Gstr const * const str);
 
-#define    _JsonStrGetCount(STR)  ((Gn4) strlen((char const *) STR))
-
 _locale_t  _JsonLocaleGet(        void);
 
 Gb         _JsonSetBuffer(        Gjson const * const json, Gcount const bufCount, Gn1 const * const buf);

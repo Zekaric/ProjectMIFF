@@ -1943,10 +1943,10 @@ static Gb _MiffTestBinValue(Gmiff *miff, Gcount testCount, Gn1 *testValue)
 static Gb _MiffTestStrValue(Gmiff *miff, Gstr const *testValue)
 {
    GmiffValue value;
-   Gn8     testValueLen;
-   Gstr   svalue[256];
+   Gn8        testValueLen;
+   Gstr       svalue[256];
 
-   testValueLen = strlen(testValue);
+   testValueLen = gstrGetCount(testValue);
 
    value = gmiffGetValue(miff);
    returnFalseIf(
@@ -2562,7 +2562,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
       // Usually for larger than memory or stream writing.
       //gmiffRecordSetStr(            miff, "String",  "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
-      count = (Gcount) strlen("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
+      count = gstrGetCount("The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./");
       gmiffSetValueStrFinite(      miff, "String");
       gmiffSetValueStrStart(       miff, count);
       forCount(index, count)
@@ -2572,6 +2572,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
             "The quick brown fox\njumped over the lazy dog.\n\t0123456789\n\t`~!@#$%^&*()_+-={}|[]\\:\";\'<>?,./"[index]);
       }
       gmiffSetValueStrStop(        miff);
+      gmiffSetRecordStop(          miff);
 
 #if defined(INCLUDE_BIN)
       // Usually for larger than memory or stream writing.
@@ -2639,7 +2640,7 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
 
       gmiffSetValueI(               miff, 42);
       // Usually for larger than memory or stream writing.
-      count = (Gcount) strlen("Yes, but what is the question?");
+      count = gstrGetCount("Yes, but what is the question?");
       gmiffSetValueStrStart(        miff, count);
       forCount(index, count)
       {

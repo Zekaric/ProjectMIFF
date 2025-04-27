@@ -72,19 +72,6 @@ Gb _MiffSetBuffer(Gmiff const * const miff, Gcount const bufCount, Gn1 const * c
 }
 
 /**************************************************************************************************
-func: _MiffSetNumInt
-**************************************************************************************************/
-Gb _MiffSetNumInt(Gmiff * const miff, Gn8 const value)
-{
-   GmiffValue vtemp;
-
-   _MiffMemClearType(&vtemp, GmiffValue);
-
-   vtemp.inr.n = value;
-   return _SetNum(miff, vtemp);
-}
-
-/**************************************************************************************************
 func: _MiffSetStr
 **************************************************************************************************/
 Gb _MiffSetStr(Gmiff * const miff, Gcount const strLen, Gstr const * const str)
@@ -167,8 +154,8 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
       {
          return _MiffSetBuffer(miff, 1, (Gn1 *) "*");
       }
-
-      return _SetNum(miff, value);
+      vtemp.inr.n = value.count;
+      return _SetNum(miff, vtemp);
 
    case gmiffValueTypeBLOCK_START:
       miff->scopeLevel++;
@@ -182,8 +169,8 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
    case gmiffValueTypeGROUP_COUNT:
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "("));
-
-      return _SetNum(miff, value);
+      vtemp.inr.n = value.count;
+      return _SetNum(miff, vtemp);
 
 
    case gmiffValueTypeNULL:
@@ -214,7 +201,12 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
          return _MiffSetBuffer(miff, 3, (Gn1 *) "\"* ");
       }
 
+      // If the string is larger than 4K
+      // Or we are streaming the string and don't know how it startes
+      // Or we know how it starts and it is one of the other header letters
+      // then we need to use the string header.
       if (value.count       >  4096 ||
+          value.data.str    == NULL ||
           value.data.str[0] == '0'  ||
           value.data.str[0] == '1'  ||
           value.data.str[0] == '2'  ||
@@ -235,8 +227,12 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
           value.data.str[0] == '\"')
       {
          returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "\""));
-         returnFalseIf(!_SetNum( miff, vtemp));
-         return         _MiffSetBuffer(miff, 1, (Gn1 *) " ");
+         // Only write out the string count if larger than 4K
+         if (value.count > 4096)
+         {
+            returnFalseIf(!_SetNum(miff, vtemp));
+         }
+         return _MiffSetBuffer(miff, 1, (Gn1 *) " ");
       }
    }
 
@@ -324,28 +320,26 @@ static Gb _SetNum(Gmiff * const miff, GmiffValue const valueInput)
    {
       if (value.isR4)
       {
-         if (value.inr4.r == 0)            return _MiffSetBuffer(miff, 1, (Gn1 *) "0");
-         if (value.inr4.r == Gr4MAX)       return _MiffSetBuffer(miff, 1, (Gn1 *) "R");
-         if (value.inr4.r == -Gr4MAX)      return _MiffSetBuffer(miff, 1, (Gn1 *) "r");
-         if (value.inr4.r == HUGE_VALF)    return _MiffSetBuffer(miff, 1, (Gn1 *) "C");
-         if (value.inr4.r == -HUGE_VALF)   return _MiffSetBuffer(miff, 1, (Gn1 *) "c");
+         if (value.inr4.r == Gr4MAX)       return _MiffSetBuffer(miff, 2, (Gn1 *) "+R");
+         if (value.inr4.r == -Gr4MAX)      return _MiffSetBuffer(miff, 2, (Gn1 *) "-R");
+         if (value.inr4.r == HUGE_VALF)    return _MiffSetBuffer(miff, 2, (Gn1 *) "+C");
+         if (value.inr4.r == -HUGE_VALF)   return _MiffSetBuffer(miff, 2, (Gn1 *) "-C");
          if (isnan(value.inr4.r))          return _MiffSetBuffer(miff, 1, (Gn1 *) "?");
 
          _sprintf_s_l((char *) string, 80, "%.*g", _MiffLocaleGet(), FLT_DECIMAL_DIG, value.inr4.r);
       }
       else
       {
-         if (value.inr.r == 0)             return _MiffSetBuffer(miff, 1, (Gn1 *) "0");
-         if (value.inr.r == Gr8MAX)        return _MiffSetBuffer(miff, 1, (Gn1 *) "R");
-         if (value.inr.r == -Gr8MAX)       return _MiffSetBuffer(miff, 1, (Gn1 *) "r");
-         if (value.inr.r == HUGE_VALF)     return _MiffSetBuffer(miff, 1, (Gn1 *) "C");
-         if (value.inr.r == -HUGE_VALF)    return _MiffSetBuffer(miff, 1, (Gn1 *) "c");
+         if (value.inr.r == Gr8MAX)        return _MiffSetBuffer(miff, 2, (Gn1 *) "+R");
+         if (value.inr.r == -Gr8MAX)       return _MiffSetBuffer(miff, 2, (Gn1 *) "-R");
+         if (value.inr.r == HUGE_VALF)     return _MiffSetBuffer(miff, 2, (Gn1 *) "+C");
+         if (value.inr.r == -HUGE_VALF)    return _MiffSetBuffer(miff, 2, (Gn1 *) "-C");
          if (isnan(value.inr.r))           return _MiffSetBuffer(miff, 1, (Gn1 *) "?");
 
          _sprintf_s_l((char *) string, 80, "%.*g", _MiffLocaleGet(), DBL_DECIMAL_DIG, value.inr.r);
       }
 
-      return _MiffSetBuffer(miff, _MiffStrGetCount(string), (Gn1 *) string);
+      return _MiffSetBuffer(miff, gstrGetCount(string), (Gn1 *) string);
    }
 
    // If the number is 0, it's 0.
@@ -358,8 +352,8 @@ static Gb _SetNum(Gmiff * const miff, GmiffValue const valueInput)
    if (value.isI)
    {
       // Send out a constant.
-      if (value.inr.i == Gi8MIN) return _MiffSetBuffer(miff, 1, (Gn1 *) "i");
-      if (value.inr.i == Gi8MAX) return _MiffSetBuffer(miff, 1, (Gn1 *) "I");
+      if (value.inr.i == Gi8MIN) return _MiffSetBuffer(miff, 2, (Gn1 *) "-I");
+      if (value.inr.i == Gi8MAX) return _MiffSetBuffer(miff, 2, (Gn1 *) "+I");
 
       // Negative number.
       if (value.inr.i < 0)
@@ -373,7 +367,7 @@ static Gb _SetNum(Gmiff * const miff, GmiffValue const valueInput)
    else
    {
       // Send out a constant.
-      if (value.inr.n == Gn8MAX) return _MiffSetBuffer(miff, 1, (Gn1 *) "N");
+      if (value.inr.n == Gn8MAX) return _MiffSetBuffer(miff, 2, (Gn1 *) "+N");
    }
 
    nval = value.inr.n;

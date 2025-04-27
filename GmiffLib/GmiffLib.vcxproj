@@ -168,7 +168,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Gmiff_byteSwap.c" />
     <ClCompile Include="Gmiff_mem.c" />
     <ClCompile Include="GmiffLib.c" />
     <ClCompile Include="Gmiff_get.c" />

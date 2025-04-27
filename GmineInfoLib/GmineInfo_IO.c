@@ -207,7 +207,7 @@ Gb _MiIoWriteBinBuffer(GmineInfo * const gmineInfo, Gcount const count, Gn1 cons
    {
       forCount(index, count)
       {
-         returnFalseIf(!gmiffSetValue_BinData(gmineInfo->miffFile, buffer[index]));
+         returnFalseIf(!gmiffSetValueBinData(gmineInfo->miffFile, buffer[index]));
       }
       returnTrue;
    }
@@ -230,7 +230,8 @@ Gb _MiIoWriteBinStart(GmineInfo * const gmineInfo, Gstr const * const key, size_
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordBinBufferStart(gmineInfo->miffFile, key, (Gcount) fileSize);
+      returnFalseIf(gmiffSetValueStrFinite(gmineInfo->miffFile, key));
+      return        gmiffSetValueBinStart( gmineInfo->miffFile, (Gcount) fileSize);
    }
 
    // JSON
@@ -245,7 +246,7 @@ Gb _MiIoWriteBinStop(GmineInfo * const gmineInfo)
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      return gmiffSetRecordBinBufferStop(gmineInfo->miffFile);
+      returnFalseIf(!gmiffSetValueBinStop(gmineInfo->miffFile));
    }
 
    // JSON
@@ -291,14 +292,14 @@ Gb _MiIoWriteColor(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key, 3));
+      returnFalseIf(!gmiffSetValueStrFinite( gmineInfo->miffFile, key));
+      returnFalseIf(!gmiffSetValueGroupCount(gmineInfo->miffFile, 3));
       {
-         returnFalseIf(!gmiffSetValue_R4(     gmineInfo->miffFile, value->r));
-         returnFalseIf(!gmiffSetValue_R4(     gmineInfo->miffFile, value->g));
-         returnFalseIf(!gmiffSetValue_R4(     gmineInfo->miffFile, value->b));
+         returnFalseIf(!gmiffSetValueR4(     gmineInfo->miffFile, value->r));
+         returnFalseIf(!gmiffSetValueR4(     gmineInfo->miffFile, value->g));
+         returnFalseIf(!gmiffSetValueR4(     gmineInfo->miffFile, value->b));
       }
-
-      return gmiffSetRecordValueStop(         gmineInfo->miffFile);
+      return gmiffSetRecordStop(             gmineInfo->miffFile);
    }
 
    // JSON
@@ -351,14 +352,14 @@ Gb _MiIoWritePoint(GmineInfo * const gmineInfo, Gstr const * const key,
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      returnFalseIf(!gmiffSetRecordValueStart(gmineInfo->miffFile, key, 3));
+      returnFalseIf(!gmiffSetValueStrFinite( gmineInfo->miffFile, key));
+      returnFalseIf(!gmiffSetValueGroupCount(gmineInfo->miffFile, 3));
       {
-         returnFalseIf(!gmiffSetValue_R(      gmineInfo->miffFile, value->x));
-         returnFalseIf(!gmiffSetValue_R(      gmineInfo->miffFile, value->y));
-         returnFalseIf(!gmiffSetValue_R(      gmineInfo->miffFile, value->z));
+         returnFalseIf(!gmiffSetValueR(      gmineInfo->miffFile, value->x));
+         returnFalseIf(!gmiffSetValueR(      gmineInfo->miffFile, value->y));
+         returnFalseIf(!gmiffSetValueR(      gmineInfo->miffFile, value->z));
       }
-
-      return gmiffSetRecordValueStop(         gmineInfo->miffFile);
+      return gmiffSetRecordStop(             gmineInfo->miffFile);
    }
 
    // JSON

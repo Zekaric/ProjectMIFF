@@ -103,9 +103,6 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-void               _MiffByteSwap4(           Gmiff4 * const value);
-void               _MiffByteSwap8(           Gmiff8 * const value);
-
 Gb                 _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
 Gb                 _MiffGetConstant(         Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
 Gb                 _MiffGetKey(              Gmiff       * const miff, Gstr * const key);
@@ -117,8 +114,6 @@ Gb                 _MiffGetPartEnd(          Gmiff       * const miff);
 GmiffData          _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
 Gcount             _MiffGetValueCount(       Gmiff       * const miff);
 Gstr               _MiffGetValueHeader(      Gmiff       * const miff);
-
-Gb                 _MiffIsByteSwapping(      void);
 
 _locale_t          _MiffLocaleGet(           void);
 
@@ -135,11 +130,8 @@ void               _MiffMemStop(             void);
 
 Gb                 _MiffSetBinByte(          Gmiff       * const miff, Gn1 const binByte);
 Gb                 _MiffSetBuffer(           Gmiff const * const miff, Gcount const bufCount, Gn1 const * const buf);
-Gb                 _MiffSetNumInt(           Gmiff       * const miff, Gn8    const value);
 Gb                 _MiffSetStr(              Gmiff       * const miff, Gcount const strCount, Gstr const * const strBuffer);
 Gb                 _MiffSetValueHeader(      Gmiff       * const miff, GmiffValue const value);
 Gb                 _MiffSetValueData(        Gmiff       * const miff, GmiffValue const value);
-
-#define            _MiffStrGetCount(STR)                          ((Gn4) strlen((char const *)    STR))
 
 #endif

@@ -187,7 +187,7 @@ Gb              gmiffSetValueStrStop(        Gmiff       * const miff);
 Gb              gmiffStart(                  GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
 void            gmiffStop(                   void);
 
-#define gmiffSetValueStrFinite(MIFF, STR) gmiffSetValueStr(MIFF, (Gcount) strlen(STR), STR)
+#define gmiffSetValueStrFinite(MIFF, STR) gmiffSetValueStr(MIFF, gstrGetCount(STR), STR)
 
 /**************************************************************************************************
 miffRecord
@@ -239,6 +239,6 @@ GmiffValue      gmiffValueSetR(              Gr8 const rvalue);
 GmiffValue      gmiffValueSetR4(             Gr4 const rvalue);
 GmiffValue      gmiffValueSetStr(            Gcount const strCount, Gstr const * const strBuffer);
 
-#define gmiffValueSetStrFinite(STR)    gmiffValueSetStr((Gcount) strlen(STR), STR)
+#define gmiffValueSetStrFinite(STR)    gmiffValueSetStr(gstrGetCount(STR), STR)
 
 #endif

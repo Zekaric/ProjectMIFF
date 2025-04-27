@@ -156,7 +156,7 @@ Gb _JsonSetR(Gjson * const json, Gr8 const value)
 
    _sprintf_s_l((char *) ctemp, 80, "%.17g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, (Gcount) strlen(ctemp), (Gn1 *) ctemp);
+   return _JsonSetBuffer(json, gstrGetCount(ctemp), (Gn1 *) ctemp);
 }
 
 /**************************************************************************************************
@@ -181,5 +181,5 @@ Gb _JsonSetR4(Gjson * const json, Gr4 const value)
 
    _sprintf_s_l((char *) ctemp, 80, "%.8g", _JsonLocaleGet(), value);
 
-   return _JsonSetBuffer(json, (Gcount) strlen(ctemp), (Gn1 *) ctemp);
+   return _JsonSetBuffer(json, gstrGetCount(ctemp), (Gn1 *) ctemp);
 }

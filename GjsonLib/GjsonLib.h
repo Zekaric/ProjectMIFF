@@ -47,6 +47,8 @@ include:
 local:
 constant:
 **************************************************************************************************/
+#define gjsonCountDEFAULT          4096
+
 typedef enum
 {
    gjsonStrLetterNORMAL,
@@ -127,7 +129,7 @@ typedef struct
    Gindex                   scope;
    GjsonScope               scopeType[1024];
    Gb                       isFirstItem;
-   Gstr                     key[GkeySIZE];
+   Gstr                     key[gjsonCountDEFAULT + 1];
 
    // Data repo getters and setters.
    void                    *dataRepo;

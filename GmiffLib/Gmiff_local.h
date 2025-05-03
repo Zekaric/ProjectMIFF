@@ -50,8 +50,6 @@ local:
 constant:
 **************************************************************************************************/
 
-#define strIsEqual(COUNT, A, B)                    (strncmp((char *) A, (char *) B, COUNT) == 0)
-
 #define MIFF_HEADER_FILETYPE_STR                   "MIFF"
 #define MIFF_HEADER_VERSION                        1
 
@@ -103,14 +101,13 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-Gb                 _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
-Gb                 _MiffGetConstant(         Gmiff       * const miff, Gcount const count, Gn1 const * const buffer);
-Gb                 _MiffGetKey(              Gmiff       * const miff, Gstr * const key);
+GmiffData          _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
 Gb                 _MiffGetLineSkip(         Gmiff       * const miff);
 void               _MiffGetNum(              Gmiff       * const miff);
 Gb                 _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
 Gb                 _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
 Gb                 _MiffGetPartEnd(          Gmiff       * const miff);
+Gb                 _MiffGetStr(              Gmiff       * const miff, Gcount const strCount, Gstr * const str);
 GmiffData          _MiffGetStrLetter(        Gmiff       * const miff, Gstr * const letter);
 Gcount             _MiffGetValueCount(       Gmiff       * const miff);
 Gstr               _MiffGetValueHeader(      Gmiff       * const miff);

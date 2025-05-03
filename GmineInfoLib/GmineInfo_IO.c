@@ -35,24 +35,14 @@ function:
 **************************************************************************************************/
 Gb _MiIoClocReader(GmineInfo * const gmineInfo)
 {
-   Gstr headerTypeStr[   GkeySIZE];
-   Gn8  headerVersion;
-
-   headerVersion = 0;
-   _MiMemClearTypeArray(headerTypeStr, Gstr, GkeySIZE);
-
    // MIFF
    if (gmineInfo->fileType == gmineInfoFileTypeMIFF)
    {
-      gmineInfo->miffFile = gmiffClocReader(
-         gmineInfo->getBuffer,
-         headerTypeStr,
-         &headerVersion,
-         gmineInfo->dataRepo);
+      gmineInfo->miffFile = gmiffClocReader(gmineInfo->getBuffer, gmineInfo->dataRepo);
       returnFalseIf(
-         !gmineInfo->miffFile                               ||
-         !_MiStrIsEqual(headerTypeStr,    HEADER_TYPE_STR)  ||
-         headerVersion != HEADER_VERSION_NUM);
+         !gmineInfo->miffFile                                                         ||
+         !_MiStrIsEqual(gmiffGetSubFormatName(gmineInfo->miffFile), HEADER_TYPE_STR)  ||
+         gmiffGetSubFormatVersion(gmineInfo->miffFile) != HEADER_VERSION_NUM);
    }
    // JSON
    else
@@ -61,6 +51,9 @@ Gb _MiIoClocReader(GmineInfo * const gmineInfo)
       Gb        isTypeOk,
                 isVersionOk;
       Gn8       version;
+      Gstr      headerTypeStr[gjsonCountDEFAULT + 1];
+
+      _MiMemClearTypeArray(headerTypeStr, Gstr, gjsonCountDEFAULT + 1);
 
       isTypeOk    = gbFALSE;
       isVersionOk = gbFALSE;
@@ -88,7 +81,7 @@ Gb _MiIoClocReader(GmineInfo * const gmineInfo)
                if      (gjsonIsKeyEqual(gmineInfo->jsonFile, KEY_NAME_STR))
                {
                   breakIf(!gjsonIsTypeStr(gjsonGetType_ObjectValue(gmineInfo->jsonFile)));
-                  breakIf(!gjsonGetStr(gmineInfo->jsonFile, GkeyBYTE_COUNT, headerTypeStr));
+                  breakIf(!gjsonGetStr(gmineInfo->jsonFile, gjsonCountDEFAULT, headerTypeStr));
                   breakIf(!_MiStrIsEqual(headerTypeStr, HEADER_TYPE_STR));
 
                   isTypeOk = gbTRUE;
@@ -129,9 +122,9 @@ Gb _MiIoClocWriter(GmineInfo * const gmineInfo)
    {
       gmineInfo->miffFile = gmiffClocWriter(
          gmineInfo->setBuffer,
+         gmineInfo->dataRepo,
          HEADER_TYPE_STR,
-         HEADER_VERSION_NUM,
-         gmineInfo->dataRepo);
+         HEADER_VERSION_NUM);
       returnFalseIf(!gmineInfo->miffFile);
    }
    // JSON

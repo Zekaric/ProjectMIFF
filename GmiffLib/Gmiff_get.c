@@ -53,6 +53,31 @@ global:
 function:
 **************************************************************************************************/
 /**************************************************************************************************
+func: _MiffGetBin
+
+Read in the binary to the internal buffer.
+**************************************************************************************************/
+Gb _MiffGetBin(Gmiff * const miff, Gcount const binCount, Gn1 * const binBuffer)
+{
+   Gindex index;
+   Gb     result;
+
+   // Reading a larger buffer directly from the repo.
+   forCount(index, binount)
+   {
+      result = _MiffGetBinByte(miff, &binBuffer[index]);
+
+      breakIf(!result);
+   }
+
+   miff->value.count = index;
+
+   returnFalseIf(!_MiffGetPartEnd(miff));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
 func: _MiffGetBinByte
 **************************************************************************************************/
 Gb _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
@@ -64,106 +89,6 @@ Gb _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
    *binByte = (_ValueFromHexInt(byte[0]) << 4) | _ValueFromHexInt(byte[1]);
 
    miff->bufferIndex++;
-
-   returnTrue;
-}
-
-/**************************************************************************************************
-func: _MiffGetConstant
-**************************************************************************************************/
-Gb _MiffGetConstant(Gmiff * const miff, Gcount const count, Gn1 const * const buffer)
-{
-   returnFalseIf(count < 2);
-
-   miff->value.type   = gmiffValueTypeNUM;
-
-   if (strIsEqual(2, buffer, "+R"))
-   {
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = Gr8MAX;
-      miff->value.inr4.r = Gr4MAX;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "-R"))
-   {
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = -Gr8MAX;
-      miff->value.inr4.r = -Gr4MAX;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "+C"))
-   {
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = HUGE_VAL;
-      miff->value.inr4.r = HUGE_VALF;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "-C"))
-   {
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = -HUGE_VAL;
-      miff->value.inr4.r = -HUGE_VALF;
-      returnTrue;
-   }
-
-   if (strIsEqual(1, buffer, "?"))
-   {
-      miff->value.isR8   = gbTRUE;
-      miff->value.isR4   = gbTRUE;
-      miff->value.inr.r  = GrNAN;
-      miff->value.inr4.r = GrNAN;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "+I"))
-   {
-      miff->value.isI    = gbTRUE;
-      miff->value.inr.i  = Gi8MAX;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "-I"))
-   {
-      miff->value.isI    = gbTRUE;
-      miff->value.inr.i  = Gi8MIN;
-      returnTrue;
-   }
-
-   if (strIsEqual(2, buffer, "+N"))
-   {
-      miff->value.inr.n  = Gn8MAX;
-      returnTrue;
-   }
-
-   // unknown constant value
-   miff->value.type = gmiffValueTypeNONE;
-
-   returnFalse;
-}
-
-/**************************************************************************************************
-func: _MiffGetKey
-**************************************************************************************************/
-Gb _MiffGetKey(Gmiff * const miff, Gstr * const key)
-{
-   Gindex index;
-
-   // Skip space.
-   loopCount(index)
-   {
-      breakIf(miff->readData[index] != ' ');
-   }
-
-   // Copy the key over.
-   _MiffMemClearTypeArray(key, Gstr, GkeySIZE);
-   _MiffMemCopyTypeArray( key, Gn1, GkeyBYTE_COUNT, &miff->readData[index]);
 
    returnTrue;
 }
@@ -232,7 +157,7 @@ Gb _MiffGetPart(Gmiff * const miff, Gb const trimLeadingTabs)
 
       // Add the letter to the byte array.
       // Only read up to a key size.  Ignore everything else.
-      if (index < GkeyBYTE_COUNT)
+      if (index < gmiffCountDEFAULT)
       {
          miff->readData[index++] = byte;
       }
@@ -280,7 +205,7 @@ Gb _MiffGetPartRest(Gmiff * const miff, Gn1 const start)
 
       // Add the letter to the byte array.
       // Only read up to a key size.  Ignore everything else.
-      if (index < GkeyBYTE_COUNT)
+      if (index < gmiffCountDEFAULT)
       {
          miff->readData[index++] = byte;
       }
@@ -403,14 +328,19 @@ Gcount _MiffGetValueCount(Gmiff * const miff)
    if (buffer[index] == '\t' ||
        buffer[index] == '\n')
    {
-      miff->isPartDone = gbTRUE;
+      miff->isPartDone   = gbTRUE;
+      miff->isRecordDone = (buffer[index] == '\n');
    }
 
    buffer[index] = 0;
 
    if (buffer[0] == '*')
    {
-      return miffCountUNKNOWN;
+      return gmiffCountUNKNOWN;
+   }
+   if (buffer[0] == 0)
+   {
+      return -gmiffCountDEFAULT;
    }
 
    _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer);
@@ -428,6 +358,45 @@ Gstr _MiffGetValueHeader(Gmiff * const miff)
    return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
 
    return (Gstr) byte;
+}
+
+/**************************************************************************************************
+func: _MiffGetStr
+
+Reading string into the internal buffer.
+**************************************************************************************************/
+Gb _MiffGetStr(Gmiff * const miff, Gcount const strCount, Gstr * const str)
+{
+   Gindex      index,
+               strIndex;
+   Gstr        letter;
+   GmiffData   dataResult;
+
+   strIndex = 0;
+   forCount(index, strCount)
+   {
+      dataResult = gmiffGetValueStrData(miff, &letter);
+
+      returnFalseIf(dataResult == gmiffDataERROR);
+
+      if (dataResult == gmiffDataIS_PART_DONE ||
+          dataResult == gmiffDataIS_RECORD_DONE)
+      {
+         miff->value.count  = strIndex;
+         miff->isPartDone   = gbTRUE;
+         miff->isRecordDone = (dataResult == gmiffDataIS_RECORD_DONE);
+         break;
+      }
+
+      str[strIndex++] = letter;
+   }
+
+   // Ensure null termination.
+   str[strIndex] = 0;
+
+   returnFalseIf(!_MiffGetPartEnd(miff));
+
+   returnTrue;
 }
 
 /**************************************************************************************************

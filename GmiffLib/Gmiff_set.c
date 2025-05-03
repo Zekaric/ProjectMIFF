@@ -150,7 +150,7 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
    {
    case gmiffValueTypeARRAY_COUNT:
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "["));
-      if (value.count == miffCountUNKNOWN)
+      if (value.count == gmiffCountUNKNOWN)
       {
          return _MiffSetBuffer(miff, 1, (Gn1 *) "*");
       }
@@ -181,7 +181,7 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
       returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "`"));
       // Only need a number if the count is larger than 4K
-      if      (value.count == miffCountUNKNOWN)
+      if      (value.count == gmiffCountUNKNOWN)
       {
          returnFalseIf(!_MiffSetBuffer(miff, 1, (Gn1 *) "*"));
       }
@@ -196,7 +196,7 @@ Gb _MiffSetValueHeader(Gmiff * const miff, GmiffValue const value)
 
       // If the start of the string is any of the headers for the other types then we need to use
       // the string header.
-      if (value.count == miffCountUNKNOWN)
+      if (value.count == gmiffCountUNKNOWN)
       {
          return _MiffSetBuffer(miff, 3, (Gn1 *) "\"* ");
       }
@@ -248,7 +248,7 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
    {
    case gmiffValueTypeBIN:
       returnFalseIf(
-         value.count == miffCountUNKNOWN ||
+         value.count == gmiffCountUNKNOWN ||
          !value.data.bin);
 
       return _SetBinBuffer(miff, value.count, value.data.bin);
@@ -258,7 +258,7 @@ Gb _MiffSetValueData(Gmiff * const miff, GmiffValue const value)
 
    case gmiffValueTypeSTR:
       returnFalseIf(
-         value.count == miffCountUNKNOWN ||
+         value.count == gmiffCountUNKNOWN ||
          !value.data.str);
 
       return _MiffSetStr(miff, value.count, value.data.str);

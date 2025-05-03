@@ -69,8 +69,9 @@ typedef enum
    gmiffValueTypeOTHER        // Any other character.
 } GmiffValueType;
 
-#define miffArrayCountZERO        -2
-#define miffCountUNKNOWN          -1
+#define gmiffCountUNKNOWN         -1
+#define gmiffCountDEFAULT         4096
+
 
 /**************************************************************************************************
 type:
@@ -119,7 +120,7 @@ typedef struct
    Gb              isPartDone;
    Gb              isRecordDone;
 
-   Gstr            subFormatName[GkeySIZE];
+   Gstr            subFormatName[gmiffCountDEFAULT + 1];
    Gi8             subFormatVersion;
 
    // The current value information.
@@ -134,10 +135,10 @@ typedef struct
    GmiffValue      value;
    Gcount          valueCount;
    Gindex          bufferIndex;
-   Gn1             buffer[4097];
+   Gn1             buffer[gmiffCountDEFAULT + 1];
 
    Gcount          readCount;
-   Gn1             readData[GkeySIZE * 2];
+   Gn1             readData[gmiffCountDEFAULT + 1];
 } Gmiff;
 
 /**************************************************************************************************
@@ -147,21 +148,24 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
-Gmiff          *gmiffClocReader(                                       GgetBuffer getBufferFunc, Gstr       * const subFormatName, Gn8 * const subFormatVersion, void * const dataRepo);
-Gb              gmiffClocReaderContent(      Gmiff       * const miff, GgetBuffer getBufferFunc, Gstr       * const subFormatName, Gn8 * const subFormatVersion, void * const dataRepo);
-Gmiff          *gmiffClocWriter(                                       GsetBuffer setBufferFunc, Gstr const * const subFormatName, Gn8   const subFormatVersion, void * const dataRepo);
-Gb              gmiffClocWriterContent(      Gmiff       * const miff, GsetBuffer setBufferFunc, Gstr const * const subFormatName, Gn8   const subFormatVersion, void * const dataRepo);
+Gmiff          *gmiffClocReader(                                       GgetBuffer getBufferFunc, void * const dataRepo);
+Gb              gmiffClocReaderContent(      Gmiff       * const miff, GgetBuffer getBufferFunc, void * const dataRepo);
+Gmiff          *gmiffClocWriter(                                       GsetBuffer setBufferFunc, void * const dataRepo, Gstr const * const subFormatName, Gn8   const subFormatVersion);
+Gb              gmiffClocWriterContent(      Gmiff       * const miff, GsetBuffer setBufferFunc, void * const dataRepo, Gstr const * const subFormatName, Gn8   const subFormatVersion);
 
 void            gmiffDloc(                   Gmiff       * const miff);
 void            gmiffDlocContent(            Gmiff       * const miff);
 
-Gb              gmiffGetRecordStart(         Gmiff       * const miff, Gstr       * const key);
 Gb              gmiffGetRecordStop(          Gmiff       * const miff);
-GmiffValue      gmiffGetValue(         Gmiff       * const miff);
-Gb              gmiffGetValueBin(            Gmiff       * const miff, Gcount const binCount, Gn1  * const binBuffer);
+Gstr const     *gmiffGetSubFormatName(       Gmiff       * const miff);
+Gi8             gmiffGetSubFormatVersion(    Gmiff       * const miff);
+GmiffValue      gmiffGetValue(               Gmiff       * const miff);
 GmiffData       gmiffGetValueBinData(        Gmiff       * const miff, Gn1 * const binByte);
-Gb              gmiffGetValueStr(            Gmiff       * const miff, Gcount const strCount, Gstr * const str);
+Gb              gmiffGetValueBinBuffer(      Gmiff       * const miff, Gcount const binCount, Gn1  * const binBuffer);
 GmiffData       gmiffGetValueStrData(        Gmiff       * const miff, Gstr * const strLetter);
+Gb              gmiffGetValueStrBuffer(      Gmiff       * const miff, Gcount const strCount, Gstr * const strBuffer);
+
+Gb              gmiffIsAtEndOfFile(          Gmiff       * const miff);
 
 Gb              gmiffSetRecordStop(          Gmiff       * const miff);
 Gb              gmiffSetValue(               Gmiff       * const miff, GmiffValue const value);
@@ -212,8 +216,10 @@ Gb              gmiffRecordSetStr(           Gmiff       * const miff, Gstr cons
 /**************************************************************************************************
 miffValue
 **************************************************************************************************/
+Gcount          gmiffValueGetArrayCount(     GmiffValue const value);
 Gb              gmiffValueGetB(              GmiffValue const value);
 Gcount          gmiffValueGetBinCount(       GmiffValue const value);
+Gcount          gmiffValueGetGroupCount(     GmiffValue const value);
 Gi8             gmiffValueGetI(              GmiffValue const value);
 Gn8             gmiffValueGetN(              GmiffValue const value);
 Gr8             gmiffValueGetR(              GmiffValue const value);

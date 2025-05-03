@@ -223,5 +223,6 @@ macro:
 #define gsizeIsGood(S)     (0 <= (S))
 
 #define gstrGetCount(S)    ((Gcount) ((S) ? strlen((char *) (S)) : 0))
+#define gstrIsEqual(A, B)  (((A) && (B)) ? strcmp((A), (B)) == 0 : gbFALSE)
 
 #endif

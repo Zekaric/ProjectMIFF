@@ -313,7 +313,7 @@ void               _MiMemStop(            void);
 
 #define            _MiStrGetCount(        STR, MAX_LEN)                   (Gcount) (strnlen(STR, (size_t) (MAX_LEN)))
 Gb                 _MiStrIsEmpty(         Gstr const * const value);
-#define            _MiStrIsEqual(         STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, GkeyBYTE_COUNT), STR, _MiStrGetCount(STR_ALT, GkeyBYTE_COUNT), STR_ALT)
+#define            _MiStrIsEqual(         STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, gmiffCountDEFAULT), STR, _MiStrGetCount(STR_ALT, gmiffCountDEFAULT), STR_ALT)
 Gstr              *_MiStrClone(           Gstr const * const value);
 
 #endif

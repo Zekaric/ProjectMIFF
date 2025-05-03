@@ -58,8 +58,7 @@ function:
 /**************************************************************************************************
 func: gmiffClocReader
 **************************************************************************************************/
-Gmiff *gmiffClocReader(GgetBuffer getBufferFunc, Gstr * const subFormatName,
-   Gn8 * const subFormatVersion, void * const dataRepo)
+Gmiff *gmiffClocReader(GgetBuffer getBufferFunc, void * const dataRepo)
 {
    Gmiff *miff;
 
@@ -70,7 +69,7 @@ Gmiff *gmiffClocReader(GgetBuffer getBufferFunc, Gstr * const subFormatName,
    returnNullIf(!miff);
 
    // Initialize the miff structure.
-   if (!gmiffClocReaderContent(miff, getBufferFunc, subFormatName, subFormatVersion, dataRepo))
+   if (!gmiffClocReaderContent(miff, getBufferFunc, dataRepo))
    {
       _MiffMemDloc(miff);
       returnNull;
@@ -83,11 +82,9 @@ Gmiff *gmiffClocReader(GgetBuffer getBufferFunc, Gstr * const subFormatName,
 /**************************************************************************************************
 func: gmiffClocReaderContent
 **************************************************************************************************/
-Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, Gstr * const subFormatName,
-   Gn8 * const subFormatVersion, void * const dataRepo)
+Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, void * const dataRepo)
 {
-   Gstr         key[GkeySIZE];
-   GmiffValue   value;
+   GmiffValue value;
 
    returnFalseIf(
       !_isStarted ||
@@ -100,23 +97,15 @@ Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, Gstr * c
    miff->getBuffer = getBufferFunc;
 
    // Read the header.
-   returnFalseIf(!gmiffGetRecordStart(miff, key));
-   returnFalseIf(!strIsEqual(GkeyBYTE_COUNT, key, MIFF_HEADER_FILETYPE_STR));
-
-   value = gmiffGetValue(miff);
-   returnFalseIf(
-      gmiffValueGetType(value) != gmiffValueTypeNUM &&
-      gmiffValueGetN(   value) != MIFF_HEADER_VERSION)
+   returnFalseIf(!gstrIsEqual(gmiffValueGetStr(gmiffGetValue(miff)), MIFF_HEADER_FILETYPE_STR));
+   returnFalseIf(gmiffValueGetN(gmiffGetValue(miff)) != MIFF_HEADER_VERSION);
    returnFalseIf(!gmiffGetRecordStop(miff));
 
-   returnFalseIf(!gmiffGetRecordStart(miff, key));
-   _MiffMemCopyTypeArray(subFormatName,       Gstr, GkeyBYTE_COUNT, key);
-   _MiffMemCopyTypeArray(miff->subFormatName, Gstr, GkeyBYTE_COUNT, key);
-
+   // Read the subformat
    value = gmiffGetValue(miff);
-   returnFalseIf(gmiffValueGetType(value) != gmiffValueTypeNUM)
-   *subFormatVersion          =
-      miff->subFormatVersion  = gmiffValueGetN(value);
+   _MiffMemCopyTypeArray(miff->subFormatName, Gstr, gmiffValueGetStrCount(value), gmiffValueGetStr(value));
+
+   miff->subFormatVersion = gmiffValueGetN(gmiffGetValue(miff));
    returnFalseIf(!gmiffGetRecordStop(miff));
 
    returnTrue;
@@ -125,8 +114,8 @@ Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, Gstr * c
 /**************************************************************************************************
 func: gmiffClocWriter
 **************************************************************************************************/
-Gmiff *gmiffClocWriter(GsetBuffer setBufferFunc, Gstr const * const subFormatName,
-   Gn8 const subFormatVersion, void * const dataRepo)
+Gmiff *gmiffClocWriter(GsetBuffer setBufferFunc, void * const dataRepo,
+   Gstr const * const subFormatName, Gn8 const subFormatVersion)
 {
    Gmiff *miff;
 
@@ -137,7 +126,7 @@ Gmiff *gmiffClocWriter(GsetBuffer setBufferFunc, Gstr const * const subFormatNam
    returnNullIf(!miff);
 
    // Initialize the structure
-   if (!gmiffClocWriterContent(miff, setBufferFunc, subFormatName, subFormatVersion, dataRepo))
+   if (!gmiffClocWriterContent(miff, setBufferFunc, dataRepo, subFormatName, subFormatVersion))
    {
       _MiffMemDloc(miff);
       returnNull;
@@ -150,8 +139,8 @@ Gmiff *gmiffClocWriter(GsetBuffer setBufferFunc, Gstr const * const subFormatNam
 /**************************************************************************************************
 func: gmiffClocWriterContent
 **************************************************************************************************/
-Gb gmiffClocWriterContent(Gmiff * const miff, GsetBuffer setBufferFunc,
-   Gstr const * const subFormatName, Gn8 const subFormatVersion, void * const dataRepo)
+Gb gmiffClocWriterContent(Gmiff * const miff, GsetBuffer setBufferFunc, void * const dataRepo,
+   Gstr const * const subFormatName, Gn8 const subFormatVersion)
 {
    returnFalseIf(
       !_isStarted     ||
@@ -197,30 +186,6 @@ void gmiffDlocContent(Gmiff * const miff)
 }
 
 /**************************************************************************************************
-func: gmiffGetRecordStart
-
-key needs to be a buffer of size GkeySIZE.
-**************************************************************************************************/
-Gb gmiffGetRecordStart(Gmiff * const miff, Gstr * const key)
-{
-   returnFalseIf(
-      !_isStarted ||
-      !miff);
-
-   // Reset the record reading.
-   miff->isRecordDone = gbFALSE;
-
-   // Clear the key.
-   _MiffMemClearTypeArray(key, Gstr, GkeySIZE);
-
-   // Read in the name of the record
-   returnFalseIf(!_MiffGetPart(miff, gbFALSE));
-   returnFalseIf(!_MiffGetKey( miff, key));
-
-   returnTrue;
-}
-
-/**************************************************************************************************
 func: gmiffGetRecordStop
 
 Skip to the end of the record if not at the end already.
@@ -241,45 +206,27 @@ Gb gmiffGetRecordStop(Gmiff * const miff)
 }
 
 /**************************************************************************************************
-func: gmiffGetValueBin
-
-bin should be large enough for the bin data.  I.E. it should be of size from
-gmiffGetValue() value.count
+func: gmiffGetSubFormatName
 **************************************************************************************************/
-Gb gmiffGetValueBin(Gmiff * const miff, Gcount const binCount, Gn1 * const binBuffer)
+Gstr const *gmiffGetSubFormatName(Gmiff * const miff)
 {
-   Gn8 index;
+   returnNullIf(
+      !_isStarted ||
+      !miff);
 
-   returnFalseIf(
-      !_isStarted                           ||
-      !miff                                 ||
-      miff->value.type != gmiffValueTypeBIN ||
-      binCount         != miff->value.count ||
-      !binBuffer);
-
-   forCount(index, binCount)
-   {
-      returnFalseIf(!gmiffGetValueBinData(miff, &binBuffer[index]));
-   }
-
-   returnFalseIf(!_MiffGetPartEnd(miff));
-
-   returnTrue;
+   return miff->subFormatName;
 }
 
 /**************************************************************************************************
-func: miffValueBinGetData
+func: gmiffGetSubFormatVersion
 **************************************************************************************************/
-Gb gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
+Gi8 gmiffGetSubFormatVersion(Gmiff * const miff)
 {
-   returnFalseIf(
-      !_isStarted                            ||
-      !miff                                  ||
-      miff->value.type  != gmiffValueTypeBIN ||
-      !binByte                               ||
-      miff->bufferIndex >= miff->value.count);
+   return0If(
+      !_isStarted ||
+      !miff);
 
-   return _MiffGetBinByte(miff, binByte);
+   return miff->subFormatVersion;
 }
 
 /**************************************************************************************************
@@ -307,20 +254,6 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
    header = _MiffGetValueHeader(miff);
    switch (header)
    {
-   default:
-      miff->value.type        = gmiffValueTypeOTHER;
-      miff->value.header      = header;
-      // Reading the rest of the value is up to the caller.
-      break;
-
-   case 0:
-      break;
-
-   case '[':
-      miff->value.type  = gmiffValueTypeARRAY_COUNT;
-      miff->value.inr.n = _MiffGetValueCount(miff);
-      break;
-
    case '{':
       miff->value.type = gmiffValueTypeBLOCK_START;
       miff->scopeLevel++;
@@ -331,24 +264,23 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
       miff->scopeLevel--;
       break;
 
-   case '(':
-      miff->value.type  = gmiffValueTypeGROUP_COUNT;
-      miff->value.inr.n = _MiffGetValueCount(miff);
+   case '[':
+      miff->value.type  = gmiffValueTypeARRAY_COUNT;
+      miff->value.count = _MiffGetValueCount(miff);
       break;
 
+   case '(':
+      miff->value.type  = gmiffValueTypeGROUP_COUNT;
+      miff->value.count = _MiffGetValueCount(miff);
+      break;
 
    case '~':
       miff->value.type  = gmiffValueTypeNULL;
       _MiffGetPartEnd(miff);
       break;
 
-   case '"':
-      miff->value.type  = gmiffValueTypeSTR;
-      miff->value.count = _MiffGetValueCount(miff);
-      // Reading the string is done with gmiffGetValueStr() or gmiffGetValueStrData();
-      break;
-
    case '-':
+   case '+':
    case '0':
    case '1':
    case '2':
@@ -359,72 +291,58 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
    case '7':
    case '8':
    case '9':
-   case 'I':
-   case 'i':
-   case 'N':
-   case 'R':
-   case 'r':
-   case 'C':
-   case 'c':
    case '?':
       miff->value.type  = gmiffValueTypeNUM;
       _MiffGetPartRest(miff, header);
       _MiffGetNum(     miff);
       break;
 
-   case '.':
+   case '`':
       miff->value.type  = gmiffValueTypeBIN;
       miff->value.count = _MiffGetValueCount(miff);
       // Reading the buffer is done with miffValueBinGet();
+      if (miff->value.count <= gmiffCountDEFAULT)
+      {
+         miff->value.data.bin = miff->buffer;
+         gmiffGetValueBin(miff, gmiffCountDEFAULT, miff->value.data.bin);
+      }
       break;
+
+   case '"':
+      miff->value.type  = gmiffValueTypeSTR;
+      miff->value.count = _MiffGetValueCount(miff);
+      // Reading the string is done with gmiffGetValueStr() or gmiffGetValueStrData();
+      if (miff->value.count <= -gmiffCountDEFAULT)
+      {
+         miff->value.data.str = (Gstr *) miff->buffer;
+         _MiffGetStr(miff, gmiffCountDEFAULT, miff->value.data.str);
+      }
+      break;
+
+   default:
+      miff->value.type     = gmiffValueTypeSTR;
+      miff->value.count    = 0;
+      miff->value.data.str = (Gstr *) miff->buffer;
+      miff->buffer[0]      = header;
+      _MiffGetStr(miff, gmiffCountDEFAULT - 1, (Gstr *) &miff->buffer[1]);
    }
 
    return miff->value;
 }
 
 /**************************************************************************************************
-func: gmiffGetValueStr
-
-Convenience function for getting a whole string if memory requirements are
-not that large.  Str should be large enough for the string being read in
-including null terminator.
+func: gmiffValueBinGetData
 **************************************************************************************************/
-Gb gmiffGetValueStr(Gmiff * const miff, Gcount const strCount, Gstr * const str)
+Gb gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
 {
-   Gn8         index;
-   Gn8         strIndex;
-   Gstr        letter;
-   GmiffData   dataResult;
-
    returnFalseIf(
-      !_isStarted                   ||
-      !miff                         ||
-      strCount != miff->value.count ||
-      !str)
+      !_isStarted                            ||
+      !miff                                  ||
+      miff->value.type  != gmiffValueTypeBIN ||
+      !binByte                               ||
+      miff->bufferIndex >= miff->value.count);
 
-   strIndex = 0;
-   forCount(index, strCount)
-   {
-      dataResult = gmiffGetValueStrData(miff, &letter);
-
-      // Ensure null termination.
-      str[strIndex] = 0;
-
-      returnFalseIf(
-         dataResult == gmiffDataERROR        ||
-         dataResult == gmiffDataIS_PART_DONE ||
-         dataResult == gmiffDataIS_RECORD_DONE);
-
-      str[strIndex++] = letter;
-   }
-
-   // Ensure null termination.
-   str[strIndex]     = 0;
-   miff->bufferIndex = strCount;
-
-   returnFalseIf(!_MiffGetPartEnd(miff));
-
-   returnTrue;
+   return _MiffGetBinByte(miff, binByte);
 }
 
 /**************************************************************************************************
@@ -842,7 +760,7 @@ Gb gmiffSetValueBinStop(Gmiff * const miff)
    // Binary or String buffer was not fully written out.
    returnFalseIf(
        miff->value.type != gmiffValueTypeBIN          ||
-       (miff->value.count != miffCountUNKNOWN &&
+       (miff->value.count != gmiffCountUNKNOWN &&
         miff->value.count != miff->bufferIndex));
 
    returnTrue;
@@ -967,7 +885,7 @@ Gb gmiffSetValueStrStop(Gmiff * const miff)
    // Binary or String buffer was not fully written out.
    returnFalseIf(
        miff->value.type != gmiffValueTypeSTR          ||
-       (miff->value.count != miffCountUNKNOWN &&
+       (miff->value.count != gmiffCountUNKNOWN &&
         miff->value.count != miff->bufferIndex));
 
    returnTrue;
@@ -977,6 +895,16 @@ Gb gmiffSetValueStrStop(Gmiff * const miff)
 miffValue
 function:
 **************************************************************************************************/
+/**************************************************************************************************
+func: gmiffValueGetArrayCount
+**************************************************************************************************/
+Gcount gmiffValueGetArrayCount(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeARRAY_COUNT);
+
+   return value.count;
+}
+
 /**************************************************************************************************
 func: gmiffValueGetB
 **************************************************************************************************/
@@ -995,6 +923,16 @@ func: gmiffValueGetBinCount
 Gcount gmiffValueGetBinCount(GmiffValue const value)
 {
    return0If(value.type != gmiffValueTypeBIN);
+
+   return value.count;
+}
+
+/**************************************************************************************************
+func: gmiffValueGetGroupCount
+**************************************************************************************************/
+Gcount gmiffValueGetGroupCount(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeGROUP_COUNT);
 
    return value.count;
 }

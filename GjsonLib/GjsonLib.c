@@ -350,7 +350,7 @@ GjsonType gjsonGetType_ObjectKeyOrStop(Gjson * const json)
       // Reading in the key and the key value separator.
       json->lastByte = 0;
 
-      returnIf(!gjsonGetStr(json, GkeyBYTE_COUNT, json->key), gjsonTypeERROR_UNEXPECTED_CHAR);
+      returnIf(!gjsonGetStr(json, gjsonCountDEFAULT, json->key), gjsonTypeERROR_UNEXPECTED_CHAR);
 
       _JsonEatSpace(json);
 
@@ -851,7 +851,7 @@ Gb gjsonIsKeyEqual(Gjson const * const json, Gstr const * const value)
       !json       ||
       !value);
 
-   return (strncmp(json->key, value, GkeyBYTE_COUNT) == 0);
+   return (strncmp(json->key, value, gjsonCountDEFAULT) == 0);
 }
 
 /**************************************************************************************************

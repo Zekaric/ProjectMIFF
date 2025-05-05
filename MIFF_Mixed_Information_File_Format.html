@@ -277,9 +277,9 @@ License (Document): Creative Commons Attribution-NoDerivs.
 <td>An array specifier.<br /><br>The values following are part of an array.  [count] can be * if unknown.  Multiple array specifiers can be used to indicate nested arrays.<br /><br />The reader and writer of the format will need to validate if the item count of the values that follow are actually matching the count provided.<br /><br />(This value is not necessary if subformat is explicit about what a value for a key should be.  Can be used to make the format more obvious or allow readers to allocate space.)</td>
 </tr>
 <tr>
-<td>([count]<br/>([type name]</td>
+<td>([count]</td>
 <td></td>
-<td>A user type.<br /><br />[count] should be a number of values in the user type or [type name] should be a simple text string for the user type.  This can follow an array specifier.<br /><br />The reader and writer of the format will need to validate if the values that follow match the user type.<br /><br />(This value is not necessary if the subformat is explicit about what the value for a key should be.  Can be used to make the format more obvious or allow readers to allocate proper space.  It is encouraged to include a record defining [type name] before its use in the file, but again, not strictly necessary as long as it is adequately documented somewhere.)</td>
+<td>A user type.<br /><br />[count] should be a number of values in the user type. <!-- or [type name] should be a simple text string for the user type.  This can follow an array specifier.--><br /><br />The reader and writer of the format will need to validate if the values that follow match the user type.<br /><br />(This value is not necessary if the subformat is explicit about what the value for a key should be.  Can be used to make the format more obvious or allow readers to allocate proper space.  <!-- It is encouraged to include a record defining [type name] before its use in the file, but again, not strictly necessary as long as it is adequately documented somewhere.-->)</td>
 </tr>
 <tr>
 <td>0 1 2 3 4 5 6 7 8 9 + -<br />+I -I +N +R -R +C -C ?</td>

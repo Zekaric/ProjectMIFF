@@ -50,6 +50,7 @@ constant:
 #define Gr4INF                HUGE_VALF
 
 #define GcountMAX             Gi4MAX
+#define GcountMIN             Gi4MIN
 
 #define GindexERROR           Gi4MIN
 #define GindexMAX             Gi4MAX

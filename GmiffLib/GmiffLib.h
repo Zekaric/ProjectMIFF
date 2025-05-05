@@ -160,10 +160,10 @@ Gb              gmiffGetRecordStop(          Gmiff       * const miff);
 Gstr const     *gmiffGetSubFormatName(       Gmiff       * const miff);
 Gi8             gmiffGetSubFormatVersion(    Gmiff       * const miff);
 GmiffValue      gmiffGetValue(               Gmiff       * const miff);
-GmiffData       gmiffGetValueBinData(        Gmiff       * const miff, Gn1 * const binByte);
 Gb              gmiffGetValueBinBuffer(      Gmiff       * const miff, Gcount const binCount, Gn1  * const binBuffer);
-GmiffData       gmiffGetValueStrData(        Gmiff       * const miff, Gstr * const strLetter);
+GmiffData       gmiffGetValueBinData(        Gmiff       * const miff, Gn1 * const binByte);
 Gb              gmiffGetValueStrBuffer(      Gmiff       * const miff, Gcount const strCount, Gstr * const strBuffer);
+GmiffData       gmiffGetValueStrData(        Gmiff       * const miff, Gstr * const strLetter);
 
 Gb              gmiffIsAtEndOfFile(          Gmiff       * const miff);
 
@@ -218,12 +218,14 @@ miffValue
 **************************************************************************************************/
 Gcount          gmiffValueGetArrayCount(     GmiffValue const value);
 Gb              gmiffValueGetB(              GmiffValue const value);
+Gn1 const      *gmiffValueGetBin(            GmiffValue const value);
 Gcount          gmiffValueGetBinCount(       GmiffValue const value);
 Gcount          gmiffValueGetGroupCount(     GmiffValue const value);
 Gi8             gmiffValueGetI(              GmiffValue const value);
 Gn8             gmiffValueGetN(              GmiffValue const value);
 Gr8             gmiffValueGetR(              GmiffValue const value);
 Gr4             gmiffValueGetR4(             GmiffValue const value);
+Gstr const     *gmiffValueGetStr(            GmiffValue const value);
 Gcount          gmiffValueGetStrCount(       GmiffValue const value);
 GmiffValueType  gmiffValueGetType(           GmiffValue const value);
 

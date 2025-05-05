@@ -97,7 +97,8 @@ Gb gmiffClocReaderContent(Gmiff * const miff, GgetBuffer getBufferFunc, void * c
    miff->getBuffer = getBufferFunc;
 
    // Read the header.
-   returnFalseIf(!gstrIsEqual(gmiffValueGetStr(gmiffGetValue(miff)), MIFF_HEADER_FILETYPE_STR));
+   value = gmiffGetValue(miff);
+   returnFalseIf(!gstrIsEqual(gmiffValueGetStr(value), MIFF_HEADER_FILETYPE_STR));
    returnFalseIf(gmiffValueGetN(gmiffGetValue(miff)) != MIFF_HEADER_VERSION);
    returnFalseIf(!gmiffGetRecordStop(miff));
 
@@ -304,7 +305,7 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
       if (miff->value.count <= gmiffCountDEFAULT)
       {
          miff->value.data.bin = miff->buffer;
-         gmiffGetValueBin(miff, gmiffCountDEFAULT, miff->value.data.bin);
+         _MiffGetBin(miff, gmiffCountDEFAULT, miff->value.data.bin);
       }
       break;
 
@@ -325,15 +326,39 @@ GmiffValue gmiffGetValue(Gmiff * const miff)
       miff->value.data.str = (Gstr *) miff->buffer;
       miff->buffer[0]      = header;
       _MiffGetStr(miff, gmiffCountDEFAULT - 1, (Gstr *) &miff->buffer[1]);
+
+      // Was not including first letter.
+      miff->value.count++;
    }
 
    return miff->value;
 }
 
 /**************************************************************************************************
-func: gmiffValueBinGetData
+func: gmiffGetValueBinBuffer
 **************************************************************************************************/
-Gb gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
+Gb gmiffGetValueBinBuffer(Gmiff * const miff, Gcount const binCount, Gn1 * const binBuffer)
+{
+   returnFalseIf(
+      !_isStarted   ||
+      !miff         ||
+      binCount < 0  ||
+      !binBuffer);
+
+   // Already read the buffer.
+   if (binCount <= gmiffCountDEFAULT)
+   {
+      _MiffMemCopyTypeArray(binBuffer, Gn1, binCount, miff->value.data.bin);
+      returnTrue;
+   }
+
+   return _MiffGetBin(miff, binCount, binBuffer);
+}
+
+/**************************************************************************************************
+func: gmiffGetValueBinData
+**************************************************************************************************/
+GmiffData gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
 {
    returnFalseIf(
       !_isStarted                            ||
@@ -343,6 +368,27 @@ Gb gmiffGetValueBinData(Gmiff * const miff, Gn1 * const binByte)
       miff->bufferIndex >= miff->value.count);
 
    return _MiffGetBinByte(miff, binByte);
+}
+
+/**************************************************************************************************
+func: gmiffGetValueStrBuffer
+**************************************************************************************************/
+Gb gmiffGetValueStrBuffer(Gmiff * const miff, Gcount const strCount, Gstr * const strBuffer)
+{
+   returnFalseIf(
+      !_isStarted   ||
+      !miff         ||
+      strCount < 0  ||
+      !strBuffer);
+
+   // Already read the buffer.
+   if (strCount <= gmiffCountDEFAULT)
+   {
+      _MiffMemCopyTypeArray(strBuffer, Gstr, strCount, miff->value.data.str);
+      returnTrue;
+   }
+
+   return _MiffGetStr(miff, strCount, strBuffer);
 }
 
 /**************************************************************************************************
@@ -918,6 +964,16 @@ Gb gmiffValueGetB(GmiffValue const value)
 }
 
 /**************************************************************************************************
+func: gmiffValueGetBin
+**************************************************************************************************/
+Gn1 const *gmiffValueGetBin(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeBIN);
+
+   return value.data.bin;
+}
+
+/**************************************************************************************************
 func: gmiffValueGetBinCount
 **************************************************************************************************/
 Gcount gmiffValueGetBinCount(GmiffValue const value)
@@ -966,12 +1022,7 @@ func: gmiffValueGetR
 **************************************************************************************************/
 Gr8 gmiffValueGetR(GmiffValue const value)
 {
-   return0If(
-      value.type != gmiffValueTypeNUM ||
-      !(value.isR8 ||
-        value.isR4 ||
-        value.isI  ||
-        value.isN));
+   return0If(value.type != gmiffValueTypeNUM);
 
    if (value.isR8)
    {
@@ -998,12 +1049,14 @@ func: gmiffValueGetR4
 **************************************************************************************************/
 Gr4 gmiffValueGetR4(GmiffValue const value)
 {
+   // Not the right type.
+   return0If(value.type != gmiffValueTypeNUM);
+
+   // Value was representable as a double precision real but not as a single precision real.
+   // return 0.
    return0If(
-      value.type != gmiffValueTypeNUM ||
-      !(value.isR8 ||
-        value.isR4 ||
-        value.isI  ||
-        value.isN));
+      value.isR8 &&
+      !value.isR4);
 
    if (value.isR4)
    {
@@ -1026,7 +1079,17 @@ Gr4 gmiffValueGetR4(GmiffValue const value)
 }
 
 /**************************************************************************************************
-func: gmiffValueGetStrLen
+func: gmiffValueGetStr
+**************************************************************************************************/
+Gstr const *gmiffValueGetStr(GmiffValue const value)
+{
+   returnFalseIf(value.type != gmiffValueTypeSTR);
+
+   return value.data.str;
+}
+
+/**************************************************************************************************
+func: gmiffValueGetStrCount
 **************************************************************************************************/
 Gcount gmiffValueGetStrCount(GmiffValue const value)
 {

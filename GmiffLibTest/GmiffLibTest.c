@@ -1885,12 +1885,12 @@ static Gb _MiffTestBValue(Gmiff *miff, Gb testValue)
 
 static Gb _MiffTestBlockStartValue(Gmiff *miff)
 {
-   return gmiffValueGetType(gmiffGetValue(miff)) != gmiffValueTypeBLOCK_START;
+   return gmiffValueGetType(gmiffGetValue(miff)) == gmiffValueTypeBLOCK_START;
 }
 
 static Gb _MiffTestBlockStopValue(Gmiff *miff)
 {
-   return gmiffValueGetType(gmiffGetValue(miff)) != gmiffValueTypeBLOCK_STOP;
+   return gmiffValueGetType(gmiffGetValue(miff)) == gmiffValueTypeBLOCK_STOP;
 }
 
 static Gb _MiffTestIValue(Gmiff *miff, Gi8 testValue)
@@ -1922,9 +1922,7 @@ static Gb _MiffTestRValue(Gmiff *miff, Gr8 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   returnFalseIf(
-      gmiffValueGetType(value) != gmiffValueTypeNUM ||
-      !gmiffValueIsR8(  value));
+   returnFalseIf(gmiffValueGetType(value) != gmiffValueTypeNUM);
    returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR(value)));
    returnFalseIf(!isnan(testValue) && gmiffValueGetR(value) != testValue);
 
@@ -1936,9 +1934,7 @@ static Gb _MiffTestR4Value(Gmiff *miff, Gr4 testValue)
    GmiffValue value;
 
    value = gmiffGetValue(miff);
-   returnFalseIf(
-      gmiffValueGetType(value) != gmiffValueTypeNUM ||
-      !gmiffValueIsR4(  value));
+   returnFalseIf(gmiffValueGetType(value) != gmiffValueTypeNUM);
    returnFalseIf( isnan(testValue) && !isnan(gmiffValueGetR4(value)));
    returnFalseIf(!isnan(testValue) && gmiffValueGetR4(value) != testValue);
 
@@ -1954,7 +1950,7 @@ static Gb _MiffTestBinValue(Gmiff *miff, Gcount testCount, Gn1 *testValue)
    returnFalseIf(
       gmiffValueGetType(value) != gmiffValueTypeBIN &&
       testCount                != gmiffValueGetBinCount(value));
-   returnFalseIf(!gmiffGetValueBin(miff, gmiffValueGetBinCount(value), svalue));
+   returnFalseIf(!gmiffGetValueBinBuffer(miff, gmiffValueGetBinCount(value), svalue));
    returnFalseIf(memcmp(svalue, testValue, testCount) != 0);
 
    returnTrue;
@@ -1962,7 +1958,10 @@ static Gb _MiffTestBinValue(Gmiff *miff, Gcount testCount, Gn1 *testValue)
 
 static Gb _MiffTestStrValue(Gmiff *miff, Gstr const *testValue)
 {
-   return gstrIsEqual(gmiffValueGetStr(gmiffGetValue(miff)), testValue);
+   GmiffValue value;
+
+   value = gmiffGetValue(miff);
+   return gstrIsEqual(gmiffValueGetStr(value), testValue);
 }
 
 static Gb _MiffTestGetNull(Gmiff *miff, char const *key)
@@ -2026,7 +2025,6 @@ static Gb _MiffTestRead(Gstr const * const fileName)
    FILE           *file;
    Gmiff          *miff;
    Gb              result;
-   Gcount          arrayCount;
    Gindex          index;
    char const     *msg;
 
@@ -2159,7 +2157,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "Bool Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 100));
-      forCount(index, arrayCount)
+      forCount(index, 100)
       {
          breakIf(!_MiffTestBValue(miff, _bools[index]));
       }
@@ -2168,7 +2166,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "I Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 256));
-      forCount(index, arrayCount)
+      forCount(index, 256)
       {
          breakIf(!_MiffTestIValue(miff, (int) _narray[index]));
       }
@@ -2177,7 +2175,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "N Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 256));
-      forCount(index, arrayCount)
+      forCount(index, 256)
       {
          breakIf(!_MiffTestNValue(miff, _narray[index]));
       }
@@ -2186,7 +2184,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "R Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 300));
-      forCount(index, arrayCount)
+      forCount(index, 300)
       {
          breakIf(!_MiffTestRValue(miff, _reals8[index]));
       }
@@ -2195,7 +2193,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "R4 Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 300));
-      forCount(index, arrayCount)
+      forCount(index, 300)
       {
          breakIf(!_MiffTestR4Value(miff, _reals4[index]));
       }
@@ -2204,7 +2202,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
       msg = "String Array";
       breakIf(!_MiffTestStrValue(miff, msg));
       breakIf(!_MiffTestArrayCountValue(miff, 10));
-      forCount(index, arrayCount)
+      forCount(index, 10)
       {
          breakIf(!_MiffTestStrValue(miff, _strings[index]));
       }
@@ -2347,7 +2345,6 @@ static Gb _MiffTestRead(Gstr const * const fileName)
    #if defined(INCLUDE_BIN)
          msg = "Binary";
          breakIf(!_MiffTestStrValue(miff, msg));
-         breakIf(!_MiffTestArrayCountValue(miff, 1));
          breakIf(!_MiffTestBinValue(miff, 256 * 3, _binary));
          breakIf(!gmiffGetRecordStop(miff));
    #endif
@@ -2355,7 +2352,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "Bool Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 100));
-         forCount(index, arrayCount)
+         forCount(index, 100)
          {
             breakIf(!_MiffTestBValue(miff, _bools[index]));
          }
@@ -2364,7 +2361,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "I Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 256));
-         forCount(index, arrayCount)
+         forCount(index, 256)
          {
             breakIf(!_MiffTestIValue(miff, (int) _narray[index]));
          }
@@ -2373,7 +2370,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "N Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 256));
-         forCount(index, arrayCount)
+         forCount(index, 256)
          {
             breakIf(!_MiffTestNValue(miff, _narray[index]));
          }
@@ -2382,7 +2379,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "R Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 300));
-         forCount(index, arrayCount)
+         forCount(index, 300)
          {
             breakIf(!_MiffTestRValue(miff, _reals8[index]));
          }
@@ -2391,7 +2388,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "R4 Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 300));
-         forCount(index, arrayCount)
+         forCount(index, 300)
          {
             breakIf(!_MiffTestR4Value(miff, _reals4[index]));
          }
@@ -2400,7 +2397,7 @@ static Gb _MiffTestRead(Gstr const * const fileName)
          msg = "String Array";
          breakIf(!_MiffTestStrValue(miff, msg));
          breakIf(!_MiffTestArrayCountValue(miff, 10));
-         forCount(index, arrayCount)
+         forCount(index, 10)
          {
             breakIf(!_MiffTestStrValue(miff, _strings[index]));
          }

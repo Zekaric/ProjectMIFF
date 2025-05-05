@@ -332,8 +332,8 @@ static Gb _SetNum(Gmiff * const miff, GmiffValue const valueInput)
       {
          if (value.inr.r == Gr8MAX)        return _MiffSetBuffer(miff, 2, (Gn1 *) "+R");
          if (value.inr.r == -Gr8MAX)       return _MiffSetBuffer(miff, 2, (Gn1 *) "-R");
-         if (value.inr.r == HUGE_VALF)     return _MiffSetBuffer(miff, 2, (Gn1 *) "+C");
-         if (value.inr.r == -HUGE_VALF)    return _MiffSetBuffer(miff, 2, (Gn1 *) "-C");
+         if (value.inr.r == HUGE_VAL)      return _MiffSetBuffer(miff, 2, (Gn1 *) "+C");
+         if (value.inr.r == -HUGE_VAL)     return _MiffSetBuffer(miff, 2, (Gn1 *) "-C");
          if (isnan(value.inr.r))           return _MiffSetBuffer(miff, 1, (Gn1 *) "?");
 
          _sprintf_s_l((char *) string, 80, "%.*g", _MiffLocaleGet(), DBL_DECIMAL_DIG, value.inr.r);

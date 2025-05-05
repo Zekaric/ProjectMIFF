@@ -101,9 +101,10 @@ variable:
 /**************************************************************************************************
 prototype:
 **************************************************************************************************/
+Gb                 _MiffGetBin(              Gmiff       * const miff, Gcount const binCount, Gn1 * const binBuffer);
 GmiffData          _MiffGetBinByte(          Gmiff       * const miff, Gn1 * const binByte);
 Gb                 _MiffGetLineSkip(         Gmiff       * const miff);
-void               _MiffGetNum(              Gmiff       * const miff);
+Gb                 _MiffGetNum(              Gmiff       * const miff);
 Gb                 _MiffGetPartRest(         Gmiff       * const miff, Gn1 const start);
 Gb                 _MiffGetPart(             Gmiff       * const miff, Gb const trimLeadingTabs);
 Gb                 _MiffGetPartEnd(          Gmiff       * const miff);

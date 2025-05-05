@@ -40,7 +40,8 @@ include:
 local:
 prototype:
 **************************************************************************************************/
-static void  _GetNum(            Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer);
+static Gb    _GetNum(            Gmiff * const miff, Gcount const count, Gn1 const * const buffer);
+static Gcount _GetNumCount(      Gstr * const str);
 static void  _GetNumInteger(     Gmiff * const miff, Gstr * const str);
 static void  _GetNumReal(        Gmiff * const miff, Gstr * const str);
 
@@ -59,15 +60,22 @@ Read in the binary to the internal buffer.
 **************************************************************************************************/
 Gb _MiffGetBin(Gmiff * const miff, Gcount const binCount, Gn1 * const binBuffer)
 {
-   Gindex index;
-   Gb     result;
+   Gindex    index;
+   GmiffData result;
 
    // Reading a larger buffer directly from the repo.
-   forCount(index, binount)
+   forCount(index, binCount)
    {
       result = _MiffGetBinByte(miff, &binBuffer[index]);
 
-      breakIf(!result);
+      if (result == gmiffDataIS_PART_DONE ||
+          result == gmiffDataIS_RECORD_DONE)
+      {
+         miff->value.count  = index;
+         miff->isPartDone   = gbTRUE;
+         miff->isRecordDone = (result == gmiffDataIS_RECORD_DONE);
+         break;
+      }
    }
 
    miff->value.count = index;
@@ -80,17 +88,37 @@ Gb _MiffGetBin(Gmiff * const miff, Gcount const binCount, Gn1 * const binBuffer)
 /**************************************************************************************************
 func: _MiffGetBinByte
 **************************************************************************************************/
-Gb _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
+GmiffData _MiffGetBinByte(Gmiff * const miff, Gn1 * const binByte)
 {
    Gn1 byte[2];
 
-   returnFalseIf(!miff->getBuffer(miff->dataRepo, 2, byte));
+   returnIf(!miff->getBuffer(miff->dataRepo, 1, &byte[0]), gmiffDataERROR);
+
+   if (byte[0] == '\t')
+   {
+      miff->isPartDone = gbTRUE;
+      return gmiffDataIS_PART_DONE;
+   }
+
+   if (byte[0] == '\n')
+   {
+      miff->isPartDone   = gbTRUE;
+      miff->isRecordDone = gbTRUE;
+      return gmiffDataIS_RECORD_DONE;
+   }
+
+   returnIf(!miff->getBuffer(miff->dataRepo, 1, &byte[1]), gmiffDataERROR);
+
+   returnIf(
+         byte[1] == '\t' ||
+         byte[0] == '\n',
+      gmiffDataERROR);
 
    *binByte = (_ValueFromHexInt(byte[0]) << 4) | _ValueFromHexInt(byte[1]);
 
    miff->bufferIndex++;
 
-   returnTrue;
+   return gmiffDataIS_DATA;
 }
 
 /**************************************************************************************************
@@ -115,9 +143,9 @@ Gb _MiffGetLineSkip(Gmiff * const miff)
 /**************************************************************************************************
 func: _MiffGetNum
 **************************************************************************************************/
-void _MiffGetNum(Gmiff * const miff)
+Gb _MiffGetNum(Gmiff * const miff)
 {
-   _GetNum(miff, &miff->value, miff->readCount, miff->readData);
+   return _GetNum(miff, miff->readCount, miff->readData);
 }
 
 /**************************************************************************************************
@@ -263,6 +291,45 @@ Gb _MiffGetPartEnd(Gmiff * const miff)
 }
 
 /**************************************************************************************************
+func: _MiffGetStr
+
+Reading string into the internal buffer.
+**************************************************************************************************/
+Gb _MiffGetStr(Gmiff * const miff, Gcount const strCount, Gstr * const str)
+{
+   Gindex      index,
+               strIndex;
+   Gstr        letter;
+   GmiffData   dataResult;
+
+   strIndex = 0;
+   forCount(index, strCount)
+   {
+      dataResult = _MiffGetStrLetter(miff, &letter);
+
+      returnFalseIf(dataResult == gmiffDataERROR);
+
+      if (dataResult == gmiffDataIS_PART_DONE ||
+          dataResult == gmiffDataIS_RECORD_DONE)
+      {
+         miff->value.count  = strIndex;
+         miff->isPartDone   = gbTRUE;
+         miff->isRecordDone = (dataResult == gmiffDataIS_RECORD_DONE);
+         break;
+      }
+
+      str[strIndex++] = letter;
+   }
+
+   // Ensure null termination.
+   str[strIndex] = 0;
+
+   returnFalseIf(!_MiffGetPartEnd(miff));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
 func: _MiffGetStrLetter
 **************************************************************************************************/
 GmiffData _MiffGetStrLetter(Gmiff * const miff, Gstr * const letter)
@@ -313,7 +380,6 @@ Gcount _MiffGetValueCount(Gmiff * const miff)
 {
    Gindex     index;
    Gstr       buffer[32];
-   GmiffValue value;
 
    forCount(index, 32)
    {
@@ -343,9 +409,7 @@ Gcount _MiffGetValueCount(Gmiff * const miff)
       return -gmiffCountDEFAULT;
    }
 
-   _GetNum(miff, &value, (Gn4) index, (Gn1 *) buffer);
-
-   return (Gcount) value.inr.n;
+   return _GetNumCount(buffer);
 }
 
 /**************************************************************************************************
@@ -355,48 +419,14 @@ Gstr _MiffGetValueHeader(Gmiff * const miff)
 {
    Gn1 byte;
 
-   return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
-
-   return (Gstr) byte;
-}
-
-/**************************************************************************************************
-func: _MiffGetStr
-
-Reading string into the internal buffer.
-**************************************************************************************************/
-Gb _MiffGetStr(Gmiff * const miff, Gcount const strCount, Gstr * const str)
-{
-   Gindex      index,
-               strIndex;
-   Gstr        letter;
-   GmiffData   dataResult;
-
-   strIndex = 0;
-   forCount(index, strCount)
+   // Eat leading spaces.
+   loop
    {
-      dataResult = gmiffGetValueStrData(miff, &letter);
-
-      returnFalseIf(dataResult == gmiffDataERROR);
-
-      if (dataResult == gmiffDataIS_PART_DONE ||
-          dataResult == gmiffDataIS_RECORD_DONE)
-      {
-         miff->value.count  = strIndex;
-         miff->isPartDone   = gbTRUE;
-         miff->isRecordDone = (dataResult == gmiffDataIS_RECORD_DONE);
-         break;
-      }
-
-      str[strIndex++] = letter;
+      return0If(!miff->getBuffer(miff->dataRepo, 1, (Gn1 *) &byte));
+      breakIf(byte != ' ');
    }
 
-   // Ensure null termination.
-   str[strIndex] = 0;
-
-   returnFalseIf(!_MiffGetPartEnd(miff));
-
-   returnTrue;
+   return (Gstr) byte;
 }
 
 /**************************************************************************************************
@@ -406,26 +436,108 @@ function:
 /**************************************************************************************************
 func: _GetNum
 **************************************************************************************************/
-static void _GetNum(Gmiff * const miff, GmiffValue * const value, Gcount const count, Gn1 const * const buffer)
+static Gb _GetNum(Gmiff * const miff, Gcount const count, Gn1 const * const buffer)
 {
-   Gb   isIntegerNumberFound,
+   Gb   isIntegerSignFound,
+        isIntegerNumberFound,
         isFractionalNumberFound,
+        isExponentSignFound,
         isExponentNumberFound;
    // Current doulbe maxes out a 10^+/-308, 400 characters is large enough.
    Gstr numStr[400];
    int  numIndex;
    int  index;
 
-   value->type  = gmiffValueTypeNONE;
-   value->inr.n = 0;
+   isIntegerSignFound         =
+      isIntegerNumberFound    =
+      isFractionalNumberFound =
+      isExponentSignFound     =
+      isExponentNumberFound   = gbFALSE;
+
+   miff->value.type  = gmiffValueTypeNONE;
+   miff->value.inr.n = 0;
 
    // Reset the number string.
-   forCount(index, 400)
+   _MiffMemClearTypeArray(numStr, Gstr, 400);
+
+   // Is the number a constant?
+   if (buffer[0] == '?')
    {
-      numStr[index] = 0;
+      miff->value.type   = gmiffValueTypeNUM;
+      miff->value.isR8   = gbTRUE;
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr.r  = NAN;
+      miff->value.inr4.r = NAN;
+      returnTrue;
    }
 
-   isIntegerNumberFound = gbFALSE;
+   if      (buffer[0] == '+')
+   {
+      if      (buffer[1] == 'I')
+      {
+         miff->value.type  = gmiffValueTypeNUM;
+         miff->value.isI   = gbTRUE;
+         miff->value.isN   = gbTRUE;
+         miff->value.inr.i = Gi8MAX;
+         returnTrue;
+      }
+      else if (buffer[1] == 'N')
+      {
+         miff->value.type  = gmiffValueTypeNUM;
+         miff->value.isN   = gbTRUE;
+         miff->value.inr.i = Gn8MAX;
+         returnTrue;
+      }
+      else if (buffer[1] == 'R')
+      {
+         miff->value.type   = gmiffValueTypeNUM;
+         miff->value.isR8   = gbTRUE;
+         miff->value.isR4   = gbTRUE;
+         miff->value.inr.r  = Gr8MAX;
+         miff->value.inr4.r = Gr4MAX;
+         returnTrue;
+      }
+      else if (buffer[1] == 'C')
+      {
+         miff->value.type   = gmiffValueTypeNUM;
+         miff->value.isR8   = gbTRUE;
+         miff->value.isR4   = gbTRUE;
+         miff->value.inr.r  = HUGE_VAL;
+         miff->value.inr4.r = HUGE_VALF;
+         returnTrue;
+      }
+   }
+   else if (buffer[0] == '-')
+   {
+      if      (buffer[1] == 'I')
+      {
+         miff->value.type  = gmiffValueTypeNUM;
+         miff->value.isI   = gbTRUE;
+         miff->value.isN   = gbTRUE;
+         miff->value.inr.i = Gi8MIN;
+         returnTrue;
+      }
+      else if (buffer[1] == 'R')
+      {
+         miff->value.type   = gmiffValueTypeNUM;
+         miff->value.isR8   = gbTRUE;
+         miff->value.isR4   = gbTRUE;
+         miff->value.inr.r  = -Gr8MAX;
+         miff->value.inr4.r = -Gr4MAX;
+         returnTrue;
+      }
+      else if (buffer[1] == 'C')
+      {
+         miff->value.type   = gmiffValueTypeNUM;
+         miff->value.isR8   = gbTRUE;
+         miff->value.isR4   = gbTRUE;
+         miff->value.inr.r  = -HUGE_VAL;
+         miff->value.inr4.r = -HUGE_VALF;
+         returnTrue;
+      }
+   }
+
+   // Number is not a constant. Convert it to an integer or real number.
 
    // Read in the integer part.
    numIndex = 0;
@@ -433,27 +545,60 @@ static void _GetNum(Gmiff * const miff, GmiffValue * const value, Gcount const c
    {
       breakIf(!buffer[index]);
 
-      // Number is a Real
+      // Number is a Real.
       if (buffer[index] == '.')
       {
-         gotoIf(isIntegerNumberFound, GET_FRACTION);
-         return;
+         // Weird number,  '+' '.'... or '-' '.'... with no integer starter.  Add 0.
+         if (!isIntegerNumberFound)
+         {
+            numStr[index++] = '0';
+         }
+
+         // Let's go fetch the fraction portion of the number.
+         goto GET_FRACTION;
       }
-      // Number is Real with an exponent
+
+      // Number is Real with an exponent.
       if (buffer[index] == 'e' ||
           buffer[index] == 'E')
       {
-         gotoIf(isIntegerNumberFound, GET_EXPONENT);
-         return;
+         // Weird number,  +e... or -e... with no integer or fractional starter.  Result is 0
+         if (!isIntegerNumberFound)
+         {
+            miff->value.type  = gmiffValueTypeNUM;
+            miff->value.isI   = gbTRUE;
+            miff->value.isN   = gbTRUE;
+            miff->value.inr.i = 0;
+            returnTrue;
+         }
+
+         goto GET_EXPONENT;
       }
 
       // Add to the integer portion.
-      if ('0' <= buffer[index] && buffer[index] <= '9')
+      if      ('0' <= buffer[index] && buffer[index] <= '9')
       {
-         numStr[numIndex++]     = (Gstr) buffer[index];
+         numStr[numIndex++]   = (Gstr) buffer[index];
          isIntegerNumberFound = gbTRUE;
       }
-      // Assuming this is the end of the number.
+      // Copy over the sign.
+      else if (buffer[index] == '-')
+      {
+         // We already saw a sign or number.  Assume we have read the number.
+         breakIf(isIntegerSignFound);
+
+         numStr[numIndex++] = (Gstr) buffer[index];
+         isIntegerSignFound = gbTRUE;
+      }
+      else if (buffer[index] == '+')
+      {
+         // We already saw a sign or number.  Assume we have read the number.
+         breakIf(isIntegerSignFound);
+
+         // Don't bother adding the + sign to the string.
+         isIntegerSignFound = gbTRUE;
+      }
+      // Assuming this is the end of the number if we see any other letter.
       else
       {
          break;
@@ -462,15 +607,18 @@ static void _GetNum(Gmiff * const miff, GmiffValue * const value, Gcount const c
 
    if (isIntegerNumberFound)
    {
-      value->type = gmiffValueTypeNUM;
       _GetNumInteger(miff, numStr);
+      returnTrue;
    }
-   return;
+
+   // Just a + or -?  Weird.  Don't know what this means.
+   returnFalse;
 
 GET_FRACTION:
    // Decimal was found.
-   isFractionalNumberFound = gbFALSE;
    numStr[numIndex++]      = '.';
+   index++;
+
    for (; index < count; index++)
    {
       breakIf(!buffer[index]);
@@ -479,17 +627,32 @@ GET_FRACTION:
       if (buffer[index] == 'e' ||
           buffer[index] == 'E')
       {
+         // Weird number "-.e" or "+.e".  In either case, 0 to an exponent is still 0.
+         if (!isIntegerNumberFound &&
+             !isFractionalNumberFound)
+         {
+            miff->value.type  = gmiffValueTypeNUM;
+            miff->value.isI   = gbTRUE;
+            miff->value.isN   = gbTRUE;
+            miff->value.inr.i = 0;
+            returnTrue;
+         }
+
+         // There was at least an integer portion but no numbers after the decimal.
+         // Remove the decimal since is adds nothing to the number.
          if (!isFractionalNumberFound)
          {
             numIndex--;
          }
+
+         // Lets go fetch the exponent.
          goto GET_EXPONENT;
       }
 
       // Add to the fractional portion.
       if ('0' <= buffer[index] && buffer[index] <= '9')
       {
-         numStr[numIndex]        = (Gstr) buffer[index];
+         numStr[numIndex++]      = (Gstr) buffer[index];
          isFractionalNumberFound = gbTRUE;
       }
       // Assuming this is the end of the number.
@@ -499,62 +662,128 @@ GET_FRACTION:
       }
    }
 
+   // We have both integer portion and fractional portion.
    if (isFractionalNumberFound)
    {
-      value->type = gmiffValueTypeNUM;
       _GetNumReal(miff, numStr);
+      returnTrue;
    }
-   return;
+
+   // No fractional digits found.  Treat it like an integer.
+   _GetNumInteger(miff, numStr);
+   returnTrue;
 
 GET_EXPONENT:
    // Exponent was found
-   isExponentNumberFound = gbFALSE;
    numStr[numIndex++]    = 'e';
-
-   // End of file in the middle of a number!
-   returnVoidIf(
-      index >= count ||
-      !buffer[index]);
-
-   // Get the sign.
-   if      ('0' <= buffer[index] && buffer[index] <= '9')
-   {
-      numStr[numIndex++]    = (Gstr) buffer[index];
-      isExponentNumberFound = gbTRUE;
-   }
-   // Negative exponent.
-   else if (buffer[index] == '-')
-   {
-      numStr[numIndex++] = (Gstr) buffer[index];
-   }
-   // Wasn't a sign or a digit after the 'e'.
-   else if (buffer[index] != '+')
-   {
-      return;
-   }
-   // If it was a "+" sign we just eat it.  Unnecessary.
    index++;
 
    // Get the exponent
    for (; index < count; index++)
    {
+      // End of the string.
       breakIf(!buffer[index]);
 
-      if ('0' <= buffer[index] && buffer[index] <= '9')
+      // Get the digits.
+      if      ('0' <= buffer[index] && buffer[index] <= '9')
       {
-         numStr[numIndex++]    = buffer[index];
+         numStr[numIndex++]    = (Gstr) buffer[index];
          isExponentNumberFound = gbTRUE;
       }
+      // Negative sign.
+      else if (buffer[index] == '-')
+      {
+         // We have already seen a number.  Seeing a sign would be wrong.  Assume this letter
+         // belongs to something else.
+         breakIf(isExponentNumberFound);
+
+         // Two signs in a row and no number?  Something wrong with the number.  Assume everything
+         // after the e doesn't belong to the number.
+         breakIf(isExponentSignFound);
+
+         numStr[numIndex++]  = (Gstr) buffer[index];
+         isExponentSignFound = gbTRUE;
+      }
+      // Positive sign
+      else if (buffer[index] == '+')
+      {
+         // We have already seen a number.  Seeing a sign would be wrong.  Assume this letter
+         // belongs to something else.
+         breakIf(isExponentNumberFound);
+
+         // Two signs in a row and no number?  Something wrong with the number.  Assume everything
+         // after the e doesn't belong to the number.
+         breakIf(isExponentSignFound);
+
+         // No need to add to the string.  Just eat the sign.
+         isExponentSignFound = gbTRUE;
+      }
+      // Wasn't a sign or a digit.
       else
       {
+         // No number found after the e.  Assume everything from the e onward number.
+         if (!isFractionalNumberFound)
+         {
+            // Trim back to the 'e'
+            loop
+            {
+               breakIf(numStr[numIndex - 1] == 'e');
+               numStr[--numIndex] = 0;
+            }
+         }
+
+         // We hit something that is not part of the number.
          break;
       }
    }
 
-   if (isExponentNumberFound)
+   // We actually have a real number.
+   if (isExponentNumberFound ||
+       isFractionalNumberFound)
    {
       _GetNumReal(miff, numStr);
+      returnTrue;
    }
+
+   // We just have an integer number.
+   if (isIntegerNumberFound)
+   {
+      _GetNumInteger(miff, numStr);
+      returnTrue;
+   }
+
+   // I don't know what we have, it sure isn't a number.
+   returnFalse;
+}
+
+/**************************************************************************************************
+func: _GetNumCount
+**************************************************************************************************/
+static Gcount _GetNumCount(Gstr * const str)
+{
+   Gn8 value;
+
+   // This is a negative number.  Definitely not a natural number.
+   if (str[0] == '-')
+   {
+      value = _NFromStr(&str[1]);
+      if (value >= ((Gn8) GcountMAX) + 1)
+      {
+         return GcountMIN;
+      }
+
+      return - ((Gi4) value);
+   }
+
+   value = _NFromStr(str);
+
+   // This unsigned integer is small enough to be a signed integer.
+   if (value > GcountMAX)
+   {
+      return GcountMAX;
+   }
+
+   return (Gcount) value;
 }
 
 /**************************************************************************************************
@@ -602,8 +831,6 @@ static void _GetNumInteger(Gmiff * const miff, Gstr * const str)
    {
       miff->value.isI   = gbTRUE;
       miff->value.inr.i = miff->value.inr.n;
-
-      return;
    }
 }
 
@@ -612,11 +839,18 @@ func: _GetNumReal
 **************************************************************************************************/
 static void _GetNumReal(Gmiff * const miff, Gstr * const str)
 {
+   miff->value.type   = gmiffValueTypeNUM;
+   miff->value.isR8   = gbTRUE;
    miff->value.inr.i  = 0;
    miff->value.inr.n  = 0;
    miff->value.inr.r  = _atof_l(str, _MiffLocaleGet());
-   miff->value.inr4.r = (float) miff->value.inr.r;
-   miff->value.type   = gmiffValueTypeNUM;
+
+   // Check if it is representable in a single precision real value.
+   if (-Gr4MAX <= miff->value.inr.r && miff->value.inr.r <= Gr4MAX)
+   {
+      miff->value.isR4   = gbTRUE;
+      miff->value.inr4.r = (float) miff->value.inr.r;
+   }
 }
 
 /**************************************************************************************************

@@ -744,7 +744,7 @@ Gb gmineInfoItemSetMinI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
       gmineInfoItem->type != gmineInfoItemTypeI);
 
    gmineInfoItem->min.i    = value;
-   gmineInfoItem->isSetMax = gbTRUE;
+   gmineInfoItem->isSetMin = gbTRUE;
 
    returnTrue;
 }
@@ -760,7 +760,7 @@ Gb gmineInfoItemSetMinN(GmineInfoItem * const gmineInfoItem, Gn8 const value)
       gmineInfoItem->type != gmineInfoItemTypeN);
 
    gmineInfoItem->min.n    = value;
-   gmineInfoItem->isSetMax = gbTRUE;
+   gmineInfoItem->isSetMin = gbTRUE;
 
    returnTrue;
 }
@@ -776,7 +776,7 @@ Gb gmineInfoItemSetMinR(GmineInfoItem * const gmineInfoItem, Gr8 const value)
       gmineInfoItem->type != gmineInfoItemTypeR);
 
    gmineInfoItem->min.r    = value;
-   gmineInfoItem->isSetMax = gbTRUE;
+   gmineInfoItem->isSetMin = gbTRUE;
 
    returnTrue;
 }

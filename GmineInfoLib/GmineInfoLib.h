@@ -129,6 +129,7 @@ Gb                       gmineInfoWriteBlockStartImageList(                Gmine
 Gb                       gmineInfoWriteBlockStartItemList(                 GmineInfo       * const gmineInfo);
 Gb                       gmineInfoWriteBlockStartPropertyList(             GmineInfo       * const gmineInfo);
 Gb                       gmineInfoWriteBlockStop(                          GmineInfo       * const gmineInfo);
+Gb                       gmineInfoWriteBlockStopList(                      GmineInfo       * const gmineInfo);
 //Gb                       gmineInfoWriteDrillHoleBlockStart(                GmineInfo       * const gmineInfo, GmineInfoDrillHole * const gmineInfoDrillHole);
 //Gb                       gmineInfoWriteDrillHoleBlockData(                 GmineInfo       * const gmineInfo, ...);
 //Gb                       gmineInfoWriteDrillHoleBlockStop(                 GmineInfo       * const gmineInfo);

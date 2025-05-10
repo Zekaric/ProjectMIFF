@@ -1530,7 +1530,11 @@ static Gb _JsonTestRead(Gstr const * const fileName)
    printf("JSON Read: %s ERROR\n", msg);
 
    gjsonDloc(json);
-   fclose(file);
+
+   if (file)
+   {
+      fclose(file);
+   }
 
    return result;
 }
@@ -1832,7 +1836,11 @@ static Gb _JsonTestWrite(Gstr const * const fileName)
    }
 
    gjsonDloc(json);
-   fclose(file);
+
+   if (file)
+   {
+      fclose(file);
+   }
 
    return result;
 }
@@ -2448,7 +2456,11 @@ static Gb _MiffTestRead(Gstr const * const fileName)
    printf("MIFF Read: %s ERROR\n", msg);
 
    gmiffDloc(miff);
-   fclose(file);
+
+   if (file)
+   {
+      fclose(file);
+   }
 
    return result;
 }
@@ -2709,7 +2721,11 @@ static Gb _MiffTestWrite(Gstr const * const fileName)
    }
 
    gmiffDloc(miff);
-   fclose(file);
+
+   if (file)
+   {
+      fclose(file);
+   }
 
    return result;
 }

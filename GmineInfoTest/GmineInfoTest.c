@@ -237,6 +237,8 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoImageSetFileName(image, "BinghamCanyonCopperMine.png"));
    returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
    returnFalseIf(!gmineInfoImageSetIsInline(image, gbTRUE));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(image, "Comment", "This is a comment"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(image, "Other",   "This is something other"));
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
 
@@ -249,12 +251,14 @@ static Gb _BlockWriteImageList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoImageSetName(    image, "Biggest Mine In The World"));
    returnFalseIf(!gmineInfoImageSetFileName(image, "BinghamCanyonCopperMine.png"));
    returnFalseIf(!gmineInfoImageSetFilePath(image, "BinghamCanyonCopperMine.png"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(image, "Other1", "This is something other 1"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(image, "Other2", "This is something other 2"));
 
    returnFalseIf(!gmineInfoAddImage(gmineInfo, image));
 
    returnFalseIf(!gmineInfoWriteBlockContentImageList(gmineInfo));
 
-   return gmineInfoWriteBlockStop(gmineInfo);
+   return gmineInfoWriteBlockStopList(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -320,7 +324,7 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
 
    returnFalseIf(!gmineInfoWriteBlockContentItemList(gmineInfo));
 
-   return gmineInfoWriteBlockStop(gmineInfo);
+   return gmineInfoWriteBlockStopList(gmineInfo);
 }
 
 /**************************************************************************************************
@@ -355,6 +359,8 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetIsClippable( prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsSelectable(prop, gbTRUE));
    returnFalseIf(!gmineInfoPropertySetIsVisible(   prop, gbTRUE));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(  prop, "Other1", "This is something other 1"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(  prop, "Other2", "This is something other 2"));
    // Everything else will be defaults.
 
    returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
@@ -419,12 +425,14 @@ static Gb _BlockWritePropertyList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoPropertySetPatternLine(             prop, "dot"));
    returnFalseIf(!gmineInfoPropertySetPatternNode(             prop, "diamond dot"));
    returnFalseIf(!gmineInfoPropertySetTransparency(            prop, 50));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(              prop, "Other1", "This is something other 1"));
+   returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(              prop, "Other2", "This is something other 2"));
 
    returnFalseIf(!gmineInfoSetPropertyListAppend(gmineInfo, prop));
 
    returnFalseIf(!gmineInfoWriteBlockContentPropertyList(gmineInfo));
 
-   return gmineInfoWriteBlockStop(gmineInfo);
+   return gmineInfoWriteBlockStopList(gmineInfo);
 }
 
 /**************************************************************************************************

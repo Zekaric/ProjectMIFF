@@ -56,7 +56,7 @@ constant:
 #define STRIFY(X)                                        #X
 #define STRINGIFY(X)                                     STRIFY(X)
 
-#define HEADER_TYPE_STR                                  "Mining Information"
+#define HEADER_TYPE_STR                                  "Mine Information"
 #define HEADER_TYPE_LEN                                  18
 #define HEADER_VERSION_NUM                               1
 #define HEADER_VERSION_STR                               STRINGIFY(HEADER_VERSION_NUM)
@@ -281,39 +281,42 @@ prototype:
 global:
 function:
 **************************************************************************************************/
-Gb                 _MiIoClocReader(       GmineInfo       * const mineInfo);
-Gb                 _MiIoClocWriter(       GmineInfo       * const mineInfo);
+Gb                 _MiIoClocReader(             GmineInfo       * const mineInfo);
+Gb                 _MiIoClocWriter(             GmineInfo       * const mineInfo);
 
-void               _MiIoDloc(             GmineInfo       * const mineInfo);
+void               _MiIoDloc(                   GmineInfo       * const mineInfo);
 
-Gb                 _MiIoWriteB(           GmineInfo       * const gmineInfo, Gstr const * const key, Gb const value);
-Gb                 _MiIoWriteBinBuffer(   GmineInfo       * const gmineInfo, Gcount const count, Gn1 const * const buffer);
-Gb                 _MiIoWriteBinStart(    GmineInfo       * const gmineInfo, Gstr const * const key, size_t const fileSize);
-Gb                 _MiIoWriteBinStop(     GmineInfo       * const gmineInfo);
-Gb                 _MiIoWriteBlockStart(  GmineInfo       * const gmineInfo, Gstr       * const key);
-Gb                 _MiIoWriteBlockStop(   GmineInfo       * const gmineInfo);
-Gb                 _MiIoWriteColor(       GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoColor const * const value);
-Gb                 _MiIoWriteI(           GmineInfo       * const gmineInfo, Gstr const * const key, Gi8 const value);
-Gb                 _MiIoWriteN(           GmineInfo       * const gmineInfo, Gstr const * const key, Gn8 const value);
-Gb                 _MiIoWritePoint(       GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);
-Gb                 _MiIoWriteR(           GmineInfo       * const gmineInfo, Gstr const * const key, Gr8 const value);
-Gb                 _MiIoWriteStr(         GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+Gb                 _MiIoWriteB(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gb const value);
+Gb                 _MiIoWriteBinBuffer(         GmineInfo       * const gmineInfo, Gcount const count, Gn1 const * const buffer);
+Gb                 _MiIoWriteBinStart(          GmineInfo       * const gmineInfo, Gstr const * const key, size_t const fileSize);
+Gb                 _MiIoWriteBinStop(           GmineInfo       * const gmineInfo);
+Gb                 _MiIoWriteBlockStart(        GmineInfo       * const gmineInfo, Gstr       * const key);
+Gb                 _MiIoWriteBlockStartList(    GmineInfo       * const gmineInfo, Gstr       * const key);
+Gb                 _MiIoWriteBlockStartListItem(GmineInfo       * const gmineInfo, Gstr       * const key);
+Gb                 _MiIoWriteBlockStop(         GmineInfo       * const gmineInfo);
+Gb                 _MiIoWriteBlockStopList(     GmineInfo       * const gmineInfo);
+Gb                 _MiIoWriteColor(             GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoColor const * const value);
+Gb                 _MiIoWriteI(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gi8 const value);
+Gb                 _MiIoWriteN(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gn8 const value);
+Gb                 _MiIoWritePoint(             GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);
+Gb                 _MiIoWriteR(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gr8 const value);
+Gb                 _MiIoWriteStr(               GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
 
-void              *_MiMemCloc(            Gcount const memByteCount);
-void               _MiMemDloc(            void * const mem);
-void               _MiMemStart(           GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
-void               _MiMemStop(            void);
+void              *_MiMemCloc(                  Gcount const memByteCount);
+void               _MiMemDloc(                  void * const mem);
+void               _MiMemStart(                 GmemCloc const memClocFunc, GmemDloc const memDlocFunc);
+void               _MiMemStop(                  void);
 
-#define            _MiMemClearType(       MEM, TYPE)                      memset((MEM), 0,               sizeof(TYPE))
-#define            _MiMemClearTypeArray(  MEM, TYPE, COUNT)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
-#define            _MiMemClocType(               TYPE)           (TYPE *) _MiMemCloc(                    sizeof(TYPE))
-#define            _MiMemClocTypeArray(   COUNT, TYPE)           (TYPE *) _MiMemCloc(          (COUNT) * sizeof(TYPE))
-#define            _MiMemCopyTypeArray(   MEM, COUNT, TYPE, SRC)          memcpy((MEM), (SRC), (COUNT) * sizeof(TYPE))
-#define            _MiMemIsEqual(         COUNT, MEM, COUNT_ALT, MEM_ALT) (memcmp(MEM, MEM_ALT, COUNT) == 0)
+#define            _MiMemClearType(             MEM, TYPE)                      memset((MEM), 0,               sizeof(TYPE))
+#define            _MiMemClearTypeArray(        MEM, TYPE, COUNT)               memset((MEM), 0,     (COUNT) * sizeof(TYPE))
+#define            _MiMemClocType(                     TYPE)           (TYPE *) _MiMemCloc(                    sizeof(TYPE))
+#define            _MiMemClocTypeArray(         COUNT, TYPE)           (TYPE *) _MiMemCloc(          (COUNT) * sizeof(TYPE))
+#define            _MiMemCopyTypeArray(         MEM, COUNT, TYPE, SRC)          memcpy((MEM), (SRC), (COUNT) * sizeof(TYPE))
+#define            _MiMemIsEqual(               COUNT, MEM, COUNT_ALT, MEM_ALT) (memcmp(MEM, MEM_ALT, COUNT) == 0)
 
-#define            _MiStrGetCount(        STR, MAX_LEN)                   (Gcount) (strnlen(STR, (size_t) (MAX_LEN)))
-Gb                 _MiStrIsEmpty(         Gstr const * const value);
-#define            _MiStrIsEqual(         STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, gmiffCountDEFAULT), STR, _MiStrGetCount(STR_ALT, gmiffCountDEFAULT), STR_ALT)
-Gstr              *_MiStrClone(           Gstr const * const value);
+#define            _MiStrGetCount(              STR, MAX_LEN)                   (Gcount) (strnlen(STR, (size_t) (MAX_LEN)))
+Gb                 _MiStrIsEmpty(               Gstr const * const value);
+#define            _MiStrIsEqual(               STR, STR_ALT)                   _MiMemIsEqual(_MiStrGetCount(STR, gmiffCountDEFAULT), STR, _MiStrGetCount(STR_ALT, gmiffCountDEFAULT), STR_ALT)
+Gstr              *_MiStrClone(                 Gstr const * const value);
 
 #endif

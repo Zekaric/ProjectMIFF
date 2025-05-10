@@ -189,10 +189,10 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </ul>
 <h1 id="1-mi">1. M.I.</h1>
 <h2 id="11-discussion">1.1. Discussion</h2>
-<p><strong>What is the purpose of M.I. (MI)?</strong></p>
-<p>MI is intended to be a file format for exporting and importing data from one mining software package to another software package.</p>
+<p><strong>What is the purpose of the Mine Information (MI) file?</strong></p>
+<p>An MI file is intended to be a file format for exporting and importing data from one mine software package to another software package.</p>
 <p>I would imagine users of software packages are annoyed at the lack of interoperability between software packages.  Currently some software packages attempt to do their best at supporting competitor file formats (read only) but there is often a lot of loss of data or, as data formats in each package evolves, suffer from compatibility issues.  Often data needs to be dumped to formats that come 'close' but are not exact, like DXF/DWG, or down to very basic ASCII files, like csv files, which are often lacking compared to the original data.  Users will need to massage this raw data in order to import it into their target software package.</p>
-<p>A lot of the client's time is lost with all this work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with an information format is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard part of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.</p>
+<p>A lot of the time is lost with all this manual work and often lock them into one system because getting data out or in from that system is too onerous.  The idea with MI file is to remove some of the pain of this data transfer task and put more of the pain on the software vendors of doing the hard work of reading in the data to their expectations.  The software users will not need to know some of the intricacies of the data or task.</p>
 <h2 id="12-goals">1.2. Goals</h2>
 <p>The main goal of this format is to be specifically a data passing format.  It is not intended to be a native format for any software package.  The focus is to make it easy for the developers from any software package to export their data to this format and, without too much difficulty, to import into another vendor's software.</p>
 <p>For the users of the software packages, the process of moving data from package to package will be much easier, less time consuming, less error prone, and less data loss as they will only have to export and import to just one type of file instead of various file formats and requiring more intimate knowledge of the data transfer process specific to their software packages.</p>
@@ -204,13 +204,13 @@ License (Document): Creative Commons Attribution-NoDerivs.
 </ul>
 <h2 id="13-disclosure">1.3. Disclosure</h2>
 <p>As of this writing I, Robbert de Groot, am a Principal Software Developer with Hexagon (previously known as (pka) Hexagon Mining, pka MineSight, pka Mintec Inc.), the current owners of MinePlan 3D software (pka MineSight 3D; pka MEDSystem.); Leica Geosystems, the makers of survey equipment and related material; as well as other mine related hardware and software products.</p>
-<p>This format is currently not sanctioned by any software vendor, including Hexagon.  This was something I am doing as an experiment to satisfy my curiosity.  It was brought about by recent efforts being made by Global Mining Guidelines (GMG), with their Open Mining Format (OMF), which seems to have the backing of some big players in the industry.  My issue with OMF, for now, is that they only have a Python library that implements the format available publically.  The format is strictly binary, which is not entirely a bad idea considering the data that needs to be passed around, but binary formats can be very fussy.  The format is also based on a ZIP archive.  The good thing about ZIP is that it will have excellent compression.  The bad thing is that ZIP archives are, in my opinion, not a great file format.</p>
-<p>So, I thought I would try my hand at defining a format that I think would be good as an information format.  I am trying to write MI independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on  since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.</p>
+<p>This format is currently not sanctioned by any software vendor, including Hexagon.  This was something I am doing as an experiment to satisfy my curiosity.  It was brought about by recent efforts being made by Global Mining Guidelines (GMG), with their Open Mining Format (OMF), which seems to have the backing of some big players in the industry.  My issue with OMF, for now, is that they only have a Python library that implements the format available publically.  The format is strictly binary (a Zip file of files.)  The good thing about ZIP is that it will have excellent compression.  The bad thing is that a ZIP archive is, in my opinion, not a great file format.  The files within the zip file are defined somewhere but are...  lacking in a way in my opinion.</p>
+<p>So, I thought I would try my hand at defining a format that I think would be good as an information format.  I am trying to write MI independent of any software package.  However there may be some unintended bias as I am most familiar with MinePlan 3D for which I have worked on since 1995.  I do intend to keep this format as inclusive as possible to address other software  package requirements as best as I understand them.  I know I will make mistakes there because I have only superficial knowledge of most of the competing software in the industry.</p>
 <p>If anyone is interested in educating me on some features they would like to see with respect to their software package of choice I would love to hear from you.  You can reach me at the following email address.</p>
 <p><a href="mailto:zekaric@gmail.com">zekaric@gmail.com</a></p>
 <h1 id="2-mi-format">2. MI Format</h1>
 <p>MI is not restricted to any particular format.  Here I will specify two, MIFF and JSON.  See the MIFF_Mixed_Information_File_Format document for the discussion of the MIFF file format.  Refer to <a href="http://JSON.org">JSON.org</a> for information about JSON.  This document will cover specifics related to using MI but it will not be restricted to any particular underlying format.</p>
-<p>The library connect to this document will read and write to either MIFF or JSON.  XML could be an option but I would not suggest it.</p>
+<p>The library associated with this document will read and write to either MIFF or JSON.  XML could be an option but I would not suggest it.</p>
 <p>The data mining companies need to keep track of and transfer around.</p>
 <pre><code>- General information
   - Project limits
@@ -220,6 +220,7 @@ License (Document): Creative Commons Attribution-NoDerivs.
 - Value Specifications
   - Project items and limits
   - Project item binning
+  - Project images and textures
   - Display properties
 - Geometry
   - 3D

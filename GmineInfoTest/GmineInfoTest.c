@@ -318,6 +318,13 @@ static Gb _BlockWriteItemList(GmineInfo * const gmineInfo)
    returnFalseIf(!gmineInfoItemSetName(          item, "rock type"));
    returnFalseIf(!gmineInfoItemSetKey(           item, "rtype"));
    returnFalseIf(!gmineInfoItemSetType(          item, gmineInfoItemTypeN));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 0));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 1));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 2));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 3));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 4));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 5));
+   returnFalseIf(!gmineInfoItemSetValueAppendN(  item, 999));
    returnFalseIf(!gmineInfoBlockKeyValueArrayAdd(item, "ship",    "It go pew pew!"));
 
    returnFalseIf(!gmineInfoSetItemListAppend(gmineInfo, item));

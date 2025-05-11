@@ -253,6 +253,7 @@ constant:
 #define KEY_BLOCK_ITEM_BIN_COLOR_MODEL_FACE              "color model face"
 #define KEY_BLOCK_ITEM_BIN_COLOR_MODEL_LINE              "color model line"
 #define KEY_BLOCK_ITEM_BIN_COLOR_MODEL_NODE              "color model node"
+#define KEY_BLOCK_ITEM_VALUE_LIST                        "value list"
 
 #define KEY_BLOCK_GEOMETRY_LIST                          "geometry list"
 #define KEY_BLOCK_GEOMETRY                               "geometry"
@@ -286,21 +287,27 @@ Gb                 _MiIoClocWriter(             GmineInfo       * const mineInfo
 
 void               _MiIoDloc(                   GmineInfo       * const mineInfo);
 
-Gb                 _MiIoWriteB(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gb const value);
-Gb                 _MiIoWriteBinBuffer(         GmineInfo       * const gmineInfo, Gcount const count, Gn1 const * const buffer);
-Gb                 _MiIoWriteBinStart(          GmineInfo       * const gmineInfo, Gstr const * const key, size_t const fileSize);
-Gb                 _MiIoWriteBinStop(           GmineInfo       * const gmineInfo);
-Gb                 _MiIoWriteBlockStart(        GmineInfo       * const gmineInfo, Gstr       * const key);
-Gb                 _MiIoWriteBlockStartList(    GmineInfo       * const gmineInfo, Gstr       * const key);
-Gb                 _MiIoWriteBlockStartListItem(GmineInfo       * const gmineInfo, Gstr       * const key);
+Gb                 _MiIoWriteBlockB(            GmineInfo       * const gmineInfo, Gstr const * const key, Gb const value);
+Gb                 _MiIoWriteBlockBinBuffer(    GmineInfo       * const gmineInfo, Gcount const count, Gn1 const * const buffer);
+Gb                 _MiIoWriteBlockBinStart(     GmineInfo       * const gmineInfo, Gstr const * const key, size_t const fileSize);
+Gb                 _MiIoWriteBlockBinStop(      GmineInfo       * const gmineInfo);
+Gb                 _MiIoWriteBlockColor(        GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoColor const * const value);
+Gb                 _MiIoWriteBlockI(            GmineInfo       * const gmineInfo, Gstr const * const key, Gi8 const value);
+Gb                 _MiIoWriteBlockN(            GmineInfo       * const gmineInfo, Gstr const * const key, Gn8 const value);
+Gb                 _MiIoWriteBlockPoint(        GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);
+Gb                 _MiIoWriteBlockR(            GmineInfo       * const gmineInfo, Gstr const * const key, Gr8 const value);
+Gb                 _MiIoWriteBlockStart(        GmineInfo       * const gmineInfo, Gstr const * const key);
+Gb                 _MiIoWriteBlockStartList(    GmineInfo       * const gmineInfo, Gstr const * const key);
+Gb                 _MiIoWriteBlockStartListItem(GmineInfo       * const gmineInfo, Gstr const * const key);
 Gb                 _MiIoWriteBlockStop(         GmineInfo       * const gmineInfo);
 Gb                 _MiIoWriteBlockStopList(     GmineInfo       * const gmineInfo);
-Gb                 _MiIoWriteColor(             GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoColor const * const value);
-Gb                 _MiIoWriteI(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gi8 const value);
-Gb                 _MiIoWriteN(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gn8 const value);
-Gb                 _MiIoWritePoint(             GmineInfo       * const gmineInfo, Gstr const * const key, GmineInfoPoint const * const value);
-Gb                 _MiIoWriteR(                 GmineInfo       * const gmineInfo, Gstr const * const key, Gr8 const value);
-Gb                 _MiIoWriteStr(               GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+Gb                 _MiIoWriteBlockStr(          GmineInfo       * const gmineInfo, Gstr const * const key, Gstr const * const value);
+Gb                 _MiIoWriteListI(             GmineInfo       * const gmineInfo, Gi8 const value);
+Gb                 _MiIoWriteListN(             GmineInfo       * const gmineInfo, Gn8 const value);
+Gb                 _MiIoWriteListR(             GmineInfo       * const gmineInfo, Gr8 const value);
+Gb                 _MiIoWriteListStart(         GmineInfo       * const gmineInfo, Gstr const * const key, Gcount const count);
+Gb                 _MiIoWriteListStop(          GmineInfo       * const gmineInfo);
+Gb                 _MiIoWriteListStr(           GmineInfo       * const gmineInfo, Gstr const * const value);
 
 void              *_MiMemCloc(                  Gcount const memByteCount);
 void               _MiMemDloc(                  void * const mem);

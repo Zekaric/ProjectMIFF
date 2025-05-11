@@ -255,6 +255,10 @@ Gb                       gmineInfoItemSetMinR(                             Gmine
 Gb                       gmineInfoItemSetName(                             GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
 Gb                       gmineInfoItemSetPrecision(                        GmineInfoItem       * const gmineInfoItem, Gr8 const value);
 Gb                       gmineInfoItemSetType(                             GmineInfoItem       * const gmineInfoItem, GmineInfoItemType const value);
+Gb                       gmineInfoItemSetValueAppendI(                     GmineInfoItem       * const gmineInfoItem, Gi8 const value);
+Gb                       gmineInfoItemSetValueAppendN(                     GmineInfoItem       * const gmineInfoItem, Gn8 const value);
+Gb                       gmineInfoItemSetValueAppendR(                     GmineInfoItem       * const gmineInfoItem, Gr8 const value);
+Gb                       gmineInfoItemSetValueAppendStr(                   GmineInfoItem       * const gmineInfoItem, Gstr const * const value);
 
 // GmineInfoProperty
 GmineInfoProperty       *gmineInfoPropertyCloc(                            void);

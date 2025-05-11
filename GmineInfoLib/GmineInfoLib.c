@@ -479,20 +479,20 @@ Gb gmineInfoWriteBlockContentImageList(GmineInfo * const gmineInfo)
             result   = _fseeki64(file, 0, SEEK_SET);
 
             // Start the binary buffer.
-            returnFalseIf(!_MiIoWriteBinStart(gmineInfo, KEY_BLOCK_IMAGE_FILE, fileSize));
+            returnFalseIf(!_MiIoWriteBlockBinStart(gmineInfo, KEY_BLOCK_IMAGE_FILE, fileSize));
 
             // Copy the contents to the MI file.
             loop
             {
                readCount = fread(buffer, 1, bufferSize, file);
                breakIf(!readCount);
-               breakIf(!_MiIoWriteBinBuffer(gmineInfo, (Gcount) readCount, buffer));
+               breakIf(!_MiIoWriteBlockBinBuffer(gmineInfo, (Gcount) readCount, buffer));
 
                // Read everything there is for the file.
                breakIf(readCount != bufferSize);
             }
 
-            breakIf(!_MiIoWriteBinStop(gmineInfo));
+            breakIf(!_MiIoWriteBlockBinStop(gmineInfo));
 
             isWritten = gbTRUE;
          }
@@ -523,9 +523,11 @@ func: gmineInfoWriteBlockContentItemList
 Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
 {
    Gcount             count,
-                      countBin;
+                      countBin,
+                      countValue;
    Gindex             index,
-                      indexBin;
+                      indexBin,
+                      indexValue;
    GmineInfoItem     *item;
    GmineInfoItemBin  *bin;
 
@@ -682,6 +684,49 @@ Gb gmineInfoWriteBlockContentItemList(GmineInfo * const gmineInfo)
          returnFalseIf(!_MiIoWriteBlockStop(gmineInfo));
       }
 
+      countValue = gmineInfoArrayGetCount(&item->valueArray);
+      if (countValue)
+      {
+         Gstr  *valueStr;
+         Gi8   *valueI;
+         Gn8   *valueN;
+         Gr8   *valueR;
+
+         returnFalseIf(!_MiIoWriteListStart(gmineInfo, KEY_BLOCK_ITEM_VALUE_LIST, countValue));
+
+         forCount(indexValue, countValue)
+         {
+            switch (item->type)
+            {
+            case gmineInfoItemTypeDATE:
+            case gmineInfoItemTypeDATETIME:
+            case gmineInfoItemTypeTIME:
+            case gmineInfoItemTypeSTR:
+               valueStr = (Gstr *) gmineInfoArrayGetAt(&item->valueArray, indexValue);
+               returnFalseIf(!_MiIoWriteListStr(gmineInfo, valueStr));
+               break;
+
+            case gmineInfoItemTypeI:
+               valueI = (Gi8 *) gmineInfoArrayGetAt(&item->valueArray, indexValue);
+               returnFalseIf(!_MiIoWriteListI(gmineInfo, *valueI));
+               break;
+
+            case gmineInfoItemTypeN:
+               valueN = (Gn8 *) gmineInfoArrayGetAt(&item->valueArray, indexValue);
+               returnFalseIf(!_MiIoWriteListN(gmineInfo, *valueN));
+               break;
+
+            case gmineInfoItemTypeR:
+            case gmineInfoItemTypePERCENT:
+               valueR = (Gr8 *) gmineInfoArrayGetAt(&item->valueArray, indexValue);
+               returnFalseIf(!_MiIoWriteListR(gmineInfo, *valueR));
+               break;
+            }
+         }
+
+         returnFalseIf(!_MiIoWriteListStop(gmineInfo));
+      }
+
       // Write the user key values.
       returnFalseIf(!_WriteKeyValueList(gmineInfo, &item->keyValueArray));
 
@@ -831,7 +876,7 @@ static Gb _WriteB(GmineInfo * const gmineInfo, char const * const key, Gb const 
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteB(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockB(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -844,7 +889,7 @@ static Gb _WriteColor(GmineInfo * const gmineInfo, char const * const key, Gb co
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteColor(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockColor(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -857,7 +902,7 @@ static Gb _WriteI(GmineInfo * const gmineInfo, char const * const key, Gb const 
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteI(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockI(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -870,7 +915,7 @@ static Gb _WriteItemType(GmineInfo * const gmineInfo, char const * const key, Gb
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteStr(gmineInfo, key, _itemTypeStr[value]));
+      returnFalseIf(!_MiIoWriteBlockStr(gmineInfo, key, _itemTypeStr[value]));
    }
 
    returnTrue;
@@ -890,7 +935,7 @@ static Gb _WriteKeyValueList(GmineInfo * const gmineInfo, GmineInfoArray * const
    forCount(index, count)
    {
       kv = (GmineInfoKeyValue *) gmineInfoArrayGetAt(keyValueArray, index);
-      returnFalseIf(!_MiIoWriteStr(gmineInfo, kv->key, kv->value));
+      returnFalseIf(!_MiIoWriteBlockStr(gmineInfo, kv->key, kv->value));
    }
 
    returnTrue;
@@ -903,7 +948,7 @@ static Gb _WriteN(GmineInfo * const gmineInfo, char const * const key, Gb const 
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteN(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockN(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -1047,7 +1092,7 @@ static Gb _WritePoint(GmineInfo * const gmineInfo, char const * const key, Gb co
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWritePoint(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockPoint(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -1060,7 +1105,7 @@ static Gb _WriteR(GmineInfo * const gmineInfo, char const * const key, Gb const 
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteR(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockR(gmineInfo, key, value));
    }
 
    returnTrue;
@@ -1073,7 +1118,7 @@ static Gb _WriteStr(GmineInfo * const gmineInfo, char const * const key, Gb cons
 {
    if (isSet)
    {
-      returnFalseIf(!_MiIoWriteStr(gmineInfo, key, value));
+      returnFalseIf(!_MiIoWriteBlockStr(gmineInfo, key, value));
    }
 
    returnTrue;

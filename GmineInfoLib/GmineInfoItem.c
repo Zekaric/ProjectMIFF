@@ -827,3 +827,89 @@ Gb gmineInfoItemSetType(GmineInfoItem * const gmineInfoItem, GmineInfoItemType c
 
    returnTrue;
 }
+
+/**************************************************************************************************
+func: gmineInfoItemSetValueAppendI
+**************************************************************************************************/
+Gb gmineInfoItemSetValueAppendI(GmineInfoItem * const gmineInfoItem, Gi8 const value)
+{
+   Gi8 *valueI;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      gmineInfoItem->type != gmineInfoItemTypeI);
+
+   valueI  = _MiMemClocType(Gi8);
+   returnFalseIf(!valueI);
+
+   *valueI = value;
+
+   returnFalseIf(!gmineInfoArrayAddLast(&gmineInfoItem->valueArray, valueI));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoItemSetValueAppendN
+**************************************************************************************************/
+Gb gmineInfoItemSetValueAppendN(GmineInfoItem * const gmineInfoItem, Gn8 const value)
+{
+   Gn8 *valueN;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      gmineInfoItem->type != gmineInfoItemTypeN);
+
+   valueN  = _MiMemClocType(Gn8);
+   returnFalseIf(!valueN);
+
+   *valueN = value;
+
+   returnFalseIf(!gmineInfoArrayAddLast(&gmineInfoItem->valueArray, valueN));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoItemSetValueAppendR
+**************************************************************************************************/
+Gb gmineInfoItemSetValueAppendR(GmineInfoItem * const gmineInfoItem, Gr8 const value)
+{
+   Gr8 *valueR;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      gmineInfoItem->type != gmineInfoItemTypeR);
+
+   valueR  = _MiMemClocType(Gr8);
+   returnFalseIf(!valueR);
+
+   *valueR = value;
+
+   returnFalseIf(!gmineInfoArrayAddLast(&gmineInfoItem->valueArray, valueR));
+
+   returnTrue;
+}
+
+/**************************************************************************************************
+func: gmineInfoItemSetValueAppendStr
+**************************************************************************************************/
+Gb gmineInfoItemSetValueAppendStr(GmineInfoItem * const gmineInfoItem, Gstr const * const value)
+{
+   Gstr *valueStr;
+
+   returnFalseIf(
+      !gmineInfoIsStarted() ||
+      !gmineInfoItem        ||
+      gmineInfoItem->type != gmineInfoItemTypeSTR);
+
+   valueStr  = _MiStrClone(value);
+   returnFalseIf(!valueStr);
+
+   returnFalseIf(!gmineInfoArrayAddLast(&gmineInfoItem->valueArray, valueStr));
+
+   returnTrue;
+}
